@@ -5,7 +5,7 @@
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8390067368864065" crossorigin="anonymous"></script>
     <meta name="robots" content="noindex">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grades & Attendance</title>
+    <title>Arcade Atlas</title>
     <link rel="icon" type="image/x-icon" href="/images/favicon.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
@@ -1091,6 +1091,82 @@
         .tab-content.active {
             display: block;
         }
+
+/* Arcade Atlas refresh */
+:root {
+  --bg-primary:#0b1020;
+  --bg-secondary:#111a2e;
+  --bg-tertiary:#18243b;
+  --accent-pink:#65e6c2;
+  --accent-blue:#69a8ff;
+  --accent-purple:#9a8cff;
+  --text-primary:#f4f7ff;
+  --text-secondary:#aab7ce;
+  --shadow-md:0 12px 32px rgba(0,0,0,.22);
+  --border-radius:16px;
+}
+body {font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;font-size:15px;background:radial-gradient(ellipse at 80% 0%,#182c4c 0%,transparent 42%),var(--bg-primary);}
+#snow {opacity:.12}
+.sidebar {background:rgba(12,19,35,.96);border-right:1px solid rgba(150,180,220,.12);box-shadow:8px 0 28px rgba(0,0,0,.18);border-radius:0;padding-top:24px}
+.sidebar-logo {color:var(--accent-pink);text-shadow:none}
+.sidebar-toggle {background:#1b2942;border:1px solid rgba(255,255,255,.1);border-radius:10px}
+.nav-item {border-radius:12px;width:calc(100% - 14px);margin:3px 7px;padding:12px 10px}
+.nav-item:hover,.nav-item.active {background:rgba(101,230,194,.12)}
+.nav-item.active::before {width:3px;background:var(--accent-pink);border-radius:4px}
+.nav-item:hover .nav-icon,.nav-item.active .nav-icon {color:var(--accent-pink)}
+.nav-text {font-family:inherit;font-size:14px}
+.main-container {min-height:100vh}
+.app-header {background:rgba(11,16,32,.88);backdrop-filter:blur(18px);border-bottom:1px solid rgba(160,185,220,.12);padding:14px 0}
+.header-content {background:transparent;box-shadow:none;border-radius:0;gap:22px;overflow:visible}
+.header-content::before {display:none}
+.logo-container {background:transparent;box-shadow:none;padding:6px 0;gap:12px}
+.logo {font-size:1.55rem;letter-spacing:-.7px;text-transform:none;padding:0;color:#f4f7ff;background:none;-webkit-text-fill-color:initial}
+.logo::after {display:none}
+.time-spent {font-family:inherit;font-size:11px;color:#8292ad;max-width:190px}
+#searchInput {font-family:inherit;background:#111d32;border:1px solid #2a3a56;border-radius:12px;padding:12px 42px 12px 15px;font-size:14px}
+#searchInput:focus {border-color:var(--accent-pink);box-shadow:0 0 0 3px rgba(101,230,194,.12)}
+.search-icon {color:var(--accent-pink)}
+.container {max-width:1320px;padding:0 28px}
+.featured-game {height:300px;margin:28px 0 24px;border:1px solid rgba(160,185,220,.16);border-radius:22px;background:linear-gradient(115deg,#172943,#101a2e 60%);box-shadow:0 20px 55px rgba(0,0,0,.2)}
+.featured-game:hover {border-color:rgba(101,230,194,.5);box-shadow:0 22px 60px rgba(0,0,0,.28);transform:translateY(-3px)}
+.featured-game-info {padding:clamp(24px,4vw,48px)}
+.featured-game-title {font-family:inherit;font-size:clamp(1.7rem,3vw,2.5rem);letter-spacing:-1px;background:none;color:#f5f8ff;-webkit-text-fill-color:initial}
+.featured-game-description {font-family:inherit;font-size:15px;line-height:1.65;color:#b7c4d9}
+.play-button {background:var(--accent-pink);color:#092018;border-radius:11px;font-family:inherit;font-size:14px;font-weight:750;box-shadow:none}
+.play-button:hover {background:#8af0d5;box-shadow:0 10px 24px rgba(101,230,194,.2)}
+.section-title,#favorites-heading {font-family:inherit;font-size:13px;letter-spacing:1.8px;text-shadow:none;color:#dce8fa;background:none;-webkit-text-fill-color:initial;text-align:left;margin:34px 0 16px}
+#favorites-heading {color:#f2d58b}
+.games-grid {grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:16px}
+.game-card {background:linear-gradient(155deg,#192741,#121d31);border:1px solid rgba(160,185,220,.13);border-radius:16px;min-height:170px;padding:16px;box-shadow:0 8px 22px rgba(0,0,0,.14)}
+.game-card:hover {background:#1c2d49;border-color:rgba(101,230,194,.5);transform:translateY(-4px);box-shadow:0 16px 30px rgba(0,0,0,.24)}
+.game-card-image {width:78px;height:78px;border-radius:18px;border:1px solid rgba(255,255,255,.12);box-shadow:none}
+.game-card:hover .game-card-image {border-color:var(--accent-pink);box-shadow:none}
+.game-card-title {font-family:inherit;font-size:14px;background:none;color:#eaf1ff;-webkit-text-fill-color:initial}
+#favorites-container {background:#111c30;border:1px solid rgba(160,185,220,.13);border-radius:16px;box-shadow:none}
+#favorites-container .game-card {min-width:155px}
+footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
+.footer-content {color:#8393ad;font-family:inherit}
+.redesign-banner {display:flex;align-items:center;gap:12px;margin:18px auto 0;padding:14px 18px;max-width:1320px;border:1px solid rgba(101,230,194,.25);border-radius:14px;background:linear-gradient(100deg,rgba(101,230,194,.12),rgba(105,168,255,.09));color:#dcecff;font-size:13px;line-height:1.5}
+.redesign-banner strong {color:#7ce9cb;letter-spacing:.04em}
+.redesign-banner .banner-icon {width:30px;height:30px;flex:0 0 30px;display:grid;place-items:center;border-radius:9px;background:rgba(101,230,194,.15);color:#7ce9cb}
+.redesign-banner .banner-copy {flex:1}
+.redesign-banner button {border:0;background:transparent;color:#aab7ce;font-size:19px;cursor:pointer;padding:3px 7px;border-radius:7px}
+.redesign-banner button:hover {background:rgba(255,255,255,.08);color:white}
+@media(max-width:760px){
+ .header-content{flex-wrap:wrap;gap:10px;padding:0 16px}
+ .logo-container{width:100%;justify-content:space-between}
+ .logo{font-size:1.35rem}
+ .time-spent{max-width:130px;text-align:right}
+ .search-container{max-width:none;width:100%}
+ .container{padding:0 16px}
+ .featured-game{height:auto;min-height:260px}
+ .featured-game-image{width:38%;background-position:center}
+ .featured-game-info{padding:22px}
+ .featured-game-description{font-size:13px;margin-bottom:18px}
+ .games-grid{grid-template-columns:repeat(auto-fill,minmax(135px,1fr));gap:11px}
+ .redesign-banner{margin:14px 16px 0;padding:12px;font-size:12px}
+}
+
     </style>
 </head>
 <body>
@@ -1146,7 +1222,7 @@
         <header class="app-header" id="app-header">
             <div class="header-content">
                 <div class="logo-container">
-                    <h1 class="logo">PROLLS SCHOOL</h1>
+                    <h1 class="logo">Arcade Atlas</h1>
                     <div class="time-spent" id="timeSpent">geeked vs locked in....</div>
                 </div>
                 
@@ -1159,6 +1235,7 @@
             </div>
         </header>
 
+        <div class="redesign-banner" role="status"><div class="banner-icon"><i class="fas fa-sparkles"></i></div><div class="banner-copy"><strong>FRESH LOOK, SAME PLAY.</strong> Arcade Atlas has been redesigned with a cleaner layout, smoother navigation, and refreshed game cards. Your favorite games and features are still here.</div><button type="button" aria-label="Dismiss redesign announcement" onclick="this.parentElement.remove()">×</button></div>
         <div id="home-content" class="content-area active">
             <div class="container">
                 <div class="featured-game">
@@ -1261,7 +1338,7 @@
                         <i class="fab fa-github"></i>
                     </a>
                 </div>
-                <p>© <span id="current-year"></span> Proll Services V5.0. All rights reserved.</p>
+                <p>© <span id="current-year"></span> Arcade Atlas. All rights reserved.</p>
             </div>
         </footer>
     </div>
