@@ -62,5 +62,11 @@
     }
   }
 
-  window.ArcadeScores = { configured, submit, getScores };
+  async function promptAndSubmit(gameTitle, score) {
+    const playerName = window.prompt("New high score! Enter your name for the leaderboard (24 characters max):", "");
+    if (playerName === null || !playerName.trim()) return false;
+    return submit(gameTitle, score, playerName);
+  }
+
+  window.ArcadeScores = { configured, submit, getScores, promptAndSubmit };
 })();
