@@ -1,3 +1,17 @@
+// Google Tag Manager — guarded so pages loading multiple shared scripts
+// still initialize the container only once.
+(function () {
+  if (window.__arcadeAtlasGTM_KHTBG5BX) return;
+  window.__arcadeAtlasGTM_KHTBG5BX = true;
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = window.gtag || function () { window.dataLayer.push(arguments); };
+  window.gtag('js', new Date());
+  var script = document.createElement('script');
+  script.async = true;
+  script.src = 'https://www.googletagmanager.com/gtm.js?id=GTM-KHTBG5BX';
+  (document.head || document.documentElement).appendChild(script);
+})(); 
+
 document.addEventListener('DOMContentLoaded', function () {
     const modal = document.getElementById('faviconModal');
     const openFaviconButton = document.getElementById('openFaviconUI');
