@@ -18,6 +18,7 @@ var flyArea = $("#flyarea").height();
 var score = 0;
 var highscore = 0;
 var arcadeScoreSubmitted = false;
+var arcadeCheatUsed = false;
 
 var pipeheight = 90;
 var pipewidth = 52;
@@ -39,10 +40,15 @@ var loopGameloop;
 var loopPipeloop;
 
 $(document).ready(function() {
-   if(window.location.search == "?debug")
+   if(window.location.search == "?debug") {
       debugmode = true;
-   if(window.location.search == "?easy")
+      arcadeCheatUsed = true;
+   }
+   if(window.location.search == "?easy") {
       pipeheight = 200;
+      arcadeCheatUsed = true;
+   }
+   if(arcadeCheatUsed) window.alert("Cheat/debug mode detected. This run will not qualify for the leaderboard.");
 
    //get the highscore
    var savedscore = getCookie("highscore");
@@ -372,7 +378,11 @@ function showScore()
 {
    if (!arcadeScoreSubmitted) {
       arcadeScoreSubmitted = true;
-      if (window.ArcadeScores) window.ArcadeScores.promptAndSubmit("Flappy Bird", score);
+      if (arcadeCheatUsed) {
+         window.alert("This Flappy Bird run was excluded from the leaderboard because cheat/debug mode was used.");
+      } else if (window.ArcadeScores) {
+         window.ArcadeScores.promptAndSubmit("Flappy Bird", score);
+      }
    }
 
    //unhide us
