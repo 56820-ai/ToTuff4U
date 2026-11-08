@@ -6,7 +6,7 @@
     <meta name="robots" content="noindex">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arcade Atlas</title>
-    <link rel="icon" type="image/x-icon" href="/images/favicon.png">
+    <link rel="icon" type="image/x-icon" href="./images/favicon.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
     
@@ -1186,7 +1186,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
             <div class="nav-icon"><i class="fas fa-home"></i></div>
             <div class="nav-text">Home</div>
         </a>
-<a href="/bookmarks" class="nav-item" target="_blank">
+<a href="./bookmarks" class="nav-item" target="_blank">
     <div class="nav-icon"><i class="fas fa-hat-wizard"></i></div>
     <div class="nav-text">Game Cheats</div>
 </a>
@@ -1298,7 +1298,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
                 </div>
                 <div class="browser-content">
                     <div class="tab-content active" id="tab1-content">
-                        <iframe src="/static" class="browser-frame" id="tab1-frame"></iframe>
+                        <iframe src="./static" class="browser-frame" id="tab1-frame"></iframe>
                     </div>
                 </div>
             </div>
@@ -1306,25 +1306,25 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 
       <div id="settings-content" class="content-area">
     <div class="container iframe-container">
-        <iframe src="/settings" style="width:100%; height:100%; border:none; border-radius:var(--border-radius);"></iframe>
+        <iframe src="./settings" style="width:100%; height:100%; border:none; border-radius:var(--border-radius);"></iframe>
     </div>
 </div>
 
 <div id="leaderboard-content" class="content-area">
     <div class="container iframe-container">
-        <iframe src="/leaderboard" style="width:100%; height:100%; border:none; border-radius:var(--border-radius);"></iframe>
+        <iframe src="./leaderboard" style="width:100%; height:100%; border:none; border-radius:var(--border-radius);"></iframe>
     </div>
 </div>
 
 <div id="ai-content" class="content-area">
     <div class="container iframe-container">
-        <iframe src="/ai" style="width:100%; height:100%; border:none; border-radius:var(--border-radius);"></iframe>
+        <iframe src="./ai" style="width:100%; height:100%; border:none; border-radius:var(--border-radius);"></iframe>
     </div>
 </div>
 
 <div id="partners-content" class="content-area">
     <div class="container iframe-container">
-        <iframe src="/partners" style="width:100%; height:100%; border:none; border-radius:var(--border-radius);"></iframe>
+        <iframe src="./partners" style="width:100%; height:100%; border:none; border-radius:var(--border-radius);"></iframe>
     </div>
 </div>
 
@@ -1625,7 +1625,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
             tabContent.className = 'tab-content';
             tabContent.id = `tab${tabCounter}-content`;
             tabContent.innerHTML = `
-                <iframe src="/static" class="browser-frame" id="tab${tabCounter}-frame"></iframe>
+                <iframe src="./static" class="browser-frame" id="tab${tabCounter}-frame"></iframe>
             `;
             
             tabs.insertBefore(tabElement, newTabButton);
@@ -1727,7 +1727,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
             }
             
             if (url === 'proll://new') {
-                iframe.src = '/static';
+                iframe.src = './static';
                 return;
             }
             
@@ -1763,8 +1763,8 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         });
         
         homeButton.addEventListener('click', function() {
-            addressBar.value = '/static';
-            navigateToUrl('/static');
+            addressBar.value = './static';
+            navigateToUrl('./static');
         });
         
         fullscreenButton.addEventListener('click', function() {
