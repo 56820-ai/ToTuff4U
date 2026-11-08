@@ -21,7 +21,14 @@
       const detail = await response.text();
       throw new Error("Score service returned " + response.status + ": " + detail.slice(0, 180));
     }
-    return response.status === 204 ? null : response.json();
+    if (response.status === 204) return null;
+    const responseText = await response.text();
+    if (!responseText.trim()) return null;
+    try {
+      return JSON.parse(responseText);
+    } catch (error) {
+      throw new Error("Score service returned invalid JSON: " + responseText.slice(0, 180));
+    }
   }
 
   async function submit(gameTitle, score, playerName) {
