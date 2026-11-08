@@ -14,11 +14,12 @@
 (function () {
   "use strict";
   var path = location.pathname.replace(/\/+$/, "").toLowerCase();
-  if (path !== "/g/mc") return;
+  if (path !== "/g/mc" && path !== "/g/retro-bowl") return;
+  var gameTitle = path === "/g/retro-bowl" ? "Retro Bowl Time" : "Minecraft";
   var playerName = "";
   try { playerName = (localStorage.getItem("arcadeLeaderboardPlayerName") || "").trim(); } catch (e) {}
   if (!playerName) {
-    playerName = (window.prompt("Choose a name for the Minecraft playtime leaderboard (24 characters max):", "") || "").trim().slice(0, 24);
+    playerName = (window.prompt("Choose a name for the playtime leaderboard (24 characters max):", "") || "").trim().slice(0, 24);
     if (playerName) try { localStorage.setItem("arcadeLeaderboardPlayerName", playerName); } catch (e) {}
   }
   if (!playerName || !window.ArcadeScores) return;
@@ -27,7 +28,7 @@
     if (submitted) return;
     submitted = true;
     var seconds = Math.max(0, Math.floor((Date.now() - startedAt) / 1000));
-    if (seconds >= 5) window.ArcadeScores.submitSession("Minecraft", seconds, playerName);
+    if (seconds >= 5) window.ArcadeScores.submitSession(gameTitle, seconds, playerName);
   }
   window.addEventListener("pagehide", submitPlaytime);
   window.addEventListener("beforeunload", submitPlaytime);
