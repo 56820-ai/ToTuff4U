@@ -405,6 +405,14 @@
   <script>
     const scoreList = document.getElementById("score-list");
 
+    function getGameLogo(gameTitle) {
+      const game = String(gameTitle || "").trim().toLowerCase();
+      const logos = {
+        "2048": "../g/2048/meta/og_image.png"
+      };
+      return logos[game] || "../images/favicon.png";
+    }
+
     function createLeaderboardItem(data) {
       const listItem = document.createElement("li");
       listItem.classList.add("leaderboard-item");
@@ -412,7 +420,7 @@
       const avatar = document.createElement("div");
       avatar.className = "user-icon";
       const image = document.createElement("img");
-      image.src = data.userIcon || "../images/favicon.png";
+      image.src = data.gameLogo || data.userIcon || "../images/favicon.png";
       image.alt = data.username || "Player";
       avatar.appendChild(image);
 
@@ -461,7 +469,8 @@
           gameTitle: item.game_title,
           score: Number(item.score).toLocaleString(),
           date: new Date(item.created_at).toLocaleDateString(),
-          userIcon: "../images/favicon.png"
+          userIcon: "../images/favicon.png",
+          gameLogo: getGameLogo(item.game_title)
         }));
     }
     renderLeaderboard();
