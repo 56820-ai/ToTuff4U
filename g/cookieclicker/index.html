@@ -203,20 +203,68 @@ var App=typeof App==='undefined'?0:App;
 <script src="../../js/arcade-scores.js"></script>
 <script>
 (function () {
+  "use strict";
+  var GAME = "Cookie Clicker";
+  var NAME_KEY = "arcadeLeaderboardPlayerName";
+  var RUN_KEY = "arcadeCookieClickerBestRun";
+  var checkTimer;
+
+  function savedName() {
+    try { return (localStorage.getItem(NAME_KEY) || "").trim().slice(0, 24); } catch (e) { return ""; }
+  }
+  function askName() {
+    var existing = savedName();
+    var name = window.prompt("New Cookie Clicker high score! Enter your leaderboard name (24 characters max):", existing);
+    if (name === null || !name.trim()) return "";
+    name = name.trim().slice(0, 24);
+    try { localStorage.setItem(NAME_KEY, name); } catch (e) {}
+    return name;
+  }
+  function scoreNow() {
+    var value = window.Game && Number(window.Game.cookiesEarned);
+    return Number.isFinite(value) && value >= 0 ? Math.floor(value) : null;
+  }
+  async function checkHighScore() {
+    if (!window.ArcadeScores || !window.ArcadeScores.configured) return;
+    var score = scoreNow();
+    if (score === null) return;
+    var previousRun = 0;
+    try { previousRun = Number(localStorage.getItem(RUN_KEY)) || 0; } catch (e) {}
+    if (score > previousRun) {
+      try { localStorage.setItem(RUN_KEY, String(score)); } catch (e) {}
+    }
+    if (score <= previousRun) return;
+    var scores = await window.ArcadeScores.getScores();
+    var top = scores.filter(function (row) { return String(row.game_title).toLowerCase() === GAME.toLowerCase(); })
+      .reduce(function (best, row) { return Math.max(best, Number(row.score) || 0); }, 0);
+    if (score <= top) return;
+    var name = savedName() || askName();
+    if (!name) return;
+    var submitted = await window.ArcadeScores.submit(GAME, score, name);
+    if (submitted) {
+      try { localStorage.setItem(RUN_KEY, String(score)); } catch (e) {}
+    }
+  }
   function addScoreButton() {
-    if (!window.ArcadeScores || document.getElementById("arcadeCookieScore")) return;
+    if (document.getElementById("arcadeCookieScore")) return;
     var button = document.createElement("button");
     button.id = "arcadeCookieScore";
     button.textContent = "Submit Cookie Clicker score";
     button.style.cssText = "position:fixed;z-index:99999;right:12px;top:12px;padding:10px 14px;border:2px solid #8b5a2b;border-radius:8px;background:#fff3cf;color:#422b12;font-weight:bold;cursor:pointer;";
     button.addEventListener("click", function () {
-      var score = window.Game && Number(window.Game.cookiesEarned);
-      if (!Number.isFinite(score) || score < 0) { alert("Your Cookie Clicker score is not ready yet."); return; }
-      window.ArcadeScores.promptAndSubmit("Cookie Clicker", Math.floor(score));
+      var score = scoreNow();
+      if (score === null) { alert("Your Cookie Clicker score is not ready yet."); return; }
+      var name = savedName() || askName();
+      if (name) window.ArcadeScores.submit(GAME, score, name);
     });
     document.body.appendChild(button);
   }
-  window.addEventListener("load", addScoreButton);
+  window.addEventListener("load", function () {
+    addScoreButton();
+    checkTimer = setInterval(checkHighScore, 5000);
+    setTimeout(checkHighScore, 1500);
+  });
+  window.addEventListener("beforeunload", function () { if (checkTimer) clearInterval(checkTimer); });
   var attempts = 0;
   var readyCheck = setInterval(function () { addScoreButton(); if (++attempts > 40) clearInterval(readyCheck); }, 500);
 })();
