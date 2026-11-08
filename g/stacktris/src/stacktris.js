@@ -436,8 +436,8 @@ Stacktris.prototype.stepPhysics = function() {
 	var lastPiece = this.objects && this.objects.length > 0 ? this.objects[this.objects.length - 1] : null;
 	var pieceSettled = !this.newPiece && lastPiece && lastPiece.b && lastPiece.b[0] &&
 		lastPiece.b[0].GetPosition().y > (0.1 + this.restitution) &&
-		lastPiece.b[0].GetLinearVelocity().y <= (4.0 + this.restitution * 10) &&
-		lastPiece.b[0].GetLinearVelocity().x <= 0.1 + this.restitution * 10;
+		Math.abs(lastPiece.b[0].GetLinearVelocity().y) <= (4.0 + this.restitution * 10) &&
+		Math.abs(lastPiece.b[0].GetLinearVelocity().x) <= 0.1 + this.restitution * 10;
 
 	if (this.newPiece || pieceSettled) {
 		this.newPiece = false;
