@@ -53,7 +53,6 @@ GameManager.prototype.isGameTerminated = function () {
 // Set up the game
 GameManager.prototype.setup = function () {
   this.score = 0;
-  this._arcadeScoreSubmitted = false;
   this.birdpos = 0.5;
   this.birdspd = 0;
   this.ab = 1;
@@ -171,10 +170,6 @@ GameManager.prototype.move = function (direction) {
     }
 
     this.actuate();
-    if (this.over && !this._arcadeScoreSubmitted) {
-      this._arcadeScoreSubmitted = true;
-      if (window.ArcadeScores) window.ArcadeScores.promptAndSubmit("Flappy 2048", this.score);
-    }
   }
 };
 
