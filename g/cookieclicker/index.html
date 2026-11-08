@@ -199,5 +199,29 @@ var App=typeof App==='undefined'?0:App;
 
 </div>
 
+
+<script src="../../js/arcade-score-config.js"></script>
+<script src="../../js/arcade-scores.js"></script>
+<script>
+(function () {
+  function addScoreButton() {
+    if (!window.ArcadeScores || document.getElementById("arcadeCookieScore")) return;
+    var button = document.createElement("button");
+    button.id = "arcadeCookieScore";
+    button.textContent = "Submit Cookie Clicker score";
+    button.style.cssText = "position:fixed;z-index:99999;right:12px;top:12px;padding:10px 14px;border:2px solid #8b5a2b;border-radius:8px;background:#fff3cf;color:#422b12;font-weight:bold;cursor:pointer;";
+    button.addEventListener("click", function () {
+      var score = window.Game && Number(window.Game.cookiesEarned);
+      if (!Number.isFinite(score) || score < 0) { alert("Your Cookie Clicker score is not ready yet."); return; }
+      window.ArcadeScores.promptAndSubmit("Cookie Clicker", Math.floor(score));
+    });
+    document.body.appendChild(button);
+  }
+  window.addEventListener("load", addScoreButton);
+  var attempts = 0;
+  var readyCheck = setInterval(function () { addScoreButton(); if (++attempts > 40) clearInterval(readyCheck); }, 500);
+})();
+</script>
+
 </body>
 </html>
