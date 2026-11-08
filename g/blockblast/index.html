@@ -225,10 +225,12 @@
                 if (screenKey === lastSubmittedScreen || score <= submittedBest) return;
                 if (screenKey === lastScreen || !lastScreen) {
                   lastScreen = screenKey;
-                  submittedBest = score;
-                  lastSubmittedScreen = screenKey;
-                  try { localStorage.setItem("arcadeBlockBlastSubmittedBest", String(score)); } catch (e) {}
-                  await window.ArcadeScores.promptAndSubmit("Block Blast", score);
+                  var submitted = await window.ArcadeScores.promptAndSubmit("Block Blast", score);
+                  if (submitted) {
+                    submittedBest = score;
+                    lastSubmittedScreen = screenKey;
+                    try { localStorage.setItem("arcadeBlockBlastSubmittedBest", String(score)); } catch (e) {}
+                  }
                 } else {
                   lastScreen = screenKey;
                 }
