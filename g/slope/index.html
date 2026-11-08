@@ -38,16 +38,16 @@
                 return workerPromise;
             }
             function normalized(s) {
-                return String(s || "").toLowerCase().replace(/[^a-z0-9\\s:]/g, " ").replace(/\\s+/g, " ").trim();
+                return String(s || "").toLowerCase().replace(/[^a-z0-9\s:]/g, " ").replace(/\s+/g, " ").trim();
             }
             function isGameOver(s) {
-                return /game\\s*over|try\\s*again|play\\s*again|you\\s*crashed|crashed|best\\s*score/.test(normalized(s));
+                return /game\s*over|try\s*again|play\s*again|you\s*crashed|crashed|best\s*score/.test(normalized(s));
             }
             function extractScore(s) {
                 var clean = String(s || "").replace(/,/g, "");
-                var m = clean.match(/(?:score|distance|points?)\\s*[:\\-]?\\s*([0-9]{1,9})/i);
+                var m = clean.match(/(?:score|distance|points?)\s*[:\-]?\s*([0-9]{1,9})/i);
                 if (m) return Math.max(0, Number(m[1]) || 0);
-                var nums = clean.match(/\\b[0-9]{1,9}\\b/g) || [];
+                var nums = clean.match(/\b[0-9]{1,9}\b/g) || [];
                 return nums.length ? Math.max(0, Number(nums[nums.length - 1]) || 0) : 0;
             }
             async function readCanvas(canvas) {
