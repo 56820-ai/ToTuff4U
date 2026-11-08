@@ -146,9 +146,131 @@
         }).then((unityInstance) => {
           loadingBar.style.display = "none";
 
-          // Leaderboard score capture is intentionally not guessed here.
-          // This Unity build keeps its score inside the compiled game; it needs
-          // a verified in-game score bridge before automatic submissions are enabled.
+          // Read only explicitly score-labelled values from Unity's persisted
+          // PlayerPrefs/IDBFS data. Never submit arbitrary numeric game data.
+          (function connectBlockBlastLeaderboard() {
+            if (!window.ArcadeScores || !window.ArcadeScores.configured) return;
+            var storageKey = "arcadeBlockBlastSubmittedBest";
+            var submittedBest = Number(sessionStorage.getItem(storageKey) || 0);
+            var busy = false;
+
+            function extractNamedScores(value, out, depth) {
+              if (depth > 7 || value == null) return;
+              if (typeof value === "string") {
+                var text = value;
+                try {
+                  var parsed = JSON.parse(text);
+                  if (parsed && typeof parsed === "object") {
+                    extractNamedScores(parsed, out, depth + 1);
+                    return;
+                  }
+                } catch (e) {}
+                var re = /(?:score|best(?:score)?|high[_ -]?score|record)[^0-9]{0,24}(\d{1,9})/ig;
+                var match;
+                while ((match = re.exec(text))) out.push(Number(match[1]));
+                return;
+              }
+              if (typeof value === "number") return;
+              if (value instanceof ArrayBuffer) {
+                extractNamedScores(new TextDecoder().decode(new Uint8Array(value)), out, depth + 1);
+                return;
+              }
+              if (ArrayBuffer.isView(value)) {
+                try { extractNamedScores(new TextDecoder().decode(value), out, depth + 1); } catch (e) {}
+                return;
+              }
+              if (Array.isArray(value)) {
+                // IDBFS file contents are byte arrays; decode them as text.
+                if (value.length && value.length < 200000 && value.every(function (n) { return Number.isInteger(n) && n >= 0 && n <= 255; })) {
+                  try { extractNamedScores(new TextDecoder().decode(new Uint8Array(value)), out, depth + 1); } catch (e) {}
+                } else {
+                  value.forEach(function (item) { extractNamedScores(item, out, depth + 1); });
+                }
+                return;
+              }
+              if (typeof value === "object") {
+                Object.keys(value).forEach(function (key) {
+                  if (/score|best|record|high/i.test(key)) {
+                    var item = value[key];
+                    if (typeof item === "number" || (typeof item === "string" && /^\d{1,9}$/.test(item.trim()))) {
+                      out.push(Number(item));
+                    } else {
+                      extractNamedScores(item, out, depth + 1);
+                    }
+                  } else if (/contents|playerprefs|score|best|record|high/i.test(key)) {
+                    extractNamedScores(value[key], out, depth + 1);
+                  }
+                });
+              }
+            }
+
+            function submitCandidates(candidates) {
+              var best = candidates.filter(function (n) {
+                return Number.isSafeInteger(n) && n >= 1 && n <= 100000000;
+              }).reduce(function (a, b) { return Math.max(a, b); }, 0);
+              if (best <= submittedBest) return;
+              submittedBest = best;
+              try { sessionStorage.setItem(storageKey, String(best)); } catch (e) {}
+              window.ArcadeScores.promptAndSubmit("Block Blast", best);
+            }
+
+            function scanLocalStorage() {
+              var values = [];
+              try {
+                for (var i = 0; i < localStorage.length; i++) {
+                  var key = localStorage.key(i);
+                  if (key && /score|best|record|high/i.test(key)) {
+                    extractNamedScores(localStorage.getItem(key), values, 0);
+                  }
+                }
+              } catch (e) {}
+              submitCandidates(values);
+            }
+
+            function scanUnityDatabases() {
+              if (!window.indexedDB || !indexedDB.databases) return;
+              indexedDB.databases().then(function (databases) {
+                databases.forEach(function (info) {
+                  if (!info.name) return;
+                  var request;
+                  try { request = indexedDB.open(info.name); } catch (e) { return; }
+                  request.onsuccess = function () {
+                    var db = request.result;
+                    Array.from(db.objectStoreNames).forEach(function (storeName) {
+                      var tx, cursor;
+                      try {
+                        tx = db.transaction(storeName, "readonly");
+                        cursor = tx.objectStore(storeName).openCursor();
+                      } catch (e) { return; }
+                      cursor.onsuccess = function () {
+                        var item = cursor.result;
+                        if (!item) return;
+                        var keyText = String(item.key || "");
+                        var candidates = [];
+                        // IDBFS stores files under paths such as /idbfs/.../PlayerPrefs.
+                        if (/playerprefs|score|best|record|high/i.test(keyText) ||
+                            /file_data|filesystem|unity/i.test(storeName + " " + info.name)) {
+                          extractNamedScores(keyText, candidates, 0);
+                          extractNamedScores(item.value, candidates, 0);
+                        }
+                        submitCandidates(candidates);
+                        item.continue();
+                      };
+                    });
+                    db.close();
+                  };
+                });
+              }).catch(function () {});
+            }
+
+            scanLocalStorage();
+            scanUnityDatabases();
+            window.setInterval(function () {
+              scanLocalStorage();
+              scanUnityDatabases();
+            }, 3000);
+            window.addEventListener("storage", scanLocalStorage);
+          })();
         }).catch((message) => {
           alert(message);
         });
