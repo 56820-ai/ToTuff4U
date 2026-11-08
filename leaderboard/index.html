@@ -403,68 +403,6 @@
   <script src="/js/arcade-score-config.js"></script>
   <script src="/js/arcade-scores.js"></script>
   <script>
-    const leaderboardData = [
-      {
-        playerName: "Hayden", 
-        gameTitle: "Most Hours On Site", 
-        username: "Hayden", 
-        score: "18+ Days", 
-        date: "11/21/2024", 
-        userIcon: "/images/clock1.png",
-        proofLink: "/proof/timerecord.png"
-      },
-      {
-        playerName: "Alex", 
-        gameTitle: "Gunspin", 
-        username: "Alex", 
-        score: "29321", 
-        date: "12/10/2024", 
-        userIcon: "/images/gunspin.png",
-        proofLink: "/proof/gunspinproof.png"
-      },
-      {
-        playerName: "Luke", 
-        gameTitle: "Block Blast", 
-        username: "Luke", 
-        score: "10008", 
-        date: "11/21/2024", 
-        userIcon: "/images/blockblast.png",
-      },
-
-      {
-        playerName: "AJ", 
-        gameTitle: "Crossy Road", 
-        username: "AJ", 
-        score: "242", 
-        date: "12/10/2024", 
-        userIcon: "/images/crossyroad.png",
-      },
-      {
-        playerName: "MONK", 
-        gameTitle: "Subway Surfers", 
-        username: "MONK", 
-        score: "25468", 
-        date: "12/09/2024", 
-        userIcon: "https://img.poki.com/cdn-cgi/image/quality=78,width=314,height=314,fit=cover,f=auto/81a0a3f18cf0ee129e56edb50fc52c3b.png",
-      },
-{
-        playerName: "Gavin", 
-        gameTitle: "Tetris", 
-        username: "Gavin", 
-        score: "11300", 
-        date: "11/26/2024", 
-        userIcon: "/images/tetris.png",
-      },
-{
-        playerName: "Lincoln", 
-        gameTitle: "Jetpack Joyride", 
-        username: "Lincoln", 
-        score: "22579", 
-        date: "12/10/2024", 
-        userIcon: "/images/jetpackjoyride.png",
-      }
-    ];
-
     const scoreList = document.getElementById("score-list");
 
     function createLeaderboardItem(data) {
@@ -500,6 +438,13 @@
 
     async function renderLeaderboard() {
       const onlineScores = window.ArcadeScores ? await window.ArcadeScores.getScores() : [];
+      if (!onlineScores.length) {
+        const empty = document.createElement("li");
+        empty.className = "leaderboard-empty";
+        empty.textContent = "No real scores have been recorded yet. Play a supported game to add the first score!";
+        scoreList.appendChild(empty);
+        return;
+      }
       onlineScores.forEach(item => createLeaderboardItem({
         username: item.player_name,
         gameTitle: item.game_title,
@@ -507,7 +452,6 @@
         date: new Date(item.created_at).toLocaleDateString(),
         userIcon: "/images/favicon.png"
       }));
-      leaderboardData.forEach(item => createLeaderboardItem(item));
     }
     renderLeaderboard();
   </script>
