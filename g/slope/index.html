@@ -14,22 +14,107 @@
     <script src="TemplateData/UnityProgress.js"></script>
     <script src="TemplateData/unityloader41.js"></script>
     <script>
-        // Keep the Unity WebGL drawing buffer readable so the leaderboard can
-        // inspect the actual end-of-run screen instead of guessing from storage.
+        // Preserve the Unity canvas frame so it can be read for score detection.
         (function () {
             var originalGetContext = HTMLCanvasElement.prototype.getContext;
             HTMLCanvasElement.prototype.getContext = function (type, attributes) {
-                var isWebGL = /webgl/i.test(String(type));
-                var inSlopeGame = this.parentElement && (this.parentElement.id === "gameContainer" || this.parentElement.closest("#gameContainer"));
-                if (isWebGL && inSlopeGame) {
+                if (/webgl/i.test(String(type)) && this.closest && this.closest("#gameContainer")) {
                     attributes = Object.assign({}, attributes || {}, { preserveDrawingBuffer: true });
                 }
                 return originalGetContext.call(this, type, attributes);
             };
         })();
 
-        var gameInstance = UnityLoader.instantiate("gameContainer", "Build/slope.json", { onProgress: UnityProgress, Module: { onRuntimeInitialized: function() { UnityProgress(gameInstance, "complete") } } });
-    </script>
+        var gameInstance = UnityLoader.instantiate("gameContainer", "Build/slope.json", {
+            onProgress: UnityProgress,
+            Module: { onRuntimeInitialized: function () { UnityProgress(gameInstance, "complete"); } }
+        });
+
+        (function connectSlopeCanvasOCR() {
+            if (!window.ArcadeScores || !window.ArcadeScores.configured) return;
+            var workerPromise = null;
+            var scanning = false;
+            var previousGameOverText = "";
+            var submittedBest = 0;
+            try { submittedBest = Number(localStorage.getItem("arcadeSlopeSubmittedBest") || 0); } catch (e) {}
+
+            function getWorker() {
+                if (!workerPromise) workerPromise = window.Tesseract.createWorker("eng");
+                return workerPromise;
+            }
+            function normalize(value) {
+                return String(value || "").toLowerCase().replace(/[^a-z0-9\s:]/g, " ").replace(/\s+/g, " ").trim();
+            }
+            function readScore(value) {
+                var text = String(value || "").replace(/,/g, "");
+                var patterns = [
+                    /(?:your\s+)?score\s*[:\-]?\s*([0-9]{1,9})/i,
+                    /distance\s*[:\-]?\s*([0-9]{1,9})/i,
+                    /([0-9]{1,9})\s*(?:m|meters|metres|points|pts)\b/i
+                ];
+                for (var i = 0; i < patterns.length; i++) {
+                    var match = text.match(patterns[i]);
+                    if (match) {
+                        var score = Number(match[1]);
+                        if (Number.isSafeInteger(score) && score > 0 && score <= 100000000) return score;
+                    }
+                }
+                // Slope's end screen may show a large number without a label.
+                var numbers = text.match(/\b[0-9]{2,9}\b/g) || [];
+                for (var j = numbers.length - 1; j >= 0; j--) {
+                    var candidate = Number(numbers[j]);
+                    if (Number.isSafeInteger(candidate) && candidate > 0 && candidate <= 100000000) return candidate;
+                }
+                return 0;
+            }
+            function isGameOver(value) {
+                var text = normalize(value);
+                return /game\s*over|try\s*again|play\s*again|you\s*crashed|crashed|restart|best\s*score/.test(text);
+            }
+            async function scan() {
+                var gameCanvas = document.querySelector("#gameContainer canvas");
+                if (scanning || !gameCanvas || !gameCanvas.width || !gameCanvas.height || !window.Tesseract) return;
+                scanning = true;
+                try {
+                    var image = document.createElement("canvas");
+                    var scale = Math.min(1, 1400 / Math.max(gameCanvas.width, gameCanvas.height));
+                    image.width = Math.max(1, Math.round(gameCanvas.width * scale));
+                    image.height = Math.max(1, Math.round(gameCanvas.height * scale));
+                    image.getContext("2d").drawImage(gameCanvas, 0, 0, image.width, image.height);
+                    var result = await (await getWorker()).recognize(image);
+                    var text = result && result.data ? result.data.text : "";
+                    if (!isGameOver(text)) {
+                        previousGameOverText = "";
+                        return;
+                    }
+                    var score = readScore(text);
+                    if (!score || score <= submittedBest) return;
+                    var signature = normalize(text) + "|" + score;
+                    if (signature === previousGameOverText) {
+                        var ok = await window.ArcadeScores.promptAndSubmit("Slope", score);
+                        if (ok) {
+                            submittedBest = score;
+                            try { localStorage.setItem("arcadeSlopeSubmittedBest", String(score)); } catch (e) {}
+                            previousGameOverText = "submitted|" + signature;
+                        }
+                    } else if (previousGameOverText !== "submitted|" + signature) {
+                        previousGameOverText = signature;
+                    }
+                } catch (error) {
+                    console.warn("Slope leaderboard OCR error:", error);
+                } finally {
+                    scanning = false;
+                }
+            }
+
+            var ocrScript = document.createElement("script");
+            ocrScript.src = "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
+            ocrScript.async = true;
+            ocrScript.onload = function () { window.setInterval(scan, 1800); };
+            ocrScript.onerror = function () { console.warn("Slope OCR library could not be loaded."); };
+            document.head.appendChild(ocrScript);
+        })();
+    </script>ipt>
 <script src="/js/arcade-score-config.js"></script>
 <script src="/js/arcade-scores.js"></script>
 <script src="/js/arcade-manual-score.js"></script>
