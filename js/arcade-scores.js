@@ -47,6 +47,7 @@
       return true;
     } catch (error) {
       console.warn("Arcade Atlas: high score was not submitted.", error.message);
+      window.alert("Your score could not be added to the leaderboard.\n\nReason: " + error.message);
       return false;
     }
   }
