@@ -63,7 +63,7 @@
     seconds = Number(seconds);
     if (!playerName || !Number.isSafeInteger(seconds) || seconds < 5 || !gameTitle || !configured) return false;
     try {
-      const response = await fetch(config.supabaseUrl.replace(/\\/$/, "") + "/rest/v1/scores", {
+      const response = await fetch(config.supabaseUrl.replace(/\/$/, "") + "/rest/v1/scores", {
         method: "POST",
         keepalive: true,
         headers: {
