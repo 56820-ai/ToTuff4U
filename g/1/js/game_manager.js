@@ -39,6 +39,7 @@ function GameManager(size, InputManager, Actuator, ScoreManager) {
   
     this.score       = 0;
     this.over        = false;
+    this._arcadeScoreSubmitted = false;
     this.won         = false;
     this.keepPlaying = false;
   
@@ -160,6 +161,10 @@ function GameManager(size, InputManager, Actuator, ScoreManager) {
       }
   
       this.actuate();
+      if (this.over && !this._arcadeScoreSubmitted) {
+        this._arcadeScoreSubmitted = true;
+        if (window.ArcadeScores) window.ArcadeScores.promptAndSubmit("Divide 1", this.score);
+      }
     }
   };
   
