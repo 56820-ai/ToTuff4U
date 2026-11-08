@@ -230,9 +230,6 @@ var App=typeof App==='undefined'?0:App;
     if (score === null) return;
     var previousRun = 0;
     try { previousRun = Number(localStorage.getItem(RUN_KEY)) || 0; } catch (e) {}
-    if (score > previousRun) {
-      try { localStorage.setItem(RUN_KEY, String(score)); } catch (e) {}
-    }
     if (score <= previousRun) return;
     var scores = await window.ArcadeScores.getScores();
     var top = scores.filter(function (row) { return String(row.game_title).toLowerCase() === GAME.toLowerCase(); })
