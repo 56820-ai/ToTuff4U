@@ -104,11 +104,23 @@
     }
   }
 
+  function getPlayerName(promptText) {
+    const key = "arcadeLeaderboardPlayerName";
+    let saved = "";
+    try { saved = (localStorage.getItem(key) || "").trim().slice(0, 24); } catch (error) {}
+    if (saved) return saved;
+    const entered = window.prompt(promptText || "Enter your name for the leaderboard (24 characters max):", "");
+    if (entered === null || !entered.trim()) return "";
+    saved = entered.trim().slice(0, 24);
+    try { localStorage.setItem(key, saved); } catch (error) {}
+    return saved;
+  }
+
   async function promptAndSubmit(gameTitle, score) {
-    const playerName = window.prompt("New high score! Enter your name for the leaderboard (24 characters max):", "");
-    if (playerName === null || !playerName.trim()) return false;
+    const playerName = getPlayerName("Enter your name for the leaderboard (24 characters max):");
+    if (!playerName) return false;
     return submit(gameTitle, score, playerName);
   }
 
-  window.ArcadeScores = { configured, submit, submitSession, getScores, promptAndSubmit };
+  window.ArcadeScores = { configured, submit, submitSession, getScores, getPlayerName, promptAndSubmit };
 })();
