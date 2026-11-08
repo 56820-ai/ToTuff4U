@@ -400,8 +400,8 @@
     </div>
   </div>
 
-  <script src="../js/arcade-score-config.js"></script>
-  <script src="../js/arcade-scores.js"></script>
+  <script src="../js/arcade-score-config.js?v=345d3bd"></script>
+  <script src="../js/arcade-scores.js?v=345d3bd"></script>
   <script>
     const scoreList = document.getElementById("score-list");
 
@@ -445,13 +445,24 @@
         scoreList.appendChild(empty);
         return;
       }
-      onlineScores.forEach(item => createLeaderboardItem({
-        username: item.player_name,
-        gameTitle: item.game_title,
-        score: Number(item.score).toLocaleString(),
-        date: new Date(item.created_at).toLocaleDateString(),
-        userIcon: "../images/favicon.png"
-      }));
+      // Keep only the highest recorded score for each game.
+      const bestByGame = new Map();
+      onlineScores.forEach(item => {
+        const key = String(item.game_title || "Game").trim().toLowerCase();
+        const previous = bestByGame.get(key);
+        if (!previous || Number(item.score) > Number(previous.score)) {
+          bestByGame.set(key, item);
+        }
+      });
+      [...bestByGame.values()]
+        .sort((a, b) => String(a.game_title).localeCompare(String(b.game_title)))
+        .forEach(item => createLeaderboardItem({
+          username: item.player_name,
+          gameTitle: item.game_title,
+          score: Number(item.score).toLocaleString(),
+          date: new Date(item.created_at).toLocaleDateString(),
+          userIcon: "../images/favicon.png"
+        }));
     }
     renderLeaderboard();
   </script>
