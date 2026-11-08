@@ -34,8 +34,10 @@
 
 				function getPlayerName() {
 					if (playerName) return playerName;
-					if (window.ArcadeScores && window.ArcadeScores.getPlayerName) playerName = window.ArcadeScores.getPlayerName("Enter your name for the leaderboard (24 characters max):");
-					if (!playerName && !namePromptOpen) { namePromptOpen = true; playerName = window.ArcadeScores && window.ArcadeScores.getPlayerName ? window.ArcadeScores.getPlayerName() : ""; namePromptOpen = false; }
+					if (namePromptOpen || !window.ArcadeScores || !window.ArcadeScores.getPlayerName) return "";
+					namePromptOpen = true;
+					playerName = window.ArcadeScores.getPlayerName("Enter your name for the leaderboard (24 characters max):");
+					namePromptOpen = false;
 					return playerName;
 				}
 
