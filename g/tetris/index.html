@@ -29,10 +29,20 @@
 
 
 </body>
+<script src="/js/arcade-score-config.js"></script>
+<script src="/js/arcade-scores.js"></script>
 <script src="dist/tetris.js"></script>
 <script>
 	(function(){
 		var tetris = new Tetris('tetris');
+		var originalUpdate = tetris._update;
+		tetris._update = function () {
+			originalUpdate.apply(this, arguments);
+			if (this.isGameOver && !this._arcadeScoreSubmitted) {
+				this._arcadeScoreSubmitted = true;
+				if (window.ArcadeScores) window.ArcadeScores.promptAndSubmit('Tetris', this.score);
+			}
+		};
 		tetris.start();
 	})();
 </script>
