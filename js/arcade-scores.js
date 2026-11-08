@@ -7,15 +7,6 @@
     config.supabaseAnonKey.length > 20 &&
     !config.supabaseAnonKey.includes("YOUR_");
 
-  function getCurrentPlayer() {
-    try {
-      const user = JSON.parse(localStorage.getItem("currentUser") || "null");
-      return user && typeof user.username === "string" ? user.username.trim().slice(0, 24) : "";
-    } catch (_) {
-      return "";
-    }
-  }
-
   async function request(path, options) {
     if (!configured) throw new Error("The shared score database has not been configured yet.");
     const response = await fetch(config.supabaseUrl.replace(/\/$/, "") + "/rest/v1/" + path, {
@@ -34,11 +25,11 @@
     return response.status === 204 ? null : response.json();
   }
 
-  async function submit(gameTitle, score) {
-    const playerName = getCurrentPlayer();
+  async function submit(gameTitle, score, playerName) {
+    playerName = typeof playerName === "string" ? playerName.trim().slice(0, 24) : "";
     const numericScore = Number(score);
     if (!playerName) {
-      console.info("Arcade Atlas: sign in before submitting a high score.");
+      console.info("Arcade Atlas: a player name is required to submit a high score.");
       return false;
     }
     if (!Number.isSafeInteger(numericScore) || numericScore < 0 || !gameTitle) return false;
