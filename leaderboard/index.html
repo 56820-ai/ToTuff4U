@@ -408,7 +408,18 @@
     function getGameLogo(gameTitle) {
       const game = String(gameTitle || "").trim().toLowerCase();
       const logos = {
-        "2048": "../g/2048/meta/og_image.png"
+        "slope": "../images/slope.png",
+        "retro bowl": "../images/retrobowl.jpg",
+        "gunspin": "../images/gunspin.png",
+        "block blast": "../images/blockblast.png",
+        "drift boss": "../images/driftboss.png",
+        "snow rider 3d": "../images/snowrider3d.png",
+        "stacktris": "../images/stacktris.jpg",
+        "minecraft": "../images/mc.png",
+        "2048": "../images/2048.png",
+        "cookie clicker": "../g/cookieclicker/img/favicon.ico",
+        "geometry dash": "../images/geodash.jpg",
+        "subway surfers": "../images/subway-surfers.png"
       };
       return logos[game] || "../images/favicon.png";
     }
