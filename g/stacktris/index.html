@@ -17,11 +17,30 @@
 		<script src="../../js/arcade-score-config.js"></script>
 		<script src="../../js/arcade-scores.js"></script>
 		<script src="src/stacktris.js"></script>
-		<script>(function(){var sent=false;window.addEventListener("pagehide",function(){if(sent||!window.ArcadeScores||!window.StacktrisInstance)return;var n=window.StacktrisInstance.objects?window.StacktrisInstance.objects.length:0;if(n<2)return;sent=true;window.ArcadeScores.promptAndSubmit("Stacktris",n);});})();</script>
+		<script>
+			window.updateStacktrisScore = function(score) {
+				var display = document.getElementById("stacktris-score");
+				if (display) display.textContent = "Pieces placed: " + score;
+			};
+			window.submitStacktrisScore = async function() {
+				var game = window.StacktrisInstance;
+				if (!game || !window.ArcadeScores) return;
+				if (game.score < 1) { alert("Place at least one piece before submitting a score."); return; }
+				if (game.scoreSubmitted) { alert("You already submitted this run."); return; }
+				var ok = await window.ArcadeScores.promptAndSubmit("Stacktris", game.score);
+				if (ok) {
+					game.scoreSubmitted = true;
+					document.getElementById("stacktris-submit").textContent = "Score submitted";
+					document.getElementById("stacktris-submit").disabled = true;
+				}
+			};
+		</script>
 	</head>
 	<body>
 		<h1>Stacktris</h1>
 		<p>by <a href="http://eternalvoid.net">Jeremy Carter</a> <a href="mailto:Jeremy@JeremyCarter.ca">Jeremy@JeremyCarter.ca</a> 2016</p>
+		<p id="stacktris-score" aria-live="polite">Pieces placed: 0</p>
+		<p><button id="stacktris-submit" type="button" onclick="window.submitStacktrisScore()">Submit score</button></p>
 		<p><a href="https://github.com/defcronyke/stacktris">Source Code</a></p>
 	</body>
 </html>
