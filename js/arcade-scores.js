@@ -58,6 +58,29 @@
     }
   }
 
+  async function submitSession(gameTitle, seconds, playerName) {
+    playerName = typeof playerName === "string" ? playerName.trim().slice(0, 24) : "";
+    seconds = Number(seconds);
+    if (!playerName || !Number.isSafeInteger(seconds) || seconds < 5 || !gameTitle || !configured) return false;
+    try {
+      const response = await fetch(config.supabaseUrl.replace(/\\/$/, "") + "/rest/v1/scores", {
+        method: "POST",
+        keepalive: true,
+        headers: {
+          apikey: config.supabaseAnonKey,
+          "Content-Type": "application/json",
+          Prefer: "return=minimal"
+        },
+        body: JSON.stringify({ player_name: playerName, game_title: String(gameTitle).slice(0, 60), score: seconds })
+      });
+      if (!response.ok) throw new Error("Score service returned " + response.status);
+      return true;
+    } catch (error) {
+      console.warn("Arcade Atlas: playtime was not submitted.", error.message);
+      return false;
+    }
+  }
+
   async function getScores() {
     try {
       return await request("scores?select=id,player_name,game_title,score,created_at&order=score.desc&limit=1000", {
@@ -75,5 +98,5 @@
     return submit(gameTitle, score, playerName);
   }
 
-  window.ArcadeScores = { configured, submit, getScores, promptAndSubmit };
+  window.ArcadeScores = { configured, submit, submitSession, getScores, promptAndSubmit };
 })();
