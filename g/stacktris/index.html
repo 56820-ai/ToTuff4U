@@ -18,29 +18,39 @@
 		<script src="../../js/arcade-scores.js"></script>
 		<script src="src/stacktris.js"></script>
 		<script>
-			window.updateStacktrisScore = function(score) {
-				var display = document.getElementById("stacktris-score");
-				if (display) display.textContent = "Pieces placed: " + score;
-			};
-			window.submitStacktrisScore = async function() {
-				var game = window.StacktrisInstance;
-				if (!game || !window.ArcadeScores) return;
-				if (game.score < 1) { alert("Place at least one piece before submitting a score."); return; }
-				if (game.scoreSubmitted) { alert("You already submitted this run."); return; }
-				var ok = await window.ArcadeScores.promptAndSubmit("Stacktris", game.score);
-				if (ok) {
-					game.scoreSubmitted = true;
-					document.getElementById("stacktris-submit").textContent = "Score submitted";
-					document.getElementById("stacktris-submit").disabled = true;
-				}
-			};
+			(function() {
+				var playerName = "";
+				var bestSubmitted = 0;
+				var nameAsked = false;
+				window.updateStacktrisScore = async function(score) {
+					var display = document.getElementById("stacktris-score");
+					if (display) display.textContent = "Pieces placed: " + score;
+					if (!window.ArcadeScores || score <= bestSubmitted) return;
+					if (!playerName) {
+						if (nameAsked) return;
+						nameAsked = true;
+						try { playerName = localStorage.getItem("arcadePlayerName") || ""; } catch (e) {}
+						if (!playerName) {
+							playerName = window.prompt("Enter your name for the leaderboard (24 characters max):", "");
+							if (!playerName || !playerName.trim()) { playerName = ""; return; }
+							playerName = playerName.trim().slice(0, 24);
+							try { localStorage.setItem("arcadePlayerName", playerName); } catch (e) {}
+						}
+					}
+					if (score <= bestSubmitted) return;
+					var submitted = await window.ArcadeScores.submit("Stacktris", score, playerName);
+					if (submitted) {
+						bestSubmitted = score;
+						if (display) display.textContent = "Pieces placed: " + score + " • Saved!";
+					}
+				};
+			})();
 		</script>
 	</head>
 	<body>
 		<h1>Stacktris</h1>
 		<p>by <a href="http://eternalvoid.net">Jeremy Carter</a> <a href="mailto:Jeremy@JeremyCarter.ca">Jeremy@JeremyCarter.ca</a> 2016</p>
 		<p id="stacktris-score" aria-live="polite">Pieces placed: 0</p>
-		<p><button id="stacktris-submit" type="button" onclick="window.submitStacktrisScore()">Submit score</button></p>
 		<p><a href="https://github.com/defcronyke/stacktris">Source Code</a></p>
 	</body>
 </html>
