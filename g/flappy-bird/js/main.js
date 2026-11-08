@@ -17,6 +17,7 @@ var flyArea = $("#flyarea").height();
 
 var score = 0;
 var highscore = 0;
+var arcadeScoreSubmitted = false;
 
 var pipeheight = 90;
 var pipewidth = 52;
@@ -81,6 +82,7 @@ function showSplash()
    position = 180;
    rotation = 0;
    score = 0;
+   arcadeScoreSubmitted = false;
 
    //update the player in preparation for the next game
    $("#player").css({ y: 0, x: 0 });
@@ -368,6 +370,11 @@ function playerDead()
 
 function showScore()
 {
+   if (!arcadeScoreSubmitted) {
+      arcadeScoreSubmitted = true;
+      if (window.ArcadeScores) window.ArcadeScores.promptAndSubmit("Flappy Bird", score);
+   }
+
    //unhide us
    $("#scoreboard").css("display", "block");
 
