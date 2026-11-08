@@ -4,12 +4,12 @@
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8390067368864065" crossorigin="anonymous"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="/js/timeTracker.js" defer></script>
-  <script src="/js/favicon.js"></script>
-  <script src="/js/panic.js"></script>
-  <script src="/js/autoclicker.js"></script>
+  <script src="../js/timeTracker.js" defer></script>
+  <script src="../js/favicon.js"></script>
+  <script src="../js/panic.js"></script>
+  <script src="../js/autoclicker.js"></script>
   <title>Grades & Attendance</title>
-  <link rel="icon" type="image/x-icon" href="/images/favicon.png">  
+  <link rel="icon" type="image/x-icon" href="../images/favicon.png">  
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   
@@ -392,7 +392,7 @@
     <header class="leaderboard-header">
       <h1>Game High Scores</h1>
       <p class="submit-note">High scores are submitted automatically from supported games when a round ends.</p>
-      <a href="/">
+      <a href="../">
       </a>
     </header>
     <div class="leaderboard">
@@ -400,8 +400,8 @@
     </div>
   </div>
 
-  <script src="/js/arcade-score-config.js"></script>
-  <script src="/js/arcade-scores.js"></script>
+  <script src="../js/arcade-score-config.js"></script>
+  <script src="../js/arcade-scores.js"></script>
   <script>
     const scoreList = document.getElementById("score-list");
 
@@ -412,7 +412,7 @@
       const avatar = document.createElement("div");
       avatar.className = "user-icon";
       const image = document.createElement("img");
-      image.src = data.userIcon || "/images/favicon.png";
+      image.src = data.userIcon || "../images/favicon.png";
       image.alt = data.username || "Player";
       avatar.appendChild(image);
 
@@ -450,7 +450,7 @@
         gameTitle: item.game_title,
         score: Number(item.score).toLocaleString(),
         date: new Date(item.created_at).toLocaleDateString(),
-        userIcon: "/images/favicon.png"
+        userIcon: "../images/favicon.png"
       }));
     }
     renderLeaderboard();
