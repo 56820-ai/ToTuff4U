@@ -28,7 +28,7 @@
     "/g/blockblast": "Block Blast",
     "/g/driftboss": "Drift Boss"
   };
-  const path = location.pathname.replace(/\\/+$/, "").toLowerCase();
+  const path = location.pathname.replace(/\/+$/, "").toLowerCase();
   const gameTitle = timedGames[path];
   if (!gameTitle || !window.ArcadeScores) return;
 
