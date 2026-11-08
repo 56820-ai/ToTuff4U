@@ -34,16 +34,8 @@
 
 				function getPlayerName() {
 					if (playerName) return playerName;
-					try { playerName = localStorage.getItem("arcadePlayerName") || ""; } catch (e) {}
-					if (!playerName && !namePromptOpen) {
-						namePromptOpen = true;
-						var entered = window.prompt("Enter your name for the leaderboard (24 characters max):", "");
-						namePromptOpen = false;
-						if (entered && entered.trim()) {
-							playerName = entered.trim().slice(0, 24);
-							try { localStorage.setItem("arcadePlayerName", playerName); } catch (e) {}
-						}
-					}
+					if (window.ArcadeScores && window.ArcadeScores.getPlayerName) playerName = window.ArcadeScores.getPlayerName("Enter your name for the leaderboard (24 characters max):");
+					if (!playerName && !namePromptOpen) { namePromptOpen = true; playerName = window.ArcadeScores && window.ArcadeScores.getPlayerName ? window.ArcadeScores.getPlayerName() : ""; namePromptOpen = false; }
 					return playerName;
 				}
 
