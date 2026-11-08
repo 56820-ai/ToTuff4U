@@ -145,6 +145,56 @@
           progressBarFull.style.width = 100 * progress + "%";
         }).then((unityInstance) => {
           loadingBar.style.display = "none";
+
+          // Best-effort leaderboard bridge for the Unity build. The game does
+          // not expose its score to the hosting page, so watch saved browser
+          // preferences for explicitly score-related numeric values.
+          (function trackBlockBlastBestScore() {
+            if (!window.ArcadeScores || !window.ArcadeScores.configured) return;
+            var storageKey = "arcadeBlockBlastSubmittedBest";
+            var submittedBest = Number(sessionStorage.getItem(storageKey) || 0);
+
+            function numericValues(value, out, depth) {
+              if (depth > 4 || value == null) return;
+              if (typeof value === "number" && Number.isFinite(value)) {
+                out.push(value);
+              } else if (typeof value === "string") {
+                var n = Number(value);
+                if (value.trim() !== "" && Number.isFinite(n)) out.push(n);
+                else {
+                  try { numericValues(JSON.parse(value), out, depth + 1); } catch (e) {}
+                }
+              } else if (typeof value === "object") {
+                Object.keys(value).forEach(function (key) {
+                  if (/score|best|record|high/i.test(key)) numericValues(value[key], out, depth + 1);
+                });
+              }
+            }
+
+            function scanSavedScores() {
+              var candidates = [];
+              try {
+                for (var i = 0; i < localStorage.length; i++) {
+                  var key = localStorage.key(i);
+                  if (!key || !/score|best|record|high/i.test(key)) continue;
+                  numericValues(localStorage.getItem(key), candidates, 0);
+                }
+              } catch (e) {}
+              var best = candidates.filter(function (n) {
+                return Number.isSafeInteger(n) && n >= 1 && n <= 100000000;
+              }).reduce(function (a, b) { return Math.max(a, b); }, 0);
+
+              if (best > submittedBest) {
+                submittedBest = best;
+                try { sessionStorage.setItem(storageKey, String(best)); } catch (e) {}
+                window.ArcadeScores.promptAndSubmit("Block Blast", best);
+              }
+            }
+
+            scanSavedScores();
+            window.setInterval(scanSavedScores, 1500);
+            window.addEventListener("storage", scanSavedScores);
+          })();
         }).catch((message) => {
           alert(message);
         });
