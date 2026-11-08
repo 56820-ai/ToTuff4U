@@ -120,7 +120,7 @@
         productVersion: "1.1",
         showBanner: unityShowBanner,
         // Keep the latest WebGL frame readable for canvas OCR.
-        preserveDrawingBuffer: true,
+        webglContextAttributes: { preserveDrawingBuffer: true },
       };
 
       // By default Unity keeps WebGL canvas render target size matched with
