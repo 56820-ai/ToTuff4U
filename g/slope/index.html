@@ -90,14 +90,14 @@
                     var score = readScore(text);
                     if (!score || score <= submittedBest) return;
                     var signature = normalize(text) + "|" + score;
-                    if (signature === previousGameOverText) {
+                    if (signature === previousGameOverText || previousGameOverText === "submitted|" + signature) {
                         var ok = await window.ArcadeScores.promptAndSubmit("Slope", score);
                         if (ok) {
                             submittedBest = score;
                             try { localStorage.setItem("arcadeSlopeSubmittedBest", String(score)); } catch (e) {}
                             previousGameOverText = "submitted|" + signature;
                         }
-                    } else if (previousGameOverText !== "submitted|" + signature) {
+                    } else {
                         previousGameOverText = signature;
                     }
                 } catch (error) {
@@ -114,10 +114,7 @@
             ocrScript.onerror = function () { console.warn("Slope OCR library could not be loaded."); };
             document.head.appendChild(ocrScript);
         })();
-    </script>ipt>
-<script src="/js/arcade-score-config.js"></script>
-<script src="/js/arcade-scores.js"></script>
-<script src="/js/arcade-manual-score.js"></script>
+    </script>
 </head>
 <body style="margin: 0; overflow: hidden;">
     <div class="webgl-content">
