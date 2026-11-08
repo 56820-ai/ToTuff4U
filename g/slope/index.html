@@ -32,87 +32,90 @@
 
         (function connectSlopeCanvasOCR() {
             if (!window.ArcadeScores || !window.ArcadeScores.configured) return;
-            var workerPromise = null;
-            var scanning = false;
-            var previousGameOverText = "";
+            var workerPromise = null, scanning = false, gameOverHandled = false;
             var submittedBest = 0;
             try { submittedBest = Number(localStorage.getItem("arcadeSlopeSubmittedBest") || 0); } catch (e) {}
-
             function getWorker() {
                 if (!workerPromise) workerPromise = window.Tesseract.createWorker("eng");
                 return workerPromise;
             }
             function normalize(value) {
-                return String(value || "").toLowerCase().replace(/[^a-z0-9\s:]/g, " ").replace(/\s+/g, " ").trim();
+                return String(value || "").toLowerCase().replace(/[^a-z0-9\\s:]/g, " ").replace(/\\s+/g, " ").trim();
             }
             function readScore(value) {
                 var text = String(value || "").replace(/,/g, "");
                 var patterns = [
-                    /(?:your\s+)?score\s*[:\-]?\s*([0-9]{1,9})/i,
-                    /distance\s*[:\-]?\s*([0-9]{1,9})/i,
-                    /([0-9]{1,9})\s*(?:m|meters|metres|points|pts)\b/i
+                    /(?:your\\s+)?score\\s*[:\\-]?\\s*([0-9]{1,9})/i,
+                    /distance\\s*[:\\-]?\\s*([0-9]{1,9})/i,
+                    /([0-9]{1,9})\\s*(?:m|meters|metres|points|pts)\\b/i
                 ];
-                for (var i = 0; i < patterns.length; i++) {
+                for (var i = 0;; i++) {
+                    if (i >= patterns.length) break;
                     var match = text.match(patterns[i]);
-                    if (match) {
-                        var score = Number(match[1]);
-                        if (Number.isSafeInteger(score) && score > 0 && score <= 100000000) return score;
-                    }
+                    if (match) return Number(match[1]) || 0;
                 }
-                // Slope's end screen may show a large number without a label.
-                var numbers = text.match(/\b[0-9]{2,9}\b/g) || [];
-                for (var j = numbers.length - 1; j >= 0; j--) {
-                    var candidate = Number(numbers[j]);
-                    if (Number.isSafeInteger(candidate) && candidate > 0 && candidate <= 100000000) return candidate;
-                }
-                return 0;
+                var numbers = text.match(/\\b[0-9]{1,9}\\b/g) || [];
+                return numbers.length ? Number(numbers[numbers.length - 1]) || 0 : 0;
             }
             function isGameOver(value) {
-                var text = normalize(value);
-                return /game\s*over|try\s*again|play\s*again|you\s*crashed|crashed|restart|best\s*score/.test(text);
+                return /game\\s*over|try\\s*again|play\\s*again|you\\s*crashed|crashed|restart|best\\s*score/.test(normalize(value));
             }
             async function scan() {
-                var gameCanvas = document.querySelector("#gameContainer canvas");
-                if (scanning || !gameCanvas || !gameCanvas.width || !gameCanvas.height || !window.Tesseract) return;
+                var canvas = document.querySelector("#gameContainer canvas");
+                if (scanning || gameOverHandled || !canvas || !canvas.width || !canvas.height || !window.Tesseract) return;
                 scanning = true;
                 try {
                     var image = document.createElement("canvas");
-                    var scale = Math.min(1, 1400 / Math.max(gameCanvas.width, gameCanvas.height));
-                    image.width = Math.max(1, Math.round(gameCanvas.width * scale));
-                    image.height = Math.max(1, Math.round(gameCanvas.height * scale));
-                    image.getContext("2d").drawImage(gameCanvas, 0, 0, image.width, image.height);
+                    var scale = Math.min(1, 1600 / Math.max(canvas.width, canvas.height));
+                    image.width = Math.max(1, Math.round(canvas.width * scale));
+                    image.height = Math.max(1, Math.round(canvas.height * scale));
+                    image.getContext("2d").drawImage(canvas, 0, 0, image.width, image.height);
                     var result = await (await getWorker()).recognize(image);
                     var text = result && result.data ? result.data.text : "";
-                    if (!isGameOver(text)) {
-                        previousGameOverText = "";
-                        return;
-                    }
+                    if (!isGameOver(text)) return;
+                    gameOverHandled = true;
                     var score = readScore(text);
-                    if (!score || score <= submittedBest) return;
-                    var signature = normalize(text) + "|" + score;
-                    if (signature === previousGameOverText || previousGameOverText === "submitted|" + signature) {
-                        var ok = await window.ArcadeScores.promptAndSubmit("Slope", score);
-                        if (ok) {
-                            submittedBest = score;
-                            try { localStorage.setItem("arcadeSlopeSubmittedBest", String(score)); } catch (e) {}
-                            previousGameOverText = "submitted|" + signature;
-                        }
+                    // Trigger the name prompt on the first recognized Game Over even if OCR
+                    // cannot read the score; zero is a valid fallback rather than no prompt.
+                    if (score < submittedBest) score = submittedBest;
+                    var ok = await window.ArcadeScores.promptAndSubmit("Slope", score);
+                    if (ok) {
+                        submittedBest = score;
+                        try { localStorage.setItem("arcadeSlopeSubmittedBest", String(score)); } catch (e) {}
                     } else {
-                        previousGameOverText = signature;
+                        gameOverHandled = false;
                     }
                 } catch (error) {
                     console.warn("Slope leaderboard OCR error:", error);
+                    gameOverHandled = false;
                 } finally {
                     scanning = false;
                 }
             }
-
-            var ocrScript = document.createElement("script");
-            ocrScript.src = "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
-            ocrScript.async = true;
-            ocrScript.onload = function () { window.setInterval(scan, 1800); };
-            ocrScript.onerror = function () { console.warn("Slope OCR library could not be loaded."); };
-            document.head.appendChild(ocrScript);
+            var script = document.createElement("script");
+            script.src = "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
+            script.async = true;
+            script.onload = function () {
+                window.setInterval(function () {
+                    // Allow a new run after the Game Over screen disappears.
+                    var canvas = document.querySelector("#gameContainer canvas");
+                    if (canvas && !gameOverHandled) scan();
+                    else if (canvas && gameOverHandled) {
+                        // Reset after gameplay resumes and the end-screen text is gone.
+                        getWorker().then(function (worker) {
+                            var probe = document.createElement("canvas");
+                            probe.width = Math.min(canvas.width, 1000);
+                            probe.height = Math.max(1, Math.round(canvas.height * probe.width / canvas.width));
+                            probe.getContext("2d").drawImage(canvas, 0, 0, probe.width, probe.height);
+                            return worker.recognize(probe);
+                        }).then(function (r) {
+                            if (!isGameOver(r && r.data ? r.data.text : "")) gameOverHandled = false;
+                        }).catch(function (e) { console.warn("Slope OCR reset error:", e); });
+                    }
+                }, 1800);
+            };
+            script.onerror = function () { console.warn("Slope OCR library could not be loaded."); };
+            document.head.appendChild(script);
         })();
     </script>
 </head>
