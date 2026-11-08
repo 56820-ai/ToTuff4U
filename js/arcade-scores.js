@@ -13,7 +13,6 @@
       ...options,
       headers: {
         apikey: config.supabaseAnonKey,
-        Authorization: "Bearer " + config.supabaseAnonKey,
         "Content-Type": "application/json",
         ...(options && options.headers ? options.headers : {})
       }
