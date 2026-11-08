@@ -21,28 +21,45 @@
 			(function() {
 				var playerName = "";
 				var bestSubmitted = 0;
-				var nameAsked = false;
-				window.updateStacktrisScore = async function(score) {
-					var display = document.getElementById("stacktris-score");
-					if (display) display.textContent = "Pieces placed: " + score;
-					if (!window.ArcadeScores || score <= bestSubmitted) return;
-					if (!playerName) {
-						if (nameAsked) return;
-						nameAsked = true;
-						try { playerName = localStorage.getItem("arcadePlayerName") || ""; } catch (e) {}
-						if (!playerName) {
-							playerName = window.prompt("Enter your name for the leaderboard (24 characters max):", "");
-							if (!playerName || !playerName.trim()) { playerName = ""; return; }
-							playerName = playerName.trim().slice(0, 24);
+				var pendingScore = 0;
+				var saving = false;
+				var namePromptOpen = false;
+
+				function getPlayerName() {
+					if (playerName) return playerName;
+					try { playerName = localStorage.getItem("arcadePlayerName") || ""; } catch (e) {}
+					if (!playerName && !namePromptOpen) {
+						namePromptOpen = true;
+						var entered = window.prompt("Enter your name for the leaderboard (24 characters max):", "");
+						namePromptOpen = false;
+						if (entered && entered.trim()) {
+							playerName = entered.trim().slice(0, 24);
 							try { localStorage.setItem("arcadePlayerName", playerName); } catch (e) {}
 						}
 					}
-					if (score <= bestSubmitted) return;
-					var submitted = await window.ArcadeScores.submit("Stacktris", score, playerName);
-					if (submitted) {
-						bestSubmitted = score;
-						if (display) display.textContent = "Pieces placed: " + score + " • Saved!";
+					return playerName;
+				}
+
+				async function saveLatestScore() {
+					if (saving || !pendingScore) return;
+					var name = getPlayerName();
+					if (!name) return;
+					saving = true;
+					while (pendingScore > bestSubmitted) {
+						var scoreToSave = pendingScore;
+						var ok = await window.ArcadeScores.submit("Stacktris", scoreToSave, name);
+						if (!ok) break;
+						bestSubmitted = scoreToSave;
 					}
+					saving = false;
+				}
+
+				window.updateStacktrisScore = function(score) {
+					var display = document.getElementById("stacktris-score");
+					if (display) display.textContent = "Pieces stacked: " + score + (score > bestSubmitted ? " • Saving…" : " • Saved");
+					if (!window.ArcadeScores || score <= bestSubmitted) return;
+					pendingScore = Math.max(pendingScore, score);
+					saveLatestScore();
 				};
 			})();
 		</script>
@@ -50,7 +67,7 @@
 	<body>
 		<h1>Stacktris</h1>
 		<p>by <a href="http://eternalvoid.net">Jeremy Carter</a> <a href="mailto:Jeremy@JeremyCarter.ca">Jeremy@JeremyCarter.ca</a> 2016</p>
-		<p id="stacktris-score" aria-live="polite">Pieces placed: 0</p>
+		<p id="stacktris-score" aria-live="polite">Pieces stacked: 0</p>
 		<p><a href="https://github.com/defcronyke/stacktris">Source Code</a></p>
 	</body>
 </html>
