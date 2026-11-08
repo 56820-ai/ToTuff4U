@@ -1,5 +1,6 @@
 window.onload = function() {
-	(new Stacktris()).start();
+	window.StacktrisInstance = new Stacktris();
+	window.StacktrisInstance.start();
 };
 
 function Stacktris() {
@@ -11,6 +12,8 @@ function Stacktris() {
 	this.restitution = 0.4;
 	this.yStart = 0.0;
 	this.speed = 3.0;
+	this.score = 0;
+	this.scoreSubmitted = false;
 	
 	Math.fmod = function (a,b) { return Number((a - (Math.floor(a / b) * b)).toPrecision(8)); };
 }
@@ -435,6 +438,8 @@ Stacktris.prototype.stepPhysics = function() {
 		this.objects[this.objects.length-1].b[0].GetLinearVelocity().x <= 0.1 + this.restitution * 10)) {
 		
 		this.newPiece = false;
+		this.score++;
+		if (window.updateStacktrisScore) window.updateStacktrisScore(this.score);
 //		console.log('settled');
 		
 		this.shuffle(this.angles);
