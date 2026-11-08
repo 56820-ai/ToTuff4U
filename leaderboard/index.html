@@ -466,25 +466,49 @@
         scoreList.appendChild(empty);
         return;
       }
-      // Keep only the highest recorded score for each game.
+      // Timed games rank players by their accumulated playtime; other games
+      // continue to rank by their single highest submitted score.
+      const timedGames = new Set(["slope", "retro bowl", "block blast", "drift boss"]);
       const bestByGame = new Map();
+      const playtimeByPlayer = new Map();
       onlineScores.forEach(item => {
         const key = String(item.game_title || "Game").trim().toLowerCase();
-        const previous = bestByGame.get(key);
-        if (!previous || Number(item.score) > Number(previous.score)) {
-          bestByGame.set(key, item);
+        if (timedGames.has(key)) {
+          const playerKey = key + "::" + String(item.player_name || "Player").trim().toLowerCase();
+          const previous = playtimeByPlayer.get(playerKey);
+          if (previous) {
+            previous.score += Number(item.score) || 0;
+            if (new Date(item.created_at) > new Date(previous.created_at)) previous.created_at = item.created_at;
+          } else {
+            playtimeByPlayer.set(playerKey, { ...item, score: Number(item.score) || 0 });
+          }
+        } else {
+          const previous = bestByGame.get(key);
+          if (!previous || Number(item.score) > Number(previous.score)) bestByGame.set(key, item);
         }
       });
+      for (const item of playtimeByPlayer.values()) {
+        const key = String(item.game_title || "Game").trim().toLowerCase();
+        const previous = bestByGame.get(key);
+        if (!previous || item.score > Number(previous.score)) bestByGame.set(key, item);
+      }
       [...bestByGame.values()]
         .sort((a, b) => String(a.game_title).localeCompare(String(b.game_title)))
-        .forEach(item => createLeaderboardItem({
-          username: item.player_name,
-          gameTitle: item.game_title,
-          score: Number(item.score).toLocaleString(),
-          date: new Date(item.created_at).toLocaleDateString(),
-          userIcon: "../images/favicon.png",
-          gameLogo: getGameLogo(item.game_title)
-        }));
+        .forEach(item => {
+          const timed = timedGames.has(String(item.game_title || "").trim().toLowerCase());
+          const seconds = Math.max(0, Number(item.score) || 0);
+          const displayScore = timed
+            ? (seconds >= 3600 ? Math.floor(seconds / 3600) + "h " + Math.floor((seconds % 3600) / 60) + "m" : Math.floor(seconds / 60) + "m " + (seconds % 60) + "s")
+            : Number(item.score).toLocaleString();
+          createLeaderboardItem({
+            username: item.player_name,
+            gameTitle: item.game_title + (timed ? " · Total playtime" : ""),
+            score: displayScore,
+            date: new Date(item.created_at).toLocaleDateString(),
+            userIcon: "../images/favicon.png",
+            gameLogo: getGameLogo(item.game_title)
+          });
+        });
     }
     renderLeaderboard();
   </script>
