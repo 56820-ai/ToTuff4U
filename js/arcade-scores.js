@@ -60,7 +60,7 @@
 
   async function getScores() {
     try {
-      return await request("scores?select=id,player_name,game_title,score,created_at&order=created_at.desc&limit=100", {
+      return await request("scores?select=id,player_name,game_title,score,created_at&order=score.desc&limit=1000", {
         method: "GET"
       });
     } catch (error) {
