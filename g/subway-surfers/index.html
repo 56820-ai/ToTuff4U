@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Subway Dash - Arcade Atlas</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#101a2b;color:#fff;font-family:Arial,sans-serif;touch-action:none}
+#game{display:block;width:100%;height:100%;background:linear-gradient(#67c7ee 0%,#b5e5f3 43%,#465b68 44%,#172535 100%)}
+.hud{position:fixed;inset:16px 18px auto;display:flex;justify-content:space-between;align-items:flex-start;pointer-events:none;text-shadow:0 2px 5px #000;font-weight:900}
+.pill{background:#101b2dcc;border:2px solid #ffffff55;border-radius:14px;padding:9px 14px;font-size:18px}
+#overlay{position:fixed;inset:0;display:grid;place-items:center;background:#07111acc}
+.panel{width:min(90vw,440px);padding:28px;border-radius:24px;text-align:center;background:linear-gradient(145deg,#182d49,#101827);border:2px solid #64d8f5;box-shadow:0 20px 70px #0009}
+h1{font-size:clamp(30px,7vw,48px);margin:0 0 8px;color:#ffd447;text-shadow:3px 4px #d34b28;letter-spacing:1px}
+p{line-height:1.5;color:#d9e7f3}.btn{border:0;border-radius:14px;padding:14px 26px;background:linear-gradient(90deg,#ffb52e,#ff653f);color:#25180b;font-size:18px;font-weight:900;cursor:pointer}
+.help{font-size:13px;color:#a9c4d8}
+#mobile{position:fixed;bottom:18px;left:0;right:0;display:flex;justify-content:space-between;padding:0 18px;pointer-events:none}
+.pad{display:flex;gap:8px}.pad button{pointer-events:auto;border:1px solid #fff8;border-radius:12px;background:#101b2dcc;color:white;font-size:22px;width:54px;height:52px}
+@media(hover:hover) and (pointer:fine){#mobile{opacity:.35}}
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<div class="hud"><div class="pill">🏃 SUBWAY DASH</div><div><div class="pill">⭐ <span id="score">0</span> m</div><div class="pill" style="margin-top:8px">🪙 <span id="coins">0</span></div></div></div>
+<div id="overlay"><div class="panel"><h1>SUBWAY DASH</h1><p>Dodge trains, leap over barriers, slide under signs, and grab as many coins as you can.</p><p class="help">← → change lanes · ↑ jump · ↓ slide<br>On touchscreens, swipe or use the buttons.</p><button class="btn" id="start">START RUN</button></div></div>
+<div id="mobile"><div class="pad"><button data-act="left">◀</button><button data-act="right">▶</button></div><div class="pad"><button data-act="jump">⬆</button><button data-act="slide">⬇</button></div></div>
+<script src="../../js/arcade-score-config.js"></script><script src="../../js/arcade-scores.js"></script>
+<script>
+(()=>{const canvas=document.getElementById('game'),ctx=canvas.getContext('2d'),overlay=document.getElementById('overlay'),scoreEl=document.getElementById('score'),coinsEl=document.getElementById('coins');
+let W=0,H=0,dpr=1,running=false,dead=false,lane=1,targetLane=1,distance=0,coins=0,speed=0.36,objects=[],spawn=0,jump=0,slide=0,last=0,playerName='';
+function resize(){dpr=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;canvas.width=W*dpr;canvas.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0)}addEventListener('resize',resize);resize();
+function roadY(t){return H*.43+t*t*H*.72}function roadX(l,t){const half=(W*.10+t*W*.34);return W/2+(l-1)*half}
+function draw(){ctx.clearRect(0,0,W,H);
+ // distant skyline
+ for(let i=0;i<15;i++){let x=i*W/14;let bh=35+(i*37%90);ctx.fillStyle=i%2?'#718b99':'#536f7e';ctx.fillRect(x,H*.43-bh,W/18,bh)}
+ // track perspective
+ ctx.fillStyle='#293b49';ctx.beginPath();ctx.moveTo(W*.40,H*.43);ctx.lineTo(W*.60,H*.43);ctx.lineTo(W*1.12,H);ctx.lineTo(-W*.12,H);ctx.fill();
+ for(let l=0;l<4;l++){let x1=W/2+(l-1.5)*W*.067,x2=W/2+(l-1.5)*W*.40;ctx.strokeStyle='#d4e0dc';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x1,H*.43);ctx.lineTo(x2,H);ctx.stroke()}
+ for(let i=0;i<18;i++){let t=((i/18+distance*.012)%1),y=roadY(t),half=W*(.07+t*.36);ctx.strokeStyle='#87949a';ctx.lineWidth=1+t*3;ctx.beginPath();ctx.moveTo(W/2-half,y);ctx.lineTo(W/2+half,y);ctx.stroke()}
+ // objects
+ objects.sort((a,b)=>a.z-b.z).forEach(o=>{let t=o.z,y=roadY(t),x=roadX(o.lane,t),scale=.22+t*1.15;if(o.type==='coin'){ctx.fillStyle='#ffd43b';ctx.strokeStyle='#fff3a0';ctx.lineWidth=3*scale;ctx.beginPath();ctx.ellipse(x,y-22*scale,11*scale,15*scale,0,0,Math.PI*2);ctx.fill();ctx.stroke()}else{let w=(o.type==='train'?76:58)*scale,h=(o.type==='train'?145:65)*scale;ctx.fillStyle=o.type==='train'?'#e34d43':o.type==='barrier'?'#f4a52d':'#4bd1d9';ctx.fillRect(x-w/2,y-h,w,h);ctx.fillStyle='#182b3a';if(o.type==='train'){ctx.fillRect(x-w*.34,y-h*.75,w*.68,h*.28);ctx.fillRect(x-w*.36,y-h*.15,w*.72,h*.1)}else{ctx.fillRect(x-w*.35,y-h*.78,w*.7,h*.22)}}});
+ // runner
+ let px=roadX(lane,.88),py=roadY(.88)-8-jump*85;let sc=.95;ctx.save();ctx.translate(px,py);ctx.scale(sc,sc);
+ ctx.fillStyle='#15273a';ctx.beginPath();ctx.ellipse(0,6,22,9,0,0,Math.PI*2);ctx.fill();
+ ctx.fillStyle='#ffca9a';ctx.beginPath();ctx.arc(0,-49,13,0,Math.PI*2);ctx.fill();
+ ctx.fillStyle='#f0443e';ctx.fillRect(-12,-38,24,34);
+ ctx.fillStyle='#273fba';ctx.fillRect(-11,-5,9,22);ctx.fillRect(3,-5,9,22);
+ ctx.strokeStyle='#ffca9a';ctx.lineWidth=7;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(-10,-31);ctx.lineTo(-22,-13);ctx.moveTo(10,-31);ctx.lineTo(22,-17);ctx.stroke();
+ if(slide>0){ctx.fillStyle='#f0443e';ctx.fillRect(-25,-18,50,17)}ctx.restore();
+}
+function spawnObject(){let lane=Math.floor(Math.random()*3),r=Math.random();let type=r<.36?'coin':r<.61?'barrier':r<.82?'sign':'train';if(type==='coin'){for(let i=0;i<5;i++)objects.push({lane,z:-.02-i*.09,type})}else objects.push({lane,z:0,type})}
+function endRun(){running=false;dead=true;let final=Math.floor(distance);overlay.style.display='grid';overlay.querySelector('h1').textContent='RUN OVER';overlay.querySelector('p').innerHTML='Distance: <b>'+final+' m</b><br>Coins: <b>'+coins+'</b>';overlay.querySelector('.help').textContent='Try again and beat your best distance!';document.getElementById('start').textContent='RUN AGAIN';if(final>0&&window.ArcadeScores){playerName=localStorage.getItem('arcadePlayerName')||'';if(!playerName){playerName=(prompt('Name for the leaderboard (24 characters max):')||'').trim().slice(0,24);if(playerName)localStorage.setItem('arcadePlayerName',playerName)}if(playerName)ArcadeScores.submit('Subway Surfers',final,playerName)}}
+function action(a){if(!running)return;if(a==='left')targetLane=Math.max(0,targetLane-1);if(a==='right')targetLane=Math.min(2,targetLane+1);if(a==='jump'&&jump===0&&slide===0)jump=1;if(a==='slide'&&jump===0)slide=1}
+function start(){lane=targetLane=1;distance=coins=0;speed=.36;objects=[];spawn=0;jump=slide=0;dead=false;running=true;overlay.style.display='none';last=performance.now();requestAnimationFrame(loop)}
+document.getElementById('start').onclick=start;
+addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown',' '].includes(e.key))e.preventDefault();if(e.key==='ArrowLeft'||e.key==='a')action('left');if(e.key==='ArrowRight'||e.key==='d')action('right');if(e.key==='ArrowUp'||e.key==='w'||e.key===' ')action('jump');if(e.key==='ArrowDown'||e.key==='s')action('slide')});
+document.querySelectorAll('[data-act]').forEach(b=>b.addEventListener('pointerdown',e=>{e.preventDefault();action(b.dataset.act)}));
+let sx=0,sy=0;canvas.addEventListener('touchstart',e=>{sx=e.changedTouches[0].clientX;sy=e.changedTouches[0].clientY},{passive:true});canvas.addEventListener('touchend',e=>{let dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;if(Math.max(Math.abs(dx),Math.abs(dy))<20)return;if(Math.abs(dx)>Math.abs(dy))action(dx<0?'left':'right');else action(dy<0?'jump':'slide')},{passive:true});
+function loop(now){if(!running)return;let dt=Math.min((now-last)/16.67,2);last=now;distance+=speed*dt*1.5;speed=Math.min(.72,speed+.00008*dt);lane+=(targetLane-lane)*Math.min(1,.24*dt);jump=Math.max(0,jump-.035*dt);slide=Math.max(0,slide-.045*dt);spawn-=dt;if(spawn<=0){spawnObject();spawn=30+Math.random()*22}
+objects.forEach(o=>o.z+=speed*.012*dt);objects=objects.filter(o=>{if(o.z>.84&&o.z<.98&&Math.abs(o.lane-Math.round(lane))<.35){if(o.type==='coin'){coins++;coinsEl.textContent=coins;o.z=2}else if(o.type==='barrier'&&jump>.25){ }else if(o.type==='sign'&&slide>.2){ }else{endRun();return false}}return o.z<1.15});
+scoreEl.textContent=Math.floor(distance);draw();if(running)requestAnimationFrame(loop)}
+draw();
+})();
+</script>
+</body></html>
