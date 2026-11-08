@@ -14,6 +14,9 @@
     <script>
         var gameInstance = UnityLoader.instantiate("gameContainer", "Build/SnowRider3D-gd-1.json", {onProgress: UnityProgress,Module:{onRuntimeInitialized: function() {UnityProgress(gameInstance, "complete")}}});
     </script>
+<script src="/js/arcade-score-config.js"></script>
+<script src="/js/arcade-scores.js"></script>
+<script src="/js/arcade-manual-score.js"></script>
 </head>
 <body style="overflow:hidden;padding:0px;margin:0px;">
     <div class="webgl-content">
