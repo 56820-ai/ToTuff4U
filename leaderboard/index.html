@@ -391,9 +391,7 @@
   <div class="leaderboard-container">
     <header class="leaderboard-header">
       <h1>Game High Scores</h1>
-      <a href="https://forms.gle/ALawAdMFksLapeo76" class="submit-btn-link">
-        <button class="submit-btn">Submit High Score</button>
-      </a>
+      <p class="submit-note">High scores are submitted automatically from supported games when a round ends.</p>
       <a href="/">
       </a>
     </header>
@@ -402,6 +400,8 @@
     </div>
   </div>
 
+  <script src="/js/arcade-score-config.js"></script>
+  <script src="/js/arcade-scores.js"></script>
   <script>
     const leaderboardData = [
       {
@@ -470,19 +470,46 @@
     function createLeaderboardItem(data) {
       const listItem = document.createElement("li");
       listItem.classList.add("leaderboard-item");
-      listItem.innerHTML = `
-        <div class="user-icon"><img src="${data.userIcon}" alt="${data.username}" /></div>
-        <div class="player-info">
-          <p class="game-title"><i class="fas fa-gamepad"></i>${data.gameTitle}</p>
-          <h3 class="username"><i class="fas fa-user"></i>${data.username}</h3>
-          <p class="date"><i class="fas fa-calendar-alt"></i> ${data.date}</p>
-        </div>
-        <div class="score">${data.score}</div>
-      `;
+
+      const avatar = document.createElement("div");
+      avatar.className = "user-icon";
+      const image = document.createElement("img");
+      image.src = data.userIcon || "/images/favicon.png";
+      image.alt = data.username || "Player";
+      avatar.appendChild(image);
+
+      const info = document.createElement("div");
+      info.className = "player-info";
+      const game = document.createElement("p");
+      game.className = "game-title";
+      game.textContent = "🎮 " + (data.gameTitle || "Game");
+      const username = document.createElement("h3");
+      username.className = "username";
+      username.textContent = "👤 " + (data.username || "Player");
+      const date = document.createElement("p");
+      date.className = "date";
+      date.textContent = "📅 " + (data.date || "");
+      info.append(game, username, date);
+
+      const score = document.createElement("div");
+      score.className = "score";
+      score.textContent = String(data.score ?? 0);
+      listItem.append(avatar, info, score);
       scoreList.appendChild(listItem);
     }
 
-    leaderboardData.forEach(item => createLeaderboardItem(item));
+    async function renderLeaderboard() {
+      const onlineScores = window.ArcadeScores ? await window.ArcadeScores.getScores() : [];
+      onlineScores.forEach(item => createLeaderboardItem({
+        username: item.player_name,
+        gameTitle: item.game_title,
+        score: Number(item.score).toLocaleString(),
+        date: new Date(item.created_at).toLocaleDateString(),
+        userIcon: "/images/favicon.png"
+      }));
+      leaderboardData.forEach(item => createLeaderboardItem(item));
+    }
+    renderLeaderboard();
   </script>
 
 </body>
