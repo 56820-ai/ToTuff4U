@@ -14,7 +14,10 @@
 		<script src="src/qasd.js"></script>
 		<script src="src/qwas.js"></script>
 		<script src="src/wasd.js"></script>
+		<script src="../../js/arcade-score-config.js"></script>
+		<script src="../../js/arcade-scores.js"></script>
 		<script src="src/stacktris.js"></script>
+		<script>(function(){var sent=false;window.addEventListener("pagehide",function(){if(sent||!window.ArcadeScores||!window.StacktrisInstance)return;var n=window.StacktrisInstance.objects?window.StacktrisInstance.objects.length:0;if(n<2)return;sent=true;window.ArcadeScores.promptAndSubmit("Stacktris",n);});})();</script>
 	</head>
 	<body>
 		<h1>Stacktris</h1>
