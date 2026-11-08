@@ -1,53 +1,21 @@
-// Tracks total site time locally and submits playtime for games without a reliable
-// readable score. The leaderboard stores seconds in the existing score column.
+// Minecraft has no single built-in score, so it ranks by accumulated playtime.
 (function () {
   "use strict";
-  function loadTimeSpent(key) {
-    const value = Number(localStorage.getItem(key) || 0);
-    return Number.isFinite(value) && value > 0 ? value : 0;
-  }
-  function saveTimeSpent(key, time) { localStorage.setItem(key, String(time)); }
-  function trackTimeSpent() {
-    const totalKey = "totalTimeSpent";
-    const startTime = Date.now();
-    let saved = false;
-    function save() {
-      if (saved) return;
-      saved = true;
-      const seconds = Math.max(0, Math.floor((Date.now() - startTime) / 1000));
-      if (seconds) saveTimeSpent(totalKey, loadTimeSpent(totalKey) + seconds);
-    }
-    window.addEventListener("pagehide", save);
-    window.addEventListener("beforeunload", save);
-  }
-  trackTimeSpent();
-
-  const timedGames = {
-    "/g/slope": "Slope",
-    "/g/retro-bowl": "Retro Bowl",
-    "/g/blockblast": "Block Blast",
-    "/g/driftboss": "Drift Boss"
-  };
-  const path = location.pathname.replace(/\/+$/, "").toLowerCase();
-  const gameTitle = timedGames[path];
-  if (!gameTitle || !window.ArcadeScores) return;
-
-  const nameKey = "arcadeLeaderboardPlayerName";
-  let playerName = (localStorage.getItem(nameKey) || "").trim();
+  var path = location.pathname.replace(/\/+$/, "").toLowerCase();
+  if (path !== "/g/mc") return;
+  var playerName = "";
+  try { playerName = (localStorage.getItem("arcadeLeaderboardPlayerName") || "").trim(); } catch (e) {}
   if (!playerName) {
-    playerName = (window.prompt("Choose a name for the Arcade Atlas leaderboard (you only need to do this once):", "") || "").trim().slice(0, 24);
-    if (playerName) localStorage.setItem(nameKey, playerName);
+    playerName = (window.prompt("Choose a name for the Minecraft playtime leaderboard (24 characters max):", "") || "").trim().slice(0, 24);
+    if (playerName) try { localStorage.setItem("arcadeLeaderboardPlayerName", playerName); } catch (e) {}
   }
-  if (!playerName) return;
-
-  const startedAt = Date.now();
-  let submitted = false;
+  if (!playerName || !window.ArcadeScores) return;
+  var startedAt = Date.now(), submitted = false;
   function submitPlaytime() {
     if (submitted) return;
     submitted = true;
-    const seconds = Math.max(0, Math.floor((Date.now() - startedAt) / 1000));
-    if (seconds < 5) return;
-    window.ArcadeScores.submitSession(gameTitle, seconds, playerName);
+    var seconds = Math.max(0, Math.floor((Date.now() - startedAt) / 1000));
+    if (seconds >= 5) window.ArcadeScores.submitSession("Minecraft", seconds, playerName);
   }
   window.addEventListener("pagehide", submitPlaytime);
   window.addEventListener("beforeunload", submitPlaytime);
