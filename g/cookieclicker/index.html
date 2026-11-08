@@ -213,12 +213,9 @@ var App=typeof App==='undefined'?0:App;
     try { return (localStorage.getItem(NAME_KEY) || "").trim().slice(0, 24); } catch (e) { return ""; }
   }
   function askName() {
-    var existing = savedName();
-    var name = window.prompt("New Cookie Clicker high score! Enter your leaderboard name (24 characters max):", existing);
-    if (name === null || !name.trim()) return "";
-    name = name.trim().slice(0, 24);
-    try { localStorage.setItem(NAME_KEY, name); } catch (e) {}
-    return name;
+    return window.ArcadeScores && window.ArcadeScores.getPlayerName
+      ? window.ArcadeScores.getPlayerName("Enter your name for the Cookie Clicker leaderboard (24 characters max):")
+      : "";
   }
   function scoreNow() {
     var value = window.Game && Number(window.Game.cookiesEarned);
@@ -242,28 +239,11 @@ var App=typeof App==='undefined'?0:App;
       try { localStorage.setItem(RUN_KEY, String(score)); } catch (e) {}
     }
   }
-  function addScoreButton() {
-    if (document.getElementById("arcadeCookieScore")) return;
-    var button = document.createElement("button");
-    button.id = "arcadeCookieScore";
-    button.textContent = "Submit Cookie Clicker score";
-    button.style.cssText = "position:fixed;z-index:99999;right:12px;top:12px;padding:10px 14px;border:2px solid #8b5a2b;border-radius:8px;background:#fff3cf;color:#422b12;font-weight:bold;cursor:pointer;";
-    button.addEventListener("click", function () {
-      var score = scoreNow();
-      if (score === null) { alert("Your Cookie Clicker score is not ready yet."); return; }
-      var name = savedName() || askName();
-      if (name) window.ArcadeScores.submit(GAME, score, name);
-    });
-    document.body.appendChild(button);
-  }
   window.addEventListener("load", function () {
-    addScoreButton();
     checkTimer = setInterval(checkHighScore, 5000);
     setTimeout(checkHighScore, 1500);
   });
   window.addEventListener("beforeunload", function () { if (checkTimer) clearInterval(checkTimer); });
-  var attempts = 0;
-  var readyCheck = setInterval(function () { addScoreButton(); if (++attempts > 40) clearInterval(readyCheck); }, 500);
 })();
 </script>
 
