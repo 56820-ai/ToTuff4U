@@ -10,11 +10,11 @@
   s.src = 'https://www.googletagmanager.com/gtm.js?id=GTM-KHTBG5BX';
   (document.head || document.documentElement).appendChild(s);
 })();
-// Minecraft and Retro Bowl rank by accumulated visible playtime.
+// Minecraft 1.12.2 and Retro Bowl rank by accumulated visible playtime.
 (function () {
   "use strict";
   var path = location.pathname.replace(/\\/+$/, "").toLowerCase();
-  if (path !== "/g/mc" && path !== "/g/retro-bowl") return;
+  if (path !== "/g/mc/1.12.2" && path !== "/g/retro-bowl") return;
 
   var gameTitle = path === "/g/retro-bowl" ? "Retro Bowl Time" : "Minecraft";
   var playerName = "";
