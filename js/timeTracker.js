@@ -23,13 +23,17 @@
     if (playerName) try { localStorage.setItem("arcadeLeaderboardPlayerName", playerName); } catch (e) {}
   }
   if (!playerName || !window.ArcadeScores) return;
-  var startedAt = Date.now(), submitted = false;\n  // Submit on both navigation and tab close; the guard prevents duplicates.
+  var startedAt = Date.now(), submitted = false;
+  // Submit on both navigation and tab close; the guard prevents duplicates.
   function submitPlaytime() {
     if (submitted) return;
     submitted = true;
     var seconds = Math.max(0, Math.floor((Date.now() - startedAt) / 1000));
     if (seconds >= 5) window.ArcadeScores.submitSession(gameTitle, seconds, playerName);
   }
-  window.addEventListener("pagehide", submitPlaytime);\n  window.addEventListener("visibilitychange", function () {\n    if (document.visibilityState === "hidden") submitPlaytime();\n  });
+  window.addEventListener("pagehide", submitPlaytime);
+  window.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "hidden") submitPlaytime();
+  });
   window.addEventListener("beforeunload", submitPlaytime);
 })();
