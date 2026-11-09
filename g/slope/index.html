@@ -53,7 +53,7 @@
                 return String(s || "").toLowerCase().replace(/[^a-z0-9\s:]/g, " ").replace(/\s+/g, " ").trim();
             }
             function isGameOver(s) {
-                return /game\s*over|try\s*again|play\s*again|you\s*crashed|crashed|best\s*score/.test(normalized(s));
+                return /game\s*over|try\s*again|play\s*again|you\s*crashed|crashed|best\s*score|again/.test(normalized(s));
             }
             function extractScore(s) {
                 var clean = String(s || "").replace(/,/g, "");
@@ -85,7 +85,7 @@
                 scanning = true;
                 try {
                     var screenText = await readCanvas(canvas);
-                    setStatus("OCR running · watching for game-over screen");
+                    setStatus("OCR running · watching for AGAIN / game-over screen");
                     var ended = isGameOver(screenText);
                     var liveScore = extractScore(screenText);
                     var hasLabeledScore = /(?:score|distance|points?)\\s*[:\\-]?\\s*[0-9]{1,9}/i.test(screenText);
