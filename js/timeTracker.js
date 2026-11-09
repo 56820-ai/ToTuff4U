@@ -10,7 +10,7 @@
   s.src = 'https://www.googletagmanager.com/gtm.js?id=GTM-KHTBG5BX';
   (document.head || document.documentElement).appendChild(s);
 })();
-// Minecraft has no single built-in score, so it ranks by accumulated playtime.
+// Minecraft and Retro Bowl rank by accumulated playtime per visit.
 (function () {
   "use strict";
   var path = location.pathname.replace(/\/+$/, "").toLowerCase();
@@ -23,13 +23,13 @@
     if (playerName) try { localStorage.setItem("arcadeLeaderboardPlayerName", playerName); } catch (e) {}
   }
   if (!playerName || !window.ArcadeScores) return;
-  var startedAt = Date.now(), submitted = false;
+  var startedAt = Date.now(), submitted = false;\n  // Submit on both navigation and tab close; the guard prevents duplicates.
   function submitPlaytime() {
     if (submitted) return;
     submitted = true;
     var seconds = Math.max(0, Math.floor((Date.now() - startedAt) / 1000));
     if (seconds >= 5) window.ArcadeScores.submitSession(gameTitle, seconds, playerName);
   }
-  window.addEventListener("pagehide", submitPlaytime);
+  window.addEventListener("pagehide", submitPlaytime);\n  window.addEventListener("visibilitychange", function () {\n    if (document.visibilityState === "hidden") submitPlaytime();\n  });
   window.addEventListener("beforeunload", submitPlaytime);
 })();
