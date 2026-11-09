@@ -1,6 +1,6 @@
 <html>
 <head>
-<script src="/js/favicon.js"></script>
+<script src="../../js/favicon.js"></script>
 <script src="/js/panic.js"></script>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-X514E26P5B"></script>
 <script src="/js/gtag.js"></script>
@@ -9,7 +9,7 @@
   <script src="/js/timeTracker.js" defer></script>
 <script src="/js/auto-clicker.js"></script>
 <title>Grades & Attendence</title>
-<link rel="icon" type="image/x-icon" href="/images/favicon.png">
+<link rel="icon" type="image/x-icon" href="../../images/favicon.png">
 <link rel="stylesheet" href="TemplateData/style.css">
     <script src="TemplateData/UnityProgress.js"></script>
     <script src="TemplateData/unityloader41.js"></script>
@@ -97,7 +97,8 @@
                         handled = true;
                         var score = hasLabeledScore && liveScore > 0 ? liveScore : latestScore;
                         if (Number.isSafeInteger(score) && score > 0 && window.ArcadeScores && window.ArcadeScores.configured) {
-                            var submitted = await window.ArcadeScores.promptAndSubmit("Slope", score);\n                            setStatus(submitted ? "score submitted" : "score submission cancelled or failed");
+                            var submitted = await window.ArcadeScores.promptAndSubmit("Slope", score);
+                            setStatus(submitted ? "score submitted" : "score submission cancelled or failed");
                         } else if (!window.ArcadeScores || !window.ArcadeScores.configured) {
                             promptOcrIssue("Game over detected, but the leaderboard connection is unavailable.");
                         } else {
@@ -109,7 +110,8 @@
                         latestScore = null;
                     }
                 } catch (e) {
-                    console.warn("Slope leaderboard detection failed:", e);\n                    promptOcrIssue("OCR failed: " + (e && e.message ? e.message : "unknown error"));
+                    console.warn("Slope leaderboard detection failed:", e);
+                    promptOcrIssue("OCR failed: " + (e && e.message ? e.message : "unknown error"));
                 } finally {
                     scanning = false;
                 }
@@ -124,8 +126,8 @@
               var script = document.createElement("script");
               script.src = "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
               script.async = true;
-              script.onload = function () { window.setInterval(tick, 900); };
-              script.onerror = function () { console.warn("Slope leaderboard OCR could not load."); };
+              script.onload = function () { setStatus("OCR loaded · watching game"); window.setInterval(tick, 900); };
+              script.onerror = function () { console.warn("Slope leaderboard OCR could not load."); promptOcrIssue("Tesseract failed to load. Check connection and reload."); };
               document.head.appendChild(script);
             }
           }
