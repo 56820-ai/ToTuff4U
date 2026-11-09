@@ -76,22 +76,24 @@
                     var screenText = await readCanvas(canvas);
                     var ended = isGameOver(screenText);
                     var liveScore = extractScore(screenText);
-                    if (!ended && /(?:score|distance|points?)\s*[:\-]?\s*[0-9]{1,9}/i.test(screenText) && liveScore > 0) {
-                        latestScore = liveScore;
-                    }
-                    if (ended && !handled) {
+                    var hasLabeledScore = /(?:score|distance|points?)\\s*[:\\-]?\\s*[0-9]{1,9}/i.test(screenText);
+                    if (hasLabeledScore && liveScore > 0) latestScore = liveScore;
+
+                    // Require two consecutive end-screen reads to avoid false triggers.
+                    endScreenHits = ended ? endScreenHits + 1 : 0;
+                    if (endScreenHits >= 2 && !handled) {
                         handled = true;
-                        lastScreenText = screenText;
-                        var endScore = extractScore(screenText);
-                        var score = endScore > 0 ? endScore : latestScore;
-                        if (Number.isSafeInteger(score) && score > 0) {
+                        var score = hasLabeledScore && liveScore > 0 ? liveScore : latestScore;
+                        if (Number.isSafeInteger(score) && score > 0 && window.ArcadeScores && window.ArcadeScores.configured) {
                             await window.ArcadeScores.promptAndSubmit("Slope", score);
+                        } else if (!window.ArcadeScores || !window.ArcadeScores.configured) {
+                            window.alert("Slope detected the end of the run, but the leaderboard connection is unavailable.");
                         } else {
-                            window.alert("Slope ended, but its score could not be read automatically. Use Submit Slope Score to enter it.");
+                            window.alert("Slope detected the end of the run, but OCR could not read the score.");
                         }
                     } else if (!ended && handled) {
                         handled = false;
-                        lastScreenText = "";
+                        endScreenHits = 0;
                         latestScore = null;
                     }
                 } catch (e) {
