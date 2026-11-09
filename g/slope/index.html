@@ -126,11 +126,11 @@
 
             // OCR is optional; keep the manual submit button available even if OCR or
             // leaderboard configuration is unavailable.
-            if (leaderboardReady) {
+            {
               var script = document.createElement("script");
               script.src = "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
               script.async = true;
-              script.onload = function () { setStatus("OCR loaded · watching game"); window.setInterval(tick, 900); };
+              script.onload = function () { setStatus(leaderboardReady ? "OCR loaded · watching game" : "OCR loaded · leaderboard config missing"); window.setInterval(tick, 900); };
               script.onerror = function () { console.warn("Slope leaderboard OCR could not load."); promptOcrIssue("Tesseract failed to load. Check connection and reload."); };
               document.head.appendChild(script);
             }
