@@ -30,7 +30,8 @@
             Module: { onRuntimeInitialized: function () { UnityProgress(gameInstance, "complete"); } }
         });
 
-        (function connectSlopeLeaderboard() {
+        (function () {
+          function connectSlopeLeaderboard() {
             if (!window.ArcadeScores || !window.ArcadeScores.configured) return;
             var workerPromise = null, scanning = false, handled = false, lastScreenText = "", latestScore = null;
             function worker() {
@@ -100,8 +101,9 @@
                 var entered = window.prompt("Enter your Slope score (distance):", "");
                 if (entered === null) return;
                 var scoreText = entered.trim().replace(/,/g, "");
-                if (!/^\\d{1,9}$/.test(scoreText)) { window.alert("Please enter a whole-number score."); return; }
-                await window.ArcadeScores.promptAndSubmit("Slope", Number(scoreText));
+                if (!/^\d{1,9}$/.test(scoreText)) { window.alert("Please enter a whole-number score."); return; }
+                var submitted = await window.ArcadeScores.promptAndSubmit("Slope", Number(scoreText));
+                if (submitted) window.alert("Slope score submitted to the leaderboard!");
             });
             document.body.appendChild(manualButton);
 
@@ -111,6 +113,13 @@
             script.onload = function () { window.setInterval(tick, 1200); };
             script.onerror = function () { console.warn("Slope leaderboard OCR could not load."); };
             document.head.appendChild(script);
+          }
+          // This script is in the document head; wait until body exists before adding controls.
+          if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", connectSlopeLeaderboard, { once: true });
+          } else {
+            connectSlopeLeaderboard();
+          }
         })();
     </script>
 </head>
