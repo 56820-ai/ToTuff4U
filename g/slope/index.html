@@ -102,24 +102,9 @@
                     scanning = false;
                 }
             }
-            // Manual fallback: Unity canvas OCR can miss the end screen or score.
-            var manualButton = document.createElement("button");
-            manualButton.type = "button";
-            manualButton.textContent = "Submit Slope Score";
-            manualButton.style.cssText = "position:fixed;right:12px;bottom:12px;z-index:2147483647;padding:10px 14px;border:2px solid #6bffd9;border-radius:9px;background:#101525;color:#fff;font:bold 14px sans-serif;cursor:pointer;";
-            manualButton.addEventListener("click", async function () {
-                if (!window.ArcadeScores || !window.ArcadeScores.configured) {
-                    window.alert("The leaderboard connection is not configured on this page yet.");
-                    return;
-                }
-                var entered = window.prompt("Enter your Slope score (distance):", "");
-                if (entered === null) return;
-                var scoreText = entered.trim().replace(/,/g, "");
-                if (!/^\d{1,9}$/.test(scoreText)) { window.alert("Please enter a whole-number score."); return; }
-                var submitted = await window.ArcadeScores.promptAndSubmit("Slope", Number(scoreText));
-                if (submitted) window.alert("Slope score submitted to the leaderboard!");
-            });
-            document.body.appendChild(manualButton);
+            // No manual score entry: only scores detected from the game canvas are submitted.
+            // This prevents casual score fabrication through the page UI, but client-side
+            // OCR is not tamper-proof; strong anti-cheat requires server-side validation.
 
             // OCR is optional; keep the manual submit button available even if OCR or
             // leaderboard configuration is unavailable.
