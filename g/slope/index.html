@@ -33,7 +33,18 @@
         (function () {
           function connectSlopeLeaderboard() {
             var leaderboardReady = !!(window.ArcadeScores && window.ArcadeScores.configured);
-            var workerPromise = null, scanning = false, handled = false, endScreenHits = 0, latestScore = null;
+            var workerPromise = null, scanning = false, handled = false, endScreenHits = 0, latestScore = null, lastPromptAt = 0;
+            var status = document.createElement("div");
+            status.id = "slope-ocr-status";
+            status.style.cssText = "position:fixed;left:10px;bottom:10px;z-index:2147483647;padding:8px 11px;border-radius:8px;background:#101525;color:#fff;border:1px solid #6bffd9;font:12px sans-serif;max-width:min(90vw,420px);";
+            status.textContent = "Slope leaderboard: starting OCR…";
+            document.body.appendChild(status);
+            function setStatus(message) { status.textContent = "Slope leaderboard: " + message; }
+            function promptOcrIssue(message) {
+              setStatus(message);
+              var now = Date.now();
+              if (now - lastPromptAt > 60000) { lastPromptAt = now; window.alert("Slope leaderboard OCR needs attention. " + message + "\\n\\nReload Slope and try again. Scores are not submitted unless OCR detects them."); }
+            }
             function worker() {
                 if (!workerPromise) workerPromise = window.Tesseract.createWorker("eng");
                 return workerPromise;
@@ -74,6 +85,7 @@
                 scanning = true;
                 try {
                     var screenText = await readCanvas(canvas);
+                    setStatus("OCR running · watching for game-over screen");
                     var ended = isGameOver(screenText);
                     var liveScore = extractScore(screenText);
                     var hasLabeledScore = /(?:score|distance|points?)\\s*[:\\-]?\\s*[0-9]{1,9}/i.test(screenText);
@@ -85,11 +97,11 @@
                         handled = true;
                         var score = hasLabeledScore && liveScore > 0 ? liveScore : latestScore;
                         if (Number.isSafeInteger(score) && score > 0 && window.ArcadeScores && window.ArcadeScores.configured) {
-                            await window.ArcadeScores.promptAndSubmit("Slope", score);
+                            var submitted = await window.ArcadeScores.promptAndSubmit("Slope", score);\n                            setStatus(submitted ? "score submitted" : "score submission cancelled or failed");
                         } else if (!window.ArcadeScores || !window.ArcadeScores.configured) {
-                            window.alert("Slope detected the end of the run, but the leaderboard connection is unavailable.");
+                            promptOcrIssue("Game over detected, but the leaderboard connection is unavailable.");
                         } else {
-                            window.alert("Slope detected the end of the run, but OCR could not read the score.");
+                            promptOcrIssue("Game over detected, but OCR could not read the score.");
                         }
                     } else if (!ended && handled) {
                         handled = false;
@@ -97,7 +109,7 @@
                         latestScore = null;
                     }
                 } catch (e) {
-                    console.warn("Slope leaderboard detection failed:", e);
+                    console.warn("Slope leaderboard detection failed:", e);\n                    promptOcrIssue("OCR failed: " + (e && e.message ? e.message : "unknown error"));
                 } finally {
                     scanning = false;
                 }
