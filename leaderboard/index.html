@@ -532,8 +532,10 @@
         .forEach(item => {
           const timed = timedGames.has(String(item.game_title || "").trim().toLowerCase());
           const seconds = Math.max(0, Number(item.score) || 0);
+          const reaction = String(item.game_title || "").trim().toLowerCase() === "reaction test";
           const displayScore = timed
             ? (seconds >= 3600 ? Math.floor(seconds / 3600) + "h " + Math.floor((seconds % 3600) / 60) + "m" : Math.floor(seconds / 60) + "m " + (seconds % 60) + "s")
+            : reaction ? Math.max(0, 10000 - Number(item.score)).toLocaleString() + " ms"
             : Number(item.score).toLocaleString();
           createLeaderboardItem({
             username: item.player_name,
