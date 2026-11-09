@@ -28,6 +28,7 @@
   (document.body || document.documentElement).appendChild(timer);
 
   var totalSeconds = 0;
+  var pendingSeconds = 0;
   var segmentStartedAt = document.visibilityState === "hidden" ? null : Date.now();
   var ended = false;
   function formatTime(seconds) {
@@ -41,12 +42,14 @@
   }
   function flushSegment() {
     if (segmentStartedAt === null) return;
-    totalSeconds += Math.max(0, Math.floor((Date.now() - segmentStartedAt) / 1000));
+    var segmentSeconds = Math.max(0, Math.floor((Date.now() - segmentStartedAt) / 1000));
+    totalSeconds += segmentSeconds;
+    pendingSeconds += segmentSeconds;
     segmentStartedAt = null;
     updateTimer();
-    if (totalSeconds >= 5 && window.ArcadeScores && typeof window.ArcadeScores.submitSession === "function") {
-      window.ArcadeScores.submitSession(gameTitle, totalSeconds, playerName);
-      totalSeconds = 0;
+    if (pendingSeconds >= 5 && window.ArcadeScores && typeof window.ArcadeScores.submitSession === "function") {
+      window.ArcadeScores.submitSession(gameTitle, pendingSeconds, playerName);
+      pendingSeconds = 0;
     }
   }
   function onVisibilityChange() {
