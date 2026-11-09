@@ -81,6 +81,20 @@
                     scanning = false;
                 }
             }
+            // Manual fallback: Unity canvas OCR can miss the end screen or score.
+            var manualButton = document.createElement("button");
+            manualButton.type = "button";
+            manualButton.textContent = "Submit Slope Score";
+            manualButton.style.cssText = "position:fixed;right:12px;bottom:12px;z-index:2147483647;padding:10px 14px;border:2px solid #6bffd9;border-radius:9px;background:#101525;color:#fff;font:bold 14px sans-serif;cursor:pointer;";
+            manualButton.addEventListener("click", async function () {
+                var entered = window.prompt("Enter your Slope score (distance):", "");
+                if (entered === null) return;
+                var scoreText = entered.trim().replace(/,/g, "");
+                if (!/^\\d{1,9}$/.test(scoreText)) { window.alert("Please enter a whole-number score."); return; }
+                await window.ArcadeScores.promptAndSubmit("Slope", Number(scoreText));
+            });
+            document.body.appendChild(manualButton);
+
             var script = document.createElement("script");
             script.src = "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
             script.async = true;
