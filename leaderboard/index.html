@@ -521,9 +521,16 @@
           if (!previous || Number(item.score) > Number(previous.score)) bestByGameAndPlayer.set(key, item);
         }
       });
+      // Show only the top 10 players for each game, not every recorded score.
+      const topScoresByGame = new Map();
       [...bestByGameAndPlayer.values()]
         .sort((a, b) => String(a.game_title).localeCompare(String(b.game_title)) || Number(b.score) - Number(a.score))
         .forEach(item => {
+          const gameKey = String(item.game_title || "Game").trim().toLowerCase();
+          if (!topScoresByGame.has(gameKey)) topScoresByGame.set(gameKey, []);
+          if (topScoresByGame.get(gameKey).length < 10) topScoresByGame.get(gameKey).push(item);
+        });
+      [...topScoresByGame.values()].flat().forEach(item => {
           const timed = timedGames.has(String(item.game_title || "").trim().toLowerCase());
           const seconds = Math.max(0, Number(item.score) || 0);
           const reaction = String(item.game_title || "").trim().toLowerCase() === "reaction test";
