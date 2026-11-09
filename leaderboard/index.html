@@ -521,14 +521,14 @@
           if (!previous || Number(item.score) > Number(previous.score)) bestByGameAndPlayer.set(key, item);
         }
       });
-      // Show only the top 10 players for each game, not every recorded score.
+      // Show only the single top player for each game.
       const topScoresByGame = new Map();
       [...bestByGameAndPlayer.values()]
         .sort((a, b) => String(a.game_title).localeCompare(String(b.game_title)) || Number(b.score) - Number(a.score))
         .forEach(item => {
           const gameKey = String(item.game_title || "Game").trim().toLowerCase();
           if (!topScoresByGame.has(gameKey)) topScoresByGame.set(gameKey, []);
-          if (topScoresByGame.get(gameKey).length < 10) topScoresByGame.get(gameKey).push(item);
+          if (topScoresByGame.get(gameKey).length < 1) topScoresByGame.get(gameKey).push(item);
         });
       [...topScoresByGame.values()].flat().forEach(item => {
           const timed = timedGames.has(String(item.game_title || "").trim().toLowerCase());
