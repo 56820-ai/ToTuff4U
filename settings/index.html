@@ -780,6 +780,34 @@
                 height: 80px;
             }
         }
+     
+        /* Responsive settings: allow every section and control to flow vertically. */
+        html { height: auto; min-height: 100%; overflow-y: auto; }
+        body { height: auto; min-height: 100vh; overflow-x: hidden; overflow-y: auto; }
+        .page { width: 100%; min-width: 0; padding: clamp(0.75rem, 4vw, 2.5rem); }
+        .settings-container { width: 100%; min-width: 0; height: auto !important; max-height: none !important; overflow: visible !important; }
+        .settings-tabs { flex-wrap: wrap; }
+        .tab-content { height: auto !important; min-height: 0; overflow: visible !important; padding: clamp(0.75rem, 4vw, 2.5rem); }
+        .setting-card { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
+        .buttons { flex-wrap: wrap; }
+        button, input, select, textarea { max-width: 100%; }
+        .dropdown { max-width: 100%; }
+        .dropdown-menu { max-width: 100%; max-height: 60vh; overflow-y: auto; }
+        .cards-container { min-width: 0; }
+        .credit-card { min-width: 0; max-width: 100%; }
+        @media (max-width: 700px) {
+          .page { padding: 0.75rem; }
+          h1 { font-size: clamp(1.25rem, 6vw, 2rem); letter-spacing: 1px; }
+          .settings-tabs { flex-direction: column; }
+          .tab-link { width: 100%; justify-content: center; padding: 0.85rem; }
+          .tab-content { padding: 0.75rem; }
+          .setting-card { padding: 1rem; margin-bottom: 1rem; }
+          .setting-card p { font-size: 1.05rem; }
+          .buttons { flex-direction: column; align-items: stretch; }
+          .buttons button { width: 100%; }
+          .modal-content { width: calc(100% - 1.5rem); max-height: calc(100vh - 2rem); overflow-y: auto; margin: 1rem auto; padding: 1rem; }
+        }
+
     </style>
 </head>
 <body>
