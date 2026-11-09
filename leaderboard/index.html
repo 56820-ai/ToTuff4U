@@ -501,34 +501,28 @@
         scoreList.appendChild(empty);
         return;
       }
-      // Timed games rank players by their accumulated playtime; other games
-      // continue to rank by their single highest submitted score.
+      // Keep each player's best score for each game; Minecraft accumulates playtime.
       const timedGames = new Set(["minecraft"]);
-      const bestByGame = new Map();
-      const playtimeByPlayer = new Map();
+      const bestByGameAndPlayer = new Map();
       onlineScores.forEach(item => {
-        const key = String(item.game_title || "Game").trim().toLowerCase();
-        if (timedGames.has(key)) {
-          const playerKey = key + "::" + String(item.player_name || "Player").trim().toLowerCase();
-          const previous = playtimeByPlayer.get(playerKey);
+        const gameKey = String(item.game_title || "Game").trim().toLowerCase();
+        const playerKey = String(item.player_name || "Player").trim().toLowerCase();
+        const key = gameKey + "::" + playerKey;
+        if (timedGames.has(gameKey)) {
+          const previous = bestByGameAndPlayer.get(key);
           if (previous) {
             previous.score += Number(item.score) || 0;
             if (new Date(item.created_at) > new Date(previous.created_at)) previous.created_at = item.created_at;
           } else {
-            playtimeByPlayer.set(playerKey, { ...item, score: Number(item.score) || 0 });
+            bestByGameAndPlayer.set(key, { ...item, score: Number(item.score) || 0 });
           }
         } else {
-          const previous = bestByGame.get(key);
-          if (!previous || Number(item.score) > Number(previous.score)) bestByGame.set(key, item);
+          const previous = bestByGameAndPlayer.get(key);
+          if (!previous || Number(item.score) > Number(previous.score)) bestByGameAndPlayer.set(key, item);
         }
       });
-      for (const item of playtimeByPlayer.values()) {
-        const key = String(item.game_title || "Game").trim().toLowerCase();
-        const previous = bestByGame.get(key);
-        if (!previous || item.score > Number(previous.score)) bestByGame.set(key, item);
-      }
-      [...bestByGame.values()]
-        .sort((a, b) => String(a.game_title).localeCompare(String(b.game_title)))
+      [...bestByGameAndPlayer.values()]
+        .sort((a, b) => String(a.game_title).localeCompare(String(b.game_title)) || Number(b.score) - Number(a.score))
         .forEach(item => {
           const timed = timedGames.has(String(item.game_title || "").trim().toLowerCase());
           const seconds = Math.max(0, Number(item.score) || 0);
