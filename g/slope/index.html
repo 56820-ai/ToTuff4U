@@ -32,7 +32,7 @@
 
         (function connectSlopeLeaderboard() {
             if (!window.ArcadeScores || !window.ArcadeScores.configured) return;
-            var workerPromise = null, scanning = false, handled = false, lastScreenText = "";
+            var workerPromise = null, scanning = false, handled = false, lastScreenText = "", latestScore = null;
             function worker() {
                 if (!workerPromise) workerPromise = window.Tesseract.createWorker("eng");
                 return workerPromise;
@@ -66,14 +66,24 @@
                 try {
                     var screenText = await readCanvas(canvas);
                     var ended = isGameOver(screenText);
+                    var liveScore = extractScore(screenText);
+                    if (!ended && /(?:score|distance|points?)\s*[:\-]?\s*[0-9]{1,9}/i.test(screenText) && liveScore > 0) {
+                        latestScore = liveScore;
+                    }
                     if (ended && !handled) {
                         handled = true;
                         lastScreenText = screenText;
-                        var score = extractScore(screenText);
-                        await window.ArcadeScores.promptAndSubmit("Slope", score);
+                        var endScore = extractScore(screenText);
+                        var score = endScore > 0 ? endScore : latestScore;
+                        if (Number.isSafeInteger(score) && score > 0) {
+                            await window.ArcadeScores.promptAndSubmit("Slope", score);
+                        } else {
+                            window.alert("Slope ended, but its score could not be read automatically. Use Submit Slope Score to enter it.");
+                        }
                     } else if (!ended && handled) {
                         handled = false;
                         lastScreenText = "";
+                        latestScore = null;
                     }
                 } catch (e) {
                     console.warn("Slope leaderboard detection failed:", e);
