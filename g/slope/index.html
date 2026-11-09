@@ -33,13 +33,27 @@
         (function () {
           function connectSlopeLeaderboard() {
             var leaderboardReady = !!(window.ArcadeScores && window.ArcadeScores.configured);
-            var workerPromise = null, scanning = false, handled = false, endScreenHits = 0, latestScore = null, maxScore = 0, lastPromptAt = 0, lastText = "";
+            var workerPromise = null, scanning = false, handled = false, endScreenHits = 0, latestScore = null, maxScore = 0, lastPromptAt = 0, lastText = "", trackingEnabled = false;
             var status = document.createElement("div");
             status.id = "slope-ocr-status";
             status.style.cssText = "position:fixed;left:10px;bottom:10px;z-index:2147483647;padding:8px 11px;border-radius:8px;background:#101525;color:#fff;border:1px solid #6bffd9;font:12px sans-serif;max-width:min(90vw,420px);";
-            status.textContent = "Slope leaderboard: starting OCR…";
+            status.textContent = "Slope leaderboard: click Leaderboard at the top to start tracking.";
             document.body.appendChild(status);
             function setStatus(message) { status.textContent = "Slope leaderboard: " + message; }
+            // Arm score tracking when the player clicks the page's top Leaderboard control.
+            document.addEventListener("click", function (event) {
+              var target = event.target && event.target.closest ? event.target.closest("button, a, [role='button']") : null;
+              if (!target) return;
+              var label = normalized(target.innerText || target.textContent || target.getAttribute("aria-label") || "");
+              if (label.indexOf("leaderboard") !== -1) {
+                trackingEnabled = true;
+                handled = false;
+                endScreenHits = 0;
+                latestScore = null;
+                maxScore = 0;
+                setStatus("Leaderboard clicked · tracking score until you die");
+              }
+            }, true);
             function promptOcrIssue(message) {
               setStatus(message);
               var now = Date.now();
@@ -83,7 +97,7 @@
             }
             async function tick() {
                 var canvas = document.querySelector("#gameContainer canvas");
-                if (scanning || !canvas || !canvas.width || !canvas.height || !window.Tesseract) return;
+                if (!trackingEnabled || scanning || !canvas || !canvas.width || !canvas.height || !window.Tesseract) return;
                 scanning = true;
                 try {
                     var screenText = await readCanvas(canvas);
@@ -135,7 +149,7 @@
               var script = document.createElement("script");
               script.src = "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
               script.async = true;
-              script.onload = function () { setStatus(leaderboardReady ? "OCR loaded · watching game" : "OCR loaded · leaderboard config missing"); window.setInterval(tick, 900); };
+              script.onload = function () { setStatus(leaderboardReady ? "OCR loaded · click Leaderboard at top to begin" : "OCR loaded · leaderboard config missing"); window.setInterval(tick, 900); };
               script.onerror = function () { console.warn("Slope leaderboard OCR could not load."); promptOcrIssue("Tesseract failed to load. Check connection and reload."); };
               document.head.appendChild(script);
             }
