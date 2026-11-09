@@ -89,13 +89,17 @@
                     var ended = isGameOver(screenText);
                     var liveScore = extractScore(screenText);
                     var hasLabeledScore = /(?:score|distance|points?)\\s*[:\\-]?\\s*[0-9]{1,9}/i.test(screenText);
-                    if (hasLabeledScore && liveScore > 0) latestScore = liveScore;
-
-                    // Require two consecutive end-screen reads to avoid false triggers.
+                    // Update the run score continuously while alive.
+                    if (!ended && liveScore > 0) {
+                        latestScore = liveScore;
+                        setStatus("RUNNING · score " + liveScore + " · waiting for game over");
+                    } else if (ended) {
+                        setStatus("GAME OVER detected · final score " + (liveScore || latestScore || "unread"));
+                    }
                     endScreenHits = ended ? endScreenHits + 1 : 0;
                     if (endScreenHits >= 2 && !handled) {
                         handled = true;
-                        var score = hasLabeledScore && liveScore > 0 ? liveScore : latestScore;
+                        var score = liveScore > 0 ? liveScore : latestScore;
                         if (Number.isSafeInteger(score) && score > 0 && window.ArcadeScores && window.ArcadeScores.configured) {
                             var submitted = await window.ArcadeScores.promptAndSubmit("Slope", score);
                             setStatus(submitted ? "score submitted" : "score submission cancelled or failed");
