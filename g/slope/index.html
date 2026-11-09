@@ -33,7 +33,7 @@
         (function () {
           function connectSlopeLeaderboard() {
             var leaderboardReady = !!(window.ArcadeScores && window.ArcadeScores.configured);
-            var workerPromise = null, scanning = false, handled = false, endScreenHits = 0, latestScore = null, lastPromptAt = 0;
+            var workerPromise = null, scanning = false, handled = false, endScreenHits = 0, latestScore = null, lastPromptAt = 0, lastText = "";
             var status = document.createElement("div");
             status.id = "slope-ocr-status";
             status.style.cssText = "position:fixed;left:10px;bottom:10px;z-index:2147483647;padding:8px 11px;border-radius:8px;background:#101525;color:#fff;border:1px solid #6bffd9;font:12px sans-serif;max-width:min(90vw,420px);";
@@ -53,7 +53,7 @@
                 return String(s || "").toLowerCase().replace(/[^a-z0-9\s:]/g, " ").replace(/\s+/g, " ").trim();
             }
             function isGameOver(s) {
-                return /game\s*over|try\s*again|play\s*again|you\s*crashed|crashed|best\s*score|again/.test(normalized(s));
+                return /game\s*over|try\s*again|play\s*again|you\s*crashed|crashed|best\s*score|again|retry|restart|continue|score\s*[:\-]?\s*\d+/i.test(normalized(s));
             }
             function extractScore(s) {
                 var clean = String(s || "").replace(/,/g, "");
@@ -97,7 +97,7 @@
                         setStatus("GAME OVER detected · final score " + (liveScore || latestScore || "unread"));
                     }
                     endScreenHits = ended ? endScreenHits + 1 : 0;
-                    if (endScreenHits >= 2 && !handled) {
+                    if (endScreenHits >= 1 && !handled) {
                         handled = true;
                         var score = liveScore > 0 ? liveScore : latestScore;
                         if (Number.isSafeInteger(score) && score > 0 && window.ArcadeScores && window.ArcadeScores.configured) {
