@@ -401,7 +401,26 @@
         font-size: 1.3rem;
       }
     }
-  </style>
+  
+    /* Responsive layout: keep the document scrollable instead of trapping content. */
+    html { height: auto; min-height: 100%; overflow-y: auto; }
+    body { height: auto; min-height: 100vh; overflow-x: hidden; overflow-y: auto; }
+    .leaderboard-container { width: min(100%, 1000px); min-width: 0; padding: clamp(0.75rem, 4vw, 2.5rem); }
+    .leaderboard { height: auto !important; max-height: none !important; overflow: visible !important; }
+    #score-list { min-width: 0; }
+    .leaderboard-item { min-width: 0; }
+    .player-info { min-width: 0; overflow-wrap: anywhere; }
+    .game-title, .username, .date, .score { overflow-wrap: anywhere; }
+    @media (max-width: 700px) {
+      .leaderboard-container { padding: 1rem 0.75rem; }
+      h1 { font-size: clamp(1.25rem, 6vw, 1.8rem); letter-spacing: 1px; }
+      .leaderboard-item { gap: 0.5rem; }
+      .game-title { font-size: 1.1rem; }
+      .username, .date { font-size: 1rem; }
+      .score { font-size: 1.15rem; }
+    }
+
+    </style>
 </head>
 <body>
   <div class="leaderboard-container">
