@@ -95,9 +95,20 @@
 
   async function getScores() {
     try {
-      return await request("scores?select=id,player_name,game_title,score,created_at&order=created_at.desc&limit=1000", {
-        method: "GET"
-      });
+      // Fetch the entire score history in pages. A single 1,000-row query can
+      // hide games whose scores are older or smaller than the busiest games.
+      const pageSize = 1000;
+      const allScores = [];
+      for (let offset = 0; ; offset += pageSize) {
+        const page = await request(
+          "scores?select=id,player_name,game_title,score,created_at&order=created_at.desc&limit=" + pageSize + "&offset=" + offset,
+          { method: "GET" }
+        );
+        if (!Array.isArray(page) || page.length === 0) break;
+        allScores.push(...page);
+        if (page.length < pageSize) break;
+      }
+      return allScores;
     } catch (error) {
       console.warn("Arcade Atlas: could not load online scores.", error.message);
       return [];
