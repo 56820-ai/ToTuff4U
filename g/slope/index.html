@@ -110,6 +110,12 @@
                 var result = await recognizeCanvas(canvas, 0.02, 0.18, true, 0.32, 0.36);
                 return extractScore(result);
             }
+            // Slope shows the final run score in the middle of its crash/end screen,
+            // not in the live HUD crop. Scan that center region when the run ends.
+            async function readEndScreenScore(canvas) {
+                var result = await recognizeCanvas(canvas, 0.30, 0.42, true, 0.18, 0.64);
+                return extractScore(result);
+            }
             async function readGameState(canvas) {
                 return await recognizeCanvas(canvas, 0, 1, false);
             }
@@ -175,6 +181,13 @@
                     // End detection does not depend on score OCR succeeding.
                     stoppedHits = gameStarted && !moving ? stoppedHits + 1 : 0;
                     var ended = textEnded || (gameStarted && stoppedHits >= 10);
+                    if (ended && gameStarted) {
+                        var endScoreReading = await readEndScreenScore(canvas);
+                        if (endScoreReading.value > 0) {
+                            maxScore = Math.max(maxScore, endScoreReading.value);
+                            latestScore = Math.max(latestScore, endScoreReading.value);
+                        }
+                    }
                     if (!gameStarted) setStatus("waiting for gameplay motion");
                     else if (!ended) setStatus("RUNNING · score read " + (latestScore || "waiting") + " · best " + maxScore);
                     else setStatus("game ended · confirming (" + endScreenHits + "/2)");
