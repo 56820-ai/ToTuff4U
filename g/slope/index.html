@@ -128,6 +128,40 @@
             async function readGameState(canvas) {
                 return await recognizeCanvas(canvas, 0, 1, false);
             }
+            // Detect actual gameplay motion independently of score OCR. The title,
+            // menu and leaderboard can have no readable score, so compare small
+            // canvas snapshots across scans and require sustained movement.
+            var previousFrame = null, motionHits = 0;
+            function detectGameplayMotion(canvas) {
+                var sample = document.createElement("canvas");
+                sample.width = 24;
+                sample.height = 14;
+                var ctx = sample.getContext("2d", { willReadFrequently: true });
+                ctx.drawImage(canvas, 0, 0, sample.width, sample.height);
+                var pixels = ctx.getImageData(0, 0, sample.width, sample.height).data;
+                var current = new Uint8Array(sample.width * sample.height * 3);
+                for (var i = 0, j = 0; i < pixels.length; i += 4) {
+                    current[j++] = pixels[i];
+                    current[j++] = pixels[i + 1];
+                    current[j++] = pixels[i + 2];
+                }
+                if (!previousFrame) {
+                    previousFrame = current;
+                    return false;
+                }
+                var changed = 0, totalDelta = 0;
+                for (var k = 0; k < current.length; k += 3) {
+                    var delta = Math.abs(current[k] - previousFrame[k]) +
+                        Math.abs(current[k + 1] - previousFrame[k + 1]) +
+                        Math.abs(current[k + 2] - previousFrame[k + 2]);
+                    totalDelta += delta;
+                    if (delta > 42) changed++;
+                }
+                previousFrame = current;
+                var changedRatio = changed / (current.length / 3);
+                var averageDelta = totalDelta / (current.length / 3);
+                return changedRatio > 0.10 && averageDelta > 10;
+            }
             async function tick() {
                 var canvas = document.querySelector("#gameContainer canvas");
                 if (scanning || !canvas || !canvas.width || !canvas.height || !window.Tesseract) return;
@@ -137,8 +171,11 @@
                     var liveScore = scoreReading.value;
                     var screenText = await readGameState(canvas);
                     var ended = isRunEnded(screenText);
-                    // A run is armed only after a real HUD score is seen. Confirm
-                    // score readings on two scans before accepting a new value.
+                    var moving = detectGameplayMotion(canvas);
+                    motionHits = (!ended && moving) ? motionHits + 1 : 0;
+                    // Either two consistent HUD score reads OR sustained visual
+                    // movement can arm a run. This avoids relying on OCR at startup.
+                    if (!ended && motionHits >= 3) gameStarted = true;
                     if (!ended && liveScore > 0) {
                         if (scoreCandidate !== null && Math.abs(liveScore - scoreCandidate) <= Math.max(2, scoreCandidate * 0.04)) {
                             scoreCandidateHits++;
@@ -181,6 +218,8 @@
                         maxScore = 0;
                         scoreCandidate = null;
                         scoreCandidateHits = 0;
+                        motionHits = 0;
+                        previousFrame = null;
                     }
                 } catch (e) {
                     console.warn("Slope leaderboard detection failed:", e);
