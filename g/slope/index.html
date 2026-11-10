@@ -72,12 +72,17 @@
                     return { value:Number(raw), confidence:Number(word.confidence)||0,
                       x0:Number(box.x0)||0,y0:Number(box.y0)||0,x1:Number(box.x1)||0,y1:Number(box.y1)||0 };
                 }).filter(function(x) {
-                    return x && x.value >= 1 && x.confidence >= 65 &&
-                      (x.x1-x.x0) > 4 && (x.y1-x.y0) > 5;
+                    return x && x.value >= 1 && x.confidence >= 30 &&
+                      (x.x1-x.x0) > 3 && (x.y1-x.y0) > 4;
                 });
+                // On the end screen, score is a large centered number. Prefer
+                // the OCR token whose bounding-box center is closest to canvas
+                // center, then larger glyphs, rather than confidence alone.
                 candidates.sort(function(a,b) {
-                    return (b.confidence-a.confidence) ||
-                      (Math.abs(a.x0-0.5)-Math.abs(b.x0-0.5));
+                    var acx=(a.x0+a.x1)/2, acy=(a.y0+a.y1)/2;
+                    var bcx=(b.x0+b.x1)/2, bcy=(b.y0+b.y1)/2;
+                    var ad=Math.hypot(acx-0.5,acy-0.5), bd=Math.hypot(bcx-0.5,bcy-0.5);
+                    return ad-bd || ((b.x1-b.x0)*(b.y1-b.y0)-(a.x1-a.x0)*(a.y1-a.y0)) || b.confidence-a.confidence;
                 });
                 return candidates[0] || {value:0,confidence:0};
             }
@@ -113,7 +118,9 @@
             // Slope shows the final run score in the middle of its crash/end screen,
             // not in the live HUD crop. Scan that center region when the run ends.
             async function readEndScreenScore(canvas) {
-                var result = await recognizeCanvas(canvas, 0.30, 0.42, true, 0.18, 0.64);
+                // OCR the broad central half of the end screen: Slope's score
+                // is visibly centered, and narrow crops can miss its font/scale.
+                var result = await recognizeCanvas(canvas, 0.20, 0.60, true, 0.15, 0.70);
                 return extractScore(result);
             }
             async function readGameState(canvas) {
