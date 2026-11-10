@@ -35,7 +35,7 @@
             var leaderboardReady = !!(window.ArcadeScores && window.ArcadeScores.configured);
             var workerPromise = null, scanning = false, handled = false;
             var endScreenHits = 0, latestScore = 0, maxScore = 0, lastPromptAt = 0;
-            var gameStarted = false, scoreCandidate = null, scoreCandidateHits = 0;
+            var gameStarted = false, scoreCandidate = null, scoreCandidateHits = 0, lastObservedScore = null, stoppedHits = 0;
             var status = document.createElement("div");
             status.id = "slope-ocr-status";
             status.style.cssText = "position:fixed;left:10px;bottom:10px;z-index:2147483647;padding:8px 11px;border-radius:8px;background:#101525;color:#fff;border:1px solid #6bffd9;font:12px sans-serif;max-width:min(90vw,420px);";
@@ -170,25 +170,32 @@
                     var scoreReading = await readHudScore(canvas);
                     var liveScore = scoreReading.value;
                     var screenText = await readGameState(canvas);
-                    var ended = isRunEnded(screenText);
+                    var textEnded = isRunEnded(screenText);
                     var moving = detectGameplayMotion(canvas);
-                    motionHits = (!ended && moving) ? motionHits + 1 : 0;
-                    // Either two consistent HUD score reads OR sustained visual
-                    // movement can arm a run. This avoids relying on OCR at startup.
-                    if (!ended && motionHits >= 3) gameStarted = true;
-                    if (!ended && liveScore > 0) {
-                        if (scoreCandidate !== null && Math.abs(liveScore - scoreCandidate) <= Math.max(2, scoreCandidate * 0.04)) {
-                            scoreCandidateHits++;
-                        } else {
+                    motionHits = (!textEnded && moving) ? motionHits + 1 : 0;
+                    // Movement arms a run; static menu/HUD OCR values never count.
+                    if (!textEnded && motionHits >= 3) gameStarted = true;
+                    // Accept only a rising score sequence during an armed run.
+                    if (gameStarted && !textEnded && liveScore > 0) {
+                        if (lastObservedScore === null) {
+                            lastObservedScore = liveScore;
                             scoreCandidate = liveScore;
                             scoreCandidateHits = 1;
-                        }
-                        if (scoreCandidateHits >= 2) {
-                            gameStarted = true;
-                            latestScore = liveScore;
-                            if (liveScore > maxScore) maxScore = liveScore;
+                        } else if (liveScore > lastObservedScore) {
+                            lastObservedScore = liveScore;
+                            scoreCandidateHits++;
+                            if (scoreCandidateHits >= 2) {
+                                latestScore = liveScore;
+                                maxScore = Math.max(maxScore, liveScore);
+                            }
+                        } else if (liveScore < lastObservedScore) {
+                            scoreCandidateHits = 0;
                         }
                     }
+                    // If OCR misses the death text, detect a sustained stop after
+                    // gameplay. Brief pauses do not end a run.
+                    stoppedHits = (gameStarted && !moving) ? stoppedHits + 1 : 0;
+                    var ended = textEnded || (gameStarted && stoppedHits >= 8 && maxScore > 0);
                     endScreenHits = (gameStarted && ended) ? endScreenHits + 1 : 0;
                     if (!gameStarted) {
                         setStatus("waiting for a run to start · automatic detection active");
@@ -218,6 +225,8 @@
                         maxScore = 0;
                         scoreCandidate = null;
                         scoreCandidateHits = 0;
+                        lastObservedScore = null;
+                        stoppedHits = 0;
                         motionHits = 0;
                         previousFrame = null;
                     }
