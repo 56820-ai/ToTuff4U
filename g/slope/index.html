@@ -63,41 +63,67 @@
                 var t = normalized(s);
                 return /leader ?board|play again|try again|game over|you crashed/.test(t);
             }
-            function extractScore(s) {
-                var nums = String(s || "").replace(/,/g, "").match(/\\b[0-9]{1,8}\\b/g) || [];
-                if (!nums.length) return 0;
-                // The HUD crop is digits-only, so choose the longest token first;
-                // this avoids treating a stray single digit as the run distance.
-                nums.sort(function(a,b) { return b.length - a.length || Number(b) - Number(a); });
-                return Number(nums[0]) || 0;
+            function extractScore(result) {
+                // Use Tesseract's individual word boxes/confidence, not the largest
+                // number anywhere in the HUD crop (which caused false high scores).
+                var words = result && result.data && result.data.words || [];
+                var candidates = words.map(function(word) {
+                    var raw = String(word.text || "").replace(/,/g, "").trim();
+                    if (!/^\\d{1,8}$/.test(raw)) return null;
+                    var confidence = Number(word.confidence) || 0;
+                    var box = word.bbox || {};
+                    var centerX = ((Number(box.x0) || 0) + (Number(box.x1) || 0)) / 2;
+                    var centerY = ((Number(box.y0) || 0) + (Number(box.y1) || 0)) / 2;
+                    return { value: Number(raw), confidence: confidence, centerX: centerX, centerY: centerY, length: raw.length };
+                }).filter(function(item) {
+                    return item && Number.isSafeInteger(item.value) && item.value > 0 && item.confidence >= 55;
+                });
+                if (!candidates.length) return { value: 0, confidence: 0 };
+                // Prefer the clearest numeric word near the center of the score HUD.
+                candidates.sort(function(x,y) {
+                    var xCenter = Math.abs(x.centerX - 0.5) + Math.abs(x.centerY - 0.5);
+                    var yCenter = Math.abs(y.centerX - 0.5) + Math.abs(y.centerY - 0.5);
+                    return (y.confidence - x.confidence) || (xCenter - yCenter) || (y.length - x.length);
+                });
+                return candidates[0];
             }
-            async function recognizeCanvas(canvas, cropTopRatio, cropHeightRatio, digitsOnly) {
+            async function recognizeCanvas(canvas, cropTopRatio, cropHeightRatio, digitsOnly, cropLeftRatio, cropWidthRatio) {
                 var image = document.createElement("canvas");
                 var sourceY = Math.round(canvas.height * cropTopRatio);
                 var sourceHeight = Math.max(1, Math.round(canvas.height * cropHeightRatio));
-                var scale = Math.min(4, 3000 / canvas.width);
-                image.width = Math.max(1, Math.round(canvas.width * scale));
+                var sourceX = Math.round(canvas.width * (cropLeftRatio || 0));
+                var sourceWidth = Math.max(1, Math.round(canvas.width * (cropWidthRatio || 1)));
+                var scale = Math.min(5, 3200 / sourceWidth);
+                image.width = Math.max(1, Math.round(sourceWidth * scale));
                 image.height = Math.max(1, Math.round(sourceHeight * scale));
                 var ctx = image.getContext("2d", { willReadFrequently: true });
-                ctx.drawImage(canvas, 0, sourceY, canvas.width, sourceHeight, 0, 0, image.width, image.height);
+                ctx.drawImage(canvas, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, image.width, image.height);
                 var pixels = ctx.getImageData(0, 0, image.width, image.height);
+                // High-contrast grayscale with a slightly softer threshold so thin
+                // anti-aliased digits are not erased.
                 for (var i = 0; i < pixels.data.length; i += 4) {
                     var gray = pixels.data[i] * 0.299 + pixels.data[i + 1] * 0.587 + pixels.data[i + 2] * 0.114;
-                    var boosted = gray < 115 ? 0 : gray > 165 ? 255 : (gray - 115) * 5.1;
+                    var boosted = gray < 105 ? 0 : gray > 175 ? 255 : (gray - 105) * 3.64;
                     pixels.data[i] = pixels.data[i + 1] = pixels.data[i + 2] = boosted;
                 }
                 ctx.putImageData(pixels, 0, 0);
                 var w = await worker();
-                // Set parameters immediately before each recognition; this worker is
-                // used serially by tick(), preventing OCR mode leakage between scans.
-                if (digitsOnly) await w.setParameters({ tessedit_char_whitelist: "0123456789,", tessedit_pageseg_mode: "11" });
+                if (digitsOnly) await w.setParameters({ tessedit_char_whitelist: "0123456789,", tessedit_pageseg_mode: "7", preserve_interword_spaces: "0" });
                 else await w.setParameters({ tessedit_char_whitelist: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", tessedit_pageseg_mode: "11" });
-                var result = await w.recognize(image);
-                return result && result.data ? result.data.text || "" : "";
+                return await w.recognize(image);
             }
             async function readHudScore(canvas) {
-                // Scan a wider top HUD band to tolerate different canvas scaling.
-                return extractScore(await recognizeCanvas(canvas, 0, 0.30, true));
+                // The Slope distance counter is expected in the upper-center HUD.
+                // Excluding the far edges avoids picking up unrelated UI digits.
+                var result = await recognizeCanvas(canvas, 0, 0.25, true, 0.18, 0.64);
+                var first = extractScore(result);
+                // Re-read with a wider crop when confidence is weak. Only accept the
+                // second pass if it independently finds a confident numeric token.
+                if (first.confidence >= 78) return first;
+                var wider = await recognizeCanvas(canvas, 0, 0.30, true, 0.08, 0.84);
+                var second = extractScore(wider);
+                if (second.confidence > first.confidence) return second;
+                return first;
             }
             async function readGameState(canvas) {
                 return await recognizeCanvas(canvas, 0, 1, false);
@@ -107,13 +133,13 @@
                 if (scanning || !canvas || !canvas.width || !canvas.height || !window.Tesseract) return;
                 scanning = true;
                 try {
-                    var liveScore = await readHudScore(canvas);
+                    var scoreReading = await readHudScore(canvas);\n                    var liveScore = scoreReading.value;
                     var screenText = await readGameState(canvas);
                     var ended = isRunEnded(screenText);
                     // A run is armed only after a real HUD score is seen. Confirm
                     // score readings on two scans before accepting a new value.
                     if (!ended && liveScore > 0) {
-                        if (scoreCandidate !== null && Math.abs(liveScore - scoreCandidate) <= Math.max(3, scoreCandidate * 0.15)) {
+                        if (scoreCandidate !== null && Math.abs(liveScore - scoreCandidate) <= Math.max(2, scoreCandidate * 0.04)) {
                             scoreCandidateHits++;
                         } else {
                             scoreCandidate = liveScore;
