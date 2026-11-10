@@ -64,28 +64,22 @@
                 return /leader ?board|play again|try again|game over|you crashed/.test(t);
             }
             function extractScore(result) {
-                // Use Tesseract's individual word boxes/confidence, not the largest
-                // number anywhere in the HUD crop (which caused false high scores).
                 var words = result && result.data && result.data.words || [];
                 var candidates = words.map(function(word) {
                     var raw = String(word.text || "").replace(/,/g, "").trim();
-                    if (!/^\d{1,8}$/.test(raw)) return null;
-                    var confidence = Number(word.confidence) || 0;
+                    if (!/^\\d{1,7}$/.test(raw)) return null;
                     var box = word.bbox || {};
-                    var centerX = ((Number(box.x0) || 0) + (Number(box.x1) || 0)) / 2;
-                    var centerY = ((Number(box.y0) || 0) + (Number(box.y1) || 0)) / 2;
-                    return { value: Number(raw), confidence: confidence, centerX: centerX, centerY: centerY, length: raw.length };
-                }).filter(function(item) {
-                    return item && Number.isSafeInteger(item.value) && item.value > 0 && item.confidence >= 55;
+                    return { value:Number(raw), confidence:Number(word.confidence)||0,
+                      x0:Number(box.x0)||0,y0:Number(box.y0)||0,x1:Number(box.x1)||0,y1:Number(box.y1)||0 };
+                }).filter(function(x) {
+                    return x && x.value >= 1 && x.confidence >= 65 &&
+                      (x.x1-x.x0) > 4 && (x.y1-x.y0) > 5;
                 });
-                if (!candidates.length) return { value: 0, confidence: 0 };
-                // Prefer the clearest numeric word near the center of the score HUD.
-                candidates.sort(function(x,y) {
-                    var xCenter = Math.abs(x.centerX - 0.5) + Math.abs(x.centerY - 0.5);
-                    var yCenter = Math.abs(y.centerX - 0.5) + Math.abs(y.centerY - 0.5);
-                    return (y.confidence - x.confidence) || (xCenter - yCenter) || (y.length - x.length);
+                candidates.sort(function(a,b) {
+                    return (b.confidence-a.confidence) ||
+                      (Math.abs(a.x0-0.5)-Math.abs(b.x0-0.5));
                 });
-                return candidates[0];
+                return candidates[0] || {value:0,confidence:0};
             }
             async function recognizeCanvas(canvas, cropTopRatio, cropHeightRatio, digitsOnly, cropLeftRatio, cropWidthRatio) {
                 var image = document.createElement("canvas");
@@ -113,17 +107,8 @@
                 return await w.recognize(image);
             }
             async function readHudScore(canvas) {
-                // The Slope distance counter is expected in the upper-center HUD.
-                // Excluding the far edges avoids picking up unrelated UI digits.
-                var result = await recognizeCanvas(canvas, 0, 0.25, true, 0.18, 0.64);
-                var first = extractScore(result);
-                // Re-read with a wider crop when confidence is weak. Only accept the
-                // second pass if it independently finds a confident numeric token.
-                if (first.confidence >= 78) return first;
-                var wider = await recognizeCanvas(canvas, 0, 0.30, true, 0.08, 0.84);
-                var second = extractScore(wider);
-                if (second.confidence > first.confidence) return second;
-                return first;
+                var result = await recognizeCanvas(canvas, 0.02, 0.18, true, 0.32, 0.36);
+                return extractScore(result);
             }
             async function readGameState(canvas) {
                 return await recognizeCanvas(canvas, 0, 1, false);
@@ -167,75 +152,57 @@
                 if (scanning || !canvas || !canvas.width || !canvas.height || !window.Tesseract) return;
                 scanning = true;
                 try {
+                    var moving = detectGameplayMotion(canvas);
                     var scoreReading = await readHudScore(canvas);
                     var liveScore = scoreReading.value;
                     var screenText = await readGameState(canvas);
                     var textEnded = isRunEnded(screenText);
-                    var moving = detectGameplayMotion(canvas);
-                    motionHits = (!textEnded && moving) ? motionHits + 1 : 0;
-                    // Movement arms a run; static menu/HUD OCR values never count.
-                    if (!textEnded && motionHits >= 3) gameStarted = true;
-                    // Accept only a rising score sequence during an armed run.
+                    motionHits = moving ? motionHits + 1 : 0;
+                    if (motionHits >= 3) gameStarted = true;
+
                     if (gameStarted && !textEnded && liveScore > 0) {
-                        if (lastObservedScore === null) {
+                        if (scoreCandidate === liveScore) scoreCandidateHits++;
+                        else { scoreCandidate = liveScore; scoreCandidateHits = 1; }
+                        if (scoreCandidateHits >= 2 && (lastObservedScore === null || liveScore >= lastObservedScore)) {
                             lastObservedScore = liveScore;
-                            scoreCandidate = liveScore;
-                            scoreCandidateHits = 1;
-                        } else if (liveScore > lastObservedScore) {
-                            lastObservedScore = liveScore;
-                            scoreCandidateHits++;
-                            if (scoreCandidateHits >= 2) {
-                                latestScore = liveScore;
-                                maxScore = Math.max(maxScore, liveScore);
-                            }
-                        } else if (liveScore < lastObservedScore) {
-                            scoreCandidateHits = 0;
+                            latestScore = liveScore;
+                            maxScore = Math.max(maxScore, liveScore);
                         }
+                    } else if (liveScore === 0) {
+                        scoreCandidate = null; scoreCandidateHits = 0;
                     }
-                    // If OCR misses the death text, detect a sustained stop after
-                    // gameplay. Brief pauses do not end a run.
-                    stoppedHits = (gameStarted && !moving) ? stoppedHits + 1 : 0;
-                    var ended = textEnded || (gameStarted && stoppedHits >= 8 && maxScore > 0);
-                    endScreenHits = (gameStarted && ended) ? endScreenHits + 1 : 0;
-                    if (!gameStarted) {
-                        setStatus("waiting for a run to start · automatic detection active");
-                    } else if (!ended) {
-                        setStatus("RUNNING · current " + (latestScore || liveScore || "reading") + " · best captured " + maxScore);
-                    } else {
-                        setStatus("end screen detected · confirming result (" + endScreenHits + "/2)");
-                    }
+
+                    // End detection does not depend on score OCR succeeding.
+                    stoppedHits = gameStarted && !moving ? stoppedHits + 1 : 0;
+                    var ended = textEnded || (gameStarted && stoppedHits >= 10);
+                    if (!gameStarted) setStatus("waiting for gameplay motion");
+                    else if (!ended) setStatus("RUNNING · score read " + (latestScore || "waiting") + " · best " + maxScore);
+                    else setStatus("game ended · confirming (" + endScreenHits + "/2)");
+                    endScreenHits = ended ? endScreenHits + 1 : 0;
+
                     if (endScreenHits >= 2 && !handled) {
                         handled = true;
-                        var score = Math.max(maxScore, latestScore);
-                        if (score > 0 && Number.isSafeInteger(score) && leaderboardReady && window.ArcadeScores) {
-                            setStatus("run ended · submitting captured score " + score);
+                        var score = maxScore || latestScore;
+                        if (score > 0 && leaderboardReady && window.ArcadeScores) {
+                            setStatus("game ended · submitting score " + score);
                             var submitted = await window.ArcadeScores.promptAndSubmit("Slope", score);
                             setStatus(submitted ? "score submitted: " + score : "submission cancelled or failed");
                         } else if (!leaderboardReady) {
-                            promptOcrIssue("The leaderboard connection is not configured; captured score was " + score + ".");
+                            promptOcrIssue("Leaderboard connection is not configured.");
                         } else {
-                            promptOcrIssue("The run ended, but no reliable score was captured.");
+                            promptOcrIssue("Game ended, but score OCR did not capture a valid score.");
                         }
                     }
                     if (!ended && handled) {
-                        handled = false;
-                        endScreenHits = 0;
-                        gameStarted = false;
-                        latestScore = 0;
-                        maxScore = 0;
-                        scoreCandidate = null;
-                        scoreCandidateHits = 0;
-                        lastObservedScore = null;
-                        stoppedHits = 0;
-                        motionHits = 0;
-                        previousFrame = null;
+                        handled=false; endScreenHits=0; gameStarted=false;
+                        latestScore=0; maxScore=0; scoreCandidate=null;
+                        scoreCandidateHits=0; lastObservedScore=null; stoppedHits=0;
+                        motionHits=0; previousFrame=null;
                     }
                 } catch (e) {
-                    console.warn("Slope leaderboard detection failed:", e);
-                    setStatus("detector error · " + (e && e.message ? e.message : "OCR error"));
-                } finally {
-                    scanning = false;
-                }
+                    console.warn("Slope leaderboard detection failed:",e);
+                    setStatus("detector error · "+(e && e.message ? e.message : "OCR error"));
+                } finally { scanning=false; }
             }
             // No manual score entry: only scores detected from the game canvas are submitted.
             // This prevents casual score fabrication through the page UI, but client-side
