@@ -13,7 +13,7 @@
 // Minecraft 1.12.2 and Retro Bowl visible-playtime timer/leaderboard.
 (function () {
   "use strict";
-  var path = location.pathname.replace(/\\/+$/, "").toLowerCase();
+  var path = location.pathname.replace(/\/+$/, "").toLowerCase();
   if (path !== "/g/mc/1.12.2" && path !== "/g/retro-bowl") return;
   var gameTitle = path === "/g/retro-bowl" ? "Retro Bowl Time" : "Minecraft";
   var playerName = "";
