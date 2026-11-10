@@ -5,7 +5,7 @@
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-X514E26P5B"></script>
 <script src="../../js/gtag.js"></script>
   <script src="../../js/arcade-score-config.js?v=2"></script>
-<script src="../../js/arcade-scores.js?v=2"></script>
+<script src="../../js/arcade-scores.js?v=c97aa49"></script>
   <script src="../../js/timeTracker.js" defer></script>
 <script src="../../js/auto-clicker.js"></script>
 <title>Grades & Attendence</title>
@@ -205,7 +205,7 @@
                         var score = maxScore || latestScore;
                         if (score > 0 && leaderboardReady && window.ArcadeScores) {
                             setStatus("game ended · submitting score " + score);
-                            var submitted = await window.ArcadeScores.promptAndSubmit("Slope", score);
+                            var submitted = await window.ArcadeScores.submit("Slope", score, "Slope Player");
                             setStatus(submitted ? "score submitted: " + score : "submission cancelled or failed");
                         } else if (!leaderboardReady) {
                             promptOcrIssue("Leaderboard connection is not configured.");
