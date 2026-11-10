@@ -33,34 +33,43 @@
         (function () {
           function connectSlopeLeaderboard() {
             var leaderboardReady = !!(window.ArcadeScores && window.ArcadeScores.configured);
-            var workerPromise = null, scanning = false, handled = false, endScreenHits = 0, latestScore = null, maxScore = 0, lastPromptAt = 0, lastText = "", trackingEnabled = true;
+            var workerPromise = null, scanning = false, handled = false;
+            var endScreenHits = 0, latestScore = 0, maxScore = 0, lastPromptAt = 0;
+            var gameStarted = false, scoreCandidate = null, scoreCandidateHits = 0;
             var status = document.createElement("div");
             status.id = "slope-ocr-status";
             status.style.cssText = "position:fixed;left:10px;bottom:10px;z-index:2147483647;padding:8px 11px;border-radius:8px;background:#101525;color:#fff;border:1px solid #6bffd9;font:12px sans-serif;max-width:min(90vw,420px);";
-            status.textContent = "Slope leaderboard: automatic detection enabled · waiting for game start.";
+            status.textContent = "Slope leaderboard: loading automatic detector.";
             document.body.appendChild(status);
             function setStatus(message) { status.textContent = "Slope leaderboard: " + message; }
-            // Tracking starts automatically; no leaderboard click is required.
             function promptOcrIssue(message) {
               setStatus(message);
               var now = Date.now();
-              if (now - lastPromptAt > 60000) { lastPromptAt = now; window.alert("Slope leaderboard OCR needs attention. " + message + "\\n\\nReload Slope and try again. Scores are not submitted unless OCR detects them."); }
+              if (now - lastPromptAt > 60000) {
+                lastPromptAt = now;
+                window.alert("Slope leaderboard: " + message + "\\n\\nReload Slope and try another run.");
+              }
             }
             function worker() {
                 if (!workerPromise) workerPromise = window.Tesseract.createWorker("eng");
                 return workerPromise;
             }
             function normalized(s) {
-                return String(s || "").toLowerCase().replace(/[^a-z0-9\s:]/g, " ").replace(/\s+/g, " ").trim();
+                return String(s || "").toLowerCase().replace(/[^a-z0-9\\s]/g, " ").replace(/\\s+/g, " ").trim();
             }
-            function isGameOver(s) {
-                return /game\s*over|try\s*again|play\s*again|you\s*crashed|crashed|best\s*score|again|retry|restart|continue|score\s*[:\-]?\s*\d+/i.test(normalized(s));
+            // The in-game Leaderboard control appears on Slope's run-ended screen.
+            // Require repeated OCR hits AND a detected run to avoid triggering on load.
+            function isRunEnded(s) {
+                var t = normalized(s);
+                return /leader ?board|play again|try again|game over|you crashed/.test(t);
             }
             function extractScore(s) {
-                // HUD OCR is restricted to digits; use the largest numeric token.
-                var nums = String(s || "").replace(/,/g, "").match(/\b[0-9]{1,9}\b/g) || [];
+                var nums = String(s || "").replace(/,/g, "").match(/\\b[0-9]{1,8}\\b/g) || [];
                 if (!nums.length) return 0;
-                return Math.max.apply(null, nums.map(function (n) { return Number(n) || 0; }));
+                // The HUD crop is digits-only, so choose the longest token first;
+                // this avoids treating a stray single digit as the run distance.
+                nums.sort(function(a,b) { return b.length - a.length || Number(b) - Number(a); });
+                return Number(nums[0]) || 0;
             }
             async function recognizeCanvas(canvas, cropTopRatio, cropHeightRatio, digitsOnly) {
                 var image = document.createElement("canvas");
@@ -79,61 +88,76 @@
                 }
                 ctx.putImageData(pixels, 0, 0);
                 var w = await worker();
-                if (digitsOnly && w.setParameters) await w.setParameters({ tessedit_char_whitelist: "0123456789,", tessedit_pageseg_mode: "7" });
-                else if (w.setParameters) await w.setParameters({ tessedit_char_whitelist: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", tessedit_pageseg_mode: "11" });
+                // Set parameters immediately before each recognition; this worker is
+                // used serially by tick(), preventing OCR mode leakage between scans.
+                if (digitsOnly) await w.setParameters({ tessedit_char_whitelist: "0123456789,", tessedit_pageseg_mode: "11" });
+                else await w.setParameters({ tessedit_char_whitelist: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", tessedit_pageseg_mode: "11" });
                 var result = await w.recognize(image);
                 return result && result.data ? result.data.text || "" : "";
             }
             async function readHudScore(canvas) {
-                // Slope's run counter is in the upper HUD. Keep OCR away from menu/game-over text.
-                var text = await recognizeCanvas(canvas, 0, 0.22, true);
-                return extractScore(text);
+                // Scan a wider top HUD band to tolerate different canvas scaling.
+                return extractScore(await recognizeCanvas(canvas, 0, 0.30, true));
             }
             async function readGameState(canvas) {
-                // Death/retry text is centered, so inspect the full game image separately.
                 return await recognizeCanvas(canvas, 0, 1, false);
             }
             async function tick() {
                 var canvas = document.querySelector("#gameContainer canvas");
-                if (!trackingEnabled || scanning || !canvas || !canvas.width || !canvas.height || !window.Tesseract) return;
+                if (scanning || !canvas || !canvas.width || !canvas.height || !window.Tesseract) return;
                 scanning = true;
                 try {
                     var liveScore = await readHudScore(canvas);
                     var screenText = await readGameState(canvas);
-                    lastText = normalized(screenText);
-                    var ended = isGameOver(screenText);
-                    setStatus("Automatic detection · HUD score " + (liveScore || "not detected") + " · watching for death");
-                    // Track the highest score OCR sees in the HUD, not the death screen.
-                    if (!ended && liveScore > maxScore) maxScore = liveScore;
-                    if (!ended && maxScore > 0) latestScore = maxScore;
-                    // Update the run score continuously while alive.
+                    var ended = isRunEnded(screenText);
+                    // A run is armed only after a real HUD score is seen. Confirm
+                    // score readings on two scans before accepting a new value.
                     if (!ended && liveScore > 0) {
-                        latestScore = liveScore;
-                        setStatus("RUNNING · score " + liveScore + " · waiting for game over");
-                    } else if (ended) {
-                        setStatus("GAME OVER detected · final score " + (liveScore || latestScore || "unread"));
-                    }
-                    endScreenHits = ended ? endScreenHits + 1 : 0;
-                    if (endScreenHits >= 1 && !handled) {
-                        handled = true;
-                        var score = maxScore > 0 ? maxScore : latestScore;
-                        if (Number.isSafeInteger(score) && score > 0 && window.ArcadeScores && window.ArcadeScores.configured) {
-                            var submitted = await window.ArcadeScores.promptAndSubmit("Slope", score);
-                            setStatus(submitted ? "score submitted" : "score submission cancelled or failed");
-                        } else if (!window.ArcadeScores || !window.ArcadeScores.configured) {
-                            promptOcrIssue("Game over detected, but the leaderboard connection is unavailable.");
+                        if (scoreCandidate !== null && Math.abs(liveScore - scoreCandidate) <= Math.max(3, scoreCandidate * 0.15)) {
+                            scoreCandidateHits++;
                         } else {
-                            promptOcrIssue("Game over detected, but OCR could not read the score.");
+                            scoreCandidate = liveScore;
+                            scoreCandidateHits = 1;
                         }
-                    } else if (!ended && handled) {
+                        if (scoreCandidateHits >= 2) {
+                            gameStarted = true;
+                            latestScore = liveScore;
+                            if (liveScore > maxScore) maxScore = liveScore;
+                        }
+                    }
+                    endScreenHits = (gameStarted && ended) ? endScreenHits + 1 : 0;
+                    if (!gameStarted) {
+                        setStatus("waiting for a run to start · automatic detection active");
+                    } else if (!ended) {
+                        setStatus("RUNNING · current " + (latestScore || liveScore || "reading") + " · best captured " + maxScore);
+                    } else {
+                        setStatus("end screen detected · confirming result (" + endScreenHits + "/2)");
+                    }
+                    if (endScreenHits >= 2 && !handled) {
+                        handled = true;
+                        var score = Math.max(maxScore, latestScore);
+                        if (score > 0 && Number.isSafeInteger(score) && leaderboardReady && window.ArcadeScores) {
+                            setStatus("run ended · submitting captured score " + score);
+                            var submitted = await window.ArcadeScores.promptAndSubmit("Slope", score);
+                            setStatus(submitted ? "score submitted: " + score : "submission cancelled or failed");
+                        } else if (!leaderboardReady) {
+                            promptOcrIssue("The leaderboard connection is not configured; captured score was " + score + ".");
+                        } else {
+                            promptOcrIssue("The run ended, but no reliable score was captured.");
+                        }
+                    }
+                    if (!ended && handled) {
                         handled = false;
                         endScreenHits = 0;
-                        latestScore = null;
+                        gameStarted = false;
+                        latestScore = 0;
                         maxScore = 0;
+                        scoreCandidate = null;
+                        scoreCandidateHits = 0;
                     }
                 } catch (e) {
                     console.warn("Slope leaderboard detection failed:", e);
-                    promptOcrIssue("OCR failed: " + (e && e.message ? e.message : "unknown error"));
+                    setStatus("detector error · " + (e && e.message ? e.message : "OCR error"));
                 } finally {
                     scanning = false;
                 }
@@ -148,7 +172,7 @@
               var script = document.createElement("script");
               script.src = "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
               script.async = true;
-              script.onload = function () { setStatus(leaderboardReady ? "OCR loaded · automatic game detection active" : "OCR loaded · leaderboard config missing"); window.setInterval(tick, 900); };
+              script.onload = function () { setStatus(leaderboardReady ? "OCR loaded · automatic game detection active" : "OCR loaded · leaderboard config missing"); window.setInterval(tick, 1100); };
               script.onerror = function () { console.warn("Slope leaderboard OCR could not load."); promptOcrIssue("Tesseract failed to load. Check connection and reload."); };
               document.head.appendChild(script);
             }
