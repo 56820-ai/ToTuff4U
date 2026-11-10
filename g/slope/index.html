@@ -55,7 +55,7 @@
                 return workerPromise;
             }
             function normalized(s) {
-                return String(s || "").toLowerCase().replace(/[^a-z0-9\\s]/g, " ").replace(/\\s+/g, " ").trim();
+                return String(s || "").toLowerCase().replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
             }
             // The in-game Leaderboard control appears on Slope's run-ended screen.
             // Require repeated OCR hits AND a detected run to avoid triggering on load.
@@ -69,7 +69,7 @@
                 var words = result && result.data && result.data.words || [];
                 var candidates = words.map(function(word) {
                     var raw = String(word.text || "").replace(/,/g, "").trim();
-                    if (!/^\\d{1,8}$/.test(raw)) return null;
+                    if (!/^\d{1,8}$/.test(raw)) return null;
                     var confidence = Number(word.confidence) || 0;
                     var box = word.bbox || {};
                     var centerX = ((Number(box.x0) || 0) + (Number(box.x1) || 0)) / 2;
@@ -133,7 +133,8 @@
                 if (scanning || !canvas || !canvas.width || !canvas.height || !window.Tesseract) return;
                 scanning = true;
                 try {
-                    var scoreReading = await readHudScore(canvas);\n                    var liveScore = scoreReading.value;
+                    var scoreReading = await readHudScore(canvas);
+                    var liveScore = scoreReading.value;
                     var screenText = await readGameState(canvas);
                     var ended = isRunEnded(screenText);
                     // A run is armed only after a real HUD score is seen. Confirm
