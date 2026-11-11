@@ -147,18 +147,21 @@
             // canvas snapshots across scans and require sustained movement.
             var previousFrame = null, motionHits = 0;
             function detectGameplayMotion(canvas) {
-                // Use a much larger frame sample than the old 24x14 thumbnail.
-                // This preserves smaller changes in the track, obstacles and player.
+                // Focus on the middle of the game scene, where the run score and
+                // crash overlay appear. Ignore borders and page/UI elements.
                 var sample = document.createElement("canvas");
-                sample.width = 120;
-                sample.height = 68;
+                sample.width = 180;
+                sample.height = 180;
                 var ctx = sample.getContext("2d", { willReadFrequently: true });
                 ctx.imageSmoothingEnabled = true;
                 ctx.imageSmoothingQuality = "high";
-                ctx.drawImage(canvas, 0, 0, sample.width, sample.height);
+                var sourceX = Math.round(canvas.width * 0.20);
+                var sourceY = Math.round(canvas.height * 0.12);
+                var sourceWidth = Math.max(1, Math.round(canvas.width * 0.60));
+                var sourceHeight = Math.max(1, Math.round(canvas.height * 0.76));
+                ctx.drawImage(canvas, sourceX, sourceY, sourceWidth, sourceHeight,
+                    0, 0, sample.width, sample.height);
                 var pixels = ctx.getImageData(0, 0, sample.width, sample.height).data;
-                // Luminance gives a stable comparison while retaining the higher
-                // spatial resolution needed to detect movement across the scene.
                 var current = new Uint8Array(sample.width * sample.height);
                 for (var i = 0, j = 0; i < pixels.length; i += 4) {
                     current[j++] = Math.round(
@@ -173,14 +176,14 @@
                 for (var k = 0; k < current.length; k++) {
                     var delta = Math.abs(current[k] - previousFrame[k]);
                     totalDelta += delta;
-                    if (delta > 12) changed++;
+                    if (delta > 10) changed++;
                 }
                 previousFrame = current;
                 var changedRatio = changed / current.length;
                 var averageDelta = totalDelta / current.length;
-                // Lower thresholds are appropriate now that the comparison has
-                // enough pixels to distinguish small, localized movement.
-                return changedRatio > 0.025 && averageDelta > 3.5;
+                // Central crop + higher pixel count detects small movement around
+                // the player/score without being distracted by page edges.
+                return changedRatio > 0.018 && averageDelta > 2.8;
             }
             async function tick() {
                 var canvas = document.querySelector("#gameContainer canvas");
