@@ -171,41 +171,38 @@
             // Slope shows the final run score in the middle of its crash/end screen,
             // not in the live HUD crop. Scan that center region when the run ends.
             async function readEndScreenScore(canvas) {
-                // Only called after the run has ended. Scan the ENTIRE game
-                // canvas so the score is not missed if the death-screen layout,
-                // canvas scaling, or score position differs from expected.
+                // Run the fastest normal OCR pass first. Only spend time on alternate
+                // layouts if the first pass cannot read a score.
                 var result = await recognizeCanvas(canvas, 0, 1, true, 0, 1, 11);
                 var best = extractScore(result);
+                if (best && best.value > 0) {
+                    lastEndOcrDebug = "Canvas " + canvas.width + "x" + canvas.height +
+                      " | Fast pass: " + String(result.data && result.data.text || "").replace(/\\s+/g, " ").trim().slice(0, 100) +
+                      " | pick=" + best.value;
+                    window.__slopeOcrDebug = lastEndOcrDebug;
+                    return best;
+                }
+
+                // Fallback passes are intentionally conditional; previously all four
+                // full-canvas OCR passes ran every time, delaying the name prompt.
                 var alternate = await recognizeCanvas(canvas, 0, 1, true, 0, 1, 6);
                 var alternateBest = extractScore(alternate);
-                // Raw grayscale and inverted full-canvas passes handle bright
-                // score text on dark overlays and dark text on bright backgrounds.
-                var grayscale = await recognizeCanvas(canvas, 0, 1, true, 0, 1, 11, "gray");
-                var grayscaleBest = extractScore(grayscale);
-                var inverted = await recognizeCanvas(canvas, 0, 1, true, 0, 1, 11, "invert");
-                var invertedBest = extractScore(inverted);
-                function describe(result, reading) {
-                  var data = result && result.data ? result.data : {};
-                  var words = Array.isArray(data.words) ? data.words.map(function(w) {
-                    return String(w.text || "").trim() + "@" + Math.round(Number(w.confidence) || 0);
-                  }).filter(Boolean).join(",") : "";
-                  return "text=[" + String(data.text || "").replace(/\s+/g, " ").trim().slice(0, 55) +
-                    "] words=[" + words.slice(0, 90) + "] pick=" + (reading.value || 0);
+                var chosen = alternateBest;
+                if (!chosen || chosen.value <= 0) {
+                    var grayscale = await recognizeCanvas(canvas, 0, 1, true, 0, 1, 11, "gray");
+                    chosen = extractScore(grayscale);
+                }
+                if (!chosen || chosen.value <= 0) {
+                    var inverted = await recognizeCanvas(canvas, 0, 1, true, 0, 1, 11, "invert");
+                    chosen = extractScore(inverted);
                 }
                 lastEndOcrDebug = "Canvas " + canvas.width + "x" + canvas.height +
-                  " | Pass1 " + describe(result, best) + " | Pass2 " +
-                  describe(alternate, alternateBest) + " | Gray " + describe(grayscale, grayscaleBest) +
-                  " | Invert " + describe(inverted, invertedBest);
+                  " | Fast pass=" + String(result.data && result.data.text || "").replace(/\\s+/g, " ").trim().slice(0, 55) +
+                  " | Alternate=" + String(alternate.data && alternate.data.text || "").replace(/\\s+/g, " ").trim().slice(0, 55) +
+                  " | pick=" + (chosen && chosen.value || 0);
                 window.__slopeOcrDebug = lastEndOcrDebug;
                 console.info("Slope end-screen OCR diagnostics:", lastEndOcrDebug);
-                var readings = [best, alternateBest, grayscaleBest, invertedBest];
-                readings.sort(function(a,b) {
-                    // All passes use the same centered crop; prefer the strongest
-                    // multi-digit reading when OCR splits or drops a digit.
-                    return (b.value > 9 ? 1 : 0) - (a.value > 9 ? 1 : 0) ||
-                        b.confidence - a.confidence;
-                });
-                return readings[0] && readings[0].value > 0 ? readings[0] : best;
+                return chosen && chosen.value > 0 ? chosen : best;
             }
             async function readGameState(canvas) {
                 return await recognizeCanvas(canvas, 0, 1, false);
@@ -297,10 +294,9 @@
                             setStatus("game ended · asking for your leaderboard name");
                             // Ask for the player's name instead of silently submitting
                             // every Slope score under the generic "Slope Player" name.
-                            var playerName = window.prompt("Enter your name for the Slope leaderboard (24 characters max):", "");
-                            if (playerName && playerName.trim()) {
-                                playerName = playerName.trim().slice(0, 24);
-                                try { localStorage.setItem("arcadeLeaderboardPlayerName", playerName); } catch (e) {}
+                            // Reuse the saved name; only show the prompt on the first submission.
+                            var playerName = window.ArcadeScores.getPlayerName("Enter your name for the Slope leaderboard (24 characters max):");
+                            if (playerName) {
                                 var submitted = await window.ArcadeScores.submit("Slope", score, playerName);
                                 setStatus(submitted ? "score submitted: " + score : "score submission failed");
                             } else {
