@@ -38,6 +38,7 @@
             var leaderboardReady = !!(window.ArcadeScores && window.ArcadeScores.configured);
             var workerPromise = null, scanning = false, handled = false;
             var endScreenHits = 0, latestScore = 0, maxScore = 0, lastPromptAt = 0;
+            var lastEndOcrDebug = 'not run';
             var gameStarted = false, scoreCandidate = null, scoreCandidateHits = 0, lastObservedScore = null, stoppedHits = 0;
             var status = document.createElement("div");
             status.id = "slope-ocr-status";
@@ -168,6 +169,18 @@
                 // preserves narrow strokes that the high-contrast pass can lose.
                 var grayscale = await recognizeCanvas(canvas, 0.20, 0.60, true, 0.15, 0.70, 13, "gray");
                 var grayscaleBest = extractScore(grayscale);
+                function describe(result, reading) {
+                  var data = result && result.data ? result.data : {};
+                  var words = Array.isArray(data.words) ? data.words.map(function(w) {
+                    return String(w.text || "").trim() + "@" + Math.round(Number(w.confidence) || 0);
+                  }).filter(Boolean).join(",") : "";
+                  return "text=[" + String(data.text || "").replace(/\s+/g, " ").trim().slice(0, 55) +
+                    "] words=[" + words.slice(0, 90) + "] pick=" + (reading.value || 0);
+                }
+                lastEndOcrDebug = "Pass1 " + describe(result, best) + " | Pass2 " +
+                  describe(alternate, alternateBest) + " | Gray " + describe(grayscale, grayscaleBest);
+                window.__slopeOcrDebug = lastEndOcrDebug;
+                console.info("Slope end-screen OCR diagnostics:", lastEndOcrDebug);
                 var readings = [best, alternateBest, grayscaleBest];
                 readings.sort(function(a,b) {
                     // All passes use the same centered crop; prefer the strongest
@@ -276,7 +289,7 @@
                         } else if (!leaderboardReady) {
                             promptOcrIssue("Leaderboard connection is not configured.");
                         } else {
-                            promptOcrIssue("Game ended, but score OCR did not capture a valid score.");
+                            promptOcrIssue("Game ended, but no score was read. OCR details: " + lastEndOcrDebug);
                         }
                     }
                     if (!ended && handled) {
