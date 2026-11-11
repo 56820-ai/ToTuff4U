@@ -1,74 +1,15 @@
 <!DOCTYPE html>
-<html>
-	<head>
-<script async src="https://www.googletagmanager.com/gtm.js?id=GTM-KHTBG5BX"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-</script>
-
-		<title>Stacktris</title>
-		
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<link rel="stylesheet" type="text/css" href="index.css">
-		
-		<script src="src/third-party/pixi.min.js"></script>
-		<script src="src/third-party/Box2dWeb-2.1.a.3.min.js"></script>
-		
-		<script src="src/asdf.js"></script>
-		<script src="src/easd.js"></script>
-		<script src="src/qasd.js"></script>
-		<script src="src/qwas.js"></script>
-		<script src="src/wasd.js"></script>
-		<script src="../../js/arcade-score-config.js"></script>
-		<script src="../../js/arcade-scores.js"></script>
-		<script src="src/stacktris.js"></script>
-		<script>
-			(function() {
-				var playerName = "";
-				var bestSubmitted = 0;
-				var pendingScore = 0;
-				var saving = false;
-				var namePromptOpen = false;
-
-				function getPlayerName() {
-					if (playerName) return playerName;
-					if (namePromptOpen || !window.ArcadeScores || !window.ArcadeScores.getPlayerName) return "";
-					namePromptOpen = true;
-					playerName = window.ArcadeScores.getPlayerName("Enter your name for the leaderboard (24 characters max):");
-					namePromptOpen = false;
-					return playerName;
-				}
-
-				async function saveLatestScore() {
-					if (saving || !pendingScore) return;
-					var name = getPlayerName();
-					if (!name) return;
-					saving = true;
-					while (pendingScore > bestSubmitted) {
-						var scoreToSave = pendingScore;
-						var ok = await window.ArcadeScores.submit("Stacktris", scoreToSave, name);
-						if (!ok) break;
-						bestSubmitted = scoreToSave;
-					}
-					saving = false;
-				}
-
-				window.updateStacktrisScore = function(score) {
-					var display = document.getElementById("stacktris-score");
-					if (display) display.textContent = "Pieces stacked: " + score + (score > bestSubmitted ? " • Saving…" : " • Saved");
-					if (!window.ArcadeScores || score <= bestSubmitted) return;
-					pendingScore = Math.max(pendingScore, score);
-					saveLatestScore();
-				};
-			})();
-		</script>
-	</head>
-	<body>
-		<h1>Stacktris</h1>
-		<p>by <a href="http://eternalvoid.net">Jeremy Carter</a> <a href="mailto:Jeremy@JeremyCarter.ca">Jeremy@JeremyCarter.ca</a> 2016</p>
-		<p id="stacktris-score" aria-live="polite">Pieces stacked: 0</p>
-		<p><a href="https://github.com/defcronyke/stacktris">Source Code</a></p>
-	</body>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Stacktris</title>
+<style>
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#111}
+iframe{display:block;width:100%;height:100%;border:0}
+</style>
+</head>
+<body>
+<iframe src="../stacktris-main/index.html" title="Stacktris" allow="fullscreen; autoplay; gamepad" allowfullscreen></iframe>
+</body>
 </html>
