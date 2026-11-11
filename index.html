@@ -1188,7 +1188,15 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 .redesign-banner button:hover {background:rgba(255,255,255,.08);color:white}
 @media(max-width:760px){.redesign-banner{margin:14px 16px 0;padding:12px;font-size:12px}}
 
-    </style>
+    
+.brand-lockup{display:flex;align-items:center;gap:12px}
+.brand-logo{width:48px;height:48px;object-fit:contain;flex:none}
+.sidebar-brand-logo{width:34px;height:34px;display:block;object-fit:contain}
+.sidebar-logo{display:flex;align-items:center;justify-content:center}
+.sidebar.expanded .sidebar-logo{margin-bottom:0}
+@media(max-width:600px){.brand-logo{width:38px;height:38px}.logo-container{gap:10px}}
+
+</style>
   
 </head>
 <body>
@@ -1197,7 +1205,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 <nav class="sidebar">
     <div class="sidebar-header">
         <div class="sidebar-logo">
-            <i class="fas fa-gamepad"></i>
+            <img src="./assets/arcade-atlas-logo.svg" alt="Arcade Atlas" class="sidebar-brand-logo">
         </div>
         <div class="sidebar-toggle">
             <i class="fas fa-chevron-right"></i>
@@ -1245,7 +1253,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         <header class="app-header" id="app-header">
             <div class="header-content">
                 <div class="logo-container">
-                    <h1 class="logo">Arcade Atlas</h1>
+                    <div class="brand-lockup"><img src="./assets/arcade-atlas-logo.svg" alt="" class="brand-logo"><h1 class="logo">Arcade Atlas</h1></div>
                     <div class="time-spent" id="timeSpent">geeked vs locked in....</div>
                 </div>
                 
