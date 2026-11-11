@@ -19,12 +19,12 @@ iframe{display:block;width:100%;height:100%;border:0}
   "use strict";
   const frame=document.getElementById("stacktris-game");
   let worker=null, scanning=false, submitted=false, lastText="", noEndCount=0;
-  const endWords=/game\\s*over|try\\s*again|out\\s*of\\s*bounds|you\\s*lost|failed|restart/i;
+  const endWords=/game\s*over|try\s*again|out\s*of\s*bounds|you\s*lost|failed|restart/i;
   function extractScore(text){
     const normalized=text.replace(/[oO]/g,"0").replace(/[lI|]/g,"1");
     const patterns=[
-      /(?:score|points?)\\s*[:：]?\\s*([0-9][0-9,]*)/i,
-      /([0-9][0-9,]*)\\s*(?:score|points?)/i
+      /(?:score|points?)\s*[:：]?\s*([0-9][0-9,]*)/i,
+      /([0-9][0-9,]*)\s*(?:score|points?)/i
     ];
     for(const pattern of patterns){
       const match=normalized.match(pattern);
