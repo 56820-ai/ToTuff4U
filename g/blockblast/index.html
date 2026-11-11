@@ -148,107 +148,154 @@
         }).then((unityInstance) => {
           loadingBar.style.display = "none";
 
-          // Visual score bridge: OCR the Unity canvas only after a likely
-          // game-over screen appears. This avoids guessing from unrelated storage.
+          // Block Blast OCR leaderboard bridge.
+          // Confetti is animated, so build a temporal-median frame to suppress
+          // particles, then OCR only the central game-over panel.
           (function connectBlockBlastCanvasOCR() {
             if (!window.ArcadeScores || !window.ArcadeScores.configured) return;
-            var canvas = document.getElementById("unity-canvas");
-            if (!canvas) return;
-            var submittedBest = 0;
-            try { submittedBest = Number(localStorage.getItem("arcadeBlockBlastSubmittedBest") || 0); } catch (e) {}
+            var gameCanvas = document.getElementById("unity-canvas");
+            if (!gameCanvas) return;
             var workerPromise = null;
             var scanning = false;
-            var lastScreen = "";
-            var lastSubmittedScreen = "";
+            var gameOverHits = 0;
+            var lastCandidate = 0;
+            var candidateHits = 0;
+            var submittedThisRun = false;
+            var lastOcrAt = 0;
 
             function getWorker() {
-              if (!workerPromise) {
-                workerPromise = window.Tesseract.createWorker("eng");
-              }
+              if (!workerPromise) workerPromise = window.Tesseract.createWorker("eng");
               return workerPromise;
             }
-
-            function normalize(text) {
-              return String(text || "").toLowerCase().replace(/[^a-z0-9\s:]/g, " ").replace(/\s+/g, " ").trim();
+            function normalize(value) {
+              return String(value || "").toLowerCase()
+                .replace(/[^a-z0-9\s:]/g, " ").replace(/\s+/g, " ").trim();
             }
-
-            function findScore(text) {
-              var lines = String(text || "").split(/\r?\n/).map(function (s) { return s.trim(); }).filter(Boolean);
-              var all = lines.join(" ");
-              var patterns = [
-                /(?:your\s+)?score\s*[:\-]?\s*([0-9][0-9,]{0,8})/i,
-                /([0-9][0-9,]{0,8})\s*(?:points|pts)/i
-              ];
-              for (var i = 0; i < patterns.length; i++) {
-                var match = all.match(patterns[i]);
-                if (match) {
-                  var n = Number(match[1].replace(/,/g, ""));
+            function hasGameOver(text) {
+              return /game\s*over|no\s*more\s*moves|out\s*of\s*moves|try\s*again|play\s*again|continue\s*playing/.test(normalize(text));
+            }
+            function readScore(text) {
+              var lines = String(text || "").split(/\r?\n/).map(function(x) { return x.trim(); }).filter(Boolean);
+              for (var i = 0; i < lines.length; i++) {
+                var m = lines[i].match(/(?:your\s*)?score\s*[:\-]?\s*([0-9][0-9,]{0,8})/i);
+                if (!m && /\bscore\b/i.test(lines[i])) {
+                  m = (lines[i] + " " + (lines[i + 1] || "")).match(/[0-9][0-9,]{0,8}/);
+                }
+                if (m) {
+                  var n = Number((m[1] || m[0]).replace(/,/g, ""));
                   if (Number.isSafeInteger(n) && n > 0 && n <= 100000000) return n;
                 }
               }
-              for (var j = 0; j < lines.length; j++) {
-                if (/\bscore\b/i.test(lines[j])) {
-                  var nearby = (lines[j] + " " + (lines[j + 1] || "") + " " + (lines[j + 2] || "")).match(/[0-9][0-9,]{0,8}/);
-                  if (nearby) {
-                    var value = Number(nearby[0].replace(/,/g, ""));
-                    if (Number.isSafeInteger(value) && value > 0 && value <= 100000000) return value;
-                  }
-                }
+              var all = lines.join(" ");
+              var points = all.match(/([0-9][0-9,]{0,8})\s*(?:points|pts)/i);
+              if (points) {
+                var p = Number(points[1].replace(/,/g, ""));
+                if (Number.isSafeInteger(p) && p > 0 && p <= 100000000) return p;
               }
               return 0;
             }
+            function wait(ms) { return new Promise(function(resolve) { setTimeout(resolve, ms); }); }
 
-            function isGameOver(text) {
-              var normalized = normalize(text);
-              return /game\s*over|no\s*more\s*moves|out\s*of\s*moves|try\s*again|play\s*again/.test(normalized);
+            async function makeConfettiReducedCrop() {
+              var w = gameCanvas.width, h = gameCanvas.height;
+              if (!w || !h) return null;
+              var sampleW = Math.min(540, w);
+              var sampleH = Math.max(1, Math.round(h * sampleW / w));
+              var frames = [];
+              var buffer = document.createElement("canvas");
+              buffer.width = sampleW; buffer.height = sampleH;
+              var bctx = buffer.getContext("2d", { willReadFrequently: true });
+              // Three snapshots: falling confetti changes position while the
+              // fixed score/game-over text remains in the same place.
+              for (var i = 0; i < 3; i++) {
+                bctx.clearRect(0, 0, sampleW, sampleH);
+                bctx.drawImage(gameCanvas, 0, 0, w, h, 0, 0, sampleW, sampleH);
+                frames.push(bctx.getImageData(0, 0, sampleW, sampleH).data);
+                if (i < 2) await wait(180);
+              }
+              var median = bctx.createImageData(sampleW, sampleH);
+              for (var p = 0; p < median.data.length; p += 4) {
+                for (var channel = 0; channel < 3; channel++) {
+                  var a = frames[0][p + channel], b = frames[1][p + channel], d = frames[2][p + channel];
+                  median.data[p + channel] = a > b ? (b > d ? b : (a > d ? d : a)) :
+                    (a > d ? a : (b > d ? d : b));
+                }
+                median.data[p + 3] = 255;
+              }
+              bctx.putImageData(median, 0, 0);
+
+              // Block Blast's end panel is central. Exclude much of the board
+              // edge and surrounding confetti, while retaining the score panel.
+              var crop = document.createElement("canvas");
+              crop.width = 900; crop.height = 1200;
+              var ctx = crop.getContext("2d", { willReadFrequently: true });
+              var sx = Math.round(sampleW * 0.08);
+              var sy = Math.round(sampleH * 0.18);
+              var sw = Math.max(1, Math.round(sampleW * 0.84));
+              var sh = Math.max(1, Math.round(sampleH * 0.64));
+              ctx.imageSmoothingEnabled = true;
+              ctx.imageSmoothingQuality = "high";
+              ctx.drawImage(buffer, sx, sy, sw, sh, 0, 0, crop.width, crop.height);
+              // Grayscale and mild contrast boost improves white score text.
+              var pixels = ctx.getImageData(0, 0, crop.width, crop.height);
+              for (var k = 0; k < pixels.data.length; k += 4) {
+                var gray = pixels.data[k] * 0.299 + pixels.data[k + 1] * 0.587 + pixels.data[k + 2] * 0.114;
+                var boosted = gray < 90 ? 0 : gray > 190 ? 255 : (gray - 90) * 2.55;
+                pixels.data[k] = pixels.data[k + 1] = pixels.data[k + 2] = boosted;
+              }
+              ctx.putImageData(pixels, 0, 0);
+              return crop;
             }
 
-            async function scanCanvas() {
-              if (scanning || !window.Tesseract || !canvas.width || !canvas.height) return;
+            async function scan() {
+              if (scanning || !window.Tesseract || !gameCanvas.width || !gameCanvas.height) return;
               scanning = true;
               try {
-                var image = document.createElement("canvas");
-                image.width = Math.max(1, Math.round(canvas.width * 0.8));
-                image.height = Math.max(1, Math.round(canvas.height * 0.8));
-                var ctx = image.getContext("2d", { willReadFrequently: true });
-                ctx.drawImage(canvas, 0, 0, image.width, image.height);
-                var result = await (await getWorker()).recognize(image);
+                var crop = await makeConfettiReducedCrop();
+                if (!crop) return;
+                var worker = await getWorker();
+                await worker.setParameters({
+                  tessedit_pageseg_mode: "11",
+                  preserve_interword_spaces: "1"
+                });
+                var result = await worker.recognize(crop);
                 var text = result && result.data ? result.data.text : "";
-                var normalized = normalize(text);
-                if (!isGameOver(text)) {
-                  lastScreen = "";
+                var ended = hasGameOver(text);
+                if (!ended) {
+                  gameOverHits = 0;
+                  candidateHits = 0;
+                  lastCandidate = 0;
+                  submittedThisRun = false;
                   return;
                 }
-                var score = findScore(text);
-                if (!score) return;
-                var screenKey = normalized + "|" + score;
-                if (screenKey === lastSubmittedScreen || score <= submittedBest) return;
-                if (screenKey === lastScreen || !lastScreen) {
-                  lastScreen = screenKey;
-                  var submitted = await window.ArcadeScores.promptAndSubmit("Block Blast", score);
-                  if (submitted) {
-                    submittedBest = score;
-                    lastSubmittedScreen = screenKey;
-                    try { localStorage.setItem("arcadeBlockBlastSubmittedBest", String(score)); } catch (e) {}
-                  }
-                } else {
-                  lastScreen = screenKey;
+                gameOverHits++;
+                var score = readScore(text);
+                if (!score || submittedThisRun) return;
+                if (score === lastCandidate) candidateHits++;
+                else { lastCandidate = score; candidateHits = 1; }
+
+                // Require two matching readings on separate scans to avoid
+                // submitting confetti artifacts or a transient OCR misread.
+                if (gameOverHits >= 2 && candidateHits >= 2) {
+                  submittedThisRun = true;
+                  var ok = await window.ArcadeScores.promptAndSubmit("Block Blast", score);
+                  if (!ok) submittedThisRun = false;
                 }
               } catch (error) {
-                console.warn("Block Blast visual score detection failed:", error);
+                console.warn("Block Blast OCR leaderboard error:", error);
               } finally {
                 scanning = false;
               }
             }
 
-            // Load OCR lazily; it is only used for the Block Blast canvas.
             var ocrScript = document.createElement("script");
             ocrScript.src = "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
             ocrScript.async = true;
-            ocrScript.onload = function () {
-              window.setInterval(scanCanvas, 2500);
+            ocrScript.onload = function() {
+              // Scan infrequently so OCR does not interrupt the puzzle gameplay.
+              window.setInterval(scan, 3000);
             };
-            ocrScript.onerror = function () {
+            ocrScript.onerror = function() {
               console.warn("Block Blast OCR library could not be loaded.");
             };
             document.head.appendChild(ocrScript);
