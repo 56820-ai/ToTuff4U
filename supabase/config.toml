@@ -1,0 +1,2 @@
+[functions.moderate-player-name]
+verify_jwt = false
