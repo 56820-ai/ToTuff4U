@@ -109,6 +109,20 @@
                     });
                 });
                 candidates = candidates.concat(joined);
+                // Some Tesseract builds return recognized digits in data.text but
+                // omit them from data.words. Since this OCR pass is already limited
+                // to the death-screen center crop, use that text as a fallback.
+                if (!candidates.length) {
+                    var recognizedText = String(result && result.data && result.data.text || "");
+                    var textNumbers = recognizedText.match(/[0-9][0-9,]{0,6}/g) || [];
+                    textNumbers.forEach(function(token) {
+                        var digits = token.replace(/,/g, "");
+                        var value = Number(digits);
+                        if (/^\\d{1,7}$/.test(digits) && value > 0) {
+                            candidates.push({value:value,digits:digits,confidence:0,x0:0,y0:0,x1:imageWidth,y1:imageHeight});
+                        }
+                    });
+                }
                 // On the end screen, score is a large centered number. Prefer
                 // the OCR token whose bounding-box center is closest to canvas
                 // center, then larger glyphs, rather than confidence alone.
