@@ -445,6 +445,7 @@
       const logos = {
         "slope": "../images/slope.png",
         "retro bowl": "../images/retrobowl.jpg",
+        "retro bowl time": "../images/retrobowl.jpg",
         "gunspin": "../images/gunspin.png",
         "block blast": "../images/blockblast.png",
         "drift boss": "../images/driftboss.png",
@@ -502,7 +503,7 @@
         return;
       }
       // Keep each player's best score for each game; Minecraft accumulates playtime.
-      const timedGames = new Set(["minecraft"]);
+      const timedGames = new Set(["minecraft", "retro bowl time"]);
       const bestByGameAndPlayer = new Map();
       onlineScores.forEach(item => {
         const gameKey = String(item.game_title || "Game").trim().toLowerCase();
@@ -534,13 +535,17 @@
           const timed = timedGames.has(String(item.game_title || "").trim().toLowerCase());
           const seconds = Math.max(0, Number(item.score) || 0);
           const reaction = String(item.game_title || "").trim().toLowerCase() === "reaction test";
+          const days = Math.floor(seconds / 86400);
+          const hours = Math.floor((seconds % 86400) / 3600);
+          const minutes = Math.floor((seconds % 3600) / 60);
+          const remainingSeconds = seconds % 60;
           const displayScore = timed
-            ? (seconds >= 3600 ? Math.floor(seconds / 3600) + "h " + Math.floor((seconds % 3600) / 60) + "m" : Math.floor(seconds / 60) + "m " + (seconds % 60) + "s")
+            ? days + "d " + hours + "h " + minutes + "m " + remainingSeconds + "s"
             : reaction ? Math.max(0, 10000 - Number(item.score)).toLocaleString() + " ms"
             : Number(item.score).toLocaleString();
           createLeaderboardItem({
             username: item.player_name,
-            gameTitle: item.game_title + (timed ? " · Total playtime" : ""),
+            gameTitle: (String(item.game_title).toLowerCase() === "retro bowl time" ? "Retro Bowl" : item.game_title) + (timed ? " · Total playtime" : ""),
             score: displayScore,
             date: new Date(item.created_at).toLocaleDateString(),
             userIcon: "../images/favicon.png",
