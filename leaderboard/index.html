@@ -420,7 +420,27 @@
       .score { font-size: 1.15rem; }
     }
 
-    </style>
+ 
+    /* Top-three podium */
+    #score-list { list-style:none; display:flex; flex-direction:column; gap:2rem; }
+    .podium-section { padding:1.25rem; border:1px solid rgba(107,255,217,.18); border-radius:20px; background:rgba(18,25,42,.72); }
+    .podium-game-title { text-align:center; font:700 1.35rem "Orbitron",sans-serif; margin:0 0 1.4rem; color:#e9faff; }
+    .podium { display:flex; align-items:flex-end; justify-content:center; gap:clamp(.5rem,2vw,1.25rem); max-width:680px; margin:0 auto; min-height:245px; }
+    .podium-place { flex:1; min-width:0; display:flex; flex-direction:column; align-items:center; text-align:center; gap:.45rem; }
+    .podium-avatar { width:clamp(48px,9vw,76px); height:clamp(48px,9vw,76px); border-radius:50%; object-fit:cover; border:3px solid #6b9dff; background:#1a1a2e; }
+    .podium-crown { font-size:1.4rem; line-height:1.2; min-height:1.4rem; }
+    .podium-name { width:100%; overflow-wrap:anywhere; font:700 clamp(1rem,2.4vw,1.25rem) "Chakra Petch",sans-serif; color:#fff; }
+    .podium-score { font:700 clamp(.85rem,2vw,1.1rem) "Orbitron",sans-serif; color:#6bffd9; overflow-wrap:anywhere; }
+    .podium-block { width:100%; display:flex; justify-content:center; align-items:center; border-radius:12px 12px 0 0; font:700 1.5rem "Orbitron",sans-serif; color:#101522; min-height:74px; background:linear-gradient(180deg,#8d9bb0,#586579); }
+    .podium-place.first .podium-block { min-height:126px; background:linear-gradient(180deg,#ffe58a,#d49a25); }
+    .podium-place.second .podium-block { min-height:96px; background:linear-gradient(180deg,#e5edf8,#8e9eaf); }
+    .podium-place.third .podium-block { min-height:74px; background:linear-gradient(180deg,#e9a477,#a95c38); }
+    .podium-place.first .podium-avatar { border-color:#ffd45e; }
+    .podium-place.second .podium-avatar { border-color:#c5d2e2; }
+    .podium-place.third .podium-avatar { border-color:#cd875e; }
+    .podium-empty { opacity:.5; font-size:.85rem; }
+    @media(max-width:480px) { .podium-section{padding:.8rem .45rem}.podium{gap:.35rem;min-height:205px}.podium-place.first .podium-block{min-height:105px}.podium-place.second .podium-block{min-height:80px}.podium-place.third .podium-block{min-height:62px}.podium-name{font-size:.95rem}.podium-score{font-size:.8rem} }
+\n    </style>
 </head>
 <body>
   <div class="leaderboard-container">
@@ -431,7 +451,7 @@
       </a>
     </header>
     <div class="leaderboard">
-      <ul id="score-list"></ul>
+      <div id="score-list"></div>
     </div>
   </div>
 
@@ -462,47 +482,74 @@
       return logos[game] || "../images/favicon.png";
     }
 
-    function createLeaderboardItem(data) {
-      const listItem = document.createElement("li");
-      listItem.classList.add("leaderboard-item");
-
-      const avatar = document.createElement("div");
-      avatar.className = "user-icon";
-      const image = document.createElement("img");
-      image.src = data.gameLogo || data.userIcon || "../images/favicon.png";
-      image.alt = data.username || "Player";
-      avatar.appendChild(image);
-
-      const info = document.createElement("div");
-      info.className = "player-info";
-      const game = document.createElement("p");
-      game.className = "game-title";
-      game.textContent = "🎮 " + (data.gameTitle || "Game");
-      const username = document.createElement("h3");
-      username.className = "username";
-      username.textContent = "👤 " + (data.username || "Player");
-      const date = document.createElement("p");
-      date.className = "date";
-      date.textContent = "📅 " + (data.date || "");
-      info.append(game, username, date);
-
-      const score = document.createElement("div");
-      score.className = "score";
-      score.textContent = String(data.score ?? 0);
-      listItem.append(avatar, info, score);
-      scoreList.appendChild(listItem);
+    function createPodiumSection(gameTitle, players, timedGames) {
+      const section = document.createElement("section");
+      section.className = "podium-section";
+      const heading = document.createElement("h2");
+      heading.className = "podium-game-title";
+      heading.textContent = gameTitle;
+      const podium = document.createElement("div");
+      podium.className = "podium";
+      const order = [
+        { rank: 2, cls: "second", medal: "🥈" },
+        { rank: 1, cls: "first", medal: "👑" },
+        { rank: 3, cls: "third", medal: "🥉" }
+      ];
+      order.forEach(place => {
+        const item = players[place.rank - 1];
+        const card = document.createElement("div");
+        card.className = "podium-place " + place.cls;
+        if (item) {
+          const crown = document.createElement("div");
+          crown.className = "podium-crown";
+          crown.textContent = place.medal;
+          const avatar = document.createElement("img");
+          avatar.className = "podium-avatar";
+          avatar.src = getGameLogo(item.game_title);
+          avatar.alt = "";
+          const name = document.createElement("div");
+          name.className = "podium-name";
+          name.textContent = item.player_name || "Player";
+          const seconds = Math.max(0, Number(item.score) || 0);
+          const gameKey = String(item.game_title || "").trim().toLowerCase();
+          const timed = timedGames.has(gameKey);
+          const reaction = gameKey === "reaction test";
+          const displayScore = timed
+            ? Math.floor(seconds / 86400) + "d " + Math.floor((seconds % 86400) / 3600) + "h " + Math.floor((seconds % 3600) / 60) + "m"
+            : reaction ? Math.max(0, 10000 - seconds).toLocaleString() + " ms" : seconds.toLocaleString();
+          const score = document.createElement("div");
+          score.className = "podium-score";
+          score.textContent = displayScore;
+          const block = document.createElement("div");
+          block.className = "podium-block";
+          block.textContent = String(place.rank);
+          card.append(crown, avatar, name, score, block);
+        } else {
+          const empty = document.createElement("div");
+          empty.className = "podium-empty";
+          empty.textContent = "—";
+          const block = document.createElement("div");
+          block.className = "podium-block";
+          block.textContent = String(place.rank);
+          card.append(empty, block);
+        }
+        podium.appendChild(card);
+      });
+      section.append(heading, podium);
+      scoreList.appendChild(section);
     }
 
     async function renderLeaderboard() {
       const onlineScores = window.ArcadeScores ? await window.ArcadeScores.getScores() : [];
       if (!onlineScores.length) {
-        const empty = document.createElement("li");
+        const empty = document.createElement("p");
         empty.className = "leaderboard-empty";
         empty.textContent = "No real scores have been recorded yet. Play a supported game to add the first score!";
         scoreList.appendChild(empty);
         return;
       }
-      // Keep each player's best score for each game; Minecraft accumulates playtime.
+
+      // Keep each player's best score per game; accumulate total playtime games.
       const timedGames = new Set(["minecraft", "retro bowl time"]);
       const bestByGameAndPlayer = new Map();
       onlineScores.forEach(item => {
@@ -514,44 +561,28 @@
           if (previous) {
             previous.score += Number(item.score) || 0;
             if (new Date(item.created_at) > new Date(previous.created_at)) previous.created_at = item.created_at;
-          } else {
-            bestByGameAndPlayer.set(key, { ...item, score: Number(item.score) || 0 });
-          }
+          } else bestByGameAndPlayer.set(key, { ...item, score: Number(item.score) || 0 });
         } else {
           const previous = bestByGameAndPlayer.get(key);
           if (!previous || Number(item.score) > Number(previous.score)) bestByGameAndPlayer.set(key, item);
         }
       });
-      // Show only the single top player for each game.
-      const topScoresByGame = new Map();
-      [...bestByGameAndPlayer.values()]
-        .sort((a, b) => String(a.game_title).localeCompare(String(b.game_title)) || Number(b.score) - Number(a.score))
-        .forEach(item => {
-          const gameKey = String(item.game_title || "Game").trim().toLowerCase();
-          if (!topScoresByGame.has(gameKey)) topScoresByGame.set(gameKey, []);
-          if (topScoresByGame.get(gameKey).length < 1) topScoresByGame.get(gameKey).push(item);
-        });
-      [...topScoresByGame.values()].flat().forEach(item => {
-          const timed = timedGames.has(String(item.game_title || "").trim().toLowerCase());
-          const seconds = Math.max(0, Number(item.score) || 0);
-          const reaction = String(item.game_title || "").trim().toLowerCase() === "reaction test";
-          const days = Math.floor(seconds / 86400);
-          const hours = Math.floor((seconds % 86400) / 3600);
-          const minutes = Math.floor((seconds % 3600) / 60);
-          const remainingSeconds = seconds % 60;
-          const displayScore = timed
-            ? days + "d " + hours + "h " + minutes + "m " + remainingSeconds + "s"
-            : reaction ? Math.max(0, 10000 - Number(item.score)).toLocaleString() + " ms"
-            : Number(item.score).toLocaleString();
-          createLeaderboardItem({
-            username: item.player_name,
-            gameTitle: (String(item.game_title).toLowerCase() === "retro bowl time" ? "Retro Bowl" : item.game_title) + (timed ? " · Total playtime" : ""),
-            score: displayScore,
-            date: new Date(item.created_at).toLocaleDateString(),
-            userIcon: "../images/favicon.png",
-            gameLogo: getGameLogo(item.game_title)
-          });
-        });
+
+      const byGame = new Map();
+      [...bestByGameAndPlayer.values()].forEach(item => {
+        const key = String(item.game_title || "Game").trim().toLowerCase();
+        if (!byGame.has(key)) byGame.set(key, []);
+        byGame.get(key).push(item);
+      });
+
+      [...byGame.entries()].sort((a,b) => a[0].localeCompare(b[0])).forEach(([key, players]) => {
+        // Lower reaction-test time is better; higher scores/playtime are better.
+        players.sort((a,b) => key === "reaction test"
+          ? Number(a.score) - Number(b.score)
+          : Number(b.score) - Number(a.score));
+        const title = key === "retro bowl time" ? "Retro Bowl · Total Playtime" : players[0].game_title;
+        createPodiumSection(title, players.slice(0,3), timedGames);
+      });
     }
     renderLeaderboard();
   </script>
