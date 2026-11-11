@@ -1,0 +1,77 @@
+name: Import Brotato DLC game files
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/import-brotato-dlc.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  import-game:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Arcade Atlas
+        uses: actions/checkout@v4
+
+      - name: Download Brotato web build
+        shell: bash
+        run: |
+          set -euo pipefail
+          dest="g/brotato-abyssal-terrors"
+          mkdir -p "$dest"
+          files=(
+            index.html
+            index.js
+            index.audio.worklet.js
+            index.icon.png
+            index.apple-touch-icon.png
+            index.png
+            index.pck.part01
+            index.pck.part02
+            index.pck.part03
+            index.pck.part04
+            index.pck.part05
+            index.pck.part06
+            index.pck.part07
+            index.pck.part08
+            index.pck.part09
+            index.pck.part10
+            index.pck.part11
+            index.wasm.part1
+            index.wasm.part2
+          )
+          for file in "${files[@]}"; do
+            echo "Downloading $file"
+            curl --fail --location --retry 3 --retry-delay 2 \
+              "https://raw.githubusercontent.com/wasm-rip/brotatodlc-web/main/$file" \
+              --output "$dest/$file"
+          done
+
+      - name: Add game to Arcade Atlas
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          path = Path("games.json")
+          data = json.loads(path.read_text())
+          games = data.setdefault("games", [])
+          if not any(g.get("path") == "g/brotato-abyssal-terrors" for g in games):
+              games.append({
+                  "title": "Brotato: Abyssal Terrors",
+                  "path": "g/brotato-abyssal-terrors",
+                  "image": "g/brotato-abyssal-terrors/index.png",
+                  "category": "ACTION"
+              })
+          path.write_text(json.dumps(data, indent=2) + "\n")
+          PY
+
+      - name: Commit imported game
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add g/brotato-abyssal-terrors games.json
+          git commit -m "Add Brotato: Abyssal Terrors"
+          git push
