@@ -1923,30 +1923,31 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
     <button class="patch-notes-close" id="closePatchNotes" aria-label="Close patch notes">&times;</button>
     <div class="patch-notes-kicker">WHAT'S NEW</div>
     <h2 id="patchNotesTitle">Arcade Atlas Update</h2>
-    <p class="patch-notes-date">November 10–11, 2026</p>
+    <p class="patch-notes-date">November 10–11, 2026 · Latest updates</p>
     <div class="patch-notes-content">
       <h3>🎮 New games</h3>
       <ul>
-        <li>Added Brotato: Abyssal Terrors.</li>
-        <li>Added Volley Random using the uploaded working game HTML.</li>
-        <li>Added Rooftop Snipers 2 and improved its Unity/Poki startup and controls.</li>
-        <li>Updated Stacktris to use the uploaded game files.</li>
+        <li>Added Brotato: Abyssal Terrors, Volley Random, Rooftop Snipers 2, and updated Stacktris with the uploaded game files.</li>
+        <li>Added a complete HTML5 Breakout game and connected its scores to the leaderboard.</li>
+        <li>Added a community-revived version of 1v1.LOL.</li>
       </ul>
       <h3>🏆 Leaderboard improvements</h3>
       <ul>
-        <li>Stacktris: connected the leaderboard and improved OCR score detection, capture resolution, and swipe handling.</li>
-        <li>Slope: improved end-screen score reading and reduced gameplay stutters by waiting until movement stops.</li>
+        <li>Redesigned game leaderboards with a top-three podium: second place on the left, first in the center, and third on the right.</li>
+        <li>Fixed Reaction Test rankings so faster times appear higher.</li>
+        <li>Stacktris: improved OCR resolution, score reading, and swipe-animation handling.</li>
+        <li>Slope: improved score recognition and made death detection faster.</li>
         <li>Block Blast: added OCR score submission with game-over checks and confetti filtering.</li>
-        <li>Retro Bowl: added playtime tracking in days, hours, minutes, and seconds, with total time on the leaderboard.</li>
+        <li>Retro Bowl: added total playtime tracking and leaderboard display.</li>
         <li>Improved player-name prompts for score and playtime submissions.</li>
       </ul>
       <h3>🛠️ Site updates</h3>
       <ul>
-        <li>Added a Privacy Policy and linked it in the footer.</li>
-        <li>Cleaned up advertising snippets and kept Google AdSense.</li>
+        <li>Added a Privacy Policy and linked it in the sidebar and footer.</li>
+        <li>Added a What's New popup with a link to the full patch notes.</li>
+        <li>Cleaned up advertising snippets and kept the Google AdSense integration.</li>
       </ul>
-    </div>
-    <div class="patch-notes-actions">
+    </div>    <div class="patch-notes-actions">
       <a href="./changelog/">Full patch notes</a>
       <button id="dismissPatchNotes">Got it</button>
     </div>
@@ -1973,7 +1974,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 </style>
 <script>
 (function(){
-  const version="2026-11-11";
+  const version="2026-11-11-2";
   const overlay=document.getElementById("patchNotesOverlay");
   const reopen=document.getElementById("reopenPatchNotes");
   const close=()=>{overlay.classList.remove("visible");overlay.setAttribute("aria-hidden","true");localStorage.setItem("arcadeAtlasPatchNotesSeen",version);reopen.style.display="block";};
