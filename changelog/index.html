@@ -1,63 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8390067368864065" crossorigin="anonymous"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Changelog</title>
+    <meta name="description" content="The latest Arcade Atlas updates, new games, fixes, and features.">
+    <title>Patch Notes | Arcade Atlas</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        :root { --pink:#ff6b9d; --blue:#6b9dff; --purple:#9d6bff; }
+        body { background: radial-gradient(ellipse at top, #20203b 0%, #0a0a1a 60%); min-height:100vh; }
+        .container { max-width:900px; padding:30px 20px 60px; }
+        .topline { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:28px; }
+        .brand { font-weight:800; letter-spacing:2px; color:#fff; text-decoration:none; font-size:18px; }
+        .back { color:#fff; text-decoration:none; border:1px solid #555; border-radius:8px; padding:9px 14px; background:#25253a; }
+        .back:hover { border-color:var(--pink); }
+        h1 { font-size:clamp(28px,5vw,42px); margin:10px 0 8px; background:linear-gradient(90deg,var(--pink),var(--blue),var(--purple)); color:transparent; background-clip:text; }
+        .subtitle { color:#bdbdd0; margin-bottom:28px; font-size:17px; }
+        .release { background:rgba(37,37,58,.88); border:1px solid rgba(255,107,157,.28); border-radius:14px; padding:22px; margin:18px 0; box-shadow:0 10px 30px #0003; }
+        .release h2 { color:#fff; font-size:23px; margin-bottom:5px; }
+        .release-date { color:#9fa8d8; font-size:14px; margin-bottom:18px; }
+        .group { margin:18px 0; }
+        .group h3 { color:var(--pink); font-size:18px; margin-bottom:8px; }
+        ul { padding-left:22px; list-style:disc; }
+        li { color:#e1e1ee; margin:8px 0; line-height:1.45; }
+        li strong { color:#fff; }
+        .tag { display:inline-block; font-size:11px; color:#dce5ff; border:1px solid #52618e; border-radius:20px; padding:3px 8px; margin-left:5px; vertical-align:2px; }
+        .older { border-color:#44445c; }
+        .older li { color:#c4c4d0; }
+        @media(max-width:560px){ .container{padding:20px 14px 40px}.release{padding:17px}.topline{align-items:flex-start} }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <div id="accordion" class="accordion">
-            <div class="card">
-                <div class="card-header" id="headingOne">
-                    <h2 class="mb-0">
-                        <center><a style="font-size: 20px;">Changelog for Proll's Game Site.</a></center>
-                    </h2>
-                </div>
-            
-                <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
-                    <div class="card-body">
-                        <ul>
-                            <li><strong><span class="date">[3/12/2024]</span> Unblock Searched Fixed - </strong>The unblocked search has been fixed!</li>
-                            <li><strong><span class="date">[3/14/2024]</span> UI Revamped - </strong> We've introduced a sleeker, more refined dark mode interface.</li>
-                            <li><strong><span class="date">[3/14/2024]</span> Changelog - </strong> Added a changelog so you can see what games we add.</li>
-                            <li><strong><span class="date">[3/18/2024]</span> 1v1.lol Fixed - </strong> 1v1.lol fixed. Lower ping, U.S. servers.</li> 
-                            <li><strong><span class="date">[3/18/2024]</span> Games Added - </strong>Motox3m games, all Riddle Schools, vex, all papas games, and stickman games</li>                           
-                            <li><strong><span class="date">[4/4/2024]</span> Source Is Public - </strong>You can now self host my site on github.</li>                           
-                            <center><button class="btn btn-dark-gray" onclick="redirectToExternalLink()">Go back to home</button></center>
+    <main class="container">
+        <div class="topline">
+            <a class="brand" href="../">ARCADE ATLAS</a>
+            <a class="back" href="../">← Back to games</a>
+        </div>
+        <h1>Patch Notes</h1>
+        <p class="subtitle">New games, leaderboard upgrades, fixes, and site improvements.</p>
 
-                        </ul>
-                    </div>
-                </div>
+        <section class="release">
+            <h2>Arcade Atlas Update</h2>
+            <p class="release-date">November 10–11, 2026 · Latest updates</p>
+
+            <div class="group">
+                <h3>New games</h3>
+                <ul>
+                    <li><strong>Brotato: Abyssal Terrors</strong> added as a playable web game, with its required game files imported automatically.</li>
+                    <li><strong>Volley Random</strong> added using the working HTML game loader.</li>
+                    <li><strong>Rooftop Snipers 2</strong> added to the game catalog and its Unity loading, keyboard focus, and Poki-to-Unity startup communication were improved.</li>
+                    <li><strong>Stacktris</strong> updated to use the uploaded game files.</li>
+                </ul>
             </div>
 
-    <script>
-        function redirectToExternalLink() {
-            window.location.href = "https://games.proll.dev"; // Replace with your external link URL
-        }
-    </script>
-            <!-- Add more collapsible sections for other categories -->
+            <div class="group">
+                <h3>Leaderboard upgrades</h3>
+                <ul>
+                    <li><strong>Stacktris:</strong> connected the game to the shared leaderboard and improved score recognition with higher-resolution OCR, centered capture, alternate text recognition, and better handling of swipe animations.</li>
+                    <li><strong>Slope:</strong> improved end-screen score reading, added fallback OCR detection, and adjusted movement detection so OCR waits until gameplay is still to reduce stutters.</li>
+                    <li><strong>Block Blast:</strong> added OCR-based score submission that checks for the game-over screen and filters moving confetti from the capture.</li>
+                    <li><strong>Retro Bowl:</strong> added playtime tracking in days, hours, minutes, and seconds, and made total playtime appear on the leaderboard.</li>
+                    <li><strong>Player names:</strong> improved the name prompt used when submitting scores and playtime.</li>
+                </ul>
+            </div>
 
-        </div>
-    </div>
-    <style>
-        .btn-dark-gray {
-    background-color: #444; /* Dark gray background color */
-    color: #fff; /* Text color */
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
+            <div class="group">
+                <h3>Site improvements</h3>
+                <ul>
+                    <li>Added a <strong>Privacy Policy</strong> explaining leaderboard data, local storage, third-party games, and advertising.</li>
+                    <li>Linked the Privacy Policy from the site footer.</li>
+                    <li>Removed the extra ad placements and kept the Google AdSense integration.</li>
+                </ul>
+            </div>
+        </section>
 
-.btn-dark-gray:hover {
-    background-color: #333; /* Darker gray background color on hover */
-}
-
-    </style>
-    <script src="script.js"></script>
+        <section class="release older">
+            <h2>Earlier updates</h2>
+            <p class="release-date">Previous changelog entries</p>
+            <ul>
+                <li><strong>[3/12/2024] Unblocked Search Fixed:</strong> The unblocked search was fixed.</li>
+                <li><strong>[3/14/2024] UI Revamped:</strong> Introduced a refined dark-mode interface.</li>
+                <li><strong>[3/14/2024] Changelog:</strong> Added a changelog for game updates.</li>
+                <li><strong>[3/18/2024] 1v1.lol Fixed:</strong> Improved the game connection with lower ping and U.S. servers.</li>
+                <li><strong>[3/18/2024] Games Added:</strong> Added Moto X3M games, Riddle School games, Vex, Papa's games, and Stickman games.</li>
+                <li><strong>[4/4/2024] Source Is Public:</strong> Made the site source available for self-hosting on GitHub.</li>
+            </ul>
+        </section>
+    </main>
 </body>
 </html>
