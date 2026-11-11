@@ -171,18 +171,19 @@
             // Slope shows the final run score in the middle of its crash/end screen,
             // not in the live HUD crop. Scan that center region when the run ends.
             async function readEndScreenScore(canvas) {
-                // OCR the broad central half of the end screen: Slope's score
-                // is visibly centered, and narrow crops can miss its font/scale.
-                var result = await recognizeCanvas(canvas, 0.20, 0.60, true, 0.15, 0.70);
+                // Only called after the run has ended. Scan the ENTIRE game
+                // canvas so the score is not missed if the death-screen layout,
+                // canvas scaling, or score position differs from expected.
+                var result = await recognizeCanvas(canvas, 0, 1, true, 0, 1, 11);
                 var best = extractScore(result);
-                // A second segmentation pass helps when two thin digits (such as
-                // "11") are mistakenly recognized as only one digit.
-                var alternate = await recognizeCanvas(canvas, 0.20, 0.60, true, 0.15, 0.70, 8);
+                var alternate = await recognizeCanvas(canvas, 0, 1, true, 0, 1, 6);
                 var alternateBest = extractScore(alternate);
-                // Try raw grayscale with a single-line OCR mode as well. This
-                // preserves narrow strokes that the high-contrast pass can lose.
-                var grayscale = await recognizeCanvas(canvas, 0.20, 0.60, true, 0.15, 0.70, 13, "gray");
+                // Raw grayscale and inverted full-canvas passes handle bright
+                // score text on dark overlays and dark text on bright backgrounds.
+                var grayscale = await recognizeCanvas(canvas, 0, 1, true, 0, 1, 11, "gray");
                 var grayscaleBest = extractScore(grayscale);
+                var inverted = await recognizeCanvas(canvas, 0, 1, true, 0, 1, 11, "invert");
+                var invertedBest = extractScore(inverted);
                 function describe(result, reading) {
                   var data = result && result.data ? result.data : {};
                   var words = Array.isArray(data.words) ? data.words.map(function(w) {
@@ -191,11 +192,13 @@
                   return "text=[" + String(data.text || "").replace(/\s+/g, " ").trim().slice(0, 55) +
                     "] words=[" + words.slice(0, 90) + "] pick=" + (reading.value || 0);
                 }
-                lastEndOcrDebug = "Pass1 " + describe(result, best) + " | Pass2 " +
-                  describe(alternate, alternateBest) + " | Gray " + describe(grayscale, grayscaleBest);
+                lastEndOcrDebug = "Canvas " + canvas.width + "x" + canvas.height +
+                  " | Pass1 " + describe(result, best) + " | Pass2 " +
+                  describe(alternate, alternateBest) + " | Gray " + describe(grayscale, grayscaleBest) +
+                  " | Invert " + describe(inverted, invertedBest);
                 window.__slopeOcrDebug = lastEndOcrDebug;
                 console.info("Slope end-screen OCR diagnostics:", lastEndOcrDebug);
-                var readings = [best, alternateBest, grayscaleBest];
+                var readings = [best, alternateBest, grayscaleBest, invertedBest];
                 readings.sort(function(a,b) {
                     // All passes use the same centered crop; prefer the strongest
                     // multi-digit reading when OCR splits or drops a digit.
