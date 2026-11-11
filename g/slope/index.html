@@ -288,9 +288,18 @@
                         handled = true;
                         var score = maxScore || latestScore;
                         if (score > 0 && leaderboardReady && window.ArcadeScores) {
-                            setStatus("game ended · submitting score " + score);
-                            var submitted = await window.ArcadeScores.submit("Slope", score, "Slope Player");
-                            setStatus(submitted ? "score submitted: " + score : "submission cancelled or failed");
+                            setStatus("game ended · asking for your leaderboard name");
+                            // Ask for the player's name instead of silently submitting
+                            // every Slope score under the generic "Slope Player" name.
+                            var playerName = window.prompt("Enter your name for the Slope leaderboard (24 characters max):", "");
+                            if (playerName && playerName.trim()) {
+                                playerName = playerName.trim().slice(0, 24);
+                                try { localStorage.setItem("arcadeLeaderboardPlayerName", playerName); } catch (e) {}
+                                var submitted = await window.ArcadeScores.submit("Slope", score, playerName);
+                                setStatus(submitted ? "score submitted: " + score : "score submission failed");
+                            } else {
+                                setStatus("name entry cancelled · score not submitted");
+                            }
                         } else if (!leaderboardReady) {
                             promptOcrIssue("Leaderboard connection is not configured.");
                         } else {
