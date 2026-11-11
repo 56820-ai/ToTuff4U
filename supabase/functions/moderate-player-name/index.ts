@@ -6,11 +6,22 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS"
 };
 
+// Lightweight per-isolate rate limit to reduce abuse of the public moderation endpoint.
+const requestsByIp = new Map<string, number[]>();
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") {
     return Response.json({ error: "Method not allowed" }, { status: 405, headers: corsHeaders });
   }
+
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+  const now = Date.now();
+  const recent = (requestsByIp.get(ip) || []).filter((time) => now - time < 60_000);
+  if (recent.length >= 30) {
+    return Response.json({ error: "Too many name checks. Please wait a minute and try again." }, { status: 429, headers: corsHeaders });
+  }
+  recent.push(now);
+  requestsByIp.set(ip, recent);
 
   const apiKey = Deno.env.get("OPENAI_API_KEY");
   if (!apiKey) {
