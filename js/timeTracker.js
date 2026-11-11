@@ -18,12 +18,12 @@
   var gameTitle = path === "/g/retro-bowl" ? "Retro Bowl Time" : "Minecraft";
   var playerName = "";
   try { playerName = (localStorage.getItem("arcadeLeaderboardPlayerName") || "").trim().slice(0, 24); } catch (e) {}
-  if (!playerName) playerName = "Uncontested";
+  
 
   var timer = document.createElement("div");
   timer.id = "arcade-playtime-timer";
   timer.setAttribute("role", "status");
-  timer.textContent = "Playtime: 00:00";
+  timer.textContent = "Playtime: 0d 0h 0m 0s";
   timer.style.cssText = "position:fixed;top:10px;right:10px;z-index:2147483647;padding:7px 11px;background:rgba(0,0,0,.82);color:#fff;border:1px solid #6bffd9;border-radius:8px;font:bold 14px/1.3 monospace;pointer-events:none;";
   (document.body || document.documentElement).appendChild(timer);
 
@@ -32,8 +32,11 @@
   var segmentStartedAt = document.visibilityState === "hidden" ? null : Date.now();
   var ended = false;
   function formatTime(seconds) {
-    var h = Math.floor(seconds / 3600), m = Math.floor((seconds % 3600) / 60), s = seconds % 60;
-    return (h ? String(h).padStart(2, "0") + ":" : "") + String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
+    var d = Math.floor(seconds / 86400);
+    var h = Math.floor((seconds % 86400) / 3600);
+    var m = Math.floor((seconds % 3600) / 60);
+    var s = seconds % 60;
+    return d + "d " + h + "h " + m + "m " + s + "s";
   }
   function updateTimer() {
     var seconds = totalSeconds;
@@ -48,8 +51,13 @@
     segmentStartedAt = null;
     updateTimer();
     if (pendingSeconds >= 5 && window.ArcadeScores && typeof window.ArcadeScores.submitSession === "function") {
-      window.ArcadeScores.submitSession(gameTitle, pendingSeconds, playerName);
-      pendingSeconds = 0;
+      if (!playerName && typeof window.ArcadeScores.getPlayerName === "function") {
+        playerName = window.ArcadeScores.getPlayerName("Enter your name for the Retro Bowl playtime leaderboard (24 characters max):");
+      }
+      if (playerName) {
+        window.ArcadeScores.submitSession(gameTitle, pendingSeconds, playerName);
+        pendingSeconds = 0;
+      }
     }
   }
   function onVisibilityChange() {
