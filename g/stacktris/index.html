@@ -14,50 +14,84 @@ iframe{display:block;width:100%;height:100%;border:0}
 </head>
 <body>
 <iframe id="stacktris-game" src="../stacktris-main/index.html" title="Stacktris" allow="fullscreen; autoplay; gamepad" allowfullscreen></iframe>
+<style>
+#stacktris-score-status{position:fixed;z-index:99999;left:8px;top:8px;padding:6px 9px;border-radius:6px;background:rgba(0,0,0,.78);color:#fff;font:12px/1.35 Arial,sans-serif;pointer-events:none;max-width:85vw}
+</style>
+<div id="stacktris-score-status">Leaderboard: starting scanner…</div>
 <script>
 (function(){
   "use strict";
   const frame=document.getElementById("stacktris-game");
-  let worker=null, scanning=false, submitted=false, lastText="", noEndCount=0;
-  const endWords=/game\s*over|try\s*again|out\s*of\s*bounds|you\s*lost|failed|restart/i;
+  const status=document.getElementById("stacktris-score-status");
+  let worker=null, scanning=false, submitted=false, lastText="", noEndCount=0, lastError="";
+  const endWords=/game\\s*over|try\\s*again|out\\s*of\\s*bounds|you\\s*lost|failed|restart|best\\s*score|new\\s*record|well\\s*played|tap\\s*to\\s*(?:play|continue)|play\\s*again|game\\s*ended/i;
+  function setStatus(message){status.textContent="Leaderboard: "+message;}
   function extractScore(text){
-    const normalized=text;
     const patterns=[
-      /(?:score|points?)\s*[:：]?\s*([0-9][0-9,]*)/i,
-      /([0-9][0-9,]*)\s*(?:score|points?)/i
+      /(?:score|points?|total)\\s*[:：]?\\s*([0-9][0-9,]*)/i,
+      /([0-9][0-9,]*)\\s*(?:score|points?)/i
     ];
     for(const pattern of patterns){
-      const match=normalized.match(pattern);
+      const match=text.match(pattern);
       if(match){const value=Number(match[1].replace(/,/g,""));if(Number.isSafeInteger(value)&&value>=0&&value<=1000000000)return value;}
     }
     return null;
   }
+  function prepareCanvas(source){
+    const scale=Math.min(2,Math.max(1,1600/Math.max(source.width,source.height)));
+    const temp=document.createElement("canvas");
+    temp.width=Math.round(source.width*scale);temp.height=Math.round(source.height*scale);
+    const ctx=temp.getContext("2d",{willReadFrequently:true});
+    ctx.drawImage(source,0,0,temp.width,temp.height);
+    const pixels=ctx.getImageData(0,0,temp.width,temp.height);
+    for(let i=0;i<pixels.data.length;i+=4){
+      const gray=(pixels.data[i]*0.299+pixels.data[i+1]*0.587+pixels.data[i+2]*0.114);
+      const value=gray>145?255:0;
+      pixels.data[i]=pixels.data[i+1]=pixels.data[i+2]=value;
+    }
+    ctx.putImageData(pixels,0,0);
+    return temp;
+  }
   async function scan(){
-    if(scanning||!frame.contentWindow||!frame.contentDocument)return;
-    const doc=frame.contentDocument, canvas=doc.getElementById("canvas");
-    if(!canvas||!canvas.width||!canvas.height)return;
+    if(scanning)return;
     scanning=true;
     try{
-      if(!worker)worker=await Tesseract.createWorker("eng",1);
-      const result=await worker.recognize(canvas);
-      const text=(result.data.text||"").trim();
+      if(!frame.contentDocument){setStatus("waiting for game frame access");return;}
+      const canvas=frame.contentDocument.getElementById("canvas");
+      if(!canvas||!canvas.width||!canvas.height){setStatus("waiting for game canvas");return;}
+      if(!window.Tesseract){setStatus("OCR library did not load");return;}
+      if(!worker){setStatus("loading text reader…");worker=await Tesseract.createWorker("eng",1);}
+      const image=prepareCanvas(canvas);
+      const result=await worker.recognize(image);
+      const text=(result.data.text||"").replace(/\\s+/g," ").trim();
       if(text!==lastText){lastText=text;console.debug("Stacktris OCR:",text);}
       const ended=endWords.test(text);
       const score=extractScore(text);
       if(ended){
         noEndCount=0;
+        setStatus("end screen detected; "+(score===null?"score not readable":"score "+score));
         if(!submitted&&score!==null){
           submitted=true;
-          window.ArcadeScores.promptAndSubmit("Stacktris",score).finally(()=>{});
+          setStatus("asking for leaderboard name…");
+          try{
+            await window.ArcadeScores.promptAndSubmit("Stacktris",score);
+            setStatus("score prompt finished");
+          }catch(error){submitted=false;setStatus("submission error: "+error.message);}
         }
       }else{
         noEndCount++;
         if(noEndCount>=2)submitted=false;
+        setStatus(text?"playing; OCR: "+text.slice(0,95):"game canvas found, but no text recognized");
       }
-    }catch(error){console.warn("Stacktris leaderboard scan failed:",error);}
-    finally{scanning=false;}
+    }catch(error){
+      lastError=error&&error.message?error.message:String(error);
+      console.warn("Stacktris leaderboard scan failed:",error);
+      setStatus("scanner error: "+lastError.slice(0,100));
+    }finally{scanning=false;}
   }
-  setInterval(scan,2500);
+  frame.addEventListener("load",()=>setStatus("game loaded; starting OCR"));
+  setInterval(scan,2000);
+  scan();
 })();
 </script>
 </body>
