@@ -38,20 +38,27 @@ iframe{display:block;width:100%;height:100%;border:0}
     return null;
   }
   function prepareCanvas(source){
-    // Read only a 700x700 square from the exact center of the game canvas.
-    const cropSize=Math.min(700,source.width,source.height);
-    const sx=Math.floor((source.width-cropSize)/2);
-    const sy=Math.floor((source.height-cropSize)/2);
-    // Upscale the centered crop 4x for clearer score recognition.
-    const scale=4;
+    // Capture the central 90% of the game screen, then normalize it to 1000x1000.
+    const cropWidth=Math.max(1,Math.floor(source.width*0.9));
+    const cropHeight=Math.max(1,Math.floor(source.height*0.9));
+    const sx=Math.floor((source.width-cropWidth)/2);
+    const sy=Math.floor((source.height-cropHeight)/2);
     const temp=document.createElement("canvas");
-    temp.width=cropSize*scale;
-    temp.height=cropSize*scale;
+    temp.width=1000;
+    temp.height=1000;
     const ctx=temp.getContext("2d",{willReadFrequently:true});
+    ctx.fillStyle="#000";
+    ctx.fillRect(0,0,1000,1000);
     ctx.imageSmoothingEnabled=true;
     ctx.imageSmoothingQuality="high";
-    ctx.drawImage(source,sx,sy,cropSize,cropSize,0,0,temp.width,temp.height);
-    const pixels=ctx.getImageData(0,0,temp.width,temp.height);
+    // Fit the full 90% center crop inside the square without stretching or skewing text.
+    const scale=Math.min(1000/cropWidth,1000/cropHeight);
+    const drawWidth=Math.round(cropWidth*scale);
+    const drawHeight=Math.round(cropHeight*scale);
+    const dx=Math.floor((1000-drawWidth)/2);
+    const dy=Math.floor((1000-drawHeight)/2);
+    ctx.drawImage(source,sx,sy,cropWidth,cropHeight,dx,dy,drawWidth,drawHeight);
+    const pixels=ctx.getImageData(0,0,1000,1000);
     for(let i=0;i<pixels.data.length;i+=4){
       const gray=(pixels.data[i]*0.299+pixels.data[i+1]*0.587+pixels.data[i+2]*0.114);
       const value=gray>135?255:0;
