@@ -1874,6 +1874,78 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         setInterval(updateTime, 1000);
     });
 </script>
+
+<!-- Latest update popup -->
+<div id="patchNotesOverlay" class="patch-notes-overlay" aria-hidden="true">
+  <section class="patch-notes-modal" role="dialog" aria-modal="true" aria-labelledby="patchNotesTitle">
+    <button class="patch-notes-close" id="closePatchNotes" aria-label="Close patch notes">&times;</button>
+    <div class="patch-notes-kicker">WHAT'S NEW</div>
+    <h2 id="patchNotesTitle">Arcade Atlas Update</h2>
+    <p class="patch-notes-date">November 10–11, 2026</p>
+    <div class="patch-notes-content">
+      <h3>🎮 New games</h3>
+      <ul>
+        <li>Added Brotato: Abyssal Terrors.</li>
+        <li>Added Volley Random using the uploaded working game HTML.</li>
+        <li>Added Rooftop Snipers 2 and improved its Unity/Poki startup and controls.</li>
+        <li>Updated Stacktris to use the uploaded game files.</li>
+      </ul>
+      <h3>🏆 Leaderboard improvements</h3>
+      <ul>
+        <li>Stacktris: connected the leaderboard and improved OCR score detection, capture resolution, and swipe handling.</li>
+        <li>Slope: improved end-screen score reading and reduced gameplay stutters by waiting until movement stops.</li>
+        <li>Block Blast: added OCR score submission with game-over checks and confetti filtering.</li>
+        <li>Retro Bowl: added playtime tracking in days, hours, minutes, and seconds, with total time on the leaderboard.</li>
+        <li>Improved player-name prompts for score and playtime submissions.</li>
+      </ul>
+      <h3>🛠️ Site updates</h3>
+      <ul>
+        <li>Added a Privacy Policy and linked it in the footer.</li>
+        <li>Cleaned up advertising snippets and kept Google AdSense.</li>
+      </ul>
+    </div>
+    <div class="patch-notes-actions">
+      <a href="./changelog/">Full patch notes</a>
+      <button id="dismissPatchNotes">Got it</button>
+    </div>
+  </section>
+</div>
+<button id="reopenPatchNotes" class="patch-notes-reopen" type="button">✨ What's New</button>
+<style>
+.patch-notes-overlay{position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,.78);display:none;align-items:center;justify-content:center;padding:18px;backdrop-filter:blur(5px)}
+.patch-notes-overlay.visible{display:flex}
+.patch-notes-modal{position:relative;width:min(620px,100%);max-height:min(82vh,760px);overflow:auto;background:linear-gradient(145deg,#1a1a2e,#25253a);border:1px solid rgba(255,107,157,.55);border-radius:16px;padding:28px;color:#fff;box-shadow:0 20px 70px #000a}
+.patch-notes-kicker{font-size:11px;letter-spacing:3px;color:#ff6b9d;font-weight:bold}
+.patch-notes-modal h2{font-size:clamp(22px,4vw,30px);margin:8px 38px 4px 0;background:linear-gradient(90deg,#ff6b9d,#6b9dff,#9d6bff);color:transparent;background-clip:text}
+.patch-notes-date{color:#aeb5d2;font-size:13px;margin-bottom:20px}
+.patch-notes-close{position:absolute;right:15px;top:12px;background:none;border:0;color:#ddd;font-size:30px;cursor:pointer}
+.patch-notes-content h3{font-size:16px;color:#ff8eb5;margin:18px 0 7px}
+.patch-notes-content ul{padding-left:22px}
+.patch-notes-content li{color:#e0e0ed;line-height:1.45;margin:7px 0;font-size:15px}
+.patch-notes-actions{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:22px;padding-top:16px;border-top:1px solid #ffffff20}
+.patch-notes-actions a{color:#9dbbff;text-decoration:none}
+.patch-notes-actions a:hover{text-decoration:underline}
+.patch-notes-actions button,.patch-notes-reopen{border:0;border-radius:9px;padding:10px 17px;background:linear-gradient(120deg,#ff6b9d,#9d6bff);color:white;font-weight:bold;cursor:pointer}
+.patch-notes-reopen{position:fixed;right:18px;bottom:18px;z-index:9999;box-shadow:0 5px 20px #0007;display:none}
+@media(max-width:520px){.patch-notes-modal{padding:22px 18px}.patch-notes-content li{font-size:14px}.patch-notes-actions{align-items:flex-start;flex-direction:column}.patch-notes-actions button{width:100%}}
+</style>
+<script>
+(function(){
+  const version="2026-11-11";
+  const overlay=document.getElementById("patchNotesOverlay");
+  const reopen=document.getElementById("reopenPatchNotes");
+  const close=()=>{overlay.classList.remove("visible");overlay.setAttribute("aria-hidden","true");localStorage.setItem("arcadeAtlasPatchNotesSeen",version);reopen.style.display="block";};
+  const show=()=>{overlay.classList.add("visible");overlay.setAttribute("aria-hidden","false");};
+  document.getElementById("closePatchNotes").addEventListener("click",close);
+  document.getElementById("dismissPatchNotes").addEventListener("click",close);
+  reopen.addEventListener("click",show);
+  overlay.addEventListener("click",e=>{if(e.target===overlay)close();});
+  document.addEventListener("keydown",e=>{if(e.key==="Escape"&&overlay.classList.contains("visible"))close();});
+  if(localStorage.getItem("arcadeAtlasPatchNotesSeen")!==version)show();
+  else reopen.style.display="block";
+})();
+</script>
+
 </body>
 </html>
 
