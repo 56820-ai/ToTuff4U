@@ -38,16 +38,19 @@ iframe{display:block;width:100%;height:100%;border:0}
     return null;
   }
   function prepareCanvas(source){
-    // Upscale aggressively so small end-screen digits are easier for OCR to read.
-    // Cap the longest edge to avoid allocating an excessively large image.
-    const longest=Math.max(source.width,source.height);
-    const scale=Math.min(4,Math.max(2,3200/longest));
+    // Read only a 700x700 square from the exact center of the game canvas.
+    const cropSize=Math.min(700,source.width,source.height);
+    const sx=Math.floor((source.width-cropSize)/2);
+    const sy=Math.floor((source.height-cropSize)/2);
+    // Upscale the centered crop 4x for clearer score recognition.
+    const scale=4;
     const temp=document.createElement("canvas");
-    temp.width=Math.round(source.width*scale);temp.height=Math.round(source.height*scale);
+    temp.width=cropSize*scale;
+    temp.height=cropSize*scale;
     const ctx=temp.getContext("2d",{willReadFrequently:true});
     ctx.imageSmoothingEnabled=true;
     ctx.imageSmoothingQuality="high";
-    ctx.drawImage(source,0,0,temp.width,temp.height);
+    ctx.drawImage(source,sx,sy,cropSize,cropSize,0,0,temp.width,temp.height);
     const pixels=ctx.getImageData(0,0,temp.width,temp.height);
     for(let i=0;i<pixels.data.length;i+=4){
       const gray=(pixels.data[i]*0.299+pixels.data[i+1]*0.587+pixels.data[i+2]*0.114);
