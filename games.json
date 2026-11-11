@@ -519,7 +519,7 @@
     {
       "title": "Breakout",
       "path": "g/breakout",
-      "image": "images/stacktris.jpg",
+      "image": "https://raw.githubusercontent.com/jakesgordon/javascript-breakout/master/packaged/assets/icon_128.png",
       "category": "ARCADE"
     },
     {
