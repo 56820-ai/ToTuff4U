@@ -68,9 +68,11 @@
             }
             function extractScore(result) {
                 var words = result && result.data && result.data.words || [];
+                var imageWidth = result && result.__ocrWidth || 1;
+                var imageHeight = result && result.__ocrHeight || 1;
                 var candidates = words.map(function(word) {
                     var raw = String(word.text || "").replace(/,/g, "").trim();
-                    if (!/^\\d{1,7}$/.test(raw)) return null;
+                    if (!/^\d{1,7}$/.test(raw)) return null;
                     var box = word.bbox || {};
                     return { value:Number(raw), confidence:Number(word.confidence)||0,
                       x0:Number(box.x0)||0,y0:Number(box.y0)||0,x1:Number(box.x1)||0,y1:Number(box.y1)||0 };
@@ -82,8 +84,8 @@
                 // the OCR token whose bounding-box center is closest to canvas
                 // center, then larger glyphs, rather than confidence alone.
                 candidates.sort(function(a,b) {
-                    var acx=(a.x0+a.x1)/2, acy=(a.y0+a.y1)/2;
-                    var bcx=(b.x0+b.x1)/2, bcy=(b.y0+b.y1)/2;
+                    var acx=((a.x0+a.x1)/2)/imageWidth, acy=((a.y0+a.y1)/2)/imageHeight;
+                    var bcx=((b.x0+b.x1)/2)/imageWidth, bcy=((b.y0+b.y1)/2)/imageHeight;
                     var ad=Math.hypot(acx-0.5,acy-0.5), bd=Math.hypot(bcx-0.5,bcy-0.5);
                     return ad-bd || ((b.x1-b.x0)*(b.y1-b.y0)-(a.x1-a.x0)*(a.y1-a.y0)) || b.confidence-a.confidence;
                 });
@@ -112,7 +114,10 @@
                 var w = await worker();
                 if (digitsOnly) await w.setParameters({ tessedit_char_whitelist: "0123456789,", tessedit_pageseg_mode: "7", preserve_interword_spaces: "0" });
                 else await w.setParameters({ tessedit_char_whitelist: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", tessedit_pageseg_mode: "11" });
-                return await w.recognize(image);
+                var result = await w.recognize(image);
+                result.__ocrWidth = image.width;
+                result.__ocrHeight = image.height;
+                return result;
             }
             async function readHudScore(canvas) {
                 var result = await recognizeCanvas(canvas, 0.02, 0.18, true, 0.32, 0.36);
