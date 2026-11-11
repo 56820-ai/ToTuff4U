@@ -62,9 +62,17 @@
             }
             // The in-game Leaderboard control appears on Slope's run-ended screen.
             // Require repeated OCR hits AND a detected run to avoid triggering on load.
-            function isRunEnded(s) {
-                var t = normalized(s);
-                return /leader ?board|play again|try again|game over|you crashed/.test(t);
+            function isRunEnded(ocrResult) {
+                // readGameState returns Tesseract's result object, not a string.
+                // Read the recognized text explicitly; otherwise String(object)
+                // becomes "[object Object]" and death screens are never detected.
+                var data = ocrResult && ocrResult.data ? ocrResult.data : {};
+                var rawText = data.text || "";
+                if (!rawText && Array.isArray(data.words)) {
+                    rawText = data.words.map(function (word) { return word.text || ""; }).join(" ");
+                }
+                var t = normalized(rawText);
+                return /leader ?board|play again|try again|game over|you crashed|crash(ed)?|run over|restart|new game/.test(t);
             }
             function extractScore(result) {
                 var words = result && result.data && result.data.words || [];
@@ -203,9 +211,9 @@
                             latestScore = Math.max(latestScore, endScoreReading.value);
                         }
                     }
-                    if (!gameStarted) setStatus("waiting for gameplay motion");
-                    else if (!ended) setStatus("RUNNING · score read " + (latestScore || "waiting") + " · best " + maxScore);
-                    else setStatus("game ended · confirming (" + endScreenHits + "/2)");
+                    if (!gameStarted) setStatus("waiting for gameplay motion (" + motionHits + "/3)");
+                    else if (!ended) setStatus("PLAYING · score " + (latestScore || "reading…") + " · best " + maxScore + (stoppedHits ? " · checking pause" : ""));
+                    else setStatus("DEATH / RUN END DETECTED · confirming (" + endScreenHits + "/2)");
                     endScreenHits = ended ? endScreenHits + 1 : 0;
 
                     if (endScreenHits >= 2 && !handled) {
