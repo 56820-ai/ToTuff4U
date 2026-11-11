@@ -82,12 +82,32 @@
                     var raw = String(word.text || "").replace(/,/g, "").trim();
                     if (!/^\d{1,7}$/.test(raw)) return null;
                     var box = word.bbox || {};
-                    return { value:Number(raw), confidence:Number(word.confidence)||0,
+                    return { value:Number(raw), digits:raw, confidence:Number(word.confidence)||0,
                       x0:Number(box.x0)||0,y0:Number(box.y0)||0,x1:Number(box.x1)||0,y1:Number(box.y1)||0 };
                 }).filter(function(x) {
                     return x && x.value >= 1 && x.confidence >= 30 &&
                       (x.x1-x.x0) > 3 && (x.y1-x.y0) > 4;
                 });
+                // Tesseract sometimes splits a multi-digit score into separate
+                // word tokens (for example, "11" becomes "1" + "1"). Rejoin
+                // horizontally adjacent digit tokens on the same line.
+                var joined = [];
+                candidates.forEach(function(a) {
+                    candidates.forEach(function(b) {
+                        if (b.x0 <= a.x0) return;
+                        var ah = a.y1 - a.y0, bh = b.y1 - b.y0;
+                        var verticalOverlap = Math.max(0, Math.min(a.y1,b.y1)-Math.max(a.y0,b.y0));
+                        var gap = b.x0 - a.x1;
+                        var digits = String(a.digits) + String(b.digits);
+                        if (digits.length <= 7 && verticalOverlap >= Math.min(ah,bh)*0.55 &&
+                            gap >= -2 && gap <= Math.max(ah,bh)*0.75) {
+                            joined.push({value:Number(digits),digits:digits,
+                              confidence:Math.min(a.confidence,b.confidence),
+                              x0:a.x0,y0:Math.min(a.y0,b.y0),x1:b.x1,y1:Math.max(a.y1,b.y1)});
+                        }
+                    });
+                });
+                candidates = candidates.concat(joined);
                 // On the end screen, score is a large centered number. Prefer
                 // the OCR token whose bounding-box center is closest to canvas
                 // center, then larger glyphs, rather than confidence alone.
@@ -137,7 +157,15 @@
                 // OCR the broad central half of the end screen: Slope's score
                 // is visibly centered, and narrow crops can miss its font/scale.
                 var result = await recognizeCanvas(canvas, 0.20, 0.60, true, 0.15, 0.70);
-                return extractScore(result);
+                var best = extractScore(result);
+                // A second segmentation pass helps when two thin digits (such as
+                // "11") are mistakenly recognized as only one digit.
+                var alternate = await recognizeCanvas(canvas, 0.20, 0.60, true, 0.15, 0.70, 8);
+                var alternateBest = extractScore(alternate);
+                if (alternateBest.value > best.value && alternateBest.confidence >= 30) {
+                    return alternateBest;
+                }
+                return best;
             }
             async function readGameState(canvas) {
                 return await recognizeCanvas(canvas, 0, 1, false);
