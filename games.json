@@ -533,6 +533,12 @@
       "path": "g/reaction-test",
       "image": "images/lazyjump3d.png",
       "category": "ARCADE"
+    },
+    {
+      "title": "Brotato: Abyssal Terrors",
+      "path": "g/brotato-abyssal-terrors",
+      "image": "g/brotato-abyssal-terrors/index.png",
+      "category": "ACTION"
     }
   ]
 }
