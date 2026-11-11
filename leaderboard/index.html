@@ -576,10 +576,9 @@
       });
 
       [...byGame.entries()].sort((a,b) => a[0].localeCompare(b[0])).forEach(([key, players]) => {
-        // Lower reaction-test time is better; higher scores/playtime are better.
-        players.sort((a,b) => key === "reaction test"
-          ? Number(a.score) - Number(b.score)
-          : Number(b.score) - Number(a.score));
+        // Reaction Test stores an inverted score (10000 - milliseconds),
+        // so a higher stored value means a faster reaction and ranks first.
+        players.sort((a,b) => Number(b.score) - Number(a.score));
         const title = key === "retro bowl time" ? "Retro Bowl · Total Playtime" : players[0].game_title;
         createPodiumSection(title, players.slice(0,3), timedGames);
       });
