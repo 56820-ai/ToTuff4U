@@ -119,7 +119,7 @@
                 });
                 return candidates[0] || {value:0,confidence:0};
             }
-            async function recognizeCanvas(canvas, cropTopRatio, cropHeightRatio, digitsOnly, cropLeftRatio, cropWidthRatio, digitPageSegMode) {
+            async function recognizeCanvas(canvas, cropTopRatio, cropHeightRatio, digitsOnly, cropLeftRatio, cropWidthRatio, digitPageSegMode, preprocessMode) {
                 var image = document.createElement("canvas");
                 var sourceY = Math.round(canvas.height * cropTopRatio);
                 var sourceHeight = Math.max(1, Math.round(canvas.height * cropHeightRatio));
@@ -131,11 +131,13 @@
                 var ctx = image.getContext("2d", { willReadFrequently: true });
                 ctx.drawImage(canvas, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, image.width, image.height);
                 var pixels = ctx.getImageData(0, 0, image.width, image.height);
-                // High-contrast grayscale with a slightly softer threshold so thin
-                // anti-aliased digits are not erased.
+                // Keep an unthresholded grayscale option: thresholding can erase
+                // thin strokes in Slope's small score font (for example the "7" in 17).
                 for (var i = 0; i < pixels.data.length; i += 4) {
                     var gray = pixels.data[i] * 0.299 + pixels.data[i + 1] * 0.587 + pixels.data[i + 2] * 0.114;
-                    var boosted = gray < 105 ? 0 : gray > 175 ? 255 : (gray - 105) * 3.64;
+                    var boosted = preprocessMode === "gray" ? gray :
+                        (gray < 105 ? 0 : gray > 175 ? 255 : (gray - 105) * 3.64);
+                    if (preprocessMode === "invert") boosted = 255 - boosted;
                     pixels.data[i] = pixels.data[i + 1] = pixels.data[i + 2] = boosted;
                 }
                 ctx.putImageData(pixels, 0, 0);
@@ -162,10 +164,18 @@
                 // "11") are mistakenly recognized as only one digit.
                 var alternate = await recognizeCanvas(canvas, 0.20, 0.60, true, 0.15, 0.70, 8);
                 var alternateBest = extractScore(alternate);
-                if (alternateBest.value > best.value && alternateBest.confidence >= 30) {
-                    return alternateBest;
-                }
-                return best;
+                // Try raw grayscale with a single-line OCR mode as well. This
+                // preserves narrow strokes that the high-contrast pass can lose.
+                var grayscale = await recognizeCanvas(canvas, 0.20, 0.60, true, 0.15, 0.70, 13, "gray");
+                var grayscaleBest = extractScore(grayscale);
+                var readings = [best, alternateBest, grayscaleBest];
+                readings.sort(function(a,b) {
+                    // All passes use the same centered crop; prefer the strongest
+                    // multi-digit reading when OCR splits or drops a digit.
+                    return (b.value > 9 ? 1 : 0) - (a.value > 9 ? 1 : 0) ||
+                        b.confidence - a.confidence;
+                });
+                return readings[0] && readings[0].value > 0 ? readings[0] : best;
             }
             async function readGameState(canvas) {
                 return await recognizeCanvas(canvas, 0, 1, false);
