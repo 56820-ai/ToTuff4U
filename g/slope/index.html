@@ -264,17 +264,19 @@
                     motionHits = moving ? motionHits + 1 : 0;
                     if (motionHits >= 3) gameStarted = true;
 
-                    // Only inspect text after movement has stopped for about 2 seconds.
-                    // This keeps the leaderboard detector from interrupting active play.
+                    // Check for the end screen as soon as the first still frame appears.
+                    // The explicit end-screen text is strong evidence; stillness alone
+                    // takes a few more samples so a brief pause during play won't end a run.
                     stoppedHits = gameStarted && !moving ? stoppedHits + 1 : 0;
                     var textEnded = false;
-                    if (gameStarted && !moving && stoppedHits >= 2) {
+                    if (gameStarted && !moving && stoppedHits >= 1) {
                         var screenText = await readGameState(canvas);
                         textEnded = isRunEnded(screenText);
                     }
 
-                    // Stillness is the fallback if the end-screen text is not recognized.
-                    var ended = textEnded || (gameStarted && stoppedHits >= 4);
+                    // Faster stillness fallback: 3 half-second samples instead of 4
+                    // 1.1-second samples. Text-confirmed death can submit immediately.
+                    var ended = textEnded || (gameStarted && stoppedHits >= 3);
                     if (ended && gameStarted) {
                         var endScoreReading = await readEndScreenScore(canvas);
                         if (endScoreReading.value > 0) {
@@ -287,7 +289,7 @@
                     else setStatus("DEATH / RUN END DETECTED · confirming (" + endScreenHits + "/2)");
                     endScreenHits = ended ? endScreenHits + 1 : 0;
 
-                    if (endScreenHits >= 2 && !handled) {
+                    if ((textEnded || endScreenHits >= 2) && !handled) {
                         handled = true;
                         var score = maxScore || latestScore;
                         if (score > 0 && leaderboardReady && window.ArcadeScores) {
@@ -329,7 +331,7 @@
               var script = document.createElement("script");
               script.src = "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
               script.async = true;
-              script.onload = function () { setStatus(leaderboardReady ? "OCR loaded · automatic game detection active" : "OCR loaded · leaderboard config missing"); window.setInterval(tick, 1100); };
+              script.onload = function () { setStatus(leaderboardReady ? "OCR loaded · faster automatic death detection active" : "OCR loaded · leaderboard config missing"); window.setInterval(tick, 500); };
               script.onerror = function () { console.warn("Slope leaderboard OCR could not load."); promptOcrIssue("Tesseract failed to load. Check connection and reload."); };
               document.head.appendChild(script);
             }
