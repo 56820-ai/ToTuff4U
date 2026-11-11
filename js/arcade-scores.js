@@ -43,6 +43,24 @@
     }
   }
 
+  async function moderatePlayerName(playerName) {
+    if (!configured) throw new Error("Leaderboard moderation is not configured.");
+    const response = await fetch(config.supabaseUrl.replace(/\\/$/, "") + "/functions/v1/moderate-player-name", {
+      method: "POST",
+      headers: {
+        apikey: config.supabaseAnonKey,
+        Authorization: "Bearer " + config.supabaseAnonKey,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ name: playerName })
+    });
+    let result = {};
+    try { result = await response.json(); } catch (error) {}
+    if (!response.ok) throw new Error(result.error || "Name moderation is temporarily unavailable.");
+    if (result.allowed !== true) throw new Error("That player name was blocked by the content moderation filter. Please choose another name.");
+    return true;
+  }
+
   async function submit(gameTitle, score, playerName) {
     playerName = typeof playerName === "string" ? playerName.trim().slice(0, 24) : "";
     const numericScore = Number(score);
@@ -52,6 +70,7 @@
     }
     if (!Number.isSafeInteger(numericScore) || numericScore < 0 || !gameTitle) return false;
     try {
+      await moderatePlayerName(playerName);
       await request("scores", {
         method: "POST",
         headers: { Prefer: "return=minimal" },
@@ -75,6 +94,7 @@
     seconds = Number(seconds);
     if (!playerName || !Number.isSafeInteger(seconds) || seconds < 5 || !gameTitle || !configured) return false;
     try {
+      await moderatePlayerName(playerName);
       const response = await fetch(config.supabaseUrl.replace(/\/$/, "") + "/rest/v1/scores", {
         method: "POST",
         keepalive: true,
