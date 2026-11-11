@@ -43,7 +43,10 @@
           onProgress: function (instance, value) {
             progress.style.width = Math.max(0, Math.min(100, value * 100)) + "%";
             loadingText.textContent = "Loading game... " + Math.round(value * 100) + "%";
-            if (value >= 1) loadingText.textContent = "Starting game...";
+            if (value >= 1) {
+              loadingText.textContent = "Starting game...";
+              setTimeout(function () { loading.style.display = "none"; }, 900);
+            }
             if (instance && instance.Module && instance.Module.canvas) {
               instance.Module.canvas.setAttribute("aria-label", "Rooftop Snipers 2 game");
             }
@@ -52,13 +55,6 @@
         document.getElementById("fullscreen").addEventListener("click", function () {
           if (gameInstance && gameInstance.SetFullscreen) gameInstance.SetFullscreen(1);
         });
-        var readyCheck = setInterval(function () {
-          var canvas = document.querySelector("#gameContainer canvas");
-          if (canvas && canvas.width > 0 && canvas.height > 0) {
-            loading.style.display = "none";
-            clearInterval(readyCheck);
-          }
-        }, 500);
         setTimeout(function () {
           if (loading.style.display !== "none") {
             loadingText.textContent = "The game is taking longer than expected...";
