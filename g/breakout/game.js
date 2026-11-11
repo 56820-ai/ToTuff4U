@@ -292,7 +292,7 @@ Game = {
     cfg = cfg || {};
     if (typeof soundManager == 'undefined') {
       var path = cfg.path || 'sound/soundmanager2-nodebug-jsmin.js';
-      var swf  = cfg.swf  || 'sound/swf';
+      var swf  = cfg.swf  || 'https://raw.githubusercontent.com/jakesgordon/javascript-breakout/master/sound/swf';
       window.SM2_DEFER = true;
       Game.loadScript(path, function() {
         window.soundManager = new SoundManager();
