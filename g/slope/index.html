@@ -119,7 +119,7 @@
                 });
                 return candidates[0] || {value:0,confidence:0};
             }
-            async function recognizeCanvas(canvas, cropTopRatio, cropHeightRatio, digitsOnly, cropLeftRatio, cropWidthRatio) {
+            async function recognizeCanvas(canvas, cropTopRatio, cropHeightRatio, digitsOnly, cropLeftRatio, cropWidthRatio, digitPageSegMode) {
                 var image = document.createElement("canvas");
                 var sourceY = Math.round(canvas.height * cropTopRatio);
                 var sourceHeight = Math.max(1, Math.round(canvas.height * cropHeightRatio));
@@ -140,7 +140,7 @@
                 }
                 ctx.putImageData(pixels, 0, 0);
                 var w = await worker();
-                if (digitsOnly) await w.setParameters({ tessedit_char_whitelist: "0123456789,", tessedit_pageseg_mode: "7", preserve_interword_spaces: "0" });
+                if (digitsOnly) await w.setParameters({ tessedit_char_whitelist: "0123456789,", tessedit_pageseg_mode: String(digitPageSegMode || 7), preserve_interword_spaces: "0" });
                 else await w.setParameters({ tessedit_char_whitelist: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789", tessedit_pageseg_mode: "11" });
                 var result = await w.recognize(image);
                 result.__ocrWidth = image.width;
