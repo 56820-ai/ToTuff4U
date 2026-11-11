@@ -150,15 +150,18 @@
                 // Focus on the middle of the game scene, where the run score and
                 // crash overlay appear. Ignore borders and page/UI elements.
                 var sample = document.createElement("canvas");
-                sample.width = 180;
-                sample.height = 180;
+                // Inspect an exact 300×300-pixel region centered in the game canvas.
+                // If the canvas is smaller than 300px in either dimension, use its full
+                // available dimension while keeping the crop centered.
+                var sourceWidth = Math.min(300, canvas.width);
+                var sourceHeight = Math.min(300, canvas.height);
+                var sourceX = Math.floor((canvas.width - sourceWidth) / 2);
+                var sourceY = Math.floor((canvas.height - sourceHeight) / 2);
+                sample.width = 300;
+                sample.height = 300;
                 var ctx = sample.getContext("2d", { willReadFrequently: true });
                 ctx.imageSmoothingEnabled = true;
                 ctx.imageSmoothingQuality = "high";
-                var sourceX = Math.round(canvas.width * 0.20);
-                var sourceY = Math.round(canvas.height * 0.12);
-                var sourceWidth = Math.max(1, Math.round(canvas.width * 0.60));
-                var sourceHeight = Math.max(1, Math.round(canvas.height * 0.76));
                 ctx.drawImage(canvas, sourceX, sourceY, sourceWidth, sourceHeight,
                     0, 0, sample.width, sample.height);
                 var pixels = ctx.getImageData(0, 0, sample.width, sample.height).data;
