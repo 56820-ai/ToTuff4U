@@ -1,40 +1,76 @@
-
-<!-- Play on Poki -->
 <!DOCTYPE html>
+<html lang="en">
 <head>
-	<meta charset="utf-8">
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-
-	<title>Rooftop Snipers 2 - Play on Poki</title>
-
-	<script>
-	window.config = {
-		loader: 'unity',
-		debug: false,
-		maxRatio: 16 / 9,
-		minRatio: 9 / 16,
-
-		title: 'Rooftop Snipers 2',
-
-		thumbnail: '895b299e7e49558ca383b23648314860.jpg',
-		numScreenshots: 4,
-
-		unityWebglBuildUrl: 'RooftopSnipers2.json',
-		unityWebglLoaderUrl: 'UnityLoader.js',
-
-		// **** Optional Settings ****
-		fileSize: 10,
-		loadingComments: ['Loading...'],
-		cachedDecompressedFileSizes: {
-			'RooftopSnipers2.wasm.framework.unityweb':475014,
-			'RooftopSnipers2.data.unityweb':9563147,
-			'RooftopSnipers2.wasm.code.unityweb':17055668,
-		},
-		//
-	};
-	</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#101827">
+  <title>Rooftop Snipers 2 | Arcade Atlas</title>
+  <link rel="icon" href="../../images/favicon.png">
+  <style>
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #101827; }
+    body { font-family: Arial, sans-serif; }
+    #gameContainer { position: fixed; inset: 0; width: 100%; height: 100%; background: #101827; }
+    #gameContainer canvas { display: block; width: 100% !important; height: 100% !important; outline: none; touch-action: none; }
+    #loading { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; color: #fff; background: #101827; z-index: 5; }
+    #loading strong { font-size: 22px; }
+    #loading small { color: #b9c5d8; }
+    #bar { width: min(280px, 70vw); height: 7px; border-radius: 8px; background: #29364b; overflow: hidden; }
+    #progress { width: 0; height: 100%; background: linear-gradient(90deg,#ff6b9d,#6b9dff); transition: width .15s; }
+    #fullscreen { position: fixed; right: 12px; top: 12px; z-index: 8; border: 1px solid #ffffff55; border-radius: 8px; background: #17243bd9; color: white; padding: 9px 12px; font-weight: 700; cursor: pointer; }
+    #error { display: none; max-width: 90vw; color: #ffb6c8; text-align: center; }
+  </style>
+  <script src="UnityLoader.js"></script>
 </head>
 <body>
-	<script src="master-loader.js"></script>
+  <div id="gameContainer"></div>
+  <div id="loading">
+    <strong>Rooftop Snipers 2</strong>
+    <div id="bar"><div id="progress"></div></div>
+    <small id="loadingText">Loading game...</small>
+    <div id="error">The game could not load. Refresh the page and try again.</div>
+  </div>
+  <button id="fullscreen" type="button">Fullscreen</button>
+  <script>
+    (function () {
+      var loading = document.getElementById("loading");
+      var progress = document.getElementById("progress");
+      var loadingText = document.getElementById("loadingText");
+      var error = document.getElementById("error");
+      var gameInstance;
+      try {
+        gameInstance = UnityLoader.instantiate("gameContainer", "RooftopSnipers2.json", {
+          onProgress: function (instance, value) {
+            progress.style.width = Math.max(0, Math.min(100, value * 100)) + "%";
+            loadingText.textContent = "Loading game... " + Math.round(value * 100) + "%";
+            if (value >= 1) loadingText.textContent = "Starting game...";
+            if (instance && instance.Module && instance.Module.canvas) {
+              instance.Module.canvas.setAttribute("aria-label", "Rooftop Snipers 2 game");
+            }
+          }
+        });
+        document.getElementById("fullscreen").addEventListener("click", function () {
+          if (gameInstance && gameInstance.SetFullscreen) gameInstance.SetFullscreen(1);
+        });
+        var readyCheck = setInterval(function () {
+          var canvas = document.querySelector("#gameContainer canvas");
+          if (canvas && canvas.width > 0 && canvas.height > 0) {
+            loading.style.display = "none";
+            clearInterval(readyCheck);
+          }
+        }, 500);
+        setTimeout(function () {
+          if (loading.style.display !== "none") {
+            loadingText.textContent = "The game is taking longer than expected...";
+          }
+        }, 30000);
+      } catch (e) {
+        console.error("Rooftop Snipers 2 failed to start:", e);
+        loadingText.style.display = "none";
+        document.getElementById("bar").style.display = "none";
+        error.style.display = "block";
+      }
+    })();
+  </script>
 </body>
 </html>
