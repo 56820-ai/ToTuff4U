@@ -245,24 +245,12 @@
                 scanning = true;
                 try {
                     var moving = detectGameplayMotion(canvas);
-                    var scoreReading = await readHudScore(canvas);
-                    var liveScore = scoreReading.value;
+                    // During gameplay, OCR is used only to recognize the end-screen
+                    // message. Score digits are read exclusively after death/end.
                     var screenText = await readGameState(canvas);
                     var textEnded = isRunEnded(screenText);
                     motionHits = moving ? motionHits + 1 : 0;
                     if (motionHits >= 3) gameStarted = true;
-
-                    if (gameStarted && !textEnded && liveScore > 0) {
-                        if (scoreCandidate === liveScore) scoreCandidateHits++;
-                        else { scoreCandidate = liveScore; scoreCandidateHits = 1; }
-                        if (scoreCandidateHits >= 2 && (lastObservedScore === null || liveScore >= lastObservedScore)) {
-                            lastObservedScore = liveScore;
-                            latestScore = liveScore;
-                            maxScore = Math.max(maxScore, liveScore);
-                        }
-                    } else if (liveScore === 0) {
-                        scoreCandidate = null; scoreCandidateHits = 0;
-                    }
 
                     // End detection does not depend on score OCR succeeding.
                     stoppedHits = gameStarted && !moving ? stoppedHits + 1 : 0;
@@ -275,7 +263,7 @@
                         }
                     }
                     if (!gameStarted) setStatus("waiting for gameplay motion (" + motionHits + "/3)");
-                    else if (!ended) setStatus("PLAYING · score " + (latestScore || "reading…") + " · best " + maxScore + (stoppedHits ? " · stillness " + stoppedHits + "/6" : " · motion detected"));
+                    else if (!ended) setStatus("PLAYING · waiting for death screen to read score" + (stoppedHits ? " · stillness " + stoppedHits + "/6" : " · motion detected"));
                     else setStatus("DEATH / RUN END DETECTED · confirming (" + endScreenHits + "/2)");
                     endScreenHits = ended ? endScreenHits + 1 : 0;
 
