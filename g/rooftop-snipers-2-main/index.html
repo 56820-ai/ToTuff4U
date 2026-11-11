@@ -40,8 +40,38 @@
       var loadingText = document.getElementById("loadingText");
       var error = document.getElementById("error");
       var gameInstance;
+      // Restore the Poki-to-Unity bridge used by the original game wrapper.
+      // The game waits for this callback before it can start a round.
+      window.initPokiBridge = function (objectName) {
+        window.pokiBridge = objectName;
+        if (window.pokiReady && window.unityGame) window.unityGame.SendMessage(objectName, "ready");
+        else if (window.pokiAdBlock && window.unityGame) window.unityGame.SendMessage(objectName, "adblock");
+        window.commercialBreak = function () {
+          Promise.resolve(window.PokiSDK ? window.PokiSDK.commercialBreak() : false).then(function () {
+            if (window.unityGame) window.unityGame.SendMessage(objectName, "commercialBreakCompleted");
+          });
+        };
+        window.rewardedBreak = function () {
+          Promise.resolve(window.PokiSDK ? window.PokiSDK.rewardedBreak() : false).then(function (reward) {
+            if (window.unityGame) window.unityGame.SendMessage(objectName, "rewardedBreakCompleted", String(!!reward));
+          });
+        };
+      };
+
       try {
-        if (window.PokiSDK) { window.PokiSDK.init().catch(function (e) { console.info("Poki SDK unavailable; continuing without ads.", e); }); window.PokiSDK.gameLoadingStart(); }
+        if (window.PokiSDK) {
+          window.PokiSDK.init().then(function () {
+            window.pokiReady = true;
+            if (window.pokiBridge && window.unityGame) window.unityGame.SendMessage(window.pokiBridge, "ready");
+          }).catch(function (e) {
+            window.pokiAdBlock = true;
+            if (window.pokiBridge && window.unityGame) window.unityGame.SendMessage(window.pokiBridge, "adblock");
+            console.info("Poki SDK unavailable; continuing without ads.", e);
+          });
+          window.PokiSDK.gameLoadingStart();
+        } else {
+          window.pokiAdBlock = true;
+        }
         gameInstance = UnityLoader.instantiate("gameContainer", "RooftopSnipers2.json", {
           onProgress: function (instance, value) {
             progress.style.width = Math.max(0, Math.min(100, value * 100)) + "%";
@@ -73,6 +103,10 @@
             }
           }
         });
+        window.unityGame = gameInstance;
+        if (window.pokiBridge && (window.pokiReady || window.pokiAdBlock)) {
+          gameInstance.SendMessage(window.pokiBridge, window.pokiReady ? "ready" : "adblock");
+        }
         document.getElementById("fullscreen").addEventListener("click", function () {
           if (gameInstance && gameInstance.SetFullscreen) gameInstance.SetFullscreen(1);
           var canvas = gameInstance && gameInstance.Module && gameInstance.Module.canvas;
