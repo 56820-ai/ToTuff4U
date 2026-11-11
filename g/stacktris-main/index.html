@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<title>Stacktris – Unblocked Games GPlus</title>
+	<title>Stacktris â€“ Unblocked Games GPlus</title>
 	<meta name="website" content="https://unblocked-gamesgplus.com/" />
 	<meta name="description" content="Unblocked Games GPlus" />
 	<meta name="google" content="notranslate">
@@ -38,6 +38,18 @@
 		<div id="gradient"></div>
 		<div id="webview_content"></div>
 	</div>
+	<script>
+	// Keep Unity WebGL frames available for the parent leaderboard OCR scanner.
+	(function(){
+		var originalGetContext=HTMLCanvasElement.prototype.getContext;
+		HTMLCanvasElement.prototype.getContext=function(type,attributes){
+			if(type==="webgl"||type==="experimental-webgl"||type==="webgl2"){
+				attributes=Object.assign({},attributes||{},{preserveDrawingBuffer:true});
+			}
+			return originalGetContext.call(this,type,attributes);
+		};
+	})();
+	</script>
 	<script type="text/javascript" src="webapp/source_min.js" crossorigin="anonymous"></script>
 	<script type="text/javascript" src="webapp/index.js" crossorigin="anonymous"></script>
 </body>
