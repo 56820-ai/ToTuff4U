@@ -262,16 +262,22 @@
                 scanning = true;
                 try {
                     var moving = detectGameplayMotion(canvas);
-                    // During gameplay, OCR is used only to recognize the end-screen
-                    // message. Score digits are read exclusively after death/end.
-                    var screenText = await readGameState(canvas);
-                    var textEnded = isRunEnded(screenText);
+                    // Keep OCR completely off the CPU while the player is moving.
+                    // Pixel motion sampling is much cheaper than running Tesseract.
                     motionHits = moving ? motionHits + 1 : 0;
                     if (motionHits >= 3) gameStarted = true;
 
-                    // End detection does not depend on score OCR succeeding.
+                    // Only inspect text after movement has stopped for about 2 seconds.
+                    // This keeps the leaderboard detector from interrupting active play.
                     stoppedHits = gameStarted && !moving ? stoppedHits + 1 : 0;
-                    var ended = textEnded || (gameStarted && stoppedHits >= 6);
+                    var textEnded = false;
+                    if (gameStarted && !moving && stoppedHits >= 2) {
+                        var screenText = await readGameState(canvas);
+                        textEnded = isRunEnded(screenText);
+                    }
+
+                    // Stillness is the fallback if the end-screen text is not recognized.
+                    var ended = textEnded || (gameStarted && stoppedHits >= 4);
                     if (ended && gameStarted) {
                         var endScoreReading = await readEndScreenScore(canvas);
                         if (endScoreReading.value > 0) {
