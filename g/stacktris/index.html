@@ -8,8 +8,57 @@
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#111}
 iframe{display:block;width:100%;height:100%;border:0}
 </style>
+<script src="../../js/arcade-score-config.js"></script>
+<script src="../../js/arcade-scores.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
 <body>
-<iframe src="../stacktris-main/index.html" title="Stacktris" allow="fullscreen; autoplay; gamepad" allowfullscreen></iframe>
+<iframe id="stacktris-game" src="../stacktris-main/index.html" title="Stacktris" allow="fullscreen; autoplay; gamepad" allowfullscreen></iframe>
+<script>
+(function(){
+  "use strict";
+  const frame=document.getElementById("stacktris-game");
+  let worker=null, scanning=false, submitted=false, lastText="", noEndCount=0;
+  const endWords=/game\\s*over|try\\s*again|out\\s*of\\s*bounds|you\\s*lost|failed|restart/i;
+  function extractScore(text){
+    const normalized=text.replace(/[oO]/g,"0").replace(/[lI|]/g,"1");
+    const patterns=[
+      /(?:score|points?)\\s*[:：]?\\s*([0-9][0-9,]*)/i,
+      /([0-9][0-9,]*)\\s*(?:score|points?)/i
+    ];
+    for(const pattern of patterns){
+      const match=normalized.match(pattern);
+      if(match){const value=Number(match[1].replace(/,/g,""));if(Number.isSafeInteger(value)&&value>=0&&value<=1000000000)return value;}
+    }
+    return null;
+  }
+  async function scan(){
+    if(scanning||!frame.contentWindow||!frame.contentDocument)return;
+    const doc=frame.contentDocument, canvas=doc.getElementById("canvas");
+    if(!canvas||!canvas.width||!canvas.height)return;
+    scanning=true;
+    try{
+      if(!worker)worker=await Tesseract.createWorker("eng",1);
+      const result=await worker.recognize(canvas);
+      const text=(result.data.text||"").trim();
+      if(text!==lastText){lastText=text;console.debug("Stacktris OCR:",text);}
+      const ended=endWords.test(text);
+      const score=extractScore(text);
+      if(ended){
+        noEndCount=0;
+        if(!submitted&&score!==null){
+          submitted=true;
+          window.ArcadeScores.promptAndSubmit("Stacktris",score).finally(()=>{});
+        }
+      }else{
+        noEndCount++;
+        if(noEndCount>=2)submitted=false;
+      }
+    }catch(error){console.warn("Stacktris leaderboard scan failed:",error);}
+    finally{scanning=false;}
+  }
+  setInterval(scan,2500);
+})();
+</script>
 </body>
 </html>
