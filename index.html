@@ -1200,7 +1200,6 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
     <div class="nav-text">Game Cheats</div>
 </a>
         <div class="sidebar-divider"></div>
-        <div class="sidebar-nav">
         <a href="./privacy.html" class="nav-item">
             <div class="nav-icon"><i class="fas fa-shield-alt"></i></div>
             <div class="nav-text">Privacy Policy</div>
@@ -1217,7 +1216,6 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
             <div class="nav-icon"><i class="fab fa-discord"></i></div>
             <div class="nav-text">Discord</div>
         </a>
-    </div>
     <div class="sidebar-divider"></div>
 </nav>
 
@@ -1410,7 +1408,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         document.querySelectorAll('.nav-item').forEach(item => {
             const pageId = item.getAttribute('data-page');
             
-            if (!item.hasAttribute('target')) {
+            if (pageId && !item.hasAttribute('target')) {
                 item.addEventListener('click', function(e) {
                     e.preventDefault();
                     navigateToPage(pageId);
