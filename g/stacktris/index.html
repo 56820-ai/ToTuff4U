@@ -24,7 +24,7 @@ iframe{display:block;width:100%;height:100%;border:0}
   const frame=document.getElementById("stacktris-game");
   const status=document.getElementById("stacktris-score-status");
   let worker=null, scanning=false, submitted=false, lastText="", noEndCount=0, lastError="";
-  const endWords=/game\s*over|try\s*again|out\s*of\s*bounds|you\s*lost|failed|restart|best\s*score|new\s*record|well\s*played|tap\s*to\s*(?:play|continue)|play\s*again|game\s*ended/i;
+  const endWords=/game\s*over|try\s*again|out\s*of\s*bounds|you\s*lost|failed|restart|best\s*score|new\s*record|well\s*played|tap\s*to\s*(?:play|continue)|play\s*again|game\s*ended|score\s*screen/i;
   function setStatus(message){status.textContent="Leaderboard: "+message;}
   function extractScore(text){
     const patterns=[
@@ -71,9 +71,18 @@ iframe{display:block;width:100%;height:100%;border:0}
       if(!canvas||!canvas.width||!canvas.height){setStatus("waiting for game canvas");return;}
       if(!window.Tesseract){setStatus("OCR library did not load");return;}
       if(!worker){setStatus("loading text reader…");worker=await Tesseract.createWorker("eng",1);}
-      const image=prepareCanvas(canvas);
-      const result=await worker.recognize(image);
-      const text=(result.data.text||"").replace(/\s+/g," ").trim();
+      // Try sparse-text recognition first; Unity game text is often isolated and stylized.
+      await worker.setParameters({tessedit_pageseg_mode:"11"});
+      let result=await worker.recognize(prepareCanvas(canvas,false));
+      let text=(result.data.text||"").replace(/\s+/g," ").trim();
+      // Retry high-contrast image with a different page layout when the first pass is weak.
+      if(text.length<12 || !/[a-z]{3,}/i.test(text)){
+        await worker.setParameters({tessedit_pageseg_mode:"6"});
+        const retry=await worker.recognize(prepareCanvas(canvas,true));
+        const retryText=(retry.data.text||"").replace(/\s+/g," ").trim();
+        if(retryText.length>text.length) { result=retry; text=retryText; }
+        await worker.setParameters({tessedit_pageseg_mode:"11"});
+      }
       if(text!==lastText){lastText=text;console.debug("Stacktris OCR:",text);}
       const ended=endWords.test(text);
       const score=extractScore(text);
