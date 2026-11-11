@@ -75,3 +75,5 @@ jobs:
           git add g/brotato-abyssal-terrors games.json
           git commit -m "Add Brotato: Abyssal Terrors"
           git push
+
+# Trigger import after workflow registration.
