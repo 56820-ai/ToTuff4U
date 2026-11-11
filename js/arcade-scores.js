@@ -57,7 +57,10 @@
     let result = {};
     try { result = await response.json(); } catch (error) {}
     if (!response.ok) throw new Error(result.error || "Name moderation is temporarily unavailable.");
-    if (result.allowed !== true) throw new Error("That player name was blocked by the content moderation filter. Please choose another name.");
+    if (result.allowed !== true) {
+      try { localStorage.removeItem("arcadeLeaderboardPlayerName"); } catch (error) {}
+      throw new Error("That player name was blocked by the content moderation filter. Please choose another name.");
+    }
     return true;
   }
 
