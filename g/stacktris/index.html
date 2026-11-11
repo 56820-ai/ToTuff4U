@@ -39,8 +39,8 @@ iframe{display:block;width:100%;height:100%;border:0}
   }
   function prepareCanvas(source,threshold){
     // Capture the central 90% without distorting the game image.
-    const cropWidth=Math.max(1,Math.floor(source.width*0.9));
-    const cropHeight=Math.max(1,Math.floor(source.height*0.9));
+    const cropWidth=Math.max(1,Math.floor(source.width*0.5));
+    const cropHeight=Math.max(1,Math.floor(source.height*0.5));
     const sx=Math.floor((source.width-cropWidth)/2);
     const sy=Math.floor((source.height-cropHeight)/2);
     const temp=document.createElement("canvas");
