@@ -12,6 +12,7 @@
     body { font-family: Arial, sans-serif; }
     #gameContainer { position: fixed; inset: 0; width: 100%; height: 100%; background: #101827; }
     #gameContainer canvas { display: block; width: 100% !important; height: 100% !important; outline: none; touch-action: none; }
+    #gameContainer canvas:focus { outline: none; }
     #loading { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; color: #fff; background: #101827; z-index: 5; }
     #loading strong { font-size: 22px; }
     #loading small { color: #b9c5d8; }
@@ -52,12 +53,30 @@
               setTimeout(function () { loading.style.display = "none"; }, 900);
             }
             if (instance && instance.Module && instance.Module.canvas) {
-              instance.Module.canvas.setAttribute("aria-label", "Rooftop Snipers 2 game");
+              var canvas = instance.Module.canvas;
+              canvas.setAttribute("aria-label", "Rooftop Snipers 2 game");
+              canvas.setAttribute("tabindex", "0");
+              canvas.style.outline = "none";
+              if (!canvas.__arcadeInputFocusBound) {
+                canvas.__arcadeInputFocusBound = true;
+                function focusGame() {
+                  try { window.focus(); canvas.focus({ preventScroll: true }); } catch (e) { try { canvas.focus(); } catch (_) {} }
+                }
+                canvas.addEventListener("pointerdown", focusGame);
+                canvas.addEventListener("mousedown", focusGame);
+                canvas.addEventListener("touchstart", focusGame, { passive: true });
+                canvas.addEventListener("click", focusGame);
+                window.addEventListener("focus", function () {
+                  if (document.activeElement === document.body) focusGame();
+                });
+              }
             }
           }
         });
         document.getElementById("fullscreen").addEventListener("click", function () {
           if (gameInstance && gameInstance.SetFullscreen) gameInstance.SetFullscreen(1);
+          var canvas = gameInstance && gameInstance.Module && gameInstance.Module.canvas;
+          if (canvas) { canvas.setAttribute("tabindex", "0"); try { canvas.focus({ preventScroll: true }); } catch (e) { canvas.focus(); } }
         });
         setTimeout(function () {
           if (loading.style.display !== "none") {
