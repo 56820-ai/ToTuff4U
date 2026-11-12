@@ -2,24 +2,117 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="robots" content="noindex,nofollow">
+<title>They Are Coming · Arcade Atlas</title>
+<link rel="icon" href="/images/favicon.png">
 <script src="/js/favicon.js"></script>
 <script src="/js/panic.js"></script>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-X514E26P5B"></script>
 <script src="/js/gtag.js"></script>
 <script src="/js/auto-clicker.js"></script>
 <script src="/js/timeTracker.js" defer></script>
-<title>They Are Coming</title>
-<link rel="icon" href="/images/favicon.png">
 <style>
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#090b10;color:#fff;font-family:Arial,sans-serif}
-#game{position:fixed;inset:0;width:100%;height:100%;border:0;background:#090b10}
-#bar{position:fixed;z-index:2;top:10px;left:10px;display:flex;gap:8px}
-#bar a{color:#fff;text-decoration:none;background:#202735;border:1px solid #465166;border-radius:8px;padding:9px 13px;font-size:14px}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#080b12;color:#fff;font-family:Arial,sans-serif}
+#unity-container{position:fixed;inset:0;width:100%;height:100%;background:#080b12}
+#unity-canvas{display:block;width:100%;height:100%;outline:none;background:#080b12;touch-action:none}
+#loading-cover{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#080b12 url("https://cdn.jsdelivr.net/gh/awaiblecomponent/575@main/background.png") center/cover no-repeat;z-index:3}
+#loading-panel{width:min(420px,86vw);padding:24px;border:1px solid #39465b;border-radius:14px;background:rgba(8,12,20,.9);text-align:center}
+#loading-panel img{width:90px;height:auto;object-fit:contain}
+#loading-title{font-size:20px;font-weight:700;margin:12px 0}
+#loading-track{height:8px;background:#263247;border-radius:20px;overflow:hidden;margin:16px 0 8px}
+#loading-progress{height:100%;width:0;background:#61e6bf;transition:width .15s}
+#loading-message{font-size:13px;color:#b7c3d5}
+#load-error{display:none;color:#ffaaa7;font-size:13px;line-height:1.5;margin-top:12px}
+#topbar{position:fixed;z-index:5;top:10px;left:10px;right:10px;display:flex;justify-content:space-between;pointer-events:none}
+#topbar a,#topbar button{pointer-events:auto;color:#fff;text-decoration:none;background:rgba(17,25,39,.88);border:1px solid #48566e;border-radius:8px;padding:9px 12px;font-size:13px;cursor:pointer}
+#topbar .right{display:flex;gap:8px}
+@media(max-width:520px){#topbar{top:6px;left:6px;right:6px}#topbar a,#topbar button{padding:8px 9px;font-size:12px}}
 </style>
 </head>
 <body>
-<div id="bar"><a href="/">← Arcade Atlas</a><a href="https://pizzaedition.io/games/they-are-coming/" target="_blank" rel="noopener">Open game site ↗</a></div>
-<iframe id="game" src="https://pizzaedition.io/they-are-coming.embed" title="They Are Coming" allow="autoplay; fullscreen; gamepad; clipboard-read; clipboard-write; accelerometer; gyroscope" allowfullscreen></iframe>
+<div id="unity-container">
+  <canvas id="unity-canvas" tabindex="-1"></canvas>
+  <div id="loading-cover">
+    <div id="loading-panel">
+      <img src="https://cdn.jsdelivr.net/gh/awaiblecomponent/575@main/logo.png" alt="">
+      <div id="loading-title">They Are Coming</div>
+      <div id="loading-track"><div id="loading-progress"></div></div>
+      <div id="loading-message">Loading game files from GitHub…</div>
+      <div id="load-error"></div>
+    </div>
+  </div>
+</div>
+<div id="topbar">
+  <a href="/">← Arcade Atlas</a>
+  <div class="right">
+    <button id="fullscreen" type="button">Fullscreen</button>
+    <a href="https://github.com/NeymarkingingYT/They-Are-Coming" target="_blank" rel="noopener">Source ↗</a>
+  </div>
+</div>
+<script>
+(function(){
+  "use strict";
+  var buildUrl="https://cdn.jsdelivr.net/gh/awaiblecomponent/575@main/Build";
+  var canvas=document.getElementById("unity-canvas");
+  var progress=document.getElementById("loading-progress");
+  var message=document.getElementById("loading-message");
+  var errorBox=document.getElementById("load-error");
+  var cover=document.getElementById("loading-cover");
+  var unityInstance=null;
+  function fail(error){
+    console.error("They Are Coming failed to load:",error);
+    errorBox.style.display="block";
+    errorBox.textContent="The game could not load. Try reloading the page. "+(error&&error.message?error.message:String(error||""));
+    message.textContent="Game loading failed";
+  }
+  async function mergeWasmParts(){
+    var urls=[0,1,2,3].map(function(i){return buildUrl+"/zombieshooterdone.wasm.br.part"+i;});
+    var responses=await Promise.all(urls.map(function(url){return fetch(url);}));
+    responses.forEach(function(response){if(!response.ok)throw new Error("Could not download a game file ("+response.status+").");});
+    var parts=await Promise.all(responses.map(function(response){return response.arrayBuffer();}));
+    var total=parts.reduce(function(sum,part){return sum+part.byteLength;},0);
+    var merged=new Uint8Array(total),offset=0;
+    parts.forEach(function(part){merged.set(new Uint8Array(part),offset);offset+=part.byteLength;});
+    return URL.createObjectURL(new Blob([merged],{type:"application/wasm+br"}));
+  }
+  async function boot(){
+    message.textContent="Downloading game engine…";
+    var codeUrl=await mergeWasmParts();
+    var config={
+      dataUrl:buildUrl+"/zombieshooterdone.data.br",
+      frameworkUrl:buildUrl+"/zombieshooterdone.framework.js",
+      codeUrl:codeUrl,
+      streamingAssetsUrl:"StreamingAssets",
+      companyName:"OnHitDev",
+      productName:"They Are Coming",
+      productVersion:"1.19"
+    };
+    var loader=document.createElement("script");
+    loader.src=buildUrl+"/zombieshooterdone.loader.js";
+    loader.onload=function(){
+      if(typeof createUnityInstance!=="function"){fail("Unity loader did not initialize.");return;}
+      createUnityInstance(canvas,config,function(value){
+        progress.style.width=Math.round(value*100)+"%";
+        message.textContent="Loading game… "+Math.round(value*100)+"%";
+      }).then(function(instance){
+        unityInstance=instance;
+        cover.style.display="none";
+      }).catch(fail);
+    };
+    loader.onerror=function(){fail("Could not download the Unity loader.");};
+    document.body.appendChild(loader);
+  }
+  document.getElementById("fullscreen").addEventListener("click",function(){
+    var target=document.getElementById("unity-container");
+    if(document.fullscreenElement){document.exitFullscreen&&document.exitFullscreen();}
+    else if(target.requestFullscreen){target.requestFullscreen();}
+  });
+  document.addEventListener("contextmenu",function(event){event.preventDefault();});
+  window.addEventListener("unhandledrejection",function(event){console.warn("Unity load issue:",event.reason);});
+  boot().catch(fail);
+})();
+</script>
 </body>
 </html>
