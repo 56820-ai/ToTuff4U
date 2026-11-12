@@ -1305,47 +1305,33 @@
         }
 
         function setTabCloak(type) {
-            let favicon = '';
-            let title = '';
+            const choices = {
+                google: { title: 'Google', icon: 'https://www.google.com/favicon.ico' },
+                classroom: { title: 'Google Classroom', icon: 'https://ssl.gstatic.com/classroom/favicon.png' },
+                docs: { title: 'Google Docs', icon: new URL('favicon/googledocs.png', window.top.location.href).href },
+                default: { title: 'Home-Classroom', icon: 'data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27%3E%3Crect width=%2748%27 height=%2748%27 rx=%279%27 fill=%27%230F9D58%27/%3E%3Cpath d=%27M8 12h32v24H8z%27 fill=%27white%27/%3E%3Cpath d=%27M12 16h24v16H12z%27 fill=%27%234285F4%27/%3E%3Ccircle cx=%2724%27 cy=%2720%27 r=%274%27 fill=%27%23F4B400%27/%3E%3Cpath d=%27M16 30c1-5 4-7 8-7s7 2 8 7%27 fill=%27%23F4B400%27/%3E%3C/svg%3E' }
+            };
+            const selected = choices[type] || choices.default;
+            const selectedType = choices[type] ? type : 'default';
+            localStorage.setItem('tabCloak', selectedType);
 
-            switch(type) {
-                case 'google':
-                    favicon = 'https://www.google.com/favicon.ico';
-                    title = 'Google';
-                    break;
-                case 'classroom':
-                    favicon = 'https://ssl.gstatic.com/classroom/favicon.png';
-                    title = 'Google Classroom';
-                    break;
-                case 'docs':
-                    favicon = '/favicon/googledocs.png';
-                    title = 'Google Docs';
-                    break;
-                default:
-                    favicon = '/images/favicon.png';
-                    title = 'Grades & Attendance';
+            function applyTo(doc) {
+                doc.title = selected.title;
+                let link = doc.querySelector("link[rel~='icon']") || doc.querySelector("link[rel*='icon']");
+                if (!link) {
+                    link = doc.createElement('link');
+                    doc.head.appendChild(link);
+                }
+                link.rel = 'icon';
+                link.type = selected.icon.startsWith('data:image/svg+xml') ? 'image/svg+xml' : 'image/x-icon';
+                link.href = selected.icon;
             }
 
-            localStorage.setItem('tabCloak', type);
-            
-            const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
-            link.rel = 'icon';
-            link.href = favicon;
-            document.head.appendChild(link);
-            
-            document.title = title;
-            
-            if (window.parent) {
-                try {
-                    window.parent.document.title = title;
-                    
-                    const parentFavicon = window.parent.document.querySelector("link[rel*='icon']") || window.parent.document.createElement('link');
-                    parentFavicon.rel = 'icon';
-                    parentFavicon.href = favicon;
-                    window.parent.document.head.appendChild(parentFavicon);
-                } catch (e) {
-                    console.log("Cannot access parent frame");
-                }
+            applyTo(document);
+            try {
+                applyTo(window.top.document);
+            } catch (error) {
+                console.warn('Could not update the browser tab from this frame:', error);
             }
         }
     </script>
