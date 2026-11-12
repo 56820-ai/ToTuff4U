@@ -95,6 +95,7 @@
   }
 
   async function getScores() {
+    window.ArcadeScores.lastLoadError = "";
     try {
       // Fetch the entire score history in pages. A single 1,000-row query can
       // hide games whose scores are older or smaller than the busiest games.
@@ -111,7 +112,8 @@
       }
       return allScores;
     } catch (error) {
-      console.warn("Arcade Atlas: could not load online scores.", error.message);
+      window.ArcadeScores.lastLoadError = error && error.message ? error.message : String(error);
+      console.warn("Arcade Atlas: could not load online scores.", window.ArcadeScores.lastLoadError);
       return [];
     }
   }
@@ -134,5 +136,5 @@
     return submit(gameTitle, score, playerName);
   }
 
-  window.ArcadeScores = { configured, submit, submitSession, getScores, getPlayerName, promptAndSubmit };
+  window.ArcadeScores = { configured, submit, submitSession, getScores, getPlayerName, promptAndSubmit, lastLoadError: "" };
 })();
