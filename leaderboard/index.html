@@ -544,7 +544,13 @@
       if (!onlineScores.length) {
         const empty = document.createElement("p");
         empty.className = "leaderboard-empty";
-        empty.textContent = "No real scores have been recorded yet. Play a supported game to add the first score!";
+        empty.style.cssText = "text-align:center;padding:2rem;color:#c0c0d0;overflow-wrap:anywhere;";
+        if (!window.ArcadeScores || !window.ArcadeScores.configured || window.ArcadeScores.lastLoadError) {
+          empty.textContent = "The leaderboard couldn't connect to the score database. " +
+            (window.ArcadeScores && window.ArcadeScores.lastLoadError ? "Error: " + window.ArcadeScores.lastLoadError : "Check the score database configuration and try again.");
+        } else {
+          empty.textContent = "No real scores have been recorded yet. Play a supported game to add the first score!";
+        }
         scoreList.appendChild(empty);
         return;
       }
