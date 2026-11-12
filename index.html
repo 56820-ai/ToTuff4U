@@ -2002,30 +2002,42 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 
 
 <script>
-// Restore the selected tab cloak on the actual top-level Arcade Atlas page.
-document.addEventListener('DOMContentLoaded', function () {
-    try {
-        const type = localStorage.getItem('tabCloak') || 'default';
-        const settingsFrame = document.querySelector('iframe[src*="settings"]');
-        if (settingsFrame && settingsFrame.contentWindow && settingsFrame.contentWindow.setTabCloak) {
-            settingsFrame.contentWindow.setTabCloak(type);
-        } else {
-            const choices = {
-                google: ['Google', 'https://www.google.com/favicon.ico'],
-                classroom: ['Google Classroom', 'https://ssl.gstatic.com/classroom/favicon.png'],
-                docs: ['Google Docs', new URL('favicon/googledocs.png', document.baseURI).href],
-                default: ['Home-Classroom', document.querySelector('link[rel*="icon"]')?.href || '']
-            };
-            const selected = choices[type] || choices.default;
-            document.title = selected[0];
-            if (selected[1]) {
-                let icon = document.querySelector('link[rel*="icon"]');
-                if (!icon) { icon = document.createElement('link'); icon.rel = 'icon'; document.head.appendChild(icon); }
-                icon.href = selected[1];
-            }
+// The top-level page owns the browser tab title and favicon. Settings runs in
+// an iframe, so it sends changes here instead of trying to edit window.top.
+(function () {
+    const defaultIcon = 'data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27%3E%3Crect width=%2748%27 height=%2748%27 rx=%279%27 fill=%27%230F9D58%27/%3E%3Cpath d=%27M8 12h32v24H8z%27 fill=%27white%27/%3E%3Cpath d=%27M12 16h24v16H12z%27 fill=%27%234285F4%27/%3E%3Ccircle cx=%2724%27 cy=%2720%27 r=%274%27 fill=%27%23F4B400%27/%3E%3Cpath d=%27M16 30c1-5 4-7 8-7s7 2 8 7%27 fill=%27%23F4B400%27/%3E%3C/svg%3E';
+    const choices = {
+        google: ['Google', 'https://www.google.com/favicon.ico'],
+        classroom: ['Google Classroom', 'https://ssl.gstatic.com/classroom/favicon.png'],
+        docs: ['Google Docs', new URL('favicon/googledocs.png', document.baseURI).href],
+        default: ['Home-Classroom', defaultIcon]
+    };
+    function applyCloak(type) {
+        const selected = choices[type] || choices.default;
+        document.title = selected[0];
+        let icon = document.querySelector("link[rel~='icon']") || document.querySelector("link[rel*='icon']");
+        if (!icon) {
+            icon = document.createElement('link');
+            icon.rel = 'icon';
+            document.head.appendChild(icon);
         }
-    } catch (error) { console.warn('Tab cloak restore failed:', error); }
-});
+        icon.rel = 'icon';
+        icon.href = selected[1];
+        icon.type = selected[1].startsWith('data:image/svg+xml') ? 'image/svg+xml' : 'image/x-icon';
+    }
+    window.addEventListener('message', function (event) {
+        if (event.origin !== window.location.origin) return;
+        if (!event.data || event.data.type !== 'ARCADE_ATLAS_SET_TAB_CLOAK') return;
+        const cloak = choices[event.data.cloak] ? event.data.cloak : 'default';
+        try { localStorage.setItem('tabCloak', cloak); } catch (error) {}
+        applyCloak(cloak);
+    });
+    // Apply immediately; this script is at the end of the document and does
+    // not need to wait for an iframe load or another DOMContentLoaded event.
+    let saved = 'default';
+    try { saved = localStorage.getItem('tabCloak') || 'default'; } catch (error) {}
+    applyCloak(saved);
+})();
 </script>
 </body>
 </html>
