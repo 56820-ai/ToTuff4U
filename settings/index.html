@@ -1126,39 +1126,47 @@ document.addEventListener('DOMContentLoaded', () => {
     particlesToggle.addEventListener('change', () => applyParticles(particlesToggle.checked));
   }
 
+  // Open a fresh about:blank tab directly from the Enable button's user gesture.
+  // Reusing a named target can leave Chrome pointing at a stale or unrelated tab.
   $('enableAboutBlank')?.addEventListener('click', () => {
-    const siteUrl = new URL('../', window.location.href);
+    const siteUrl = new URL('../', document.baseURI);
     siteUrl.hash = 'home';
-    localStorage.setItem('aboutBlankReturnUrl', siteUrl.href);
     const titles = { google: 'Google', classroom: 'Google Classroom', docs: 'Google Docs', default: 'Home-Classroom' };
     const cloak = localStorage.getItem('tabCloak') || 'default';
-    const icon = document.querySelector("link[rel*='icon']")?.href || '';
-    const popup = window.open('about:blank', 'ArcadeAtlasCloak');
-    if (!popup) { alert('Allow popups for Arcade Atlas, then click Enable again.'); return; }
+    const icon = document.querySelector("link[rel~='icon']")?.href || '';
+    const popup = window.open('about:blank', '_blank');
+    if (!popup) {
+      alert('Chrome blocked the new tab. Allow pop-ups for this Arcade Atlas site, then click Enable again.');
+      return;
+    }
     try {
+      const safeIcon = icon.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+      const safeUrl = siteUrl.href.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
       popup.document.open();
       popup.document.write('<!doctype html><html><head><meta charset="utf-8"><title>' +
-        (titles[cloak] || titles.default) + '</title><link rel="icon" href="' +
-        icon.replace(/"/g, '&quot;') +
-        '"><style>html,body,iframe{width:100%;height:100%;margin:0;border:0;overflow:hidden}iframe{position:fixed;inset:0}</style></head><body><iframe src="' +
-        siteUrl.href.replace(/"/g, '&quot;') +
+        (titles[cloak] || titles.default) + '</title><link rel="icon" href="' + safeIcon +
+        '"><meta name="viewport" content="width=device-width,initial-scale=1">' +
+        '<style>html,body,iframe{width:100%;height:100%;margin:0;border:0;overflow:hidden}iframe{position:fixed;inset:0}</style>' +
+        '</head><body><iframe title="Arcade Atlas" src="' + safeUrl +
         '" allow="fullscreen; autoplay; gamepad"></iframe></body></html>');
       popup.document.close();
       window.aboutBlankCloakWindow = popup;
+      try { localStorage.setItem('aboutBlankCloakEnabled', 'true'); } catch (_) {}
     } catch (error) {
       console.error('Could not set up the cloaked tab:', error);
-      alert('The cloaked tab could not be configured. Please try again.');
+      try { popup.close(); } catch (_) {}
+      alert('The blank tab opened, but Arcade Atlas could not load inside it. Please try again.');
     }
   });
   $('disableAboutBlank')?.addEventListener('click', () => {
-    let popup = window.aboutBlankCloakWindow;
-    try {
-      if (!popup || popup.closed) popup = window.open('', 'ArcadeAtlasCloak');
-      if (popup && !popup.closed) popup.close();
-      window.aboutBlankCloakWindow = null;
-    } catch (_) {
-      alert('The cloaked tab could not be closed from this window. Close the about:blank tab manually.');
+    const popup = window.aboutBlankCloakWindow;
+    if (popup && !popup.closed) {
+      try { popup.close(); } catch (_) {}
+    } else {
+      alert('The cloaked tab was opened separately. Switch to that tab and close it to disable cloaking.');
     }
+    window.aboutBlankCloakWindow = null;
+    try { localStorage.removeItem('aboutBlankCloakEnabled'); } catch (_) {}
   });
 
   const choices = {
