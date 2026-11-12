@@ -44,6 +44,31 @@
   }
 
 
+  async function submitThroughServer(gameTitle, score, playerName, kind, keepalive) {
+    if (!configured) throw new Error("The shared score database has not been configured yet.");
+    const response = await fetch(config.supabaseUrl.replace(/\\/$/, "") + "/functions/v1/submit-score", {
+      method: "POST",
+      keepalive: !!keepalive,
+      headers: {
+        apikey: config.supabaseAnonKey,
+        Authorization: "Bearer " + config.supabaseAnonKey,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        player_name: playerName,
+        game_title: String(gameTitle).slice(0, 60),
+        score: Number(score),
+        kind: kind
+      })
+    });
+    if (!response.ok) {
+      let detail = "";
+      try { detail = (await response.text()).slice(0, 180); } catch (error) {}
+      throw new Error("Score service returned " + response.status + (detail ? ": " + detail : ""));
+    }
+    return true;
+  }
+
   async function submit(gameTitle, score, playerName) {
     playerName = typeof playerName === "string" ? playerName.trim().slice(0, 24) : "";
     const numericScore = Number(score);
@@ -52,27 +77,18 @@
       return false;
     }
     if (!Number.isSafeInteger(numericScore) || numericScore < 0 || !gameTitle) return false;
-    // Slope runs are limited to 1,500 points. Reject implausible values before POST.
     if (String(gameTitle).trim().toLowerCase() === "slope" && numericScore > 1500) {
       console.warn("Arcade Atlas: Slope score rejected (maximum 1,500).");
       window.alert("That Slope score was rejected. The leaderboard limit is 1,500.");
       return false;
     }
     try {
-      await request("scores", {
-        method: "POST",
-        headers: { Prefer: "return=minimal" },
-        body: JSON.stringify({
-          player_name: playerName,
-          game_title: String(gameTitle).slice(0, 60),
-          score: numericScore
-        })
-      });
+      await submitThroughServer(gameTitle, numericScore, playerName, "score", false);
       console.info("Arcade Atlas: high score submitted.");
       return true;
     } catch (error) {
       console.warn("Arcade Atlas: high score was not submitted.", error.message);
-      window.alert("Your score could not be added to the leaderboard.\n\nReason: " + error.message);
+      window.alert("Your score could not be added to the leaderboard.\\n\\nReason: " + error.message);
       return false;
     }
   }
@@ -82,17 +98,7 @@
     seconds = Number(seconds);
     if (!playerName || !Number.isSafeInteger(seconds) || seconds < 5 || !gameTitle || !configured) return false;
     try {
-      const response = await fetch(config.supabaseUrl.replace(/\/$/, "") + "/rest/v1/scores", {
-        method: "POST",
-        keepalive: true,
-        headers: {
-          apikey: config.supabaseAnonKey,
-          "Content-Type": "application/json",
-          Prefer: "return=minimal"
-        },
-        body: JSON.stringify({ player_name: playerName, game_title: String(gameTitle).slice(0, 60), score: seconds })
-      });
-      if (!response.ok) throw new Error("Score service returned " + response.status);
+      await submitThroughServer(gameTitle, seconds, playerName, "session", true);
       return true;
     } catch (error) {
       console.warn("Arcade Atlas: playtime was not submitted.", error.message);
