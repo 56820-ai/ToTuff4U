@@ -580,6 +580,33 @@
       });
     }
     renderLeaderboard();
+    // Report the rendered document height so the main page owns scrolling.
+    (function enableParentPageScrolling() {
+      let lastHeight = 0;
+      function reportHeight() {
+        const height = Math.max(
+          document.documentElement.scrollHeight,
+          document.body ? document.body.scrollHeight : 0,
+          document.documentElement.offsetHeight,
+          document.body ? document.body.offsetHeight : 0
+        );
+        if (Math.abs(height - lastHeight) > 2) {
+          lastHeight = height;
+          window.parent.postMessage({ type: "arcade-atlas-leaderboard-height", height }, window.location.origin);
+        }
+      }
+      window.addEventListener("load", reportHeight);
+      if (window.ResizeObserver) {
+        const observer = new ResizeObserver(reportHeight);
+        observer.observe(document.documentElement);
+        if (document.body) observer.observe(document.body);
+      }
+      setTimeout(reportHeight, 100);
+      setTimeout(reportHeight, 500);
+      setTimeout(reportHeight, 1200);
+      window.addEventListener("resize", reportHeight);
+    })();
+
   </script>
 
 </body>
