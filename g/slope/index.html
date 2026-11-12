@@ -33,6 +33,41 @@
             Module: { onRuntimeInitialized: function () { UnityProgress(gameInstance, "complete"); } }
         });
 
+        // Pause Unity's main loop whenever this page is not the active tab.
+        // Unity's Emscripten runtime exposes pauseMainLoop/resumeMainLoop on Module.
+        (function () {
+            var pausedForBackground = false;
+            function getUnityModule() {
+                return gameInstance && gameInstance.Module;
+            }
+            function pauseForBackground() {
+                if (pausedForBackground || !document.hidden && document.hasFocus()) return;
+                var module = getUnityModule();
+                if (module && typeof module.pauseMainLoop === "function") {
+                    module.pauseMainLoop();
+                    pausedForBackground = true;
+                }
+            }
+            function resumeForForeground() {
+                if (document.hidden || !document.hasFocus() || !pausedForBackground) return;
+                var module = getUnityModule();
+                if (module && typeof module.resumeMainLoop === "function") {
+                    module.resumeMainLoop();
+                    pausedForBackground = false;
+                }
+            }
+            document.addEventListener("visibilitychange", function () {
+                if (document.hidden) pauseForBackground();
+                else resumeForForeground();
+            });
+            window.addEventListener("blur", pauseForBackground);
+            window.addEventListener("focus", resumeForForeground);
+            // The Unity runtime may finish initializing after the first focus event.
+            window.addEventListener("load", function () {
+                if (document.hidden || !document.hasFocus()) pauseForBackground();
+            });
+        })();
+
         (function () {
           function connectSlopeLeaderboard() {
             var leaderboardReady = !!(window.ArcadeScores && window.ArcadeScores.configured);
