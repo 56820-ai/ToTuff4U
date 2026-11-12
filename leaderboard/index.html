@@ -559,25 +559,15 @@
         return;
       }
 
-      // Keep each player's best score per game; accumulate total playtime games.
+      // Keep every submitted score as its own leaderboard record.
+      // A player may appear multiple times when they submit multiple runs.
       const timedGames = new Set(["minecraft", "retro bowl time"]);
-      const bestByGameAndPlayer = new Map();
+      const byGame = new Map();
       onlineScores.forEach(item => {
-        const gameKey = String(item.game_title || "Game").trim().toLowerCase();
-        const playerKey = String(item.player_name || "Player").trim().toLowerCase();
-        const key = gameKey + "::" + playerKey;
-        if (timedGames.has(gameKey)) {
-          const previous = bestByGameAndPlayer.get(key);
-          if (previous) {
-            previous.score += Number(item.score) || 0;
-            if (new Date(item.created_at) > new Date(previous.created_at)) previous.created_at = item.created_at;
-          } else bestByGameAndPlayer.set(key, { ...item, score: Number(item.score) || 0 });
-        } else {
-          const previous = bestByGameAndPlayer.get(key);
-          if (!previous || Number(item.score) > Number(previous.score)) bestByGameAndPlayer.set(key, item);
-        }
+        const key = String(item.game_title || "Game").trim().toLowerCase();
+        if (!byGame.has(key)) byGame.set(key, []);
+        byGame.get(key).push(item);
       });
-
       const byGame = new Map();
       [...bestByGameAndPlayer.values()].forEach(item => {
         const key = String(item.game_title || "Game").trim().toLowerCase();
