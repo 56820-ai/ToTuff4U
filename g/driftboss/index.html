@@ -22,7 +22,7 @@
 (function () {
   "use strict";
   var workerPromise = null, scanning = false, submitted = false;
-  var bestRunScore = 0, lastScore = null, unchangedScans = 0, started = false;
+  var bestRunScore = 0, started = false, endScoreCandidate = null, endScoreCandidateHits = 0;
   var endScreenHits = 0, lastStatus = "";
   var status = document.createElement("div");
   status.id = "driftboss-ocr-status";
@@ -57,15 +57,55 @@
     });
     return candidates[0].value;
   }
-  async function finishRun() {
-    if (submitted || !started || bestRunScore <= 0) return;
+  async function readCenterRunScore(canvas) {
+    // On the Game Over screen Drift Boss shows the score for the run that
+    // just ended around the middle of the game canvas. Do not read the
+    // persistent best score from the top HUD.
+    var crop = document.createElement("canvas");
+    var sx = Math.round(canvas.width * 0.18);
+    var sy = Math.round(canvas.height * 0.22);
+    var sw = Math.max(1, Math.round(canvas.width * 0.64));
+    var sh = Math.max(1, Math.round(canvas.height * 0.58));
+    var scale = Math.min(5, 2400 / sw);
+    crop.width = Math.max(1, Math.round(sw * scale));
+    crop.height = Math.max(1, Math.round(sh * scale));
+    var ctx = crop.getContext("2d", { willReadFrequently: true });
+    ctx.drawImage(canvas, sx, sy, sw, sh, 0, 0, crop.width, crop.height);
+    var w = await worker();
+    await w.setParameters({
+      tessedit_char_whitelist: "0123456789,",
+      tessedit_pageseg_mode: "11",
+      preserve_interword_spaces: "0"
+    });
+    var result = await w.recognize(crop);
+    var words = result && result.data && result.data.words || [];
+    var picks = words.map(function (word) {
+      var raw = String(word.text || "").replace(/,/g, "").trim();
+      var box = word.bbox || {};
+      var x0 = Number(box.x0) || 0, y0 = Number(box.y0) || 0;
+      var x1 = Number(box.x1) || 0, y1 = Number(box.y1) || 0;
+      if (!/^\d{1,7}$/.test(raw) || Number(word.confidence) < 50 ||
+          x1 <= x0 || y1 <= y0) return null;
+      var cx = (x0 + x1) / 2 / crop.width;
+      var cy = (y0 + y1) / 2 / crop.height;
+      return { value: Number(raw), confidence: Number(word.confidence),
+        centerDistance: Math.hypot(cx - 0.5, cy - 0.5),
+        area: (x1 - x0) * (y1 - y0) };
+    }).filter(function (item) { return item && Number.isSafeInteger(item.value); });
+    picks.sort(function (a, b) {
+      return a.centerDistance - b.centerDistance || b.area - a.area || b.confidence - a.confidence;
+    });
+    return picks.length ? picks[0].value : null;
+  }
+  async function finishRun(runScore) {
+    if (submitted || !started || !Number.isSafeInteger(runScore) || runScore < 0) return;
     submitted = true;
-    setStatus("run ended · submitting " + bestRunScore);
+    setStatus("Game Over · submitting this run's score: " + runScore);
     var name = window.ArcadeScores && window.ArcadeScores.getPlayerName
       ? window.ArcadeScores.getPlayerName("Enter your name for the Drift Boss leaderboard (24 characters max):") : "";
     if (!name) { setStatus("name entry cancelled · score not submitted"); submitted = false; return; }
-    var ok = await window.ArcadeScores.submit("Drift Boss", bestRunScore, name);
-    setStatus(ok ? "OCR score submitted: " + bestRunScore : "score submission failed");
+    var ok = await window.ArcadeScores.submit("Drift Boss", runScore, name);
+    setStatus(ok ? "OCR submitted this run's score: " + runScore : "score submission failed");
   }
   async function scan() {
     if (scanning) return;
@@ -74,8 +114,6 @@
     scanning = true;
     try {
       var image = document.createElement("canvas");
-      // Read the complete game canvas once: numeric OCR is accepted only from
-      // the top HUD, while end-screen words can be detected anywhere.
       var scale = Math.min(3, 2400 / canvas.width);
       image.width = Math.max(1, Math.round(canvas.width * scale));
       image.height = Math.max(1, Math.round(canvas.height * scale));
@@ -90,26 +128,34 @@
       var result = await w.recognize(image);
       var score = readTopScore(result, image);
       var text = String(result.data && result.data.text || "").toLowerCase().replace(/\s+/g, " ");
-      if (score !== null) {
-        if (score > 0) started = true;
-        if (score > bestRunScore) bestRunScore = score;
-        if (score === lastScore) unchangedScans++;
-        else { lastScore = score; unchangedScans = 0; }
-        setStatus("reading top score · " + score + " (run best " + bestRunScore + ")");
+      if (score !== null && score > 0) {
+        started = true;
+        setStatus("live HUD · " + score + " · waiting for Game Over");
       }
-      var endWords = /game\s*over|try\s*again|play\s*again|continue|restart/.test(text);
+      // Only enter final-score mode after an actual end-screen label is seen.
+      var endWords = /game\s*over|try\s*again|play\s*again/.test(text);
       if (endWords) endScreenHits++;
-      else endScreenHits = 0;
-      // Some versions render the Game Over heading as an image. In that case,
-      // submit after the top HUD score has stopped changing for several scans.
-      if (started && !submitted && (endScreenHits >= 2 || (unchangedScans >= 4 && bestRunScore > 0))) {
-        await finishRun();
+      else if (!endScreenHits) endScreenHits = 0;
+      if (started && !submitted && endScreenHits >= 1) {
+        setStatus("Game Over detected · reading this run's score in the center");
+        var runScore = await readCenterRunScore(canvas);
+        if (runScore !== null) {
+          if (runScore === endScoreCandidate) endScoreCandidateHits++;
+          else { endScoreCandidate = runScore; endScoreCandidateHits = 1; }
+          setStatus("center score detected · " + runScore + " (" + endScoreCandidateHits + "/2)");
+          if (endScoreCandidateHits >= 2) await finishRun(runScore);
+        } else {
+          endScoreCandidate = null;
+          endScoreCandidateHits = 0;
+          setStatus("Game Over detected · scanning center for this run's score");
+        }
       }
-      // A fresh run starts when the top score resets after a completed run.
-      if (submitted && score === 0) {
-        submitted = false; started = false; bestRunScore = 0;
-        lastScore = 0; unchangedScans = 0; endScreenHits = 0;
-        setStatus("new run detected · watching top score");
+      // Reset only after the Game Over overlay has disappeared and a new
+      // positive live HUD score appears. The previous run's best is not reused.
+      if (submitted && !endWords && score !== null && score > 0) {
+        submitted = false; started = true; bestRunScore = score;
+        endScreenHits = 0; endScoreCandidate = null; endScoreCandidateHits = 0;
+        setStatus("new run detected · watching live HUD");
       }
     } catch (error) {
       console.warn("Drift Boss leaderboard OCR failed:", error);
@@ -122,7 +168,7 @@
     script.src = "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
     script.async = true;
     script.onload = function () {
-      setStatus("OCR loaded · watching the score at the top");
+      setStatus("OCR loaded · watching live score and Game Over screen");
       window.setInterval(scan, 900);
     };
     script.onerror = function () { setStatus("Tesseract failed to load · check connection and reload"); };
