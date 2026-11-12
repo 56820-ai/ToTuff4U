@@ -539,6 +539,12 @@
       "path": "g/brotato-abyssal-terrors",
       "image": "g/brotato-abyssal-terrors/index.png",
       "category": "ACTION"
+    },
+    {
+      "title": "Blocky Combat SWAT",
+      "path": "g/duckdb2-blocky-combat-swat-main",
+      "image": "images/pixelgun.png",
+      "category": "ACTION"
     }
   ]
 }
