@@ -545,6 +545,12 @@
       "path": "g/duckdb2-blocky-combat-swat-main",
       "image": "images/pixelgun.png",
       "category": "ACTION"
+    },
+    {
+      "title": "They Are Coming",
+      "path": "g/they-are-coming",
+      "image": "https://pizzaedition.io/assets/game-covers/they-are-coming.jpg",
+      "category": "ACTION"
     }
   ]
 }
