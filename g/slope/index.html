@@ -28,6 +28,48 @@
             };
         })();
 
+        // Best-effort guest mode: clear sign-in state before Unity starts.
+        // This cannot remove a login screen compiled into the Unity game itself.
+        (function forceGuestMode() {
+            var authKey = /auth|login|account|user.?token|access.?token|refresh.?token|session/i;
+            try {
+                [window.localStorage, window.sessionStorage].forEach(function (store) {
+                    if (!store) return;
+                    var keys = [];
+                    for (var i = 0; i < store.length; i++) {
+                        var key = store.key(i);
+                        if (key && authKey.test(key)) keys.push(key);
+                    }
+                    keys.forEach(function (key) { store.removeItem(key); });
+                });
+            } catch (e) {
+                console.warn("Slope guest mode: could not clear web storage.", e);
+            }
+            try {
+                document.cookie.split(";").forEach(function (cookie) {
+                    var name = cookie.split("=")[0].trim();
+                    if (authKey.test(name)) {
+                        document.cookie = name + "=; Max-Age=0; path=/";
+                        document.cookie = name + "=; Max-Age=0; path=/ToTuff4U/g/slope/";
+                    }
+                });
+            } catch (e) {
+                console.warn("Slope guest mode: could not clear cookies.", e);
+            }
+            // Remove only IndexedDB databases whose names clearly indicate auth data.
+            try {
+                if (window.indexedDB && indexedDB.databases) {
+                    indexedDB.databases().then(function (databases) {
+                        databases.forEach(function (database) {
+                            if (database.name && authKey.test(database.name)) {
+                                indexedDB.deleteDatabase(database.name);
+                            }
+                        });
+                    }).catch(function () {});
+                }
+            } catch (e) {}
+        })();
+
         var gameInstance = UnityLoader.instantiate("gameContainer", "Build/slope.json", {
             onProgress: UnityProgress,
             Module: { onRuntimeInitialized: function () { UnityProgress(gameInstance, "complete"); } }
