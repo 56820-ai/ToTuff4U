@@ -2034,12 +2034,15 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
             try { localStorage.setItem('tabCloak', cloak); localStorage.removeItem('selectedFavicon'); localStorage.removeItem('selectedTitle'); } catch (error) {}
             applyCloak(cloak);
         } else if (event.data.type === 'ARCADE_ATLAS_SET_FAVICON') {
-            if (typeof event.data.href !== 'string' || !event.data.href.startsWith(window.location.origin + '/')) return;
+            if (typeof event.data.href !== 'string') return;
+            let faviconUrl;
+            try { faviconUrl = new URL(event.data.href, window.location.href); } catch (_) { return; }
+            if (faviconUrl.protocol !== 'https:' && faviconUrl.origin !== window.location.origin) return;
             let icon = document.querySelector("link[rel~='icon']") || document.querySelector("link[rel*='icon']");
             if (!icon) { icon = document.createElement('link'); icon.rel = 'icon'; document.head.appendChild(icon); }
-            icon.href = event.data.href;
+            icon.href = faviconUrl.href;
             if (typeof event.data.title === 'string') document.title = event.data.title;
-            try { localStorage.setItem('selectedFavicon', event.data.href); localStorage.setItem('selectedTitle', event.data.title || ''); } catch (error) {}
+            try { localStorage.setItem('selectedFavicon', faviconUrl.href); localStorage.setItem('selectedTitle', event.data.title || ''); } catch (error) {}
         } else if (event.data.type === 'ARCADE_ATLAS_SET_PARTICLES') {
             const snow = document.getElementById('snow');
             if (snow) snow.style.display = event.data.enabled ? '' : 'none';
