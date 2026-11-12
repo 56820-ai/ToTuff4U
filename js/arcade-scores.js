@@ -52,6 +52,12 @@
       return false;
     }
     if (!Number.isSafeInteger(numericScore) || numericScore < 0 || !gameTitle) return false;
+    // Slope runs are limited to 1,500 points. Reject implausible values before POST.
+    if (String(gameTitle).trim().toLowerCase() === "slope" && numericScore > 1500) {
+      console.warn("Arcade Atlas: Slope score rejected (maximum 1,500).");
+      window.alert("That Slope score was rejected. The leaderboard limit is 1,500.");
+      return false;
+    }
     try {
       await request("scores", {
         method: "POST",
