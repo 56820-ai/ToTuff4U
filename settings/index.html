@@ -995,10 +995,10 @@
             <span id="closeFaviconModal" class="close">&times;</span>
             <h2>Select Favicon</h2>
             <div id="faviconSelection">
-                <img src="/images/favicon.png" class="favicon-option" data-favicon="/images/favicon.png" data-title="Grades & Attendance">
-                <img src="https://ssl.gstatic.com/classroom/ic_product_classroom_144.png" class="favicon-option" data-favicon="https://ssl.gstatic.com/classroom/favicon.png" data-title="Home">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSOKSBV-WuzkwkPLTB5AQwpOCyTOs25hXkkVA&s" class="favicon-option" data-favicon="https://www.google.com/favicon.ico" data-title="Google">
-                <img src="/favicon/googledocs.png" class="favicon-option" data-favicon="/favicon/googledocs.png" data-title="Google Docs">
+                <img src="../images/favicon.png" class="favicon-option" data-favicon="../images/favicon.png" data-title="Grades & Attendance">
+                <img src="https://ssl.gstatic.com/classroom/favicon.png" class="favicon-option" data-favicon="https://ssl.gstatic.com/classroom/favicon.png" data-title="Google Classroom">
+                <img src="https://www.google.com/favicon.ico" class="favicon-option" data-favicon="https://www.google.com/favicon.ico" data-title="Google">
+                <img src="../favicon/googledocs.png" class="favicon-option" data-favicon="../favicon/googledocs.png" data-title="Google Docs">
             </div>
         </div>
     </div>
@@ -1031,321 +1031,260 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const faviconModal = document.getElementById('faviconModal');
-            const keybindModal = document.getElementById('keybindModal');
-            const autoClickerModal = document.getElementById('autoClickerModal');
-            const openFaviconButton = document.getElementById('openFaviconUI');
-            const setKeybindButton = document.getElementById('setKeybindButton');
-            const openAutoClickerModalButton = document.getElementById('openAutoClickerModalButton');
-            const closeFaviconModal = document.getElementById('closeFaviconModal');
-            const closeKeybindModal = document.getElementById('closeKeybindModal');
-            const closeAutoClickerModal = document.getElementById('closeAutoClickerModal');
-            const faviconImages = document.querySelectorAll('#faviconSelection img');
-            const keybindInput = document.getElementById('keybind');
-            const saveKeybindButton = document.getElementById('saveKeybind');
-            const autoKeybindInput = document.getElementById('autoKeybind');
-            const autoClickSpeedInput = document.getElementById('autoClickSpeed');
-            const saveAutoClickerSettingsButton = document.getElementById('saveAutoClickerSettings');
-            const autoClickerStatusMessage = document.getElementById('autoClickerStatusMessage');
-            const particlesToggle = document.getElementById('toggle-particles');
-            const dropdown = document.getElementById('tab-cloak');
-            const dropdownButton = dropdown.querySelector('.dropdown-button');
-            const dropdownSelected = dropdown.querySelector('.dropdown-selected');
-            const dropdownMenu = dropdown.querySelector('.dropdown-menu');
-            const dropdownItems = dropdown.querySelectorAll('.dropdown-menu li');
+document.addEventListener('DOMContentLoaded', () => {
+  const $ = id => document.getElementById(id);
+  const faviconModal = $('faviconModal');
+  const keybindModal = $('keybindModal');
+  const autoClickerModal = $('autoClickerModal');
+  const dropdown = $('tab-cloak');
+  const dropdownButton = dropdown?.querySelector('.dropdown-button');
+  const dropdownMenu = dropdown?.querySelector('.dropdown-menu');
+  const dropdownSelected = dropdown?.querySelector('.dropdown-selected');
+  const status = $('autoClickerStatusMessage');
+  const particlesToggle = $('toggle-particles');
+  const modals = [faviconModal, keybindModal, autoClickerModal];
 
-            let panicKeybind = localStorage.getItem('panicKeybind') || '\\';
-            let autoClickerKeybind = localStorage.getItem('autoClickerKeybind') || 'a';
-            let autoClickerSpeed = localStorage.getItem('autoClickerSpeed') || 1000;
-            
-            keybindInput.value = panicKeybind;
-            autoKeybindInput.value = autoClickerKeybind;
-            autoClickSpeedInput.value = autoClickerSpeed;
+  const showModal = modal => { if (modal) { modal.style.display = 'block'; modal.setAttribute('aria-hidden', 'false'); } };
+  const hideModal = modal => { if (modal) { modal.style.display = 'none'; modal.setAttribute('aria-hidden', 'true'); } };
+  const setIcon = (href, title) => {
+    const absolute = new URL(href, window.location.href).href;
+    localStorage.setItem('selectedFavicon', absolute);
+    localStorage.setItem('selectedTitle', title);
+    let link = document.querySelector("link[rel~='icon']") || document.querySelector("link[rel*='icon']");
+    if (!link) { link = document.createElement('link'); link.rel = 'icon'; document.head.appendChild(link); }
+    link.href = absolute;
+    document.title = title;
+    window.parent.postMessage({ type: 'ARCADE_ATLAS_SET_FAVICON', href: absolute, title }, window.location.origin);
+  };
 
-            const particlesSetting = localStorage.getItem('particlesEnabled');
-            if (particlesSetting !== null) {
-                particlesToggle.checked = particlesSetting === 'true';
-            }
+  $('openFaviconUI')?.addEventListener('click', () => showModal(faviconModal));
+  $('setKeybindButton')?.addEventListener('click', () => showModal(keybindModal));
+  $('openAutoClickerModalButton')?.addEventListener('click', () => showModal(autoClickerModal));
+  $('closeFaviconModal')?.addEventListener('click', () => hideModal(faviconModal));
+  $('closeKeybindModal')?.addEventListener('click', () => hideModal(keybindModal));
+  $('closeAutoClickerModal')?.addEventListener('click', () => hideModal(autoClickerModal));
+  window.addEventListener('click', event => {
+    modals.forEach(modal => { if (event.target === modal) hideModal(modal); });
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') modals.forEach(hideModal);
+  });
 
-            const selectedFavicon = localStorage.getItem('selectedFavicon');
-            const selectedTitle = localStorage.getItem('selectedTitle');
-            if (selectedFavicon) {
-                const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
-                link.rel = 'icon';
-                link.href = selectedFavicon;
-                document.head.appendChild(link);
-                document.title = selectedTitle || document.title;
-            }
+  document.querySelectorAll('#faviconSelection [data-favicon]').forEach(img => {
+    img.addEventListener('click', () => {
+      setIcon(img.dataset.favicon, img.dataset.title || 'Arcade Atlas');
+      hideModal(faviconModal);
+    });
+  });
 
-            openFaviconButton.addEventListener('click', function() {
-                faviconModal.style.display = 'block';
-            });
+  const panicInput = $('keybind');
+  const autoKeyInput = $('autoKeybind');
+  const autoSpeedInput = $('autoClickSpeed');
+  let panicKey = localStorage.getItem('panicKeybind') || '\\';
+  let autoKey = localStorage.getItem('autoClickerKeybind') || 'a';
+  let autoSpeed = Number(localStorage.getItem('autoClickerSpeed') || 1000);
+  if (panicInput) panicInput.value = panicKey;
+  if (autoKeyInput) autoKeyInput.value = autoKey;
+  if (autoSpeedInput) autoSpeedInput.value = autoSpeed;
 
-            setKeybindButton.addEventListener('click', function() {
-                keybindModal.style.display = 'block';
-            });
+  $('saveKeybind')?.addEventListener('click', () => {
+    const value = (panicInput?.value || '').trim();
+    if (Array.from(value).length !== 1) { alert('Please enter exactly one key.'); panicInput?.focus(); return; }
+    panicKey = value;
+    localStorage.setItem('panicKeybind', panicKey);
+    hideModal(keybindModal);
+    alert('Panic key saved: ' + panicKey);
+  });
 
-            openAutoClickerModalButton.addEventListener('click', function() {
-                autoClickerModal.style.display = 'block';
-            });
+  $('saveAutoClickerSettings')?.addEventListener('click', () => {
+    const key = (autoKeyInput?.value || '').trim();
+    const speed = Number(autoSpeedInput?.value);
+    if (Array.from(key).length !== 1 || !Number.isInteger(speed) || speed < 1 || speed > 60000) {
+      alert('Enter one key and a click speed between 1 and 60000 ms.');
+      return;
+    }
+    autoKey = key;
+    autoSpeed = speed;
+    localStorage.setItem('autoClickerKeybind', autoKey);
+    localStorage.setItem('autoClickerSpeed', String(autoSpeed));
+    if (status) status.textContent = 'Settings saved. Press "' + autoKey + '" to start or stop.';
+    hideModal(autoClickerModal);
+  });
 
-            closeFaviconModal.addEventListener('click', function() {
-                faviconModal.style.display = 'none';
-            });
+  const applyParticles = enabled => {
+    localStorage.setItem('particlesEnabled', String(enabled));
+    window.parent.postMessage({ type: 'ARCADE_ATLAS_SET_PARTICLES', enabled }, window.location.origin);
+    try {
+      const snow = window.parent.document.getElementById('snow');
+      if (snow) snow.style.display = enabled ? '' : 'none';
+    } catch (_) {}
+  };
+  if (particlesToggle) {
+    const saved = localStorage.getItem('particlesEnabled');
+    particlesToggle.checked = saved === null ? true : saved === 'true';
+    applyParticles(particlesToggle.checked);
+    particlesToggle.addEventListener('change', () => applyParticles(particlesToggle.checked));
+  }
 
-            closeKeybindModal.addEventListener('click', function() {
-                keybindModal.style.display = 'none';
-            });
+  $('enableAboutBlank')?.addEventListener('click', () => {
+    const siteUrl = new URL('../', window.location.href);
+    siteUrl.hash = 'home';
+    localStorage.setItem('aboutBlankReturnUrl', siteUrl.href);
+    const titles = { google: 'Google', classroom: 'Google Classroom', docs: 'Google Docs', default: 'Home-Classroom' };
+    const cloak = localStorage.getItem('tabCloak') || 'default';
+    const icon = document.querySelector("link[rel*='icon']")?.href || '';
+    const popup = window.open('about:blank', 'ArcadeAtlasCloak');
+    if (!popup) { alert('Allow popups for Arcade Atlas, then click Enable again.'); return; }
+    try {
+      popup.document.open();
+      popup.document.write('<!doctype html><html><head><meta charset="utf-8"><title>' +
+        (titles[cloak] || titles.default) + '</title><link rel="icon" href="' +
+        icon.replace(/"/g, '&quot;') +
+        '"><style>html,body,iframe{width:100%;height:100%;margin:0;border:0;overflow:hidden}iframe{position:fixed;inset:0}</style></head><body><iframe src="' +
+        siteUrl.href.replace(/"/g, '&quot;') +
+        '" allow="fullscreen; autoplay; gamepad"></iframe></body></html>');
+      popup.document.close();
+      window.aboutBlankCloakWindow = popup;
+    } catch (error) {
+      console.error('Could not set up the cloaked tab:', error);
+      alert('The cloaked tab could not be configured. Please try again.');
+    }
+  });
+  $('disableAboutBlank')?.addEventListener('click', () => {
+    let popup = window.aboutBlankCloakWindow;
+    try {
+      if (!popup || popup.closed) popup = window.open('', 'ArcadeAtlasCloak');
+      if (popup && !popup.closed) popup.close();
+      window.aboutBlankCloakWindow = null;
+    } catch (_) {
+      alert('The cloaked tab could not be closed from this window. Close the about:blank tab manually.');
+    }
+  });
 
-            closeAutoClickerModal.addEventListener('click', function() {
-                autoClickerModal.style.display = 'none';
-            });
+  const choices = {
+    default: { title: 'Home-Classroom', icon: 'data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27%3E%3Crect width=%2748%27 height=%2748%27 rx=%279%27 fill=%27%230F9D58%27/%3E%3Cpath d=%27M8 12h32v24H8z%27 fill=%27white%27/%3E%3Cpath d=%27M12 16h24v16H12z%27 fill=%27%234285F4%27/%3E%3Ccircle cx=%2724%27 cy=%2720%27 r=%274%27 fill=%27%23F4B400%27/%3E%3Cpath d=%27M16 30c1-5 4-7 8-7s7 2 8 7%27 fill=%27%23F4B400%27/%3E%3C/svg%3E' },
+    google: { title: 'Google', icon: 'https://www.google.com/favicon.ico' },
+    classroom: { title: 'Google Classroom', icon: 'https://ssl.gstatic.com/classroom/favicon.png' },
+    docs: { title: 'Google Docs', icon: new URL('../favicon/googledocs.png', window.location.href).href }
+  };
+  const setTabCloak = type => {
+    const key = choices[type] ? type : 'default';
+    const selected = choices[key];
+    localStorage.setItem('tabCloak', key);
+    if (dropdownSelected) dropdownSelected.textContent = selected.title;
+    const link = document.querySelector("link[rel~='icon']") || document.querySelector("link[rel*='icon']") || document.head.appendChild(Object.assign(document.createElement('link'), { rel: 'icon' }));
+    link.href = selected.icon;
+    document.title = selected.title;
+    window.parent.postMessage({ type: 'ARCADE_ATLAS_SET_TAB_CLOAK', cloak: key }, window.location.origin);
+  };
+  dropdownButton?.addEventListener('click', event => {
+    event.stopPropagation();
+    const open = dropdownMenu.style.display !== 'block';
+    dropdownMenu.style.display = open ? 'block' : 'none';
+    dropdown?.classList.toggle('active', open);
+    dropdownButton.setAttribute('aria-expanded', String(open));
+  });
+  document.addEventListener('click', event => {
+    if (dropdown && !dropdown.contains(event.target)) {
+      dropdownMenu.style.display = 'none';
+      dropdown.classList.remove('active');
+      dropdownButton?.setAttribute('aria-expanded', 'false');
+    }
+  });
+  dropdown?.querySelectorAll('.dropdown-menu li[data-value]').forEach(item => {
+    item.addEventListener('click', () => {
+      setTabCloak(item.dataset.value);
+      dropdownMenu.style.display = 'none';
+      dropdown.classList.remove('active');
+      dropdownButton?.setAttribute('aria-expanded', 'false');
+    });
+  });
+  const savedCloak = localStorage.getItem('tabCloak');
+  if (savedCloak && choices[savedCloak]) setTabCloak(savedCloak);
 
-            window.addEventListener('click', function(event) {
-                if (event.target === faviconModal) {
-                    faviconModal.style.display = 'none';
-                }
-                if (event.target === keybindModal) {
-                    keybindModal.style.display = 'none';
-                }
-                if (event.target === autoClickerModal) {
-                    autoClickerModal.style.display = 'none';
-                }
-            });
+  // Register key handlers in the settings frame, parent page, and same-origin game frames.
+  let autoTimer = null;
+  const listenedDocuments = new WeakSet();
+  const setStatus = message => { if (status) status.textContent = message; };
+  const getClickDocument = () => {
+    try {
+      const parentDoc = window.parent.document;
+      let frame = parentDoc.activeElement;
+      if (!frame || frame === document.querySelector('body') || frame === window.frameElement) {
+        frame = parentDoc.querySelector('#tab1-frame') ||
+          [...parentDoc.querySelectorAll('iframe')].find(candidate => candidate !== window.frameElement && candidate.offsetWidth && candidate.offsetHeight);
+      }
+      if (frame && frame.tagName === 'IFRAME') return frame.contentDocument;
+      return parentDoc;
+    } catch (_) { return document; }
+  };
+  const clickOnce = () => {
+    const targetDoc = getClickDocument();
+    if (!targetDoc) { setStatus('Auto clicker cannot access this game frame.'); return; }
+    const active = targetDoc.activeElement;
+    if (active && /^(INPUT|TEXTAREA|SELECT)$/.test(active.tagName)) return;
+    const x = Math.max(1, Math.floor(targetDoc.defaultView.innerWidth / 2));
+    const y = Math.max(1, Math.floor(targetDoc.defaultView.innerHeight / 2));
+    const target = targetDoc.elementFromPoint(x, y) || targetDoc.body;
+    if (target) target.dispatchEvent(new MouseEvent('click', { view: targetDoc.defaultView, bubbles: true, cancelable: true, clientX: x, clientY: y }));
+  };
+  const stopAuto = () => {
+    if (autoTimer !== null) clearInterval(autoTimer);
+    autoTimer = null;
+    setStatus('Auto clicker stopped.');
+  };
+  const toggleAuto = () => {
+    if (autoTimer !== null) { stopAuto(); return; }
+    autoTimer = setInterval(clickOnce, autoSpeed);
+    setStatus('Auto clicker running. Press "' + autoKey + '" again to stop.');
+  };
+  const onShortcut = event => {
+    if (event.repeat || event.ctrlKey || event.altKey || event.metaKey) return;
+    const target = event.target;
+    if (target && /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName)) return;
+    if (event.key.toLowerCase() === autoKey.toLowerCase()) { event.preventDefault(); toggleAuto(); }
+    if (event.key === panicKey) { event.preventDefault(); window.top.location.href = 'https://classroom.google.com'; }
+  };
+  const registerDocument = doc => {
+    if (!doc || listenedDocuments.has(doc)) return;
+    listenedDocuments.add(doc);
+    doc.addEventListener('keydown', onShortcut);
+  };
+  registerDocument(document);
+  try {
+    const parentDoc = window.parent.document;
+    registerDocument(parentDoc);
+    parentDoc.querySelectorAll('iframe').forEach(frame => {
+      try { registerDocument(frame.contentDocument); } catch (_) {}
+    });
+  } catch (_) {}
+  // Re-scan periodically so newly opened same-origin game frames can receive shortcuts.
+  const scanFrames = setInterval(() => {
+    try { window.parent.document.querySelectorAll('iframe').forEach(frame => { try { registerDocument(frame.contentDocument); } catch (_) {} }); } catch (_) {}
+  }, 1500);
+  window.addEventListener('beforeunload', () => { stopAuto(); clearInterval(scanFrames); });
 
-            dropdownButton.addEventListener('click', function(event) {
-                event.stopPropagation();
-                dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
-                dropdown.classList.toggle('active');
-            });
+  // Make tab buttons keyboard-accessible as well as clickable.
+  document.querySelectorAll('.tab-link').forEach(button => {
+    button.setAttribute('role', 'tab');
+    button.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') button.click();
+    });
+  });
+});
 
-            document.addEventListener('click', function(event) {
-                if (!dropdown.contains(event.target)) {
-                    dropdownMenu.style.display = 'none';
-                    dropdown.classList.remove('active');
-                }
-            });
-
-            faviconImages.forEach(img => {
-                img.addEventListener('click', function() {
-                    const selectedFavicon = this.dataset.favicon;
-                    const selectedTitle = this.dataset.title;
-
-                    localStorage.setItem('selectedFavicon', selectedFavicon);
-                    localStorage.setItem('selectedTitle', selectedTitle);
-
-                    const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
-                    link.rel = 'icon';
-                    link.href = selectedFavicon;
-                    document.head.appendChild(link);
-                    document.title = selectedTitle;
-
-                    alert(`Favicon changed to: ${selectedTitle}`);
-                    faviconModal.style.display = 'none';
-                });
-            });
-
-            saveKeybindButton.addEventListener('click', function() {
-                const keybind = keybindInput.value.trim();
-                if (keybind.length === 1) {
-                    panicKeybind = keybind;
-                    localStorage.setItem('panicKeybind', panicKeybind);
-                    alert(`Panic Keybind set to: ${panicKeybind}`);
-                    keybindModal.style.display = 'none';
-                } else {
-                    alert('Please enter a single character.');
-                }
-            });
-
-            saveAutoClickerSettingsButton.addEventListener('click', function() {
-                const keybind = autoKeybindInput.value.trim();
-                const clickSpeed = parseInt(autoClickSpeedInput.value, 10);
-
-                if (keybind.length === 1 && clickSpeed > 0) {
-                    autoClickerKeybind = keybind;
-                    autoClickerSpeed = clickSpeed;
-
-                    localStorage.setItem('autoClickerKeybind', autoClickerKeybind);
-                    localStorage.setItem('autoClickerSpeed', autoClickerSpeed);
-
-                    alert(`Auto Clicker Keybind set to: ${autoClickerKeybind}\nClick Speed set to: ${autoClickerSpeed}ms`);
-                    autoClickerStatusMessage.textContent = 'Auto Clicker settings saved.';
-                    autoClickerStatusMessage.style.color = 'var(--accent-cyan)';
-                    autoClickerModal.style.display = 'none';
-                } else {
-                    alert('Please enter valid settings for Auto Clicker.');
-                }
-            });
-
-            particlesToggle.addEventListener('change', function() {
-                localStorage.setItem('particlesEnabled', this.checked);
-                
-                if (window.parent && window.parent.toggleParticles) {
-                    window.parent.toggleParticles(this.checked);
-                }
-                
-                if (this.checked) {
-                    if (window.parent && window.parent.document.getElementById('snow')) {
-                        window.parent.document.getElementById('snow').style.display = 'block';
-                    }
-                } else {
-                    if (window.parent && window.parent.document.getElementById('snow')) {
-                        window.parent.document.getElementById('snow').style.display = 'none';
-                    }
-                }
-            });
-
-            document.getElementById('enableAboutBlank').addEventListener('click', function() {
-                enableAboutBlank();
-            });
-
-            document.getElementById('disableAboutBlank').addEventListener('click', function() {
-                disableAboutBlank();
-            });
-
-            dropdownItems.forEach(item => {
-                item.addEventListener('click', function() {
-                    const value = this.getAttribute('data-value');
-                    dropdownSelected.textContent = this.textContent;
-                    dropdownMenu.style.display = 'none';
-                    dropdown.classList.remove('active');
-                    setTabCloak(value);
-                });
-            });
-
-            let autoClickerInterval;
-            document.addEventListener('keydown', function(event) {
-                if (event.key === autoClickerKeybind) {
-                    if (autoClickerInterval) {
-                        clearInterval(autoClickerInterval);
-                        autoClickerInterval = null;
-                        autoClickerStatusMessage.textContent = 'Auto Clicker stopped.';
-                    } else {
-                        autoClickerInterval = setInterval(function() {
-                            const activeElement = document.activeElement;
-                            if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA')) {
-                                return;
-                            }
-                            
-                            const event = new MouseEvent('click', {
-                                view: window,
-                                bubbles: true,
-                                cancelable: true
-                            });
-                            
-                            document.elementFromPoint(
-                                window.innerWidth / 2,
-                                window.innerHeight / 2
-                            ).dispatchEvent(event);
-                        }, autoClickerSpeed);
-                        autoClickerStatusMessage.textContent = 'Auto Clicker running...';
-                    }
-                }
-                
-                if (event.key === panicKeybind) {
-                    window.location.href = 'https://classroom.google.com';
-                }
-            });
-
-            const loadedTabCloak = localStorage.getItem('tabCloak');
-            if (loadedTabCloak) {
-                const cloakOption = document.querySelector(`li[data-value="${loadedTabCloak}"]`);
-                if (cloakOption) {
-                    dropdownSelected.textContent = cloakOption.textContent;
-                    setTabCloak(loadedTabCloak);
-                }
-            }
-        });
-
-        function openTab(evt, tabName) {
-            const tabContents = document.getElementsByClassName("tab-content");
-            for (let i = 0; i < tabContents.length; i++) {
-                tabContents[i].classList.remove("active");
-            }
-
-            const tabLinks = document.getElementsByClassName("tab-link");
-            for (let i = 0; i < tabLinks.length; i++) {
-                tabLinks[i].classList.remove("active");
-            }
-
-            document.getElementById(tabName).classList.add("active");
-            evt.currentTarget.classList.add("active");
-        }
-
-        function enableAboutBlank() {
-            // GitHub Pages is hosted in a repository subfolder, so preserve the full site path.
-            const siteUrl = new URL('../', window.location.href);
-            siteUrl.hash = 'home';
-            const returnUrl = siteUrl.href;
-            localStorage.setItem('aboutBlankReturnUrl', returnUrl);
-
-            const currentCloak = localStorage.getItem('tabCloak') || 'default';
-            const cloakTitles = {
-                google: 'Google',
-                classroom: 'Google Classroom',
-                docs: 'Google Docs',
-                default: 'Home-Classroom'
-            };
-            const newWindow = window.open('about:blank', '_blank');
-            if (!newWindow) {
-                alert('Please allow popups for Arcade Atlas, then try again.');
-                return;
-            }
-            // Keep a reference so the Disable button in this settings frame can
-            // close the exact about:blank tab opened by Enable.
-            window.aboutBlankCloakWindow = newWindow;
-
-            const icon = document.querySelector("link[rel*='icon']")?.href || '';
-            newWindow.document.open();
-            newWindow.document.write(`<!doctype html>
-<html><head><meta charset="utf-8"><title>${cloakTitles[currentCloak] || cloakTitles.default}</title>
-<link rel="icon" href="${icon}">
-<style>html,body,iframe{width:100%;height:100%;margin:0;border:0;overflow:hidden}iframe{position:fixed;inset:0}</style>
-</head><body><iframe src="${returnUrl}" allow="fullscreen; autoplay; gamepad"></iframe></body></html>`);
-            newWindow.document.close();
-        }
-
-        function disableAboutBlank() {
-            const cloakWindow = window.aboutBlankCloakWindow;
-            if (cloakWindow && !cloakWindow.closed) {
-                cloakWindow.close();
-                window.aboutBlankCloakWindow = null;
-                return;
-            }
-            alert('No about:blank tab opened by this Settings page is currently active. Click Enable to open one first.');
-        }
-
-        function setTabCloak(type) {
-            const choices = {
-                google: { title: 'Google', icon: 'https://www.google.com/favicon.ico' },
-                classroom: { title: 'Google Classroom', icon: 'https://ssl.gstatic.com/classroom/favicon.png' },
-                docs: { title: 'Google Docs', icon: new URL('../favicon/googledocs.png', window.location.href).href },
-                default: { title: 'Home-Classroom', icon: 'data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27%3E%3Crect width=%2748%27 height=%2748%27 rx=%279%27 fill=%27%230F9D58%27/%3E%3Cpath d=%27M8 12h32v24H8z%27 fill=%27white%27/%3E%3Cpath d=%27M12 16h24v16H12z%27 fill=%27%234285F4%27/%3E%3Ccircle cx=%2724%27 cy=%2720%27 r=%274%27 fill=%27%23F4B400%27/%3E%3Cpath d=%27M16 30c1-5 4-7 8-7s7 2 8 7%27 fill=%27%23F4B400%27/%3E%3C/svg%3E' }
-            };
-            const selectedType = choices[type] ? type : 'default';
-            const selected = choices[selectedType];
-            localStorage.setItem('tabCloak', selectedType);
-
-            // Keep the settings preview in sync, then ask the top-level page
-            // to update the actual browser tab.
-            document.title = selected.title;
-            let previewIcon = document.querySelector("link[rel~='icon']") || document.querySelector("link[rel*='icon']");
-            if (!previewIcon) {
-                previewIcon = document.createElement('link');
-                previewIcon.rel = 'icon';
-                document.head.appendChild(previewIcon);
-            }
-            previewIcon.href = selected.icon;
-            try {
-                window.parent.postMessage({
-                    type: 'ARCADE_ATLAS_SET_TAB_CLOAK',
-                    cloak: selectedType
-                }, window.location.origin);
-            } catch (error) {
-                console.warn('Could not send tab cloak to the main page:', error);
-            }
-        }
-    </script>
+function openTab(evt, tabName) {
+  const contents = document.querySelectorAll('.tab-content');
+  const links = document.querySelectorAll('.tab-link');
+  if (![...contents].some(content => content.id === tabName)) return;
+  contents.forEach(content => content.classList.toggle('active', content.id === tabName));
+  links.forEach(link => {
+    const active = link === evt.currentTarget;
+    link.classList.toggle('active', active);
+    link.setAttribute('aria-selected', String(active));
+    link.setAttribute('tabindex', active ? '0' : '-1');
+  });
+}
+</script>
 </body>
 </html>
