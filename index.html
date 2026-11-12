@@ -2000,6 +2000,33 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 })();
 </script>
 
+
+<script>
+// Restore the selected tab cloak on the actual top-level Arcade Atlas page.
+document.addEventListener('DOMContentLoaded', function () {
+    try {
+        const type = localStorage.getItem('tabCloak') || 'default';
+        const settingsFrame = document.querySelector('iframe[src*="settings"]');
+        if (settingsFrame && settingsFrame.contentWindow && settingsFrame.contentWindow.setTabCloak) {
+            settingsFrame.contentWindow.setTabCloak(type);
+        } else {
+            const choices = {
+                google: ['Google', 'https://www.google.com/favicon.ico'],
+                classroom: ['Google Classroom', 'https://ssl.gstatic.com/classroom/favicon.png'],
+                docs: ['Google Docs', new URL('favicon/googledocs.png', document.baseURI).href],
+                default: ['Home-Classroom', document.querySelector('link[rel*="icon"]')?.href || '']
+            };
+            const selected = choices[type] || choices.default;
+            document.title = selected[0];
+            if (selected[1]) {
+                let icon = document.querySelector('link[rel*="icon"]');
+                if (!icon) { icon = document.createElement('link'); icon.rel = 'icon'; document.head.appendChild(icon); }
+                icon.href = selected[1];
+            }
+        }
+    } catch (error) { console.warn('Tab cloak restore failed:', error); }
+});
+</script>
 </body>
 </html>
 
