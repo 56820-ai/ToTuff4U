@@ -20,37 +20,114 @@
 	<script type="text/javascript" src="game.js"></script>
 <script>
 (function () {
-  // Drift Boss stores the live run distance in ig.game.lastScore.
-  // Submit only when the game transitions to its actual Game Over screen.
-  var attempts = 0;
-  var installTimer = setInterval(function () {
-    attempts++;
-    var game = window.ig && window.ig.game;
-    if (game && typeof game.goToLevel === "function" && !game.__arcadeAtlasDriftBossHook) {
-      var originalGoToLevel = game.goToLevel;
-      game.goToLevel = function (levelName) {
-        var result = originalGoToLevel.apply(this, arguments);
-        var level = String(levelName || "").toLowerCase();
-        if (level === "gameover") {
-          var score = Math.round(Number(this.lastScore));
-          if (Number.isSafeInteger(score) && score >= 0 && !this.__arcadeAtlasDriftBossSubmitted) {
-            this.__arcadeAtlasDriftBossSubmitted = true;
-            if (window.ArcadeScores && typeof window.ArcadeScores.promptAndSubmit === "function") {
-              window.ArcadeScores.promptAndSubmit("Drift Boss", score);
-            }
-          }
-        } else if (level === "gameplay") {
-          this.__arcadeAtlasDriftBossSubmitted = false;
-        }
-        return result;
-      };
-      game.__arcadeAtlasDriftBossHook = true;
-      clearInterval(installTimer);
-    } else if (attempts >= 240) {
-      clearInterval(installTimer);
-      console.warn("Arcade Atlas: Drift Boss score tracking could not attach.");
+  "use strict";
+  var workerPromise = null;
+  var scanning = false;
+  var candidate = null;
+  var candidateHits = 0;
+  var submitted = false;
+  var lastStatus = "";
+  var status = document.createElement("div");
+  status.id = "driftboss-ocr-status";
+  status.style.cssText = "position:fixed;left:10px;bottom:10px;z-index:2147483647;padding:8px 11px;border-radius:8px;background:#101525;color:#fff;border:1px solid #6bffd9;font:12px sans-serif;max-width:min(90vw,420px);pointer-events:none;";
+  status.textContent = "Drift Boss leaderboard: loading OCR.";
+  function setStatus(message) {
+    if (message !== lastStatus) {
+      status.textContent = "Drift Boss leaderboard: " + message;
+      lastStatus = message;
     }
-  }, 250);
+  }
+  function worker() {
+    if (!workerPromise) workerPromise = window.Tesseract.createWorker("eng");
+    return workerPromise;
+  }
+  function parseScore(result) {
+    var data = result && result.data ? result.data : {};
+    var raw = String(data.text || "").replace(/\s+/g, " ").trim();
+    // Drift Boss's actual Game Over screen displays both "score" and "best".
+    // Require those labels so live HUD numbers or menu text cannot submit.
+    if (!/score\s*[:=]?/i.test(raw) || !/best\s*[:=]?/i.test(raw)) return null;
+    var match = raw.match(/score\s*[:=]?\s*([0-9][0-9,]*)/i);
+    if (!match) return null;
+    var value = Number(match[1].replace(/,/g, ""));
+    if (!Number.isSafeInteger(value) || value < 0) return null;
+    var words = Array.isArray(data.words) ? data.words : [];
+    var numericWords = words.filter(function (word) {
+      return String(word.text || "").replace(/,/g, "").trim() === String(value) &&
+        Number(word.confidence) >= 55;
+    });
+    if (!numericWords.length) return null;
+    return { value: value, confidence: Math.max.apply(null, numericWords.map(function (w) { return Number(w.confidence) || 0; })), text: raw };
+  }
+  async function scan() {
+    if (scanning || submitted) return;
+    var canvas = document.getElementById("canvas");
+    if (!canvas || !canvas.width || !canvas.height) return;
+    scanning = true;
+    try {
+      if (!window.Tesseract) {
+        setStatus("waiting for Tesseract OCR to load.");
+        return;
+      }
+      var image = document.createElement("canvas");
+      var scale = Math.min(3, 2400 / canvas.width);
+      image.width = Math.max(1, Math.round(canvas.width * scale));
+      image.height = Math.max(1, Math.round(canvas.height * scale));
+      var ctx = image.getContext("2d", { willReadFrequently: true });
+      ctx.drawImage(canvas, 0, 0, image.width, image.height);
+      var w = await worker();
+      await w.setParameters({
+        tessedit_char_whitelist: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789,:. ",
+        tessedit_pageseg_mode: "11",
+        preserve_interword_spaces: "1"
+      });
+      var result = await w.recognize(image);
+      var reading = parseScore(result);
+      if (reading) {
+        if (candidate === reading.value) candidateHits++;
+        else { candidate = reading.value; candidateHits = 1; }
+        setStatus("end screen detected · confirming score " + reading.value + " (" + candidateHits + "/2)");
+        if (candidateHits >= 2) {
+          submitted = true;
+          var name = window.ArcadeScores && window.ArcadeScores.getPlayerName
+            ? window.ArcadeScores.getPlayerName("Enter your name for the Drift Boss leaderboard (24 characters max):")
+            : "";
+          if (!name) {
+            setStatus("name entry cancelled · score not submitted");
+            submitted = false;
+            return;
+          }
+          var ok = await window.ArcadeScores.submit("Drift Boss", reading.value, name);
+          setStatus(ok ? "OCR score submitted: " + reading.value + " m" : "score submission failed");
+        }
+      } else {
+        candidate = null;
+        candidateHits = 0;
+        setStatus("scanning game canvas · waiting for the Game Over score");
+      }
+    } catch (error) {
+      console.warn("Drift Boss leaderboard OCR failed:", error);
+      setStatus("OCR error · " + (error && error.message ? error.message : "could not read canvas"));
+    } finally {
+      scanning = false;
+    }
+  }
+  function start() {
+    if (!document.body.contains(status)) document.body.appendChild(status);
+    var script = document.createElement("script");
+    script.src = "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
+    script.async = true;
+    script.onload = function () {
+      setStatus("OCR loaded · waiting for a run to end");
+      window.setInterval(scan, 1100);
+    };
+    script.onerror = function () {
+      setStatus("Tesseract failed to load · check connection and reload");
+    };
+    document.head.appendChild(script);
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start, { once: true });
+  else start();
 })();
 </script>
 	<script src="../../storage/js/cloak.js"></script>
