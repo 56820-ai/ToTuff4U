@@ -18,6 +18,41 @@
 	<meta name="apple-mobile-web-app-capable" content="yes">
 	<link rel="stylesheet" type="text/css" href="game.css">
 	<script type="text/javascript" src="game.js"></script>
+<script>
+(function () {
+  // Drift Boss stores the live run distance in ig.game.lastScore.
+  // Submit only when the game transitions to its actual Game Over screen.
+  var attempts = 0;
+  var installTimer = setInterval(function () {
+    attempts++;
+    var game = window.ig && window.ig.game;
+    if (game && typeof game.goToLevel === "function" && !game.__arcadeAtlasDriftBossHook) {
+      var originalGoToLevel = game.goToLevel;
+      game.goToLevel = function (levelName) {
+        var result = originalGoToLevel.apply(this, arguments);
+        var level = String(levelName || "").toLowerCase();
+        if (level === "gameover") {
+          var score = Math.round(Number(this.lastScore));
+          if (Number.isSafeInteger(score) && score >= 0 && !this.__arcadeAtlasDriftBossSubmitted) {
+            this.__arcadeAtlasDriftBossSubmitted = true;
+            if (window.ArcadeScores && typeof window.ArcadeScores.promptAndSubmit === "function") {
+              window.ArcadeScores.promptAndSubmit("Drift Boss", score);
+            }
+          }
+        } else if (level === "gameplay") {
+          this.__arcadeAtlasDriftBossSubmitted = false;
+        }
+        return result;
+      };
+      game.__arcadeAtlasDriftBossHook = true;
+      clearInterval(installTimer);
+    } else if (attempts >= 240) {
+      clearInterval(installTimer);
+      console.warn("Arcade Atlas: Drift Boss score tracking could not attach.");
+    }
+  }, 250);
+})();
+</script>
 	<script src="../../storage/js/cloak.js"></script>
 <script src="/js/arcade-score-config.js"></script>
 <script src="/js/arcade-scores.js"></script>

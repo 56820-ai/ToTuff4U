@@ -514,9 +514,11 @@
           const gameKey = String(item.game_title || "").trim().toLowerCase();
           const timed = timedGames.has(gameKey);
           const reaction = gameKey === "reaction test";
+          const driftBoss = gameKey === "drift boss";
           const displayScore = timed
             ? Math.floor(seconds / 86400) + "d " + Math.floor((seconds % 86400) / 3600) + "h " + Math.floor((seconds % 3600) / 60) + "m"
-            : reaction ? Math.max(0, 10000 - seconds).toLocaleString() + " ms" : seconds.toLocaleString();
+            : reaction ? Math.max(0, 10000 - seconds).toLocaleString() + " ms"
+            : driftBoss ? seconds.toLocaleString() + " m" : seconds.toLocaleString();
           const score = document.createElement("div");
           score.className = "podium-score";
           score.textContent = displayScore;
