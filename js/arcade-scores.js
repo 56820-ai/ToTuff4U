@@ -45,28 +45,19 @@
 
 
   async function submitThroughServer(gameTitle, score, playerName, kind, keepalive) {
+    // Temporary recovery path: use the original public scores endpoint.
+    // IP tracking will be re-enabled after the Edge Function is verified.
     if (!configured) throw new Error("The shared score database has not been configured yet.");
-    const response = await fetch(config.supabaseUrl.replace(/\\/$/, "") + "/functions/v1/submit-score", {
+    return request("scores", {
       method: "POST",
       keepalive: !!keepalive,
-      headers: {
-        apikey: config.supabaseAnonKey,
-        Authorization: "Bearer " + config.supabaseAnonKey,
-        "Content-Type": "application/json"
-      },
+      headers: { "Prefer": "return=minimal" },
       body: JSON.stringify({
         player_name: playerName,
         game_title: String(gameTitle).slice(0, 60),
-        score: Number(score),
-        kind: kind
+        score: Number(score)
       })
     });
-    if (!response.ok) {
-      let detail = "";
-      try { detail = (await response.text()).slice(0, 180); } catch (error) {}
-      throw new Error("Score service returned " + response.status + (detail ? ": " + detail : ""));
-    }
-    return true;
   }
 
   async function submit(gameTitle, score, playerName) {
