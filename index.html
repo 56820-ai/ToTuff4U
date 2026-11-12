@@ -1902,6 +1902,8 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
                 },
                 retina_detect: true,
             });
+            const savedParticles = localStorage.getItem('particlesEnabled');
+            if (savedParticles === 'false') document.getElementById('snow').style.display = 'none';
         }
         
         const allGames = await loadGames();
@@ -2026,17 +2028,39 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         icon.type = selected[1].startsWith('data:image/svg+xml') ? 'image/svg+xml' : 'image/x-icon';
     }
     window.addEventListener('message', function (event) {
-        if (event.origin !== window.location.origin) return;
-        if (!event.data || event.data.type !== 'ARCADE_ATLAS_SET_TAB_CLOAK') return;
-        const cloak = choices[event.data.cloak] ? event.data.cloak : 'default';
-        try { localStorage.setItem('tabCloak', cloak); } catch (error) {}
-        applyCloak(cloak);
+        if (event.origin !== window.location.origin || !event.data) return;
+        if (event.data.type === 'ARCADE_ATLAS_SET_TAB_CLOAK') {
+            const cloak = choices[event.data.cloak] ? event.data.cloak : 'default';
+            try { localStorage.setItem('tabCloak', cloak); localStorage.removeItem('selectedFavicon'); localStorage.removeItem('selectedTitle'); } catch (error) {}
+            applyCloak(cloak);
+        } else if (event.data.type === 'ARCADE_ATLAS_SET_FAVICON') {
+            if (typeof event.data.href !== 'string' || !event.data.href.startsWith(window.location.origin + '/')) return;
+            let icon = document.querySelector("link[rel~='icon']") || document.querySelector("link[rel*='icon']");
+            if (!icon) { icon = document.createElement('link'); icon.rel = 'icon'; document.head.appendChild(icon); }
+            icon.href = event.data.href;
+            if (typeof event.data.title === 'string') document.title = event.data.title;
+            try { localStorage.setItem('selectedFavicon', event.data.href); localStorage.setItem('selectedTitle', event.data.title || ''); } catch (error) {}
+        } else if (event.data.type === 'ARCADE_ATLAS_SET_PARTICLES') {
+            const snow = document.getElementById('snow');
+            if (snow) snow.style.display = event.data.enabled ? '' : 'none';
+            try { localStorage.setItem('particlesEnabled', String(!!event.data.enabled)); } catch (error) {}
+        }
     });
     // Apply immediately; this script is at the end of the document and does
     // not need to wait for an iframe load or another DOMContentLoaded event.
     let saved = 'default';
     try { saved = localStorage.getItem('tabCloak') || 'default'; } catch (error) {}
     applyCloak(saved);
+    try {
+        const customIcon = localStorage.getItem('selectedFavicon');
+        const customTitle = localStorage.getItem('selectedTitle');
+        if (customIcon) {
+            let icon = document.querySelector("link[rel~='icon']") || document.querySelector("link[rel*='icon']");
+            if (!icon) { icon = document.createElement('link'); icon.rel = 'icon'; document.head.appendChild(icon); }
+            icon.href = customIcon;
+            if (customTitle) document.title = customTitle;
+        }
+    } catch (error) {}
 })();
 </script>
 </body>
