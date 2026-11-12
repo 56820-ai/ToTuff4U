@@ -41,7 +41,7 @@
 
         <section class="release">
             <h2>Arcade Atlas Update</h2>
-            <p class="release-date">November 10–11, 2026 · Latest updates</p>
+            <p class="release-date">November 10–12, 2026 · Latest updates</p>
 
             <div class="group">
                 <h3>New games</h3>
@@ -57,7 +57,8 @@
                 <h3>Leaderboard upgrades</h3>
                 <ul>
                     <li><strong>Stacktris:</strong> connected the game to the shared leaderboard and improved score recognition with higher-resolution OCR, centered capture, alternate text recognition, and better handling of swipe animations.</li>
-                    <li><strong>Slope:</strong> improved end-screen score reading, added fallback OCR detection, and adjusted movement detection so OCR waits until gameplay is still to reduce stutters.</li>
+                    <li><strong>Slope:</strong> restored the original Unity version of the game and improved end-screen score detection.</li>
+                    <li><strong>Slope anti-cheat:</strong> scores must be detected from the live game canvas after gameplay movement and an end screen; OCR must read the same score in two separate frames with at least 55% confidence. Text-only OCR guesses are rejected, and scores above 1,500 are blocked.</li>
                     <li><strong>Block Blast:</strong> added OCR-based score submission that checks for the game-over screen and filters moving confetti from the capture.</li>
                     <li><strong>Retro Bowl:</strong> added playtime tracking in days, hours, minutes, and seconds, and made total playtime appear on the leaderboard.</li>
                     <li><strong>Player names:</strong> improved the name prompt used when submitting scores and playtime.</li>
