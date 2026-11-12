@@ -568,12 +568,6 @@
         if (!byGame.has(key)) byGame.set(key, []);
         byGame.get(key).push(item);
       });
-      const byGame = new Map();
-      [...bestByGameAndPlayer.values()].forEach(item => {
-        const key = String(item.game_title || "Game").trim().toLowerCase();
-        if (!byGame.has(key)) byGame.set(key, []);
-        byGame.get(key).push(item);
-      });
 
       [...byGame.entries()].sort((a,b) => a[0].localeCompare(b[0])).forEach(([key, players]) => {
         // Reaction Test stores an inverted score (10000 - milliseconds),
