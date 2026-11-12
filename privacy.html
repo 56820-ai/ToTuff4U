@@ -21,7 +21,7 @@
 <main>
   <a class="back" href="./">← Back to Arcade Atlas</a>
   <h1>Privacy Policy</h1>
-  <p class="date">Effective date: November 11, 2026</p>
+  <p class="date">Effective date: November 12, 2026</p>
   <p>This Privacy Policy explains how Arcade Atlas ("we," "our," or "the site") handles information when you visit and use the website. Arcade Atlas is a browser-based game site.</p>
 
   <h2>Information you provide</h2>
@@ -33,6 +33,8 @@
 
   <h2>Leaderboards and database</h2>
   <p>Leaderboard submissions are processed by Supabase, our database service provider. Submitted leaderboard information is used to operate and display game rankings. Because leaderboard entries are public, information you submit there should be treated as public. Database and service-provider handling is also subject to <a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer">Supabase's Privacy Policy</a>.</p>
+
+  <p>When a score or playtime entry is submitted, Arcade Atlas's server-side score service processes the network IP address associated with the request and stores a secret-keyed hash of that address in a private database table alongside the entry. Arcade Atlas uses this pseudonymous identifier to help detect suspicious repeat submissions and protect leaderboard integrity. The readable IP address is not stored in the Arcade Atlas score tables. The hash is not displayed publicly and is accessible only to the server-side score service and authorized database administrators. Network changes, shared Wi-Fi, mobile networks, or VPNs can affect whether entries appear to come from the same address. Supabase may separately process request/network metadata under its own privacy policy.</p>
 
   <h2>Analytics and advertising</h2>
   <p>Arcade Atlas uses Google technologies, including Google Tag Manager and Google AdSense. These services may collect information such as browser/device details, approximate location derived from network information, pages visited, and interactions. Google AdSense and its partners may use cookies or similar technologies to show and measure advertisements, subject to your settings, applicable law, and Google's policies.</p>
