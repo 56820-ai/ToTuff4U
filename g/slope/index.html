@@ -28,35 +28,6 @@
             };
         })();
 
-        // Always start Slope as a guest: remove persisted account/session data
-        // before the Unity game initializes. Keep unrelated game settings/saves intact.
-        (function forceGuestMode() {
-            var authKey = /auth|login|account|user.?token|access.?token|refresh.?token|session/i;
-            try {
-                [window.localStorage, window.sessionStorage].forEach(function (store) {
-                    if (!store) return;
-                    var keys = [];
-                    for (var i = 0; i < store.length; i++) {
-                        var key = store.key(i);
-                        if (key && authKey.test(key)) keys.push(key);
-                    }
-                    keys.forEach(function (key) { store.removeItem(key); });
-                });
-            } catch (e) {
-                console.warn("Slope guest mode could not clear stored sign-in data:", e);
-            }
-            try {
-                document.cookie.split(";").forEach(function (cookie) {
-                    var name = cookie.split("=")[0].trim();
-                    if (authKey.test(name)) {
-                        document.cookie = name + "=; Max-Age=0; path=/";
-                    }
-                });
-            } catch (e) {
-                console.warn("Slope guest mode could not clear sign-in cookies:", e);
-            }
-        })();
-
         var gameInstance = UnityLoader.instantiate("gameContainer", "Build/slope.json", {
             onProgress: UnityProgress,
             Module: { onRuntimeInitialized: function () { UnityProgress(gameInstance, "complete"); } }
