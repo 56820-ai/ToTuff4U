@@ -13,9 +13,13 @@
 // Minecraft 1.12.2 and Retro Bowl visible-playtime timer/leaderboard.
 (function () {
   "use strict";
+  // GitHub Pages serves this project beneath /ToTuff4U/, so match the
+  // game route at the end of the path instead of requiring a root-domain path.
   var path = location.pathname.replace(/\/+$/, "").toLowerCase();
-  if (path !== "/g/mc/1.12.2" && path !== "/g/retro-bowl") return;
-  var gameTitle = path === "/g/retro-bowl" ? "Retro Bowl Time" : "Minecraft";
+  var isMinecraft = /\/g\/mc\/1\.12\.2$/.test(path);
+  var isRetroBowl = /\/g\/retro-bowl$/.test(path);
+  if (!isMinecraft && !isRetroBowl) return;
+  var gameTitle = isRetroBowl ? "Retro Bowl Time" : "Minecraft";
   var playerName = "";
   try { playerName = (localStorage.getItem("arcadeLeaderboardPlayerName") || "").trim().slice(0, 24); } catch (e) {}
   
@@ -52,7 +56,7 @@
     updateTimer();
     if (pendingSeconds >= 5 && window.ArcadeScores && typeof window.ArcadeScores.submitSession === "function") {
       if (!playerName && typeof window.ArcadeScores.getPlayerName === "function") {
-        playerName = window.ArcadeScores.getPlayerName("Enter your name for the Retro Bowl playtime leaderboard (24 characters max):");
+        playerName = window.ArcadeScores.getPlayerName("Enter your name for the " + (isRetroBowl ? "Retro Bowl" : "Minecraft") + " playtime leaderboard (24 characters max):");
       }
       if (playerName) {
         window.ArcadeScores.submitSession(gameTitle, pendingSeconds, playerName);
