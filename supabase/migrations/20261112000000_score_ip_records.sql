@@ -9,7 +9,3 @@ create table if not exists public.score_ip_records (
 alter table public.score_ip_records enable row level security;
 revoke all on table public.score_ip_records from anon, authenticated;
 grant all on table public.score_ip_records to service_role;
-
--- Force all new score/playtime writes through the Edge Function so each
--- inserted row receives a matching private IP hash.
-revoke insert on table public.scores from anon, authenticated;
