@@ -1200,6 +1200,21 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 
 </style>
   
+<style>
+/* Let the leaderboard grow with its content so the main page owns scrolling. */
+.leaderboard-iframe-container, .leaderboard-iframe-container.fullscreen {
+  height:auto !important;
+  min-height:calc(100vh - 100px);
+  overflow:visible;
+}
+#leaderboard-frame {
+  display:block;
+  width:100%;
+  height:900px;
+  min-height:900px;
+  border:0;
+}
+</style>
 </head>
 <body>
     <div id="snow"></div>
@@ -1345,8 +1360,8 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 </div>
 
 <div id="leaderboard-content" class="content-area">
-    <div class="container iframe-container">
-        <iframe src="./leaderboard" style="width:100%; height:100%; border:none; border-radius:var(--border-radius);"></iframe>
+    <div class="container iframe-container leaderboard-iframe-container">
+        <iframe id="leaderboard-frame" src="./leaderboard" style="width:100%; height:100%; border:none; border-radius:var(--border-radius);" title="Arcade Atlas leaderboard"></iframe>
     </div>
 </div>
 
@@ -2065,6 +2080,14 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         }
     } catch (error) {}
 })();
+</script>
+<script>
+window.addEventListener("message", function(event) {
+  const frame = document.getElementById("leaderboard-frame");
+  if (!frame || event.source !== frame.contentWindow || !event.data || event.data.type !== "arcade-atlas-leaderboard-height") return;
+  const height = Number(event.data.height);
+  if (Number.isFinite(height) && height > 0) frame.style.height = Math.ceil(height) + "px";
+});
 </script>
 </body>
 </html>
