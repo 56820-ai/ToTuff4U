@@ -540,7 +540,11 @@
     }
 
     async function renderLeaderboard() {
-      const onlineScores = window.ArcadeScores ? await window.ArcadeScores.getScores() : [];
+      const loadedScores = window.ArcadeScores ? await window.ArcadeScores.getScores() : [];
+      // Hide legacy/invalid Slope entries above the 1,500-point limit.
+      const onlineScores = loadedScores.filter(item =>
+        String(item.game_title || "").trim().toLowerCase() !== "slope" || Number(item.score) <= 1500
+      );
       if (!onlineScores.length) {
         const empty = document.createElement("p");
         empty.className = "leaderboard-empty";
