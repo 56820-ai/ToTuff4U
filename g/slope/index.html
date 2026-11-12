@@ -117,6 +117,7 @@
             var endScreenHits = 0, latestScore = 0, maxScore = 0, lastPromptAt = 0;
             var lastEndOcrDebug = 'not run';
             var gameStarted = false, scoreCandidate = null, scoreCandidateHits = 0, lastObservedScore = null, stoppedHits = 0;
+            var endScoreCandidate = null, endScoreCandidateHits = 0;
             var status = document.createElement("div");
             status.id = "slope-ocr-status";
             status.style.cssText = "position:fixed;left:10px;bottom:10px;z-index:2147483647;padding:8px 11px;border-radius:8px;background:#101525;color:#fff;border:1px solid #6bffd9;font:12px sans-serif;max-width:min(90vw,420px);";
@@ -163,7 +164,7 @@
                     return { value:Number(raw), digits:raw, confidence:Number(word.confidence)||0,
                       x0:Number(box.x0)||0,y0:Number(box.y0)||0,x1:Number(box.x1)||0,y1:Number(box.y1)||0 };
                 }).filter(function(x) {
-                    return x && x.value >= 1 && x.confidence >= 30 &&
+                    return x && x.value >= 1 && x.value <= 1500 && x.confidence >= 55 &&
                       (x.x1-x.x0) > 3 && (x.y1-x.y0) > 4;
                 });
                 // Tesseract sometimes splits a multi-digit score into separate
@@ -186,20 +187,7 @@
                     });
                 });
                 candidates = candidates.concat(joined);
-                // Some Tesseract builds return recognized digits in data.text but
-                // omit them from data.words. Since this OCR pass is already limited
-                // to the death-screen center crop, use that text as a fallback.
-                if (!candidates.length) {
-                    var recognizedText = String(result && result.data && result.data.text || "");
-                    var textNumbers = recognizedText.match(/[0-9][0-9,]{0,6}/g) || [];
-                    textNumbers.forEach(function(token) {
-                        var digits = token.replace(/,/g, "");
-                        var value = Number(digits);
-                        if (/^\\d{1,7}$/.test(digits) && value > 0) {
-                            candidates.push({value:value,digits:digits,confidence:0,x0:0,y0:0,x1:imageWidth,y1:imageHeight});
-                        }
-                    });
-                }
+                // Reject text-only OCR guesses: accepted scores need word boxes and confidence.
                 // On the end screen, score is a large centered number. Prefer
                 // the OCR token whose bounding-box center is closest to canvas
                 // center, then larger glyphs, rather than confidence alone.
@@ -356,9 +344,18 @@
                     var ended = textEnded || (gameStarted && stoppedHits >= 3);
                     if (ended && gameStarted) {
                         var endScoreReading = await readEndScreenScore(canvas);
-                        if (endScoreReading.value > 0) {
-                            maxScore = Math.max(maxScore, endScoreReading.value);
-                            latestScore = Math.max(latestScore, endScoreReading.value);
+                        // Require a capped, confident score to match across two distinct frames.
+                        if (endScoreReading.value > 0 && endScoreReading.value <= 1500 &&
+                            Number(endScoreReading.confidence) >= 55) {
+                            if (endScoreCandidate === endScoreReading.value) endScoreCandidateHits++;
+                            else { endScoreCandidate = endScoreReading.value; endScoreCandidateHits = 1; }
+                            if (endScoreCandidateHits >= 2) {
+                                maxScore = Math.max(maxScore, endScoreCandidate);
+                                latestScore = Math.max(latestScore, endScoreCandidate);
+                            }
+                        } else {
+                            endScoreCandidate = null;
+                            endScoreCandidateHits = 0;
                         }
                     }
                     if (!gameStarted) setStatus("waiting for gameplay motion (" + motionHits + "/3)");
@@ -368,7 +365,7 @@
 
                     if ((textEnded || endScreenHits >= 2) && !handled) {
                         handled = true;
-                        var score = maxScore || latestScore;
+                        var score = maxScore || 0;
                         if (score > 0 && leaderboardReady && window.ArcadeScores) {
                             setStatus("game ended · asking for your leaderboard name");
                             // Ask for the player's name instead of silently submitting
@@ -391,6 +388,7 @@
                         handled=false; endScreenHits=0; gameStarted=false;
                         latestScore=0; maxScore=0; scoreCandidate=null;
                         scoreCandidateHits=0; lastObservedScore=null; stoppedHits=0;
+                        endScoreCandidate=null; endScoreCandidateHits=0;
                         motionHits=0; previousFrame=null;
                     }
                 } catch (e) {
