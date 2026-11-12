@@ -1292,6 +1292,9 @@
                 alert('Please allow popups for Arcade Atlas, then try again.');
                 return;
             }
+            // Keep a reference so the Disable button in this settings frame can
+            // close the exact about:blank tab opened by Enable.
+            window.aboutBlankCloakWindow = newWindow;
 
             const icon = document.querySelector("link[rel*='icon']")?.href || '';
             newWindow.document.open();
@@ -1304,14 +1307,13 @@
         }
 
         function disableAboutBlank() {
-            let topUrl = '';
-            try { topUrl = window.top.location.href; } catch (error) {}
-            if (topUrl === 'about:blank') {
-                const returnUrl = localStorage.getItem('aboutBlankReturnUrl') || new URL('../', window.location.href).href;
-                window.top.location.replace(returnUrl);
-            } else {
-                alert('About:blank mode is not active in this tab. Use Enable to open it in a new tab first.');
+            const cloakWindow = window.aboutBlankCloakWindow;
+            if (cloakWindow && !cloakWindow.closed) {
+                cloakWindow.close();
+                window.aboutBlankCloakWindow = null;
+                return;
             }
+            alert('No about:blank tab opened by this Settings page is currently active. Click Enable to open one first.');
         }
 
         function setTabCloak(type) {
