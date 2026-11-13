@@ -579,6 +579,20 @@
       "image": "https://raw.githubusercontent.com/BKcore/HexGL/master/icon_256.png",
       "category": "RACING",
       "source": "https://github.com/BKcore/HexGL"
+    },
+    {
+      "title": "Bitburner",
+      "path": "https://bitburner-official.github.io/",
+      "image": "https://opengraph.githubassets.com/1/bitburner-official/bitburner-src",
+      "category": "IDLE",
+      "source": "https://github.com/bitburner-official/bitburner-src"
+    },
+    {
+      "title": "BananaBread",
+      "path": "https://kripken.github.io/BananaBread/cube2/bb.html",
+      "image": "https://opengraph.githubassets.com/1/kripken/BananaBread",
+      "category": "ACTION",
+      "source": "https://github.com/kripken/BananaBread"
     }
   ]
 }
