@@ -593,6 +593,34 @@
       "image": "https://opengraph.githubassets.com/1/kripken/BananaBread",
       "category": "ACTION",
       "source": "https://github.com/kripken/BananaBread"
+    },
+    {
+      "title": "Arcade 3D",
+      "path": "https://webgl-games.github.io/arcade-3d/",
+      "image": "https://opengraph.githubassets.com/1/webgl-games/arcade-3d",
+      "category": "ACTION",
+      "source": "https://github.com/webgl-games/arcade-3d"
+    },
+    {
+      "title": "Nightmaze",
+      "path": "https://masterchiefproject.github.io/Nightmaze/",
+      "image": "https://opengraph.githubassets.com/1/MasterChiefProject/Nightmaze",
+      "category": "HORROR",
+      "source": "https://github.com/MasterChiefProject/Nightmaze"
+    },
+    {
+      "title": "Cube Libre",
+      "path": "https://flyingfathead.github.io/cube-libre/",
+      "image": "https://raw.githubusercontent.com/FlyingFathead/cube-libre/main/docs/assets/cube-libre-logo.png",
+      "category": "ARCADE",
+      "source": "https://github.com/FlyingFathead/cube-libre"
+    },
+    {
+      "title": "The Clash of Civilizations",
+      "path": "https://umut3rc.github.io/The-Clash-Of-Civilizations/",
+      "image": "https://opengraph.githubassets.com/1/umut3RC/The-Clash-Of-Civilizations",
+      "category": "STRATEGY",
+      "source": "https://github.com/umut3RC/The-Clash-Of-Civilizations"
     }
   ]
 }
