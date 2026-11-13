@@ -620,8 +620,11 @@
 .game-card-image {
     width: 70px; 
     height: 70px; 
-    object-fit: cover;
-    border-radius: 50%;
+    object-fit: contain;
+    object-position: center;
+    background-color: rgba(8, 13, 25, 0.45);
+    padding: 4px;
+    border-radius: 18px;
     margin-bottom: 0.75rem; 
     border: 2px solid var(--accent-pink);
     box-shadow: 0 0 0 2px rgba(107, 157, 255, 0.3);
@@ -1659,6 +1662,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
             img.src = game.image || makeGameIconFallback(game);
             img.alt = game.title || 'Game icon';
             img.className = 'game-card-image';
+            img.referrerPolicy = 'no-referrer';
             attachGameIconFallback(img, game);
             const title = document.createElement('div');
             title.className = 'game-card-title';
@@ -1711,6 +1715,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
             img.alt = game.title || 'Game icon';
             img.className = 'game-card-image';
             img.loading = 'lazy';
+            img.referrerPolicy = 'no-referrer';
             attachGameIconFallback(img, game);
             const title = document.createElement('div');
             title.className = 'game-card-title';
