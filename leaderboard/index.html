@@ -575,6 +575,20 @@
         // Reaction Test stores an inverted score (10000 - milliseconds),
         // so a higher stored value means a faster reaction and ranks first.
         players.sort((a,b) => Number(b.score) - Number(a.score));
+        // For Slope, rank each player only once using their personal best.
+        // This prevents repeated runs by one person from occupying the whole podium.
+        if (key === "slope") {
+          const bestByPlayer = new Map();
+          players.forEach(item => {
+            const playerKey = String(item.player_name || "").trim().toLocaleLowerCase();
+            if (!playerKey) return;
+            const previous = bestByPlayer.get(playerKey);
+            if (!previous || Number(item.score) > Number(previous.score)) {
+              bestByPlayer.set(playerKey, item);
+            }
+          });
+          players = [...bestByPlayer.values()].sort((a,b) => Number(b.score) - Number(a.score));
+        }
         const title = key === "retro bowl time" ? "Retro Bowl · Total Playtime" : players[0].game_title;
         createPodiumSection(title, players.slice(0,3), timedGames);
       });
