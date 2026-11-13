@@ -1514,7 +1514,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 
     async function loadGames() {
         try {
-            const response = await fetch('games.json?v=2026-11-13-games');
+            const response = await fetch('games.json?v=2026-11-13-modern');
             const data = await response.json();
             return data.games;
         } catch (error) {
@@ -1954,13 +1954,16 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
     <div class="patch-notes-content">
       <h3>🎮 New games</h3>
       <ul>
-        <li>Added Hextris, A Dark Room, Untrusted, HexGL, Bitburner, and BananaBread.</li>
-        <li>Each new listing launches the game's real upstream browser build and includes a GitHub source link on its card.</li>
-        <li>These games stay hosted by their original maintainers; no unverified repacks or lookalike copies were added.</li>
+        <li>Added Arcade 3D, with five browser-playable 3D modes.</li>
+        <li>Added Nightmaze, an original Unity 6 WebGL horror game.</li>
+        <li>Added Cube Libre, a browser-based WebGL 2 3D survival game.</li>
+        <li>Added The Clash of Civilizations, a Unity WebGL real-time strategy demo.</li>
+        <li>Also added Hextris, A Dark Room, Untrusted, HexGL, Bitburner, and BananaBread.</li>
+        <li>Every new card links to the developer's GitHub source and launches the documented upstream browser build.</li>
       </ul>
       <h3>🏆 Leaderboards</h3>
       <ul>
-        <li>Shared Arcade Atlas leaderboard support was not added for these six games because their upstream builds do not expose a compatible score-submission interface to this site.</li>
+        <li>Shared Arcade Atlas leaderboard support was not added for the new upstream games because they do not expose a compatible score-submission interface to this site.</li>
       </ul>
       <h3>🏆 Leaderboard improvements</h3>
       <ul>
@@ -2006,7 +2009,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 </style>
 <script>
 (function(){
-  const version="2026-11-13-1";
+  const version="2026-11-13-2";
   const overlay=document.getElementById("patchNotesOverlay");
   const reopen=document.getElementById("reopenPatchNotes");
   const close=()=>{overlay.classList.remove("visible");overlay.setAttribute("aria-hidden","true");localStorage.setItem("arcadeAtlasPatchNotesSeen",version);reopen.style.display="block";};
