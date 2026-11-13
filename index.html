@@ -1514,7 +1514,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 
     async function loadGames() {
         try {
-            const response = await fetch('games.json');
+            const response = await fetch('games.json?v=2026-11-13-games');
             const data = await response.json();
             return data.games;
         } catch (error) {
@@ -1950,13 +1950,17 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
     <button class="patch-notes-close" id="closePatchNotes" aria-label="Close patch notes">&times;</button>
     <div class="patch-notes-kicker">WHAT'S NEW</div>
     <h2 id="patchNotesTitle">Arcade Atlas Update</h2>
-    <p class="patch-notes-date">November 10–11, 2026 · Latest updates</p>
+    <p class="patch-notes-date">November 13, 2026 · Latest updates</p>
     <div class="patch-notes-content">
       <h3>🎮 New games</h3>
       <ul>
-        <li>Added Brotato: Abyssal Terrors, Volley Random, Rooftop Snipers 2, and updated Stacktris with the uploaded game files.</li>
-        <li>Added a complete HTML5 Breakout game and connected its scores to the leaderboard.</li>
-        <li>Added a community-revived version of 1v1.LOL.</li>
+        <li>Added Hextris, A Dark Room, Untrusted, HexGL, Bitburner, and BananaBread.</li>
+        <li>Each new listing launches the game's real upstream browser build and includes a GitHub source link on its card.</li>
+        <li>These games stay hosted by their original maintainers; no unverified repacks or lookalike copies were added.</li>
+      </ul>
+      <h3>🏆 Leaderboards</h3>
+      <ul>
+        <li>Shared Arcade Atlas leaderboard support was not added for these six games because their upstream builds do not expose a compatible score-submission interface to this site.</li>
       </ul>
       <h3>🏆 Leaderboard improvements</h3>
       <ul>
@@ -2002,7 +2006,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 </style>
 <script>
 (function(){
-  const version="2026-11-11-2";
+  const version="2026-11-13-1";
   const overlay=document.getElementById("patchNotesOverlay");
   const reopen=document.getElementById("reopenPatchNotes");
   const close=()=>{overlay.classList.remove("visible");overlay.setAttribute("aria-hidden","true");localStorage.setItem("arcadeAtlasPatchNotesSeen",version);reopen.style.display="block";};
