@@ -513,7 +513,7 @@
     {
       "title": "Snake",
       "path": "g/snake",
-      "image": "images/googlesnake.jpg",
+      "image": "images/snake-game.svg",
       "category": "ARCADE"
     },
     {
@@ -525,13 +525,13 @@
     {
       "title": "Memory Match",
       "path": "g/memory-match",
-      "image": "images/cupcake2048.png",
+      "image": "images/memory-match.svg",
       "category": "PUZZLE"
     },
     {
       "title": "Reaction Test",
       "path": "g/reaction-test",
-      "image": "images/lazyjump3d.png",
+      "image": "images/reaction-test.svg",
       "category": "ARCADE"
     },
     {
@@ -543,7 +543,7 @@
     {
       "title": "Blocky Combat SWAT",
       "path": "g/duckdb2-blocky-combat-swat-main",
-      "image": "images/pixelgun.png",
+      "image": "images/blocky-combat-swat.svg",
       "category": "ACTION"
     },
     {
