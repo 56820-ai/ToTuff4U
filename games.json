@@ -663,6 +663,12 @@
       "image": "https://raw.githubusercontent.com/Thommynator/AgeOfWarGame/main/TemplateData/favicon.ico",
       "category": "STRATEGY",
       "source": "https://github.com/Thommynator/AgeOfWarGame"
+    },
+    {
+      "title": "DuckCraft",
+      "path": "https://unblocked-games.s3.amazonaws.com/duckcraft.html",
+      "image": "https://unblocked-games.s3.amazonaws.com/media/posts/745/duckcraft-unblocked.webp",
+      "category": "ADVENTURE"
     }
   ]
 }
