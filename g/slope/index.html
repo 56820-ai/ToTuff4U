@@ -366,22 +366,35 @@
                     if ((textEnded || endScreenHits >= 2) && !handled) {
                         handled = true;
                         var score = maxScore || 0;
-                        if (score > 0 && leaderboardReady && window.ArcadeScores) {
-                            setStatus("game ended · asking for your leaderboard name");
-                            // Ask for the player's name instead of silently submitting
-                            // every Slope score under the generic "Slope Player" name.
-                            // Reuse the saved name; only show the prompt on the first submission.
+                        if (leaderboardReady && window.ArcadeScores) {
+                            setStatus(score > 0 ? "game ended · review the detected score" : "game ended · enter your score manually");
+                            // Let the player correct OCR mistakes before anything is written.
+                            // If OCR fails completely, the same prompt acts as manual score entry.
                             var playerName = window.ArcadeScores.getPlayerName("Enter your name for the Slope leaderboard (24 characters max):");
                             if (playerName) {
-                                var submitted = await window.ArcadeScores.submit("Slope", score, playerName);
-                                setStatus(submitted ? "score submitted: " + score : "score submission failed");
+                                var scoreText = window.prompt(
+                                    score > 0
+                                        ? "Slope detected " + score + ". Confirm or correct your final score (0–1,500):"
+                                        : "Slope could not read your score. Enter your final score manually (0–1,500):",
+                                    score > 0 ? String(score) : ""
+                                );
+                                if (scoreText !== null && scoreText.trim() !== "") {
+                                    var correctedScore = Number(scoreText.replace(/,/g, "").trim());
+                                    if (Number.isSafeInteger(correctedScore) && correctedScore >= 0 && correctedScore <= 1500) {
+                                        var submitted = await window.ArcadeScores.submit("Slope", correctedScore, playerName);
+                                        setStatus(submitted ? "score submitted: " + correctedScore : "score submission failed");
+                                    } else {
+                                        setStatus("invalid score · not submitted");
+                                        window.alert("Enter a whole-number Slope score from 0 to 1,500.");
+                                    }
+                                } else {
+                                    setStatus("score entry cancelled · score not submitted");
+                                }
                             } else {
                                 setStatus("name entry cancelled · score not submitted");
                             }
-                        } else if (!leaderboardReady) {
-                            promptOcrIssue("Leaderboard connection is not configured.");
                         } else {
-                            promptOcrIssue("Game ended, but no score was read. OCR details: " + lastEndOcrDebug);
+                            promptOcrIssue("Leaderboard connection is not configured.");
                         }
                     }
                     if (!ended && handled) {
