@@ -1514,7 +1514,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 
     async function loadGames() {
         try {
-            const response = await fetch('games.json?v=2026-11-13-modern');
+            const response = await fetch('games.json?v=2026-11-13-modern2');
             const data = await response.json();
             return data.games;
         } catch (error) {
@@ -1959,6 +1959,10 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         <li>Added Cube Libre, a browser-based WebGL 2 3D survival game.</li>
         <li>Added The Clash of Civilizations, a Unity WebGL real-time strategy demo.</li>
         <li>Added Quake III Arena (Q3JS), a WebAssembly browser shooter with live multiplayer servers.</li>
+        <li>Added Gothic Whip, a Godot action-platformer with a boss fight.</li>
+        <li>Added Hollowmere, a farming and creature-collecting RPG.</li>
+        <li>Added Ancient Beast, an online tactical creature-battler (early alpha).</li>
+        <li>Added The Backdooms, a compact DOOM-inspired browser FPS.</li>
         <li>Also added Hextris, A Dark Room, Untrusted, HexGL, Bitburner, and BananaBread.</li>
         <li>Every new card links to the developer's GitHub source and launches the documented upstream browser build.</li>
       </ul>
@@ -2010,7 +2014,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 </style>
 <script>
 (function(){
-  const version="2026-11-13-3";
+  const version="2026-11-13-4";
   const overlay=document.getElementById("patchNotesOverlay");
   const reopen=document.getElementById("reopenPatchNotes");
   const close=()=>{overlay.classList.remove("visible");overlay.setAttribute("aria-hidden","true");localStorage.setItem("arcadeAtlasPatchNotesSeen",version);reopen.style.display="block";};
