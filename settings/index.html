@@ -910,6 +910,11 @@
 
             <div id="cloaking" class="tab-content">
                 <div class="setting-card">
+                    <h2>Open Arcade Atlas in a New Tab</h2>
+                    <p>Opens the normal Arcade Atlas page in a separate browser tab. This does not hide the site or bypass browser or school filtering.</p>
+                    <button id="openArcadeNewTab" type="button">Open in New Tab</button>
+                </div>
+                <div class="setting-card">
                     <h2>Tab Cloaking</h2>
                     <p>Disguise your tabs as something educational! Change both the title and favicon to avoid detection.</p>
                     <div class="dropdown" id="tab-cloak">
@@ -1034,6 +1039,13 @@ document.addEventListener('DOMContentLoaded', () => {
     document.title = title;
     window.parent.postMessage({ type: 'ARCADE_ATLAS_SET_FAVICON', href: absolute, title }, window.location.origin);
   };
+
+  $('openArcadeNewTab')?.addEventListener('click', () => {
+    const destination = new URL('../', window.location.href);
+    destination.hash = 'home';
+    const opened = window.open(destination.href, '_blank', 'noopener,noreferrer');
+    if (!opened) alert('Your browser blocked the new tab. Allow pop-ups for this site and try again.');
+  });
 
   $('openFaviconUI')?.addEventListener('click', () => showModal(faviconModal));
   $('setKeybindButton')?.addEventListener('click', () => showModal(keybindModal));
