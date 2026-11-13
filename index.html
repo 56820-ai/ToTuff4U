@@ -18,7 +18,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
     
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-    <script src="js/global-loader.js"></script>
 
     <style>
         @import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap");
@@ -1721,18 +1720,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
             title.className = 'game-card-title';
             title.textContent = game.title || 'Game';
             link.append(img, title);
-            if (game.source) {
-                const sourceLink = document.createElement('a');
-                sourceLink.href = game.source;
-                sourceLink.target = '_blank';
-                sourceLink.rel = 'noopener noreferrer';
-                sourceLink.textContent = 'GitHub source';
-                sourceLink.style.cssText = 'font-size:.85rem;margin-top:5px;color:var(--accent-blue);text-decoration:underline';
-                sourceLink.addEventListener('click', event => event.stopPropagation());
-                gameCard.append(link, sourceLink);
-            } else {
-                gameCard.appendChild(link);
-            }
+            gameCard.appendChild(link);
             const starIcon = document.createElement('i');
             starIcon.className = (isFavorite ? 'fas' : 'far') + ' fa-star favorite-star ' + (isFavorite ? 'active' : '');
             starIcon.addEventListener('click', toggleFavorite);
