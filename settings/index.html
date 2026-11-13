@@ -1048,15 +1048,13 @@ document.addEventListener('DOMContentLoaded', () => {
       alert('Your browser blocked the new tab. Allow pop-ups for this site and try again.');
       return;
     }
+    // Navigate the new tab itself instead of embedding the site in an iframe.
+    // This avoids iframe restrictions and scripts that may close or redirect embedded pages.
     try {
-      const safeUrl = destination.href.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
-      popup.document.open();
-      popup.document.write('<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Arcade Atlas</title><style>html,body,iframe{width:100%;height:100%;margin:0;border:0}iframe{display:block}</style></head><body><iframe title="Arcade Atlas" src="' + safeUrl + '" allow="fullscreen; autoplay; gamepad"></iframe></body></html>');
-      popup.document.close();
+      popup.location.replace(destination.href);
     } catch (error) {
-      console.error('Could not load Arcade Atlas in the new blank tab:', error);
-      try { popup.close(); } catch (_) {}
-      alert('The blank tab opened, but Arcade Atlas could not load inside it. Please try again.');
+      console.error('Could not navigate the new tab:', error);
+      alert('The blank tab opened, but navigation was blocked. Please allow pop-ups and try again.');
     }
   });
 
