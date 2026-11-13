@@ -1,0 +1,46 @@
+name: Import licensed GitHub games
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/import-github-games.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  import-games:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Arcade Atlas
+        uses: actions/checkout@v4
+
+      - name: Import playable static game projects
+        shell: bash
+        run: |
+          set -euo pipefail
+          tmp="$(mktemp -d)"
+          import_repo() {
+            local repo="$1"
+            local folder="$2"
+            echo "Importing $repo into g/$folder"
+            git clone --depth 1 "https://github.com/$repo.git" "$tmp/$folder"
+            mkdir -p "g/$folder"
+            rsync -a --delete --exclude='.git' "$tmp/$folder/" "g/$folder/"
+            test -f "g/$folder/index.html"
+          }
+          import_repo "Hextris/hextris" "hextris"
+          import_repo "doublespeakgames/adarkroom" "a-dark-room"
+          import_repo "BKcore/HexGL" "hexgl"
+          import_repo "Kuberwastaken/backdooms" "backdooms"
+
+      - name: Commit imported game files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add g/hextris g/a-dark-room g/hexgl g/backdooms
+          git commit -m "Import four licensed GitHub games" || echo "No new changes"
+          git pull --rebase origin main
+          git push
