@@ -1,0 +1,73 @@
+name: Retrieve official DuckCraft download
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/retrieve-duckcraft.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  retrieve:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Arcade Atlas
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Download the free official itch.io build
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm init -y
+          npm install --no-audit --no-fund itchio-downloader
+          mkdir -p duckcraft-download
+          node <<'NODE'
+          const { downloadGame } = require('itchio-downloader');
+          (async () => {
+            const result = await downloadGame({
+              itchGameUrl: 'https://quack-lab.itch.io/duckcraft',
+              downloadDirectory: './duckcraft-download',
+              writeMetaData: true,
+              onProgress: ({ bytesReceived, totalBytes, fileName }) => {
+                const pct = totalBytes ? (100 * bytesReceived / totalBytes).toFixed(1) : 'unknown';
+                console.log(`${fileName || 'DuckCraft'}: ${bytesReceived}/${totalBytes || '?'} bytes (${pct}%)`);
+              }
+            });
+            if (!result || !result.status || !result.filePath) {
+              console.error('Official itch.io download failed:', result);
+              process.exit(1);
+            }
+            console.log('Downloaded file:', result.filePath);
+            console.log('Bytes downloaded:', result.bytesDownloaded);
+            console.log('Size verified:', result.sizeVerified);
+          })().catch(error => { console.error(error); process.exit(1); });
+          NODE
+          ZIP="$(find duckcraft-download -maxdepth 1 -type f -iname '*.zip' -print -quit)"
+          test -n "$ZIP"
+          mkdir -p duckcraft-extracted
+          unzip -q "$ZIP" -d duckcraft-extracted
+          echo "Downloaded archive: $ZIP"
+          echo "Archive size:"
+          du -h "$ZIP"
+          echo "Extracted file inventory:"
+          find duckcraft-extracted -maxdepth 4 -type f -printf '%p (%s bytes)\n' | sort | head -300
+          echo "Godot-related files:"
+          find duckcraft-extracted -type f \( -iname '*.pck' -o -iname '*.exe' -o -iname 'project.godot' -o -iname '*.gd' -o -iname '*.wasm' -o -iname '*.js' -o -iname '*.html' \) -printf '%p\n' | sort
+
+      - name: Preserve archive and extracted files for inspection
+        uses: actions/upload-artifact@v4
+        with:
+          name: official-duckcraft-download-and-inspection
+          path: |
+            duckcraft-download/
+            duckcraft-extracted/
+          if-no-files-found: error
+          retention-days: 7
