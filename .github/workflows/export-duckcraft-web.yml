@@ -1,0 +1,82 @@
+name: Export DuckCraft for browsers
+on:
+  push:
+    paths:
+      - '.github/workflows/export-duckcraft-web.yml'
+  workflow_dispatch:
+permissions:
+  actions: read
+  contents: read
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download recovered Godot project
+        uses: actions/download-artifact@v4
+        with:
+          name: duckcraft-recovered-godot-project
+          run-id: 43516478828
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          path: incoming
+      - name: Prepare project
+        run: |
+          mkdir -p recovered
+          cp -a incoming/recovered/. recovered/
+          cat > recovered/export_presets.cfg <<'EOF'
+          [preset.0]
+          name="Web"
+          platform="Web"
+          runnable=true
+          dedicated_server=false
+          custom_features=""
+          export_filter="all_resources"
+          include_filter=""
+          exclude_filter=""
+          export_path="build/index.html"
+          encryption_include_filters=""
+          encryption_exclude_filters=""
+          encrypt_pck=false
+          encrypt_directory=false
+          [preset.0.options]
+          variant/extensions_support=false
+          variant/thread_support=false
+          vram_texture_compression/for_desktop=false
+          vram_texture_compression/for_mobile=false
+          html/custom_html_shell=""
+          html/head_include=""
+          html/canvas_resize_policy=2
+          html/focus_canvas_on_start=true
+          html/experimental_virtual_keyboard=false
+          progressive_web_app/enabled=false
+          progressive_web_app/offline_page=""
+          progressive_web_app/display=1
+          progressive_web_app/orientation=0
+          EOF
+      - name: Install Godot 4.5.1 and Web export templates
+        run: |
+          curl -fL --retry 3 https://github.com/godotengine/godot/releases/download/4.5.1-stable/Godot_v4.5.1-stable_linux.x86_64.zip -o godot.zip
+          unzip -q godot.zip -d godot-bin
+          GODOT=$(find godot-bin -type f -name 'Godot_v4.5.1-stable_linux.x86_64' | head -1)
+          test -n "$GODOT"
+          chmod +x "$GODOT"
+          echo "GODOT=$GODOT" >> "$GITHUB_ENV"
+          curl -fL --retry 3 https://github.com/godotengine/godot/releases/download/4.5.1-stable/Godot_v4.5.1-stable_export_templates.tpz -o templates.tpz
+          mkdir -p "$HOME/.local/share/godot/export_templates/4.5.1.stable"
+          unzip -q templates.tpz -d templates
+          cp -a templates/templates/. "$HOME/.local/share/godot/export_templates/4.5.1.stable/"
+          ls -lh "$HOME/.local/share/godot/export_templates/4.5.1.stable/"
+      - name: Import project and export Web build
+        run: |
+          "$GODOT" --headless --editor --path recovered --import 2>&1 | tee import.log
+          mkdir -p recovered/build
+          "$GODOT" --headless --path recovered --export-release Web build/index.html 2>&1 | tee export.log
+          test -s recovered/build/index.html
+          find recovered/build -maxdepth 2 -type f -printf '%p (%s bytes)\n'
+      - name: Upload browser build for inspection
+        uses: actions/upload-artifact@v4
+        with:
+          name: duckcraft-browser-build
+          path: recovered/build/
+          if-no-files-found: error
+          retention-days: 7
