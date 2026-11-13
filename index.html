@@ -1519,7 +1519,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 
     async function loadGames() {
         try {
-            const response = await fetch('games.json?v=2026-11-13-icons2');
+            const response = await fetch('games.json?v=2026-11-13-real-art1');
             if (!response.ok) throw new Error('Could not load games.json: ' + response.status);
             const data = await response.json();
             cachedGames = Array.isArray(data.games) ? data.games : [];
