@@ -283,6 +283,12 @@
       "category": "ADVENTURE"
     },
     {
+      "title": "Eaglercraft 1.12.2",
+      "path": "g/mc/1.12.2",
+      "image": "images/mc.png",
+      "category": "ADVENTURE"
+    },
+    {
       "title": "Bloons TD5",
       "path": "g/btd5",
       "image": "images/btd5.png",
@@ -421,7 +427,7 @@
       "category": "SIMULATION"
     },
     {
-      "title": "1",
+      "title": "2048",
       "path": "g/1",
       "image": "https://d3nsrxdg84ic1d.cloudfront.net/uploads/5a145eaa-3696-4de4-8c1d-41400e3d296c/e8ccaaae.PNG?v=0",
       "category": "PUZZLE"
@@ -455,12 +461,6 @@
       "path": "g/temple-run-2",
       "image": "https://play-lh.googleusercontent.com/go4XqS4mYs-G2tZymiVLF4wJYXIi5QrvwixNRzssk4G_vRBHrAdg4E1ddNwy9c2cZA",
       "category": "ENDLESS RUNNER"
-    },
-    {
-      "title": "Stickman Golf",
-      "path": "g/stickman-golf",
-      "image": "https://image.spreadshirtmedia.com/image-server/v1/products/T1459A839PA3861PT28D12687618W6161H10000/views/1,width=550,height=550,appearanceId=839,backgroundColor=F2F2F2/golf-stickman-sticker.jpg",
-      "category": "SPORTS"
     },
     {
       "title": "CSGO Case Opener",
