@@ -46,7 +46,7 @@
 
   async function submitThroughServer(gameTitle, score, playerName, kind, keepalive) {
     if (!configured) throw new Error("The shared score database has not been configured yet.");
-    const endpoint = config.supabaseUrl.replace(/\\/$/, "") + "/functions/v1/submit-score";
+    const endpoint = config.supabaseUrl.replace(/\/$/, "") + "/functions/v1/submit-score";
     const response = await fetch(endpoint, {
       method: "POST",
       keepalive: !!keepalive,
