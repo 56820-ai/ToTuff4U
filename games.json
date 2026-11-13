@@ -596,7 +596,7 @@
     },
     {
       "title": "Arcade 3D",
-      "path": "g/arcade-3d",
+      "path": "https://webgl-games.github.io/arcade-3d/",
       "image": "https://opengraph.githubassets.com/1/webgl-games/arcade-3d",
       "category": "ACTION",
       "source": "https://github.com/webgl-games/arcade-3d"
@@ -645,7 +645,7 @@
     },
     {
       "title": "Ancient Beast",
-      "path": "g/ancient-beast",
+      "path": "https://play.ancientbeast.com/",
       "image": "https://raw.githubusercontent.com/FreezingMoon/AncientBeast/master/assets/favicon.png",
       "category": "STRATEGY",
       "source": "https://github.com/FreezingMoon/AncientBeast"
