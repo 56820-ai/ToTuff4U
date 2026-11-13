@@ -1,0 +1,47 @@
+name: Recover DuckCraft Godot project
+on:
+  workflow_dispatch:
+permissions:
+  actions: read
+  contents: read
+jobs:
+  recover:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download the verified official game archive
+        uses: actions/download-artifact@v4
+        with:
+          name: official-duckcraft-download-and-inspection
+          run-id: 43514985898
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          path: incoming
+      - name: Extract official Windows build
+        run: |
+          mkdir -p game recovered
+          unzip -q incoming/duckcraft-download/game-16066195.zip -d game
+      - name: Install Godot RE Tools
+        run: |
+          curl -fL --retry 3 https://github.com/GDRETools/gdsdecomp/releases/download/v2.7.4/GDRE_tools-v2.7.4-linux.zip -o gdre.zip
+          mkdir gdre
+          unzip -q gdre.zip -d gdre
+          find gdre -maxdepth 3 -type f -printf '%p\n' | head -80
+          chmod +x $(find gdre -type f -name 'gdre_tools' -o -name 'gdre_tools.x86_64' | head -1)
+      - name: Recover editable Godot project
+        run: |
+          TOOL=$(find gdre -type f \( -name 'gdre_tools' -o -name 'gdre_tools.x86_64' \) | head -1)
+          test -n "$TOOL"
+          "$TOOL" --headless --recover=game/DuckCraft_Game/Duck_Craft.pck --output=recovered 2>&1 | tee recovery.log
+          echo "Recovered project inventory:"
+          find recovered -maxdepth 4 -type f -printf '%p (%s bytes)\n' | head -200
+          echo "Detected Godot version / recovery notes:"
+          grep -Ei 'godot|version|error|warning|recover' recovery.log | tail -100 || true
+      - name: Preserve recovered project for inspection
+        uses: actions/upload-artifact@v4
+        with:
+          name: duckcraft-recovered-godot-project
+          path: |
+            recovered/
+            recovery.log
+          if-no-files-found: error
+          retention-days: 7
