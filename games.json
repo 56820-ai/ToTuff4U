@@ -583,7 +583,7 @@
     {
       "title": "Bitburner",
       "path": "https://bitburner-official.github.io/",
-      "image": "https://opengraph.githubassets.com/1/bitburner-official/bitburner-src",
+      "image": "https://raw.githubusercontent.com/bitburner-official/bitburner-src/dev/assets/favicon.ico",
       "category": "IDLE",
       "source": "https://github.com/bitburner-official/bitburner-src"
     },
@@ -625,7 +625,7 @@
     {
       "title": "Quake III Arena (Q3JS)",
       "path": "https://q3js.com/",
-      "image": "https://opengraph.githubassets.com/1/lklacar/q3js",
+      "image": "https://raw.githubusercontent.com/lklacar/q3js/main/website/public/quake3.svg",
       "category": "ACTION",
       "source": "https://github.com/lklacar/q3js"
     },
@@ -646,7 +646,7 @@
     {
       "title": "Ancient Beast",
       "path": "https://play.ancientbeast.com/",
-      "image": "https://opengraph.githubassets.com/1/FreezingMoon/AncientBeast",
+      "image": "https://raw.githubusercontent.com/FreezingMoon/AncientBeast/master/assets/favicon.png",
       "category": "STRATEGY",
       "source": "https://github.com/FreezingMoon/AncientBeast"
     },
@@ -660,7 +660,7 @@
     {
       "title": "Age of War (Unity Remake)",
       "path": "https://thommynator.github.io/AgeOfWarGame/",
-      "image": "https://opengraph.githubassets.com/1/Thommynator/AgeOfWarGame",
+      "image": "https://raw.githubusercontent.com/Thommynator/AgeOfWarGame/main/TemplateData/favicon.ico",
       "category": "STRATEGY",
       "source": "https://github.com/Thommynator/AgeOfWarGame"
     }
