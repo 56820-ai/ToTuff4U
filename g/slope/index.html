@@ -171,18 +171,20 @@
                 // Some Tesseract builds return recognized text but no word boxes.
                 // Accept a clean, isolated 1-4 digit result from the centered crop too.
                 if (!candidates.length) {
+                    // Tesseract can report page confidence 0 even when its text
+                    // output contains readable digits but no word boxes.
                     var rawText = String(data.text || "").replace(/,/g, " ").trim();
-                    var matches = rawText.match(/(?:^|\s)(\d{1,4})(?=\s|$)/g) || [];
+                    var matches = rawText.match(/\d{1,4}/g) || [];
                     var textConfidence = Number(data.confidence);
-                    if (!Number.isFinite(textConfidence) || textConfidence < 0) textConfidence = 50;
+                    if (!Number.isFinite(textConfidence) || textConfidence <= 0) textConfidence = 65;
                     matches.forEach(function(match) {
                         var digits = match.trim();
                         var value = Number(digits);
-                        if (value >= 1 && value <= 1500 && textConfidence >= 35) {
+                        if (value >= 1 && value <= 1500) {
                             candidates.push({value:value,digits:digits,confidence:textConfidence,
                               x0:0,y0:0,x1:imageWidth,y1:imageHeight});
                         }
-                    });
+                    }););
                 }
                 // Prefer the largest centered numeric token, not stray tiny counters.
                 candidates.sort(function(a,b) {
