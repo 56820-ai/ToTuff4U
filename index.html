@@ -1528,13 +1528,13 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
     }
 
     function normalizeGamePath(path) {
-        return String(path || '').replace(/\\/+$/, '').toLowerCase();
+        return String(path || '').replace(/\/+$/, '').toLowerCase();
     }
 
     function makeGameIconFallback(game) {
         const title = String(game.title || 'Game');
         const category = String(game.category || 'ARCADE').toUpperCase();
-        const initials = title.split(/\\s+/).filter(Boolean).slice(0, 2).map(word => word[0]).join('').toUpperCase() || 'G';
+        const initials = title.split(/\s+/).filter(Boolean).slice(0, 2).map(word => word[0]).join('').toUpperCase() || 'G';
         const palette = {
             ACTION: ['#ef4444', '#7f1d1d'],
             ARCADE: ['#22c55e', '#14532d'],
