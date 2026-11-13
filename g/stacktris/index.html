@@ -7,6 +7,7 @@
 <style>
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#111}
 iframe{display:block;width:100%;height:100%;border:0}
+#stacktris-score-status{position:fixed;z-index:99999;left:8px;top:8px;padding:6px 9px;border-radius:6px;background:rgba(0,0,0,.78);color:#fff;font:12px/1.35 Arial,sans-serif;pointer-events:none;max-width:85vw}
 </style>
 <script src="../../js/arcade-score-config.js"></script>
 <script src="../../js/arcade-scores.js"></script>
@@ -14,145 +15,113 @@ iframe{display:block;width:100%;height:100%;border:0}
 </head>
 <body>
 <iframe id="stacktris-game" src="../stacktris-main/index.html" title="Stacktris" allow="fullscreen; autoplay; gamepad" allowfullscreen></iframe>
-<style>
-#stacktris-score-status{position:fixed;z-index:99999;left:8px;top:8px;padding:6px 9px;border-radius:6px;background:rgba(0,0,0,.78);color:#fff;font:12px/1.35 Arial,sans-serif;pointer-events:none;max-width:85vw}
-</style>
-<div id="stacktris-score-status">Leaderboard: starting scanner…</div>
+<div id="stacktris-score-status">Leaderboard: waiting for Stacktris…</div>
 <script>
 (function(){
   "use strict";
   const frame=document.getElementById("stacktris-game");
   const status=document.getElementById("stacktris-score-status");
-  let worker=null, scanning=false, submitted=false, lastText="", lastError="";
-  let previousFrame=null, stillSince=0, lastMotionAt=Date.now(), lastOcrAt=0;
-  const STILL_MS=2000;
+  let worker=null, scanning=false, lastOcrAt=0, lastText="";
+  let candidateScore=null, candidateCount=0, lastSubmittedScore=null;
   function setStatus(message){status.textContent="Leaderboard: "+message;}
+
+  // Stacktris/Fancade can place its score in different parts of the HUD.
+  // Read the entire game canvas instead of assuming the score is bottom-center.
+  function prepareCanvas(source,threshold){
+    const maxWidth=1500, maxHeight=1100;
+    const scale=Math.min(maxWidth/source.width,maxHeight/source.height);
+    const width=Math.max(1,Math.round(source.width*scale));
+    const height=Math.max(1,Math.round(source.height*scale));
+    const canvas=document.createElement("canvas");
+    canvas.width=width; canvas.height=height;
+    const ctx=canvas.getContext("2d",{willReadFrequently:true});
+    ctx.fillStyle="#fff"; ctx.fillRect(0,0,width,height);
+    ctx.imageSmoothingEnabled=true; ctx.imageSmoothingQuality="high";
+    ctx.drawImage(source,0,0,width,height);
+    if(threshold){
+      const image=ctx.getImageData(0,0,width,height);
+      for(let i=0;i<image.data.length;i+=4){
+        const gray=image.data[i]*.299+image.data[i+1]*.587+image.data[i+2]*.114;
+        const value=gray>155?255:0;
+        image.data[i]=image.data[i+1]=image.data[i+2]=value;
+      }
+      ctx.putImageData(image,0,0);
+    }
+    return canvas;
+  }
+
   function extractScore(text){
+    const normalized=text.replace(/[|]/g,"I").replace(/\s+/g," ");
     const patterns=[
-      /(?:score|points?|total)\\s*[:：]?\\s*([0-9][0-9,]*)/i,
-      /([0-9][0-9,]*)\\s*(?:score|points?)/i
+      /(?:score|sc0re|sco re|points?|total)\s*[:：#-]?\s*([0-9][0-9,]*)/i,
+      /([0-9][0-9,]*)\s*(?:score|points?)/i
     ];
     for(const pattern of patterns){
-      const match=text.match(pattern);
-      if(match){const value=Number(match[1].replace(/,/g,""));if(Number.isSafeInteger(value)&&value>=0&&value<=1000000000)return value;}
-    }
-    // A score displayed by itself may have no accompanying label.
-    const numbers=(text.match(/\\b[0-9][0-9,]{0,8}\\b/g)||[])
-      .map(v=>Number(v.replace(/,/g,""))).filter(v=>Number.isSafeInteger(v)&&v>=0&&v<=1000000000);
-    return numbers.length===1?numbers[0]:null;
-  }
-  function prepareCanvas(source,threshold){
-    // Tight crop around the lower-center score area; ignore nearly all other gameplay.
-    const cropWidth=Math.max(1,Math.floor(source.width*0.30));
-    const cropHeight=Math.max(1,Math.floor(source.height*0.20));
-    const sx=Math.floor((source.width-cropWidth)/2);
-    const sy=Math.floor(source.height*0.60);
-    const temp=document.createElement("canvas");
-    temp.width=1200; temp.height=1200;
-    const ctx=temp.getContext("2d",{willReadFrequently:true});
-    ctx.fillStyle="#202020";ctx.fillRect(0,0,1200,1200);
-    const scale=Math.min(1200/cropWidth,1200/cropHeight);
-    const w=Math.round(cropWidth*scale),h=Math.round(cropHeight*scale);
-    ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality="high";
-    ctx.drawImage(source,sx,sy,cropWidth,cropHeight,Math.floor((1200-w)/2),Math.floor((1200-h)/2),w,h);
-    if(threshold){
-      const pixels=ctx.getImageData(0,0,1200,1200);
-      for(let i=0;i<pixels.data.length;i+=4){
-        const gray=pixels.data[i]*0.299+pixels.data[i+1]*0.587+pixels.data[i+2]*0.114;
-        const value=gray>150?255:0;
-        pixels.data[i]=pixels.data[i+1]=pixels.data[i+2]=value;
+      const match=normalized.match(pattern);
+      if(match){
+        const value=Number(match[1].replace(/,/g,""));
+        if(Number.isSafeInteger(value)&&value>=0&&value<=1000000000)return value;
       }
-      ctx.putImageData(pixels,0,0);
     }
-    return temp;
+    // Never submit a random number from the game screen without a score label.
+    return null;
   }
-  function checkMovement(source){
-    // Compare tiny snapshots so OCR starts only after the rendered game stops moving.
-    const sample=document.createElement("canvas");
-    sample.width=32;sample.height=32;
-    const ctx=sample.getContext("2d",{willReadFrequently:true});
-    // Track movement only in the lower-center score region, not the rest of the game
-    // or the animated "Swipe for more" prompt elsewhere on the screen.
-    const trackWidth=Math.max(1,Math.floor(source.width*0.30));
-    const trackHeight=Math.max(1,Math.floor(source.height*0.20));
-    const trackX=Math.floor((source.width-trackWidth)/2);
-    const trackY=Math.floor(source.height*0.60);
-    ctx.drawImage(source,trackX,trackY,trackWidth,trackHeight,0,0,32,32);
-    const pixels=ctx.getImageData(0,0,32,32).data;
-    const current=new Uint8Array(32*32);
-    for(let i=0,j=0;i<pixels.length;i+=4,j++){
-      current[j]=Math.round(pixels[i]*0.299+pixels[i+1]*0.587+pixels[i+2]*0.114);
-    }
-    let difference=0;
-    if(previousFrame){
-      for(let i=0;i<current.length;i++)difference+=Math.abs(current[i]-previousFrame[i]);
-      difference/=current.length;
-    }else{
-      difference=999;
-    }
-    previousFrame=current;
-    if(difference>3.5){
-      lastMotionAt=Date.now();
-      if(submitted)submitted=false;
-      return false;
-    }
-    return Date.now()-lastMotionAt>=STILL_MS;
+
+  async function submitDetectedScore(score){
+    if(score===lastSubmittedScore)return;
+    const name=window.ArcadeScores && window.ArcadeScores.getPlayerName
+      ? window.ArcadeScores.getPlayerName("Enter your name for the Stacktris leaderboard (24 characters max):")
+      : "";
+    if(!name){setStatus("score "+score+" detected; name entry cancelled");return;}
+    setStatus("submitting score "+score+"…");
+    const ok=await window.ArcadeScores.submit("Stacktris",score,name);
+    if(ok){lastSubmittedScore=score;setStatus("score submitted: "+score);}
+    else{setStatus("score "+score+" detected, but submission failed");}
   }
+
   async function scan(){
-    if(scanning)return;
-    scanning=true;
+    if(scanning||Date.now()-lastOcrAt<2500)return;
+    scanning=true; lastOcrAt=Date.now();
     try{
-      if(!frame.contentDocument){setStatus("waiting for game frame access");return;}
-      const canvas=frame.contentDocument.getElementById("canvas");
+      let doc;
+      try{doc=frame.contentDocument;}catch(_){setStatus("game frame is not accessible");return;}
+      if(!doc){setStatus("waiting for game frame");return;}
+      const canvas=doc.getElementById("canvas");
       if(!canvas||!canvas.width||!canvas.height){setStatus("waiting for game canvas");return;}
-      const isStill=checkMovement(canvas);
-      if(!isStill){
-        const seconds=Math.min(2,Math.floor((Date.now()-lastMotionAt)/1000));
-        setStatus("game moving; waiting for 2 seconds of stillness ("+seconds+"/2)");
+      if(!window.Tesseract){setStatus("score reader did not load");return;}
+      if(!worker){setStatus("loading full-screen score reader…");worker=await Tesseract.createWorker("eng",1);}
+      await worker.setParameters({tessedit_pageseg_mode:"11",preserve_interword_spaces:"1"});
+      let result=await worker.recognize(prepareCanvas(canvas,false));
+      let text=(result.data.text||"").replace(/\s+/g," ").trim();
+      let score=extractScore(text);
+      if(score===null){
+        await worker.setParameters({tessedit_pageseg_mode:"11"});
+        result=await worker.recognize(prepareCanvas(canvas,true));
+        const retryText=(result.data.text||"").replace(/\s+/g," ").trim();
+        if(retryText.length>text.length)text=retryText;
+        score=extractScore(text);
+      }
+      if(text!==lastText){lastText=text;console.debug("Stacktris full-screen OCR:",text);}
+      if(score===null){
+        candidateScore=null;candidateCount=0;
+        setStatus("scanning full screen; waiting for a labeled score");
         return;
       }
-      if(Date.now()-lastOcrAt<1800)return;
-      lastOcrAt=Date.now();
-      if(!window.Tesseract){setStatus("OCR library did not load");return;}
-      if(!worker){setStatus("game still for 2 seconds; loading score reader…");worker=await Tesseract.createWorker("eng",1);}
-      await worker.setParameters({tessedit_pageseg_mode:"11"});
-      let result=await worker.recognize(prepareCanvas(canvas,false));
-      let text=(result.data.text||"").replace(/\\s+/g," ").trim();
-      if(text.length<3){
-        await worker.setParameters({tessedit_pageseg_mode:"6"});
-        const retry=await worker.recognize(prepareCanvas(canvas,true));
-        const retryText=(retry.data.text||"").replace(/\\s+/g," ").trim();
-        if(retryText.length>text.length)text=retryText;
-        await worker.setParameters({tessedit_pageseg_mode:"11"});
+      if(score===candidateScore)candidateCount++;
+      else{candidateScore=score;candidateCount=1;}
+      if(candidateCount<2){
+        setStatus("score "+score+" detected; confirming…");
+        return;
       }
-      if(text!==lastText){lastText=text;console.debug("Stacktris lower-center OCR:",text);}
-      const score=extractScore(text);
-      if(score!==null&&!submitted){
-        submitted=true;
-        setStatus("score detected: "+score+"; asking for name…");
-        try{
-          const name=window.prompt("Enter your name for the Stacktris leaderboard (24 characters max):","");
-          if(name&&name.trim()){
-            const playerName=name.trim().slice(0,24);
-            try{localStorage.setItem("arcadeLeaderboardPlayerName",playerName);}catch(e){}
-            const ok=await window.ArcadeScores.submit("Stacktris",score,playerName);
-            setStatus(ok?"score submitted: "+score:"score submission failed");
-          }else{
-            submitted=false;
-            setStatus("name entry cancelled; score not submitted");
-          }
-        }catch(error){submitted=false;setStatus("submission error: "+error.message);}
-      }else{
-        setStatus("still for 2+ seconds; lower-center OCR: "+(text||"no text recognized")+(score===null?" · score not found":" · score "+score));
-      }
+      if(score===lastSubmittedScore){setStatus("score already submitted: "+score);return;}
+      await submitDetectedScore(score);
     }catch(error){
-      lastError=error&&error.message?error.message:String(error);
-      console.warn("Stacktris leaderboard scan failed:",error);
-      setStatus("scanner error: "+lastError.slice(0,100));
+      console.warn("Stacktris score recognition failed:",error);
+      setStatus("scanner error: "+String(error.message||error).slice(0,100));
     }finally{scanning=false;}
   }
-  frame.addEventListener("load",()=>setStatus("game loaded; starting OCR"));
-  setInterval(scan,500);
+  frame.addEventListener("load",()=>setStatus("game loaded; scanning entire screen"));
+  setInterval(scan,700);
   scan();
 })();
 </script>
