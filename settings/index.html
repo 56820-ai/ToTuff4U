@@ -277,20 +277,6 @@
             box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
         }
 
-        #enableAboutBlank {
-            background: linear-gradient(135deg, 
-                rgba(107, 157, 255, 0.2), 
-                rgba(37, 37, 58, 0.9));
-            border-color: rgba(107, 157, 255, 0.3);
-        }
-
-        #disableAboutBlank {
-            background: linear-gradient(135deg, 
-                rgba(255, 107, 157, 0.2), 
-                rgba(37, 37, 58, 0.9));
-            border-color: rgba(255, 107, 157, 0.3);
-        }
-
         .switch {
             position: relative;
             display: inline-block;
@@ -924,14 +910,6 @@
 
             <div id="cloaking" class="tab-content">
                 <div class="setting-card">
-                    <h2>about:blank Cloaking</h2>
-                    <p>about:blank cloaking allows you to hide this site from your tab history. Please enable popups for this to work.</p>
-                    <div class="buttons">
-                        <button id="enableAboutBlank">Enable</button>
-                        <button id="disableAboutBlank">Disable</button>
-                    </div>
-                </div>
-                <div class="setting-card">
                     <h2>Tab Cloaking</h2>
                     <p>Disguise your tabs as something educational! Change both the title and favicon to avoid detection.</p>
                     <div class="dropdown" id="tab-cloak">
@@ -1126,50 +1104,7 @@ document.addEventListener('DOMContentLoaded', () => {
     particlesToggle.addEventListener('change', () => applyParticles(particlesToggle.checked));
   }
 
-  // Open a fresh about:blank tab directly from the Enable button's user gesture.
-  // Reusing a named target can leave Chrome pointing at a stale or unrelated tab.
-  $('enableAboutBlank')?.addEventListener('click', () => {
-    const siteUrl = new URL('../', document.baseURI);
-    siteUrl.hash = 'home';
-    const titles = { google: 'Google', classroom: 'Google Classroom', docs: 'Google Docs', default: 'Home-Classroom' };
-    const cloak = localStorage.getItem('tabCloak') || 'default';
-    const icon = document.querySelector("link[rel~='icon']")?.href || '';
-    const popup = window.open('about:blank', '_blank');
-    if (!popup) {
-      alert('Chrome blocked the new tab. Allow pop-ups for this Arcade Atlas site, then click Enable again.');
-      return;
-    }
-    try {
-      const safeIcon = icon.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
-      const safeUrl = siteUrl.href.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
-      popup.document.open();
-      popup.document.write('<!doctype html><html><head><meta charset="utf-8"><title>' +
-        (titles[cloak] || titles.default) + '</title><link rel="icon" href="' + safeIcon +
-        '"><meta name="viewport" content="width=device-width,initial-scale=1">' +
-        '<style>html,body,iframe{width:100%;height:100%;margin:0;border:0;overflow:hidden}iframe{position:fixed;inset:0}</style>' +
-        '</head><body><iframe title="Arcade Atlas" src="' + safeUrl +
-        '" allow="fullscreen; autoplay; gamepad"></iframe></body></html>');
-      popup.document.close();
-      window.aboutBlankCloakWindow = popup;
-      try { localStorage.setItem('aboutBlankCloakEnabled', 'true'); } catch (_) {}
-    } catch (error) {
-      console.error('Could not set up the cloaked tab:', error);
-      try { popup.close(); } catch (_) {}
-      alert('The blank tab opened, but Arcade Atlas could not load inside it. Please try again.');
-    }
-  });
-  $('disableAboutBlank')?.addEventListener('click', () => {
-    const popup = window.aboutBlankCloakWindow;
-    if (popup && !popup.closed) {
-      try { popup.close(); } catch (_) {}
-    } else {
-      alert('The cloaked tab was opened separately. Switch to that tab and close it to disable cloaking.');
-    }
-    window.aboutBlankCloakWindow = null;
-    try { localStorage.removeItem('aboutBlankCloakEnabled'); } catch (_) {}
-  });
-
-  const choices = {
+    const choices = {
     default: { title: 'Home-Classroom', icon: 'data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27%3E%3Crect width=%2748%27 height=%2748%27 rx=%279%27 fill=%27%230F9D58%27/%3E%3Cpath d=%27M8 12h32v24H8z%27 fill=%27white%27/%3E%3Cpath d=%27M12 16h24v16H12z%27 fill=%27%234285F4%27/%3E%3Ccircle cx=%2724%27 cy=%2720%27 r=%274%27 fill=%27%23F4B400%27/%3E%3Cpath d=%27M16 30c1-5 4-7 8-7s7 2 8 7%27 fill=%27%23F4B400%27/%3E%3C/svg%3E' },
     google: { title: 'Google', icon: 'https://www.google.com/favicon.ico' },
     classroom: { title: 'Google Classroom', icon: 'https://ssl.gstatic.com/classroom/favicon.png' },
