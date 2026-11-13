@@ -36,11 +36,69 @@ jobs:
           import_repo "BKcore/HexGL" "hexgl"
           import_repo "Kuberwastaken/backdooms" "backdooms"
 
+          # Arcade 3D is MIT-licensed. Its five game modes are standalone
+          # browser HTML files; the multiplayer/account wrapper is not copied.
+          git clone --depth 1 https://github.com/webgl-games/arcade-3d.git "$tmp/arcade-3d"
+          mkdir -p g/arcade-3d/modes
+          cp "$tmp/arcade-3d"/public/*.html g/arcade-3d/modes/
+          cp "$tmp/arcade-3d/LICENSE" g/arcade-3d/LICENSE
+          cp "$tmp/arcade-3d/README.md" g/arcade-3d/README-UPSTREAM.md
+          cat > g/arcade-3d/index.html <<'HTML'
+          <!doctype html>
+          <html lang="en">
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width,initial-scale=1">
+            <title>Arcade 3D</title>
+            <style>
+              *{box-sizing:border-box}body{margin:0;min-height:100vh;background:#101722;color:#f4f6fb;font:16px system-ui,sans-serif;padding:36px}
+              main{max-width:900px;margin:auto}h1{font-size:clamp(2rem,6vw,3.5rem);margin:0 0 8px}
+              p{color:#aab7ca;line-height:1.5}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:28px}
+              a{display:block;padding:22px;border:1px solid #35445a;border-radius:14px;background:#1a2636;color:#fff;text-decoration:none;font-weight:700}
+              a:hover{border-color:#8db7ff;background:#22344b}small{display:block;color:#aab7ca;font-weight:400;margin-top:7px}
+              footer{margin-top:30px;color:#91a0b4;font-size:13px}
+            </style>
+          </head>
+          <body><main><h1>Arcade 3D</h1><p>Five browser-playable 3D modes. Some online features need the original project's multiplayer server; offline bot play is available in supported modes.</p>
+          <section class="grid">
+            <a href="modes/tiny-planet.html">Explore: Tiny Planet<small>Open-world driving and exploration</small></a>
+            <a href="modes/team-deathmatch.html">Team Deathmatch<small>4v4 arena combat against bots or online</small></a>
+            <a href="modes/battle-royale.html">Battle Royale<small>Loot, survive and outlast the zone</small></a>
+            <a href="modes/destruction.html">Destruction<small>Physics sandbox</small></a>
+            <a href="modes/rocket-mission.html">Rocket Mission<small>Build, launch and land a rocket</small></a>
+          </section>
+          <footer>Original game files by webgl-games. MIT License. Three.js is loaded from its upstream CDN by the game pages.</footer>
+          </main></body></html>
+          HTML
+
+      - name: Build Ancient Beast web game
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.2"
+      - name: Compile Ancient Beast static web build
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone --depth 1 https://github.com/FreezingMoon/AncientBeast.git "$tmp/ancient-beast"
+          cd "$tmp/ancient-beast"
+          bun install --frozen-lockfile
+          bun run build
+          test -f deploy/index.html
+          mkdir -p "$GITHUB_WORKSPACE/g/ancient-beast"
+          rsync -a --delete deploy/ "$GITHUB_WORKSPACE/g/ancient-beast/"
+          cp LICENSE.md "$GITHUB_WORKSPACE/g/ancient-beast/LICENSE.md"
+          cp README.md "$GITHUB_WORKSPACE/g/ancient-beast/README-UPSTREAM.md"
+          printf '%s\n' "Source: https://github.com/FreezingMoon/AncientBeast" "License: AGPL-3.0; artwork/audio are CC-BY-SA-4.0 per upstream README." "Built from commit: $(git rev-parse HEAD)" > "$GITHUB_WORKSPACE/g/ancient-beast/ATTRIBUTION.txt"
+
       - name: Commit imported game files
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add g/hextris g/a-dark-room g/hexgl g/backdooms
-          git commit -m "Import four licensed GitHub games" || echo "No new changes"
+          git add g/hextris g/a-dark-room g/hexgl g/backdooms g/arcade-3d g/ancient-beast
+          git commit -m "Import additional licensed browser games" || echo "No new changes"
           git pull --rebase origin main
           git push
