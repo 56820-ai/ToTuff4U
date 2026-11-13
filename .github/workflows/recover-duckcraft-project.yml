@@ -1,5 +1,8 @@
 name: Recover DuckCraft Godot project
 on:
+  push:
+    paths:
+      - '.github/workflows/recover-duckcraft-project.yml'
   workflow_dispatch:
 permissions:
   actions: read
@@ -26,12 +29,13 @@ jobs:
           mkdir gdre
           unzip -q gdre.zip -d gdre
           find gdre -maxdepth 3 -type f -printf '%p\n' | head -80
-          chmod +x $(find gdre -type f -name 'gdre_tools' -o -name 'gdre_tools.x86_64' | head -1)
+          TOOL=$(find gdre -type f \( -name 'gdre_tools' -o -name 'gdre_tools.x86_64' -o -name 'GDRE_tools.x86_64' \) | head -1)
+          test -n "$TOOL"
+          chmod +x "$TOOL"
+          echo "GDRE_TOOL=$TOOL" >> "$GITHUB_ENV"
       - name: Recover editable Godot project
         run: |
-          TOOL=$(find gdre -type f \( -name 'gdre_tools' -o -name 'gdre_tools.x86_64' \) | head -1)
-          test -n "$TOOL"
-          "$TOOL" --headless --recover=game/DuckCraft_Game/Duck_Craft.pck --output=recovered 2>&1 | tee recovery.log
+          "$GDRE_TOOL" --headless --recover=game/DuckCraft_Game/Duck_Craft.pck --output=recovered 2>&1 | tee recovery.log
           echo "Recovered project inventory:"
           find recovered -maxdepth 4 -type f -printf '%p (%s bytes)\n' | head -200
           echo "Detected Godot version / recovery notes:"
