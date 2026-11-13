@@ -236,38 +236,37 @@
             // Slope shows the final run score in the middle of its crash/end screen,
             // not in the live HUD crop. Scan that center region when the run ends.
             async function readEndScreenScore(canvas) {
-                // Run the fastest normal OCR pass first. Only spend time on alternate
-                // layouts if the first pass cannot read a score.
-                var result = await recognizeCanvas(canvas, 0, 1, true, 0, 1, 11);
+                // The final score is centered on Slope's crash screen. Read that
+                // region first so menu labels, counters and unrelated digits elsewhere
+                // on the canvas cannot win the OCR selection.
+                var result = await recognizeCanvas(canvas, 0.15, 0.70, true, 0.15, 0.70, 11);
                 var best = extractScore(result);
-                if (best && best.value > 0) {
-                    lastEndOcrDebug = "Canvas " + canvas.width + "x" + canvas.height +
-                      " | Fast pass: " + String(result.data && result.data.text || "").replace(/\\s+/g, " ").trim().slice(0, 100) +
-                      " | pick=" + best.value;
+                if (best && best.value > 0 && best.value <= 1500 && best.confidence >= 65) {
+                    lastEndOcrDebug = "Center crop " + canvas.width + "x" + canvas.height +
+                      " | " + String(result.data && result.data.text || "").replace(/\\s+/g, " ").trim().slice(0, 80) +
+                      " | pick=" + best.value + " (" + Math.round(best.confidence) + "%)";
                     window.__slopeOcrDebug = lastEndOcrDebug;
                     return best;
                 }
 
-                // Fallback passes are intentionally conditional; previously all four
-                // full-canvas OCR passes ran every time, delaying the name prompt.
+                // Fallback only when the focused pass cannot find a confident score.
+                // A second segmentation mode handles cases where the digits are split.
                 var alternate = await recognizeCanvas(canvas, 0, 1, true, 0, 1, 6);
                 var alternateBest = extractScore(alternate);
                 var chosen = alternateBest;
-                if (!chosen || chosen.value <= 0) {
-                    var grayscale = await recognizeCanvas(canvas, 0, 1, true, 0, 1, 11, "gray");
+                if (!chosen || chosen.value <= 0 || chosen.value > 1500 || chosen.confidence < 65) {
+                    var grayscale = await recognizeCanvas(canvas, 0.15, 0.70, true, 0.15, 0.70, 11, "gray");
                     chosen = extractScore(grayscale);
                 }
-                if (!chosen || chosen.value <= 0) {
-                    var inverted = await recognizeCanvas(canvas, 0, 1, true, 0, 1, 11, "invert");
-                    chosen = extractScore(inverted);
-                }
                 lastEndOcrDebug = "Canvas " + canvas.width + "x" + canvas.height +
-                  " | Fast pass=" + String(result.data && result.data.text || "").replace(/\\s+/g, " ").trim().slice(0, 55) +
-                  " | Alternate=" + String(alternate.data && alternate.data.text || "").replace(/\\s+/g, " ").trim().slice(0, 55) +
-                  " | pick=" + (chosen && chosen.value || 0);
+                  " | Center=" + String(result.data && result.data.text || "").replace(/\\s+/g, " ").trim().slice(0, 45) +
+                  " | Full=" + String(alternate.data && alternate.data.text || "").replace(/\\s+/g, " ").trim().slice(0, 45) +
+                  " | pick=" + (chosen && chosen.value || 0) +
+                  " (" + Math.round(chosen && chosen.confidence || 0) + "%)";
                 window.__slopeOcrDebug = lastEndOcrDebug;
                 console.info("Slope end-screen OCR diagnostics:", lastEndOcrDebug);
-                return chosen && chosen.value > 0 ? chosen : best;
+                return chosen && chosen.value > 0 && chosen.value <= 1500 && chosen.confidence >= 65
+                    ? chosen : { value: 0, confidence: 0 };
             }
             async function readGameState(canvas) {
                 return await recognizeCanvas(canvas, 0, 1, false);
@@ -366,35 +365,19 @@
                     if ((textEnded || endScreenHits >= 2) && !handled) {
                         handled = true;
                         var score = maxScore || 0;
-                        if (leaderboardReady && window.ArcadeScores) {
-                            setStatus(score > 0 ? "game ended · review the detected score" : "game ended · enter your score manually");
-                            // Let the player correct OCR mistakes before anything is written.
-                            // If OCR fails completely, the same prompt acts as manual score entry.
+                        if (score > 0 && leaderboardReady && window.ArcadeScores) {
+                            setStatus("game ended · submitting detected score " + score);
                             var playerName = window.ArcadeScores.getPlayerName("Enter your name for the Slope leaderboard (24 characters max):");
                             if (playerName) {
-                                var scoreText = window.prompt(
-                                    score > 0
-                                        ? "Slope detected " + score + ". Confirm or correct your final score (0–1,500):"
-                                        : "Slope could not read your score. Enter your final score manually (0–1,500):",
-                                    score > 0 ? String(score) : ""
-                                );
-                                if (scoreText !== null && scoreText.trim() !== "") {
-                                    var correctedScore = Number(scoreText.replace(/,/g, "").trim());
-                                    if (Number.isSafeInteger(correctedScore) && correctedScore >= 0 && correctedScore <= 1500) {
-                                        var submitted = await window.ArcadeScores.submit("Slope", correctedScore, playerName);
-                                        setStatus(submitted ? "score submitted: " + correctedScore : "score submission failed");
-                                    } else {
-                                        setStatus("invalid score · not submitted");
-                                        window.alert("Enter a whole-number Slope score from 0 to 1,500.");
-                                    }
-                                } else {
-                                    setStatus("score entry cancelled · score not submitted");
-                                }
+                                var submitted = await window.ArcadeScores.submit("Slope", score, playerName);
+                                setStatus(submitted ? "score submitted: " + score : "score submission failed");
                             } else {
                                 setStatus("name entry cancelled · score not submitted");
                             }
-                        } else {
+                        } else if (!leaderboardReady) {
                             promptOcrIssue("Leaderboard connection is not configured.");
+                        } else {
+                            promptOcrIssue("Score could not be read confidently. No score was submitted. OCR details: " + lastEndOcrDebug);
                         }
                     }
                     if (!ended && handled) {
