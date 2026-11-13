@@ -554,14 +554,14 @@
     },
     {
       "title": "Hextris",
-      "path": "https://hextris.github.io/hextris/",
+      "path": "g/hextris",
       "image": "https://raw.githubusercontent.com/Hextris/hextris/gh-pages/images/facebook-opengraph.png",
       "category": "PUZZLE",
       "source": "https://github.com/Hextris/hextris"
     },
     {
       "title": "A Dark Room",
-      "path": "https://adarkroom.doublespeakgames.com/",
+      "path": "g/a-dark-room",
       "image": "https://raw.githubusercontent.com/doublespeakgames/adarkroom/main/img/adr.png",
       "category": "ADVENTURE",
       "source": "https://github.com/doublespeakgames/adarkroom"
@@ -575,7 +575,7 @@
     },
     {
       "title": "HexGL",
-      "path": "https://hexgl.bkcore.com/play/",
+      "path": "g/hexgl",
       "image": "https://raw.githubusercontent.com/BKcore/HexGL/master/icon_256.png",
       "category": "RACING",
       "source": "https://github.com/BKcore/HexGL"
@@ -652,7 +652,7 @@
     },
     {
       "title": "The Backdooms",
-      "path": "https://kuberwastaken.github.io/backdooms",
+      "path": "g/backdooms",
       "image": "https://raw.githubusercontent.com/Kuberwastaken/backdooms/main/public/Gameplay-GIF.gif",
       "category": "HORROR",
       "source": "https://github.com/Kuberwastaken/backdooms"
