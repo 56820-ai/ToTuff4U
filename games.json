@@ -628,6 +628,34 @@
       "image": "https://opengraph.githubassets.com/1/lklacar/q3js",
       "category": "ACTION",
       "source": "https://github.com/lklacar/q3js"
+    },
+    {
+      "title": "Gothic Whip",
+      "path": "https://askjackb.github.io/gothic-whip-game/",
+      "image": "https://raw.githubusercontent.com/askjackb/gothic-whip-game/main/screenshot_action.png",
+      "category": "ACTION",
+      "source": "https://github.com/askjackb/gothic-whip-game"
+    },
+    {
+      "title": "Hollowmere",
+      "path": "https://hollowmere.tretu.de/",
+      "image": "https://raw.githubusercontent.com/robintrepte/hollowmere.tretu.de/main/store/steam/header_capsule_920x430.png",
+      "category": "SIMULATION",
+      "source": "https://github.com/robintrepte/hollowmere.tretu.de"
+    },
+    {
+      "title": "Ancient Beast",
+      "path": "https://play.ancientbeast.com/",
+      "image": "https://opengraph.githubassets.com/1/FreezingMoon/AncientBeast",
+      "category": "STRATEGY",
+      "source": "https://github.com/FreezingMoon/AncientBeast"
+    },
+    {
+      "title": "The Backdooms",
+      "path": "https://kuberwastaken.github.io/backdooms",
+      "image": "https://raw.githubusercontent.com/Kuberwastaken/backdooms/main/public/Gameplay-GIF.gif",
+      "category": "HORROR",
+      "source": "https://github.com/Kuberwastaken/backdooms"
     }
   ]
 }
