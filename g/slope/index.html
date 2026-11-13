@@ -160,7 +160,7 @@
                 var imageHeight = result && result.__ocrHeight || 1;
                 var candidates = words.map(function(word) {
                     var raw = String(word.text || "").replace(/,/g, "").trim();
-                    if (!/^\\d{1,7}$/.test(raw)) return null;
+                    if (!/^\d{1,7}$/.test(raw)) return null;
                     var box = word.bbox || {};
                     return { value:Number(raw), digits:raw, confidence:Number(word.confidence)||0,
                       x0:Number(box.x0)||0,y0:Number(box.y0)||0,x1:Number(box.x1)||0,y1:Number(box.y1)||0 };
@@ -172,7 +172,7 @@
                 // Accept a clean, isolated 1-4 digit result from the centered crop too.
                 if (!candidates.length) {
                     var rawText = String(data.text || "").replace(/,/g, " ").trim();
-                    var matches = rawText.match(/(?:^|\\s)(\\d{1,4})(?=\\s|$)/g) || [];
+                    var matches = rawText.match(/(?:^|\s)(\d{1,4})(?=\s|$)/g) || [];
                     var textConfidence = Number(data.confidence);
                     if (!Number.isFinite(textConfidence) || textConfidence < 0) textConfidence = 50;
                     matches.forEach(function(match) {
@@ -237,7 +237,7 @@
                 var best = extractScore(result);
                 if (best && best.value > 0 && best.value <= 1500 && best.confidence >= 45) {
                     lastEndOcrDebug = "Center crop " + canvas.width + "x" + canvas.height +
-                      " | " + String(result.data && result.data.text || "").replace(/\\s+/g, " ").trim().slice(0, 80) +
+                      " | " + String(result.data && result.data.text || "").replace(/\s+/g, " ").trim().slice(0, 80) +
                       " | pick=" + best.value + " (" + Math.round(best.confidence) + "%)";
                     window.__slopeOcrDebug = lastEndOcrDebug;
                     return best;
@@ -253,8 +253,8 @@
                     chosen = extractScore(grayscale);
                 }
                 lastEndOcrDebug = "Canvas " + canvas.width + "x" + canvas.height +
-                  " | Center=" + String(result.data && result.data.text || "").replace(/\\s+/g, " ").trim().slice(0, 45) +
-                  " | Full=" + String(alternate.data && alternate.data.text || "").replace(/\\s+/g, " ").trim().slice(0, 45) +
+                  " | Center=" + String(result.data && result.data.text || "").replace(/\s+/g, " ").trim().slice(0, 45) +
+                  " | Full=" + String(alternate.data && alternate.data.text || "").replace(/\s+/g, " ").trim().slice(0, 45) +
                   " | pick=" + (chosen && chosen.value || 0) +
                   " (" + Math.round(chosen && chosen.confidence || 0) + "%)";
                 window.__slopeOcrDebug = lastEndOcrDebug;
