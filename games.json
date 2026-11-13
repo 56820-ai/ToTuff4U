@@ -625,7 +625,7 @@
     {
       "title": "Quake III Arena (Q3JS)",
       "path": "https://q3js.com/",
-      "image": "https://raw.githubusercontent.com/lklacar/q3js/main/website/public/quake3.svg",
+      "image": "https://raw.githubusercontent.com/lklacar/q3js/master/website/public/quake3.svg",
       "category": "ACTION",
       "source": "https://github.com/lklacar/q3js"
     },
