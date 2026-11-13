@@ -575,9 +575,9 @@
         // Reaction Test stores an inverted score (10000 - milliseconds),
         // so a higher stored value means a faster reaction and ranks first.
         players.sort((a,b) => Number(b.score) - Number(a.score));
-        // For Slope, rank each player only once using their personal best.
+        // Cookie Clicker ranks each player only once using their personal best.
         // This prevents repeated runs by one person from occupying the whole podium.
-        if (key === "slope") {
+        if (key === "cookie clicker") {
           const bestByPlayer = new Map();
           players.forEach(item => {
             const playerKey = String(item.player_name || "").trim().toLocaleLowerCase();
