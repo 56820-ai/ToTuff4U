@@ -62,12 +62,35 @@ jobs:
           echo "Godot-related files:"
           find duckcraft-extracted -type f \( -iname '*.pck' -o -iname '*.exe' -o -iname 'project.godot' -o -iname '*.gd' -o -iname '*.wasm' -o -iname '*.js' -o -iname '*.html' \) -printf '%p\n' | sort
 
-      - name: Preserve archive and extracted files for inspection
+      - name: Recover the Godot project from the official Windows build
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fL --retry 3 -o /tmp/gdre.zip https://github.com/GDRETools/gdsdecomp/releases/download/v2.7.4/GDRE_tools-v2.7.4-linux.zip
+          mkdir -p /tmp/gdre duckcraft-recovered
+          unzip -q /tmp/gdre.zip -d /tmp/gdre
+          GDRE_BIN="$(find /tmp/gdre -type f -name gdre_tools -print -quit)"
+          if [ -z "$GDRE_BIN" ]; then
+            GDRE_BIN="$(find /tmp/gdre -type f -perm -111 | head -1)"
+          fi
+          test -n "$GDRE_BIN"
+          chmod +x "$GDRE_BIN"
+          echo "GDRE version:"
+          "$GDRE_BIN" --headless --version || true
+          echo "Recovering project from the original Windows executable..."
+          "$GDRE_BIN" --headless --recover=duckcraft-extracted/DuckCraft_Game/Duck_Craft.exe --output=duckcraft-recovered
+          echo "Recovered project inventory:"
+          find duckcraft-recovered -maxdepth 5 -type f -printf '%p (%s bytes)\\n' | sort | head -500
+          echo "Project entry and scripts:"
+          find duckcraft-recovered -type f \\( -name project.godot -o -name '*.gd' -o -name '*.tscn' -o -name '*.tres' \\) -printf '%p\\n' | sort | head -300
+
+      - name: Preserve archive, extracted files, and recovered project
         uses: actions/upload-artifact@v4
         with:
-          name: official-duckcraft-download-and-inspection
+          name: official-duckcraft-recovered-project
           path: |
             duckcraft-download/
             duckcraft-extracted/
+            duckcraft-recovered/
           if-no-files-found: error
           retention-days: 7
