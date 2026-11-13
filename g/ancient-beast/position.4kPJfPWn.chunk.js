@@ -1,0 +1,1 @@
+function t(t,e,n){let r;return e>1&&(e=1),e<-1&&(e=-1),0===n?r=1===e?1:4:(t%2==0&&e<1&&e++,r=1===e?-1===n?0:2:1===n?3:5),r}export{t};

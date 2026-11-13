@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>Arcade 3D — Destruction Sandbox</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%;overflow:hidden;background:#0c1018;
+    font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;color:#eef0e9;user-select:none}
+  #app{position:fixed;inset:0}
+  canvas{display:block}
+  .hidden{display:none !important}
+
+  #cross{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:20;pointer-events:none;color:#ff7a3c;font-size:22px;font-weight:800;text-shadow:0 0 4px #000}
+
+  #topbar{position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:30;display:flex;gap:16px;align-items:center;
+    background:rgba(12,16,24,.72);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:7px 18px;backdrop-filter:blur(6px)}
+  #topbar .lbl{font-size:9px;opacity:.55;text-transform:uppercase;letter-spacing:1px}
+  #lvl{font-weight:800;font-size:20px;color:#ff7a3c}
+  #lvlbarwrap{width:150px;height:9px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.2);border-radius:6px;overflow:hidden}
+  #lvlbar{height:100%;width:0%;background:linear-gradient(90deg,#fb923c,#ef4444);transition:width .2s}
+
+  #tool{position:fixed;left:16px;bottom:16px;z-index:30;width:240px}
+  #toolName{font-size:15px;font-weight:800;text-transform:uppercase;letter-spacing:1px}
+  #cdwrap{height:10px;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.2);border-radius:6px;overflow:hidden;margin-top:6px}
+  #cd{height:100%;width:100%;background:#fb923c;transition:width .05s}
+  #toolHint{font-size:10px;opacity:.6;margin-top:4px}
+
+  #feed{position:fixed;right:14px;top:56px;z-index:30;width:260px;display:flex;flex-direction:column;gap:4px;align-items:flex-end}
+  #feed .row{background:rgba(12,16,24,.7);border:1px solid rgba(255,255,255,.1);border-radius:7px;padding:3px 9px;font-size:11px;animation:fade 6s forwards}
+  #feed .comms{font-style:italic;opacity:.92}
+  @keyframes fade{0%,82%{opacity:1}100%{opacity:0}}
+
+  #voice{position:fixed;left:16px;top:56px;z-index:30;width:200px;background:rgba(12,16,24,.72);
+    border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:8px;backdrop-filter:blur(6px)}
+  #voice h4{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;opacity:.55;margin-bottom:6px;display:flex;justify-content:space-between}
+  .vrow{display:flex;align-items:center;gap:6px;padding:3px 4px;border-radius:6px;font-size:11px}
+  .vrow .dot{width:8px;height:8px;border-radius:50%;background:#444;flex:none;transition:all .1s}
+  .vrow .name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#ffd0a0}
+  .vrow.you .name{font-weight:800;color:#8ef0a0}
+  .vrow.speaking .dot{background:#4ade80;box-shadow:0 0 7px #4ade80}
+  .vrow .mute{cursor:pointer;font-size:10px;opacity:.5;background:none;border:none;color:#fff;padding:1px 3px;border-radius:4px}
+  .vrow .mute:hover{opacity:1;background:rgba(255,255,255,.1)}
+  .vrow.muted .name{opacity:.4;text-decoration:line-through}
+  .vrow.muted .dot{background:#444 !important;box-shadow:none !important}
+  #voiceCtl{display:flex;gap:6px;margin-top:7px;border-top:1px solid rgba(255,255,255,.1);padding-top:7px}
+  #voiceCtl button{flex:1;cursor:pointer;font-family:inherit;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;
+    background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:#fff;border-radius:6px;padding:5px 2px}
+  #voiceCtl button.on{background:#ef4444;border-color:#ef4444}
+  #voiceCtl button.on.deaf{background:#a855f7;border-color:#a855f7}
+
+  .overlay{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;background:rgba(6,10,16,.86);backdrop-filter:blur(8px)}
+  .panel{width:min(540px,92vw);background:rgba(18,22,30,.96);border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:26px;text-align:center}
+  .panel h1{font-size:26px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:4px}
+  .panel h1 .accent{color:#fb923c}
+  .panel .sub{font-size:11px;opacity:.6;text-transform:uppercase;letter-spacing:.25em;margin-bottom:18px}
+  .panel p{font-size:12px;opacity:.82;line-height:1.7;margin-bottom:8px}
+  .panel .keys{font-size:11px;opacity:.7;line-height:2;margin:14px 0}
+  .panel .keys b{background:#eef0e9;color:#111;border-radius:4px;padding:1px 6px;margin:0 1px}
+  .btn{cursor:pointer;font-family:inherit;font-weight:800;text-transform:uppercase;letter-spacing:.12em;font-size:13px;
+    background:#fb923c;color:#111;border:none;border-radius:10px;padding:12px 28px;margin-top:10px;box-shadow:0 4px 0 #9a4a16}
+  .btn:active{transform:translateY(2px);box-shadow:0 2px 0 #9a4a16}
+  #achToast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:60;background:rgba(18,22,30,.97);
+    border:1px solid #fb923c;border-radius:12px;padding:10px 16px;display:flex;gap:10px;align-items:center;opacity:0;transition:opacity .3s}
+  #achToast.show{opacity:1}
+  #achToast .ic{font-size:22px}
+  #achToast .t{font-size:9px;color:#fb923c;text-transform:uppercase;letter-spacing:1px;font-weight:700}
+  #achToast .d{font-size:12px;font-weight:700}
+  #hint{position:fixed;left:50%;bottom:70px;transform:translateX(-50%);z-index:25;font-size:11px;opacity:.6}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="cross" class="hidden">✛</div>
+
+<div id="topbar" class="hidden">
+  <span><span class="lbl">City Leveled</span> <span id="lvl">0%</span></span>
+  <div id="lvlbarwrap"><div id="lvlbar"></div></div>
+  <span><span class="lbl">Demolished</span> <b id="demoN">0</b></span>
+</div>
+
+<div id="voice" class="hidden">
+  <h4><span>CREW COMMS</span><span id="voiceState">LIVE</span></h4>
+  <div id="vrows"></div>
+  <div id="voiceCtl">
+    <button id="btnMic" title="Mute your microphone">🎤 Mic</button>
+    <button id="btnDeaf" title="Stop listening to everyone">🎧 Deafen</button>
+  </div>
+</div>
+
+<div id="feed" class="hidden"></div>
+
+<div id="tool" class="hidden">
+  <div id="toolName">🚀 Demolisher</div>
+  <div id="cdwrap"><div id="cd"></div></div>
+  <div id="toolHint">click = rocket · F = fly · V = drive a car · everything is destructible</div>
+</div>
+
+<div id="hint" class="hidden">click to lock aim · <b>WASD</b> move · <b>F</b> fly · <b>Space</b> jump/up · <b>Shift</b> sprint/down · <b>Click</b> blast · <b>Esc</b> release</div>
+<div id="achToast"><div class="ic" id="achIc">🏆</div><div><div class="t">Achievement Unlocked</div><div class="d" id="achD"></div></div></div>
+
+<div class="overlay" id="startOverlay">
+  <div class="panel">
+    <h1>DESTRUCTION <span class="accent">SANDBOX</span></h1>
+    <div class="sub">No fighting &bull; co-op chaos &bull; level the city</div>
+    <p>LIVE co-op chaos: you smash the same city as <b>real players</b> — every rocket, collapse and rubble pile is shared. You <b>can't</b> hurt each other; the whole point is to blow up <b>everything</b> together, talking over real 🎤 crew comms. Flatten 100% for total destruction.</p>
+    <div class="keys">
+      <b>WASD</b> move &nbsp; <b>Shift</b> sprint &nbsp; <b>Space</b> jump &nbsp; <b>F</b> fly &nbsp; <b>V</b> car<br>
+      <b>Mouse</b> aim &nbsp; <b>Click</b> launch rocket
+    </div>
+    <div id="mpStatus" style="font-size:11px;color:#a8c4e0;margin-bottom:6px">connecting…</div>
+    <button class="btn" id="startBtn">🌐 Start the Mayhem — Live</button>
+    <div style="margin-top:6px"><button id="practiceBtn" style="cursor:pointer;font-family:inherit;font-size:10px;color:#8fa8c0;background:none;border:1px solid #3a4a5e;border-radius:8px;padding:5px 12px">🤖 smash solo with bot crew</button></div>
+  </div>
+</div>
+
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" }}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+window.__err=null;
+addEventListener('error', e=>{ window.__err=(e.message||'')+' @'+(e.lineno||''); });
+
+/* ============================ CONFIG ============================ */
+const CITY = 70;             // half-extent of city
+const CREW = 6;              // total players (you + 5 bots)
+const NAMES = ['YOU','BOOM','RUBBLE','ASH','CRASH','NUKE'];
+const COMMS = ['Boom!','Take that tower down!','Watch this!','Whole block, let\'s go!','So satisfying.','Reloading the launcher.','Level it all!','Did you see that?!','More rockets!'];
+const BLAST_RADIUS = 13;     // explosion damage radius
+const BLAST_DMG = 60;        // damage at the center of a blast
+const ROCKET_CD = 700;       // ms cooldown between player rockets
+const ROCKET_SPEED = 52;     // units/sec
+const MAX_DEBRIS = 900;   // high cap so demolished blocks stay as rubble instead of vanishing
+
+/* ============================ RENDERER ============================ */
+const app=document.getElementById('app');
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(innerWidth,innerHeight); renderer.setPixelRatio(Math.min(2,devicePixelRatio));
+renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+app.appendChild(renderer.domElement);
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0xbcd2dc);
+scene.fog=new THREE.Fog(0xbcd2dc, 110, 230);
+const camera=new THREE.PerspectiveCamera(72, innerWidth/innerHeight, 0.1, 700);
+addEventListener('resize',()=>{ camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth,innerHeight); });
+
+scene.add(new THREE.HemisphereLight(0xeaf4ff,0x554433,0.95));
+const sun=new THREE.DirectionalLight(0xffffff,1.1); sun.position.set(50,90,30); sun.castShadow=true;
+sun.shadow.mapSize.set(2048,2048); const sc=sun.shadow.camera; sc.left=-100;sc.right=100;sc.top=100;sc.bottom=-100;sc.near=1;sc.far=260; scene.add(sun);
+const mat=(c)=>new THREE.MeshLambertMaterial({color:c});
+
+/* ground + roads */
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(CITY*2+40,CITY*2+40),mat(0x4a4f47));
+ground.rotation.x=-Math.PI/2; ground.receiveShadow=true; scene.add(ground);
+for(let i=-2;i<=2;i++){ // road stripes
+  const rh=new THREE.Mesh(new THREE.PlaneGeometry(CITY*2,5),mat(0x3a3d3a)); rh.rotation.x=-Math.PI/2; rh.position.set(0,0.02,i*26); scene.add(rh);
+  const rv=new THREE.Mesh(new THREE.PlaneGeometry(5,CITY*2),mat(0x3a3d3a)); rv.rotation.x=-Math.PI/2; rv.position.set(i*26,0.02,0); scene.add(rv);
+}
+
+/* ============================ DESTRUCTIBLES ============================ */
+const targets=[];   // {group,x,z,w,d,h,hp,maxhp,alive,kind}
+let totalTargets=0, demolished=0;
+function addTarget(x,z,w,d,h,color,kind){
+  const g=new THREE.Group();
+  const chunks=[];
+  if(kind==='building'){
+    // stack of independently-destructible floor chunks (carve it down, blow the base to drop it)
+    const n=Math.max(1, Math.round(h/3.4)), ch=h/n;
+    for(let i=0;i<n;i++){
+      const m=new THREE.Mesh(new THREE.BoxGeometry(w, ch*0.98, d), mat(color));
+      m.position.y=i*ch+ch/2; m.castShadow=true; m.receiveShadow=true; g.add(m);
+      chunks.push({mesh:m, hp:ch*9+18, alive:true, cy:i*ch+ch/2, ch});
+    }
+    const trim=new THREE.Mesh(new THREE.BoxGeometry(w+0.4,0.5,d+0.4),mat(0x2c2f36)); trim.position.y=h+0.2; g.add(trim); chunks[n-1].trim=trim;
+  } else {
+    const body=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat(color)); body.position.y=h/2; body.castShadow=true; body.receiveShadow=true; g.add(body);
+    chunks.push({mesh:body, hp:h*8+20, alive:true, cy:h/2, ch:h});
+  }
+  g.position.set(x,0,z); scene.add(g);
+  const t={group:g, x,z,w,d,h, kind, color, chunks, aliveChunks:chunks.length, alive:true};
+  targets.push(t); totalTargets++;
+  return t;
+}
+function buildCity(){
+  const cols=[0x9a7a55,0xb05a4a,0x6f7a82,0x7d6f9a,0xa88a5a,0x5f8a7a,0x8a8f96];
+  let ci=0;
+  for(let gx=-2;gx<=2;gx++){ for(let gz=-2;gz<=2;gz++){
+    // building lots between roads
+    const bx=gx*26, bz=gz*26;
+    // 1-4 buildings per lot
+    const n=1+((gx+gz+4)%3);
+    for(let k=0;k<n;k++){
+      const ox=(k%2?6:-6)+ (Math.random()*4-2), oz=(k<2?-6:6)+(Math.random()*4-2);
+      const w=6+Math.random()*4, d=6+Math.random()*4, h=6+Math.random()*22;
+      addTarget(bx+ox, bz+oz, w,h>20?Math.min(d,8):d, h, cols[(ci++)%cols.length], 'building');
+    }
+  }}
+  // cars on roads
+  for(let i=0;i<14;i++){ const onX=Math.random()<0.5; const lane=((Math.random()*5)|0-2)*26;
+    const px=onX? (Math.random()*CITY*2-CITY): lane; const pz=onX? lane : (Math.random()*CITY*2-CITY);
+    addTarget(px,pz, onX?3.4:1.8, 1.4, onX?1.8:3.4, [0xd14b4b,0x4b86d1,0xe0c24a,0x59b06a][(Math.random()*4)|0],'car'); }
+  // street props (hydrants/boxes)
+  for(let i=0;i<18;i++){ const a=Math.random()*Math.PI*2,r=10+Math.random()*CITY; addTarget(Math.cos(a)*r,Math.sin(a)*r, 1.2,1.2,1.6, 0xcf8a3a,'prop'); }
+}
+buildCity();
+
+/* ============================ DEBRIS ============================ */
+const debris=[];
+// free a slot when at the cap — always sacrifice transient dust before permanent rubble
+function recycleDebris(){ if(debris.length<MAX_DEBRIS) return; let idx=debris.findIndex(d=>!d.persist); if(idx<0) idx=0;
+  const old=debris.splice(idx,1)[0]; scene.remove(old.mesh); old.mesh.geometry.dispose(); old.mesh.material.dispose(); }
+function spawnDebris(x,y,z,color,count){
+  for(let i=0;i<count;i++){
+    recycleDebris();
+    const s=0.5+Math.random()*1.2;
+    const m=new THREE.Mesh(new THREE.BoxGeometry(s,s,s),mat(color));
+    m.position.set(x+(Math.random()*2-1)*2, y+Math.random()*3, z+(Math.random()*2-1)*2);
+    m.castShadow=true; scene.add(m);
+    debris.push({mesh:m, vx:(Math.random()*2-1)*9, vy:5+Math.random()*9, vz:(Math.random()*2-1)*9,
+      rx:(Math.random()*2-1)*6, rz:(Math.random()*2-1)*6, life:3+Math.random()*2, s, bh:s/2});   // dust = transient
+  }
+}
+function updateDebris(dt){
+  for(let i=debris.length-1;i>=0;i--){ const d=debris[i];
+    if(d.settled) continue;   // permanent rubble that has come to rest — leave it exactly where it landed
+    d.vy-=24*dt; d.mesh.position.x+=d.vx*dt; d.mesh.position.y+=d.vy*dt; d.mesh.position.z+=d.vz*dt;
+    d.mesh.rotation.x+=d.rx*dt; d.mesh.rotation.z+=d.rz*dt;
+    const rest=d.bh||d.s/2; if(d.mesh.position.y<=rest){ d.mesh.position.y=rest; d.vy*=-0.35; d.vx*=0.6; d.vz*=0.6; d.rx*=0.5; d.rz*=0.5;
+      if(d.persist && Math.abs(d.vy)<1.2 && Math.hypot(d.vx,d.vz)<0.6){ d.vx=d.vy=d.vz=d.rx=d.rz=0; d.settled=true; } }   // rubble comes to rest
+    if(!d.persist){ d.life-=dt;
+      if(d.life<=0){ scene.remove(d.mesh); d.mesh.geometry.dispose(); d.mesh.material.dispose(); debris.splice(i,1); }
+      else if(d.life<1){ d.mesh.material.transparent=true; d.mesh.material.opacity=d.life; }
+    }
+  }
+}
+
+/* explosions (visual) */
+const fx=[];
+function explosion(x,y,z){
+  const flash=new THREE.Mesh(new THREE.SphereGeometry(1,12,10), new THREE.MeshBasicMaterial({color:0xffd070,transparent:true}));
+  flash.position.set(x,y,z); scene.add(flash); fx.push({mesh:flash,life:0.4,max:0.4,grow:BLAST_RADIUS});
+  const ring=new THREE.Mesh(new THREE.TorusGeometry(1,0.4,8,24), new THREE.MeshBasicMaterial({color:0xff7a3c,transparent:true}));
+  ring.rotation.x=Math.PI/2; ring.position.set(x,1,z); scene.add(ring); fx.push({mesh:ring,life:0.5,max:0.5,grow:BLAST_RADIUS*1.3,ring:true});
+}
+function updateFx(dt){
+  for(let i=fx.length-1;i>=0;i--){ const f=fx[i]; f.life-=dt; const k=1-f.life/f.max;
+    const s=0.4+k*f.grow; f.mesh.scale.set(s, f.ring?s:s*0.7, s); f.mesh.material.opacity=Math.max(0,1-k);
+    if(f.life<=0){ scene.remove(f.mesh); f.mesh.geometry.dispose(); f.mesh.material.dispose(); fx.splice(i,1); } }
+}
+
+/* ============================ BLAST LOGIC ============================ */
+let shake=0;
+function blastAt(x,y,z, source){
+  explosion(x,y,z);
+  // screen shake if near camera
+  const dCam=camera.position.distanceTo(new THREE.Vector3(x,y,z)); if(dCam<40) shake=Math.max(shake, (1-dCam/40)*0.8);
+  for(const t of targets){ if(!t.alive) continue;
+    if(Math.hypot(t.x-x, t.z-z) > BLAST_RADIUS + Math.max(t.w,t.d)) continue; // quick cull
+    for(const c of t.chunks){ if(!c.alive) continue;
+      const dist=Math.hypot(t.x-x, c.cy-y, t.z-z);
+      if(dist<BLAST_RADIUS){
+        c.hp -= BLAST_DMG*(1-dist/BLAST_RADIUS);
+        if(c.hp<=0) destroyChunk(t,c,source);
+        else spawnDebris(t.x, c.cy, t.z, t.color, 1);
+      }
+    }
+  }
+}
+// destroy one floor chunk; everything above it loses support and topples too
+function destroyChunk(t, chunk, source){
+  if(!chunk.alive) return;
+  chunk.alive=false; chunk.mesh.visible=false; if(chunk.trim) chunk.trim.visible=false; t.aliveChunks--;
+  spawnChunkDebris(t, chunk);
+  for(const c of t.chunks){ if(c.alive && c.cy>chunk.cy){ c.alive=false; c.mesh.visible=false; if(c.trim) c.trim.visible=false; t.aliveChunks--; spawnChunkDebris(t,c); } }
+  if(t.aliveChunks<=0){ t.alive=false; demolished++;
+    if(source) source.demo=(source.demo||0)+1;
+    if(source&&source.isHuman) onPlayerDemo(t);
+    feedRow(`<b style="color:${source&&source.isHuman?'#8ef0a0':'#ffd0a0'}">${source?source.name:'someone'}</b> leveled a ${t.kind} · ${demolished}/${totalTargets}`);
+  }
+}
+function spawnChunkDebris(t, chunk){
+  recycleDebris();
+  const cw=t.w*(0.7+Math.random()*0.3), cd=t.d*(0.7+Math.random()*0.3), chh=chunk.ch*(0.8+Math.random()*0.3);
+  const m=new THREE.Mesh(new THREE.BoxGeometry(cw,chh,cd), mat(t.color));
+  m.position.set(t.x+(Math.random()*2-1)*1.2, chunk.cy, t.z+(Math.random()*2-1)*1.2); m.rotation.y=Math.random()*0.6; m.castShadow=true; m.receiveShadow=true; scene.add(m);
+  const ox=Math.random()*2-1, oz=Math.random()*2-1, ol=Math.hypot(ox,oz)||1, push=2+Math.random()*4;
+  debris.push({mesh:m, vx:ox/ol*push, vy:1.5+Math.random()*3, vz:oz/ol*push, rx:(Math.random()*2-1)*2.5, rz:(Math.random()*2-1)*2.5, s:chh, bh:chh/2, persist:true});  // building blocks become permanent rubble
+  spawnDebris(t.x, chunk.cy, t.z, t.color, 2);
+}
+
+/* ============================ ROCKETS ============================ */
+const rockets=[];
+function launchRocket(p, origin, dir){
+  const m=new THREE.Mesh(new THREE.CapsuleGeometry(0.22,0.7,4,8), mat(0x2c2f36)); m.position.copy(origin);
+  const tip=new THREE.Mesh(new THREE.ConeGeometry(0.22,0.5,8),mat(0xff5a3c)); tip.position.y=0.55; m.add(tip);
+  scene.add(m); rockets.push({mesh:m, vel:dir.clone().multiplyScalar(ROCKET_SPEED), life:3, owner:p});
+}
+const _rp=new THREE.Vector3();
+function updateRockets(dt){
+  for(let i=rockets.length-1;i>=0;i--){ const r=rockets[i];
+    r.vel.y-=8*dt; // slight arc
+    _rp.copy(r.mesh.position).addScaledVector(r.vel, dt);
+    // orient
+    r.mesh.position.copy(_rp); r.mesh.lookAt(_rp.clone().add(r.vel)); r.mesh.rotateX(Math.PI/2);
+    let hit=false, hy=_rp.y;
+    if(_rp.y<=0.4){ hit=true; hy=0.4; }
+    if(!hit){ for(const t of targets){ if(!t.alive)continue; if(Math.abs(_rp.x-t.x)<t.w/2+0.4 && Math.abs(_rp.z-t.z)<t.d/2+0.4){ for(const c of t.chunks){ if(c.alive && Math.abs(_rp.y-c.cy)<c.ch/2+0.4){ hit=true; break; } } if(hit) break; } } }
+    r.life-=dt; if(r.life<=0) hit=true;
+    if(hit){ blastAt(_rp.x, hy, _rp.z, r.owner); scene.remove(r.mesh); r.mesh.traverse(o=>{o.geometry&&o.geometry.dispose&&o.geometry.dispose();}); rockets.splice(i,1); }
+  }
+}
+
+/* ============================ CHARACTERS ============================ */
+function makeCrew(color){
+  const g=new THREE.Group();
+  const skin=mat(0xe8b890), cloth=mat(color), dark=mat(0x2a2d34);
+  const lL=new THREE.Mesh(new THREE.BoxGeometry(0.34,0.85,0.34),dark); lL.position.set(-0.2,0.42,0);
+  const lR=lL.clone(); lR.position.x=0.2;
+  const torso=new THREE.Mesh(new THREE.BoxGeometry(0.8,0.95,0.45),cloth); torso.position.y=1.32;
+  const aL=new THREE.Mesh(new THREE.BoxGeometry(0.26,0.8,0.26),cloth); aL.position.set(-0.56,1.32,0);
+  const aR=aL.clone(); aR.position.x=0.56;
+  const head=new THREE.Mesh(new THREE.BoxGeometry(0.5,0.5,0.5),skin); head.position.y=2.05;
+  const helm=new THREE.Mesh(new THREE.BoxGeometry(0.58,0.3,0.58),mat(0xff7a3c)); helm.position.y=2.3; // hard hat
+  const launcher=new THREE.Mesh(new THREE.BoxGeometry(0.18,0.18,1.1),mat(0x33363d)); launcher.position.set(0.56,1.35,-0.2);
+  for(const m of [lL,lR,torso,aL,aR,head,helm]) m.castShadow=true;
+  g.add(lL,lR,torso,aL,aR,head,helm,launcher);
+  g.userData.parts={lL,lR};
+  const muzzle=new THREE.Object3D(); muzzle.position.set(0.56,1.35,-0.95); g.add(muzzle); g.userData.muzzle=muzzle;
+  return g;
+}
+function makeTag(name,isYou){
+  const cv=document.createElement('canvas'); cv.width=200; cv.height=44; const cx=cv.getContext('2d');
+  const tex=new THREE.CanvasTexture(cv); cx.font='bold 26px ui-monospace,monospace'; cx.textAlign='center';
+  cx.fillStyle=isYou?'#8ef0a0':'#ffd0a0'; cx.lineWidth=5; cx.strokeStyle='rgba(0,0,0,.8)'; cx.strokeText(name,100,30); cx.fillText(name,100,30);
+  tex.needsUpdate=true;
+  const spr=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,depthTest:false,transparent:true})); spr.scale.set(2.2,0.5,1); spr.position.y=2.95; return spr;
+}
+const players=[];
+function createPlayer(idx,isHuman){
+  const color=isHuman?0x3bd16f:new THREE.Color().setHSL((idx*0.16)%1,0.5,0.55).getHex();
+  const grp=makeCrew(color); scene.add(grp); grp.add(makeTag(NAMES[idx],isHuman));
+  const a=(idx/CREW)*Math.PI*2, r=isHuman?0:24;
+  const p={ idx,isHuman, name:NAMES[idx], grp, pos:new THREE.Vector3(Math.cos(a)*r,0,Math.sin(a)*r), yaw:0, y:0, vy:0, onGround:true,
+    nextFire:0, demo:0, speaking:false, muted:false,
+    aiNextThink:0, aiGoal:null, aiNextFire:0 };
+  players.push(p); return p;
+}
+for(let i=0;i<CREW;i++) createPlayer(i,i===0);
+let me=players[0];
+
+/* ============================ DRIVABLE CARS ============================ */
+const cars=[];
+function makeDriveCar(x,z,color){
+  const g=new THREE.Group();
+  const body=new THREE.Mesh(new THREE.BoxGeometry(2.6,1.1,5.0),mat(color)); body.position.y=1.0; body.castShadow=true; g.add(body);
+  const cabin=new THREE.Mesh(new THREE.BoxGeometry(2.2,0.9,2.4),mat(0x20303f)); cabin.position.set(0,1.85,-0.3); g.add(cabin);
+  for(const [wx,wz] of [[-1.2,1.6],[1.2,1.6],[-1.2,-1.6],[1.2,-1.6]]){ const w=new THREE.Mesh(new THREE.CylinderGeometry(0.62,0.62,0.5,10),mat(0x111316)); w.rotation.z=Math.PI/2; w.position.set(wx,0.6,wz); g.add(w); }
+  g.position.set(x,0,z); scene.add(g);
+  const car={g,x,z,heading:0,speed:0}; cars.push(car); return car;
+}
+for(const [x,z,c] of [[10,4,0xd14b4b],[-16,-8,0x4b86d1],[22,-20,0xe0c24a],[-6,18,0x59b06a]]) makeDriveCar(x,z,c);
+function nearestCar(){ let best=null,bd=30; for(const c of cars){ const d=(c.x-me.pos.x)**2+(c.z-me.pos.z)**2; if(d<bd){bd=d;best=c;} } return best; }
+function enterCar(c){ me.driving=c; me.flying=false; me.grp.visible=false; feedRow('<span class="comms">🚗 Driving — WASD drive · ram buildings · V to exit</span>','comms'); }
+function exitCar(){ const c=me.driving; me.driving=null; me.grp.visible=true; me.pos.set(c.x+3.5,0,c.z); me.y=0; }
+function updateCar(c,dt){
+  let acc=0,turn=0; if(keys['KeyW'])acc+=1; if(keys['KeyS'])acc-=1; if(keys['KeyA'])turn+=1; if(keys['KeyD'])turn-=1;
+  c.speed += acc*24*dt; c.speed*=0.97; c.speed=Math.max(-13,Math.min(30,c.speed));
+  if(Math.abs(c.speed)>0.4) c.heading += turn*1.7*dt*(c.speed>0?1:-1);
+  const dx=Math.sin(c.heading), dz=Math.cos(c.heading);
+  c.x=Math.max(-CITY+1,Math.min(CITY-1, c.x+dx*c.speed*dt));
+  c.z=Math.max(-CITY+1,Math.min(CITY-1, c.z+dz*c.speed*dt));
+  c.g.position.set(c.x,0,c.z); c.g.rotation.y=c.heading;
+  if(Math.abs(c.speed)>7){ for(const t of targets){ if(!t.alive||t.kind==='prop')continue; if(Math.abs(c.x-t.x)<t.w/2+2.2 && Math.abs(c.z-t.z)<t.d/2+2.2){ blastAt(c.x,2,c.z,me); mpEvent({t:'blast', p:[c.x,2,c.z]}); c.speed*=0.35; break; } } }
+  me.pos.set(c.x,0,c.z); me.yaw=c.heading;
+}
+
+/* ============================ INPUT ============================ */
+const keys={};
+addEventListener('keydown',e=>{ keys[e.code]=true;
+  if(e.code==='KeyF' && running){ me.flying=!me.flying; me.vy=0; feedRow('<span class="comms">'+(me.flying?'✈️ FLIGHT ON — Space = up, Shift = down':'Flight off')+'</span>','comms'); }
+  if(e.code==='KeyV' && running){ if(me.driving) exitCar(); else { const c=nearestCar(); if(c) enterCar(c); else feedRow('<span class="comms">No car nearby</span>','comms'); } }
+});
+addEventListener('keyup',e=> keys[e.code]=false);
+let camYaw=0,camPitch=0.34,locked=false;
+const canvas=renderer.domElement;
+canvas.addEventListener('click',()=>{ if(running && !locked){ canvas.requestPointerLock(); return; } });
+document.addEventListener('pointerlockchange',()=>{ locked=document.pointerLockElement===canvas; });
+// FPS-standard axes: mouse right = look right, mouse up = look up
+addEventListener('mousemove',e=>{ if(!locked)return; camYaw+=e.movementX*0.0024; camPitch+=e.movementY*0.0024; camPitch=Math.max(-0.35,Math.min(0.95,camPitch)); });
+addEventListener('mousedown',e=>{ if(e.button===0 && running && locked) playerFire(); });
+
+function playerFire(){
+  if(GT<me.nextFire) return; me.nextFire=GT+ROCKET_CD;
+  const o=new THREE.Vector3(), d=new THREE.Vector3();
+  camera.getWorldPosition(o); camera.getWorldDirection(d);
+  o.addScaledVector(d,2);
+  launchRocket(me,o,d);
+  // LIVE: everyone sees my rocket AND its blast — rocket physics is deterministic,
+  // so replaying the same launch keeps every client's city identical
+  mpEvent({t:'rocket', o:[o.x,o.y,o.z], d:[d.x,d.y,d.z]});
+}
+
+/* ============================ COLLISION ============================ */
+function collide(pos,radius){
+  pos.x=Math.max(-CITY+radius,Math.min(CITY-radius,pos.x));
+  pos.z=Math.max(-CITY+radius,Math.min(CITY-radius,pos.z));
+  for(const t of targets){ if(!t.alive||t.kind==='prop')continue;
+    const hx=t.w/2+radius, hz=t.d/2+radius, dx=pos.x-t.x, dz=pos.z-t.z;
+    if(Math.abs(dx)<hx && Math.abs(dz)<hz){ const px=hx-Math.abs(dx), pz=hz-Math.abs(dz);
+      if(px<pz) pos.x+=(dx<0?-px:px); else pos.z+=(dz<0?-pz:pz); }
+  }
+}
+
+/* ============================ AI (demolition crew) ============================ */
+function nearestAlive(p){ let best=null,bd=Infinity; for(const t of targets){ if(!t.alive)continue; const d=(t.x-p.pos.x)**2+(t.z-p.pos.z)**2; if(d<bd){bd=d;best=t;} } return best; }
+const _bd=new THREE.Vector3();
+function updateBot(p,dt){
+  if(GT>p.aiNextThink || !p.aiGoal || !p.aiGoal.alive){ p.aiNextThink=GT+800+Math.random()*800; p.aiGoal=nearestAlive(p); }
+  const g=p.aiGoal; let move=new THREE.Vector3();
+  if(g && g.alive){
+    const dist=Math.hypot(g.x-p.pos.x,g.z-p.pos.z); p.yaw=Math.atan2(g.x-p.pos.x,-(g.z-p.pos.z));
+    if(dist>18) { _bd.set(g.x-p.pos.x,0,g.z-p.pos.z).normalize(); move.add(_bd); }
+    else if(dist<10){ _bd.set(g.x-p.pos.x,0,g.z-p.pos.z).normalize(); move.sub(_bd); }
+    if(dist<26 && GT>p.aiNextFire){ p.aiNextFire=GT+900+Math.random()*900;
+      const o=new THREE.Vector3(); p.grp.userData.muzzle.getWorldPosition(o);
+      const d=new THREE.Vector3(g.x,g.h*0.5,g.z).sub(o).normalize(); launchRocket(p,o,d); }
+  }
+  if(move.lengthSq()>0) move.normalize();
+  const sp=6; p.pos.x+=move.x*sp*dt; p.pos.z+=move.z*sp*dt; collide(p.pos,0.6);
+}
+
+/* ============================ VOICE / FEED ============================ */
+function feedRow(html,cls){ const f=document.getElementById('feed'); const r=document.createElement('div'); r.className='row '+(cls||''); r.innerHTML=html; f.prepend(r); while(f.children.length>6) f.lastChild.remove(); setTimeout(()=>r.remove(),6000); }
+let micMuted=false, deafened=false;
+const vrowsEl=document.getElementById('vrows');
+function buildVoice(){ vrowsEl.innerHTML='';
+  for(const p of players){ const row=document.createElement('div'); row.className='vrow'+(p.isHuman?' you':'');
+    row.innerHTML=`<span class="dot"></span><span class="name">${p.name}${p.isHuman?' (you)':''}</span>`+(p.isHuman?'':'<button class="mute">mute</button>');
+    p._vrow=row; const b=row.querySelector('.mute');
+    if(b) b.onclick=()=>{ p.muted=!p.muted; row.classList.toggle('muted',p.muted); b.textContent=p.muted?'unmute':'mute'; };
+    vrowsEl.appendChild(row);
+  }
+}
+document.getElementById('btnMic').onclick=()=>toggleMic();   // REAL mic: click to talk to the crew
+document.getElementById('btnDeaf').onclick=function(){ deafened=!deafened; this.classList.toggle('on',deafened); this.classList.toggle('deaf',deafened); this.textContent=deafened?'🎧 Deaf':'🎧 Deafen'; document.getElementById('voiceState').textContent=deafened?'MUTED':'LIVE'; };
+function comms(p){ if(p.muted||deafened) return; const line=COMMS[(Math.random()*COMMS.length)|0]; feedRow(`<span class="comms"><b style="color:#ffd0a0">${p.name}:</b> ${line}</span>`,'comms'); }
+function tickVoice(){
+  if(me._vrow) me._vrow.classList.toggle('speaking', micOn);
+  if(MP.online && !PRACTICE) return;   // live crews use the real 🎤 relay, not simulated chatter
+  for(const p of players){ if(p.isHuman){ continue; }
+  if(p.muted||deafened){ p._vrow&&p._vrow.classList.remove('speaking'); continue; }
+  if(!p.speaking && Math.random()<0.01){ p.speaking=true; p._vrow&&p._vrow.classList.add('speaking'); comms(p); setTimeout(()=>{p.speaking=false; p._vrow&&p._vrow.classList.remove('speaking');},900+Math.random()*800); } } }
+
+/* ============================ ACHIEVEMENTS ============================ */
+const ACH_KEY='tp_dz_ach';
+const ACHS={ first_blast:{ic:'💥',title:'First Blast'}, wrecker:{ic:'🏗️',title:'Wrecker — 10 demolished'}, halfway:{ic:'🔥',title:'Halfway — 50% leveled'}, total:{ic:'☢️',title:'Total Destruction — 100%'} };
+let achGot={}; try{ achGot=JSON.parse(localStorage.getItem(ACH_KEY)||'{}'); }catch(e){ achGot={}; }
+function unlock(id){ if(achGot[id])return; achGot[id]=Date.now(); try{localStorage.setItem(ACH_KEY,JSON.stringify(achGot));}catch(e){}
+  const a=ACHS[id]; document.getElementById('achIc').textContent=a.ic; document.getElementById('achD').textContent=a.title;
+  const t=document.getElementById('achToast'); t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3500); }
+function onPlayerDemo(){ unlock('first_blast'); if(me.demo>=10) unlock('wrecker'); }
+
+/* ============================ MATCH ============================ */
+let running=false, GT=0;
+/* ============================ LIVE CO-OP ============================ *
+ * Real players over the ws relay: you all smash the SAME city. Rockets and
+ * car-ram blasts are replayed on every client (rocket physics is deterministic),
+ * so towers fall identically for everyone. Bots exist only in solo practice. */
+const MP={online:false, ws:null, id:0, host:true, humans:1};
+let PRACTICE=false;
+function mpStatus(txt){ const el=document.getElementById('mpStatus'); if(el) el.textContent=txt; }
+function mpEvent(o){ if(MP.online && !PRACTICE && MP.ws && MP.ws.readyState===1) MP.ws.send(JSON.stringify(o)); }
+function mpSetMe(slot){
+  const p=players[slot]; if(!p || p===me) return;
+  me.isHuman=false; me=p; me.isHuman=true; me.isRemote=false; buildVoice();
+}
+function mpConnect(){
+  let ws; try{ ws=new WebSocket(location.protocol==='https:'?('wss://'+location.host+'/mp'):('ws://'+location.hostname+':8031')); }
+  catch(e){ mpStatus('🤖 OFFLINE — solo with bot crew'); return; }
+  const giveUp=setTimeout(()=>{ try{ws.close();}catch(e){} mpStatus('🤖 OFFLINE — solo with bot crew'); },1500);
+  ws.onopen=()=>{ clearTimeout(giveUp); ws.send(JSON.stringify({t:'join', room:'dz', name:'P'+(100+((Math.random()*899)|0))})); };
+  ws.onerror=()=>{};
+  ws.onclose=()=>{ if(MP.online){ MP.online=false; MP.host=true; for(const p of players) p.isRemote=false; mpStatus('🤖 OFFLINE — solo with bot crew'); } };
+  ws.onmessage=ev=>{ let m; try{ m=JSON.parse(ev.data); }catch(e){ return; } mpHandle(m,ws); };
+}
+function mpHandle(m,ws){
+  switch(m.t){
+    case 'welcome':{ MP.online=true; MP.ws=ws; MP.id=m.id; MP.host=m.host; MP.humans=1+m.peers.length;
+      mpSetMe(m.slot);
+      for(const pe of m.peers){ const p=players[pe.slot]; if(p){ p.isRemote=true; p.isHuman=false; } }
+      mpStatus('🌐 LIVE — '+MP.humans+' in the crew'+(MP.host?' (you host)':'')); break; }
+    case 'peer-join':{ MP.humans++; const p=players[m.slot];
+      if(p){ p.isRemote=true; p.isHuman=false; p.grp.visible=true; }
+      feedRow('<b style="color:#8ef0a0">a real wrecker joined the crew!</b>');
+      mpStatus('🌐 LIVE — '+MP.humans+' in the crew'+(MP.host?' (you host)':'')); break; }
+    case 'peer-leave':{ MP.humans=Math.max(1,MP.humans-1); const p=players[m.slot];
+      if(p){ p.isRemote=false; if(MP.online && !PRACTICE) p.grp.visible=false; feedRow(p.name+' left'); }
+      mpStatus('🌐 LIVE — '+MP.humans+' in the crew'+(MP.host?' (you host)':'')); break; }
+    case 'you-are-host': MP.host=true; break;
+    case 'host': break;
+    case 'reqstart': if(MP.host && !running){ mpEvent({t:'start'}); start(); } break;
+    case 'start': if(!running) start(); break;
+    case 'st':{ const p=players[m._slot]; if(!p || p===me) break;
+      p.isRemote=true; p.isHuman=false; p.grp.visible=true;
+      p.pos.x=m.d[0]; p.pos.z=m.d[1]; p.y=m.d[2]; p.yaw=m.d[3]; break; }
+    case 'rocket':{ const p=players[m._slot]||me;
+      launchRocket(p, new THREE.Vector3(m.o[0],m.o[1],m.o[2]), new THREE.Vector3(m.d[0],m.d[1],m.d[2])); break; }
+    case 'blast': blastAt(m.p[0],m.p[1],m.p[2], players[m._slot]||null); break;
+    case 'voice': playVoice(m); break;
+    case 'feed': feedRow(m.h); break;
+  }
+}
+let mpLastSt=0;
+function mpNetTick(){
+  if(!MP.online || PRACTICE || !running) return;
+  if(GT-mpLastSt>100){ mpLastSt=GT;
+    mpEvent({t:'st', d:[+me.pos.x.toFixed(2), +me.pos.z.toFixed(2), +me.y.toFixed(2), +me.yaw.toFixed(2)]}); }
+}
+function requestStart(){
+  if(!MP.online || PRACTICE){ start(); return; }
+  if(MP.host){ mpEvent({t:'start'}); start(); }
+  else { mpEvent({t:'reqstart'}); document.getElementById('startBtn').textContent='Waiting for host…'; }
+}
+/* real crew voice — everyone in the room hears everyone (it's co-op) */
+let micOn=false, micStream=null, micRec=null;
+async function toggleMic(){
+  const btn=document.getElementById('btnMic');
+  if(micOn){ micOn=false; btn.classList.remove('on'); btn.textContent='🎤 Mic';
+    try{ micRec && micRec.state!=='inactive' && micRec.stop(); }catch(e){}
+    if(micStream){ micStream.getTracks().forEach(t=>t.stop()); micStream=null; }
+    if(me._vrow) me._vrow.classList.remove('speaking'); return; }
+  if(!MP.online){ btn.textContent='🎤 offline'; setTimeout(()=>btn.textContent='🎤 Mic',1100); return; }
+  try{ micStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true}}); }
+  catch(e){ btn.textContent='🎤 blocked'; setTimeout(()=>btn.textContent='🎤 Mic',1400); return; }
+  micOn=true; btn.classList.add('on'); btn.textContent='🔴 LIVE';
+  if(me._vrow) me._vrow.classList.add('speaking');
+  micLoop();
+}
+function micLoop(){
+  if(!micOn || !micStream) return;
+  try{ micRec=new MediaRecorder(micStream,{mimeType:'audio/webm;codecs=opus',audioBitsPerSecond:24000}); }
+  catch(e){ try{ micRec=new MediaRecorder(micStream); }catch(e2){ micOn=false; return; } }
+  micRec.ondataavailable=ev=>{
+    if(!micOn || !MP.online || ev.data.size<500) return;
+    ev.data.arrayBuffer().then(ab=>{
+      const u=new Uint8Array(ab); let s='';
+      for(let i=0;i<u.length;i+=1024) s+=String.fromCharCode.apply(null,u.subarray(i,i+1024));
+      mpEvent({t:'voice', d:btoa(s)});
+    });
+  };
+  micRec.onstop=()=>micLoop();
+  micRec.start();
+  setTimeout(()=>{ try{ micRec.state!=='inactive' && micRec.stop(); }catch(e){} },400);
+}
+function playVoice(m){
+  const p=players[m._slot]; if(!p) return;
+  if(p.muted || deafened) return;
+  try{
+    const bin=atob(m.d), u8=new Uint8Array(bin.length);
+    for(let i=0;i<bin.length;i++) u8[i]=bin.charCodeAt(i);
+    const url=URL.createObjectURL(new Blob([u8],{type:'audio/webm'}));
+    const a=new Audio(url); a.volume=0.95; a.onended=()=>URL.revokeObjectURL(url); a.play().catch(()=>{});
+  }catch(e){ return; }
+  if(p._vrow){ p._vrow.classList.add('speaking');
+    clearTimeout(p._vt); p._vt=setTimeout(()=>p._vrow.classList.remove('speaking'),500); }
+}
+mpConnect();
+
+function start(){
+  running=true; GT=0;
+  document.getElementById('startOverlay').classList.add('hidden');
+  for(const id of ['cross','topbar','voice','feed','tool','hint']) document.getElementById(id).classList.remove('hidden');
+  // LIVE: only real crew members walk the city — no bots
+  if(MP.online && !PRACTICE){ for(const p of players){ if(p!==me && !p.isRemote) p.grp.visible=false; } }
+  buildVoice();
+}
+document.getElementById('startBtn').onclick=requestStart;
+document.getElementById('practiceBtn').onclick=()=>{
+  PRACTICE=true;
+  try{ if(MP.ws) MP.ws.close(); }catch(e){}
+  MP.online=false; MP.host=true; for(const p of players){ p.isRemote=false; p.grp.visible=true; }
+  mpStatus('🤖 SOLO — bot crew');
+  start();
+};
+
+/* ============================ PLAYER / CAMERA ============================ */
+function updatePlayer(dt){
+  if(me.driving){ updateCar(me.driving,dt); return; }
+  let f=0,s=0; if(keys['KeyW'])f+=1; if(keys['KeyS'])f-=1; if(keys['KeyA'])s-=1; if(keys['KeyD'])s+=1;
+  const sprint=keys['ShiftLeft']||keys['ShiftRight']?1.7:1, speed=7*sprint;
+  me.yaw=camYaw;  // always face where you aim
+  if(f||s){ const a=camYaw, dx=Math.sin(a)*f+Math.cos(a)*s, dz=-Math.cos(a)*f+Math.sin(a)*s, l=Math.hypot(dx,dz)||1;
+    me.pos.x+=(dx/l)*speed*dt; me.pos.z+=(dz/l)*speed*dt; }
+  if(me.flying){
+    const fly=16; if(keys['Space']) me.y+=fly*dt; if(keys['ShiftLeft']||keys['ShiftRight']) me.y-=fly*dt;
+    me.y=Math.max(0, Math.min(130, me.y)); me.vy=0; me.onGround=false;
+    if(me.y>2.5){ me.pos.x=Math.max(-CITY+0.6,Math.min(CITY-0.6,me.pos.x)); me.pos.z=Math.max(-CITY+0.6,Math.min(CITY-0.6,me.pos.z)); }  // fly over buildings
+    else collide(me.pos,0.6);
+  } else {
+    if(keys['Space']&&me.onGround){ me.vy=7.6; me.onGround=false; }
+    me.vy-=22*dt; me.y+=me.vy*dt; if(me.y<=0){ me.y=0; me.vy=0; me.onGround=true; }
+    collide(me.pos,0.6);
+  }
+}
+const _ct=new THREE.Vector3(),_cp=new THREE.Vector3();
+function updateCamera(){
+  if(me.driving){ const c=me.driving, bx=Math.sin(c.heading), bz=Math.cos(c.heading);
+    _cp.set(c.x-bx*13, 8, c.z-bz*13); if(shake>0){ _cp.x+=(Math.random()*2-1)*shake; _cp.y+=(Math.random()*2-1)*shake; }
+    camera.position.lerp(_cp,0.12); camera.lookAt(c.x+bx*8, 2.5, c.z+bz*8); return; }
+  const px=me.pos.x,py=me.y+1.5,pz=me.pos.z,dist=5.6,height=1.0;
+  const ox=Math.sin(camYaw)*Math.cos(camPitch)*dist, oz=-Math.cos(camYaw)*Math.cos(camPitch)*dist, oy=Math.sin(camPitch)*dist+height;
+  _cp.set(px-ox,py+oy,pz-oz); _cp.y=Math.max(_cp.y,0.6);
+  if(shake>0){ _cp.x+=(Math.random()*2-1)*shake; _cp.y+=(Math.random()*2-1)*shake; }
+  camera.position.lerp(_cp,0.4);
+  _ct.set(px+Math.sin(camYaw)*1.5,py+0.2,pz-Math.cos(camYaw)*1.5); camera.lookAt(_ct);
+}
+
+/* ============================ HUD ============================ */
+function updateHUD(){
+  const pct=Math.round(demolished/totalTargets*100);
+  document.getElementById('lvl').textContent=pct+'%'; document.getElementById('lvlbar').style.width=pct+'%';
+  document.getElementById('demoN').textContent=demolished;
+  document.getElementById('cd').style.width=Math.min(100,(GT-(me.nextFire-ROCKET_CD))/ROCKET_CD*100)+'%';
+  if(pct>=50) unlock('halfway'); if(pct>=100) unlock('total');
+}
+function syncBodies(){
+  for(const p of players){ p.grp.position.set(p.pos.x,p.y,p.pos.z); p.grp.rotation.y=-p.yaw;   // -yaw: launcher points local -z → face where you aim
+    const parts=p.grp.userData.parts; const moving=true; const t=GT*0.012;
+    if(parts){ parts.lL.rotation.x=Math.sin(t)*0.4; parts.lR.rotation.x=-Math.sin(t)*0.4; } }
+}
+
+/* ============================ LOOP ============================ */
+function stepSim(dt){
+  if(running){
+    GT+=dt*1000; scene.updateMatrixWorld(true);
+    updatePlayer(dt);
+    if(!MP.online || PRACTICE){ for(const p of players){ if(!p.isHuman && !p.isRemote) updateBot(p,dt); } }
+    mpNetTick();
+    updateRockets(dt); updateDebris(dt); updateFx(dt); tickVoice(); updateHUD();
+    if(shake>0) shake=Math.max(0,shake-dt*1.6);
+  } else { updateDebris(dt); updateFx(dt); }
+  syncBodies();
+}
+let last=performance.now();
+function frame(){ requestAnimationFrame(frame); const wn=performance.now(); let dt=(wn-last)/1000; last=wn; if(dt>0.05)dt=0.05; stepSim(dt); updateCamera(); renderer.render(scene,camera); }
+window.__dz={ players, step:stepSim, paint(){updateCamera(); renderer.render(scene,camera);}, blastAt, me, cars, enterCar, get running(){return running;}, get gt(){return GT;}, get demolished(){return demolished;}, get total(){return totalTargets;}, get rubble(){return debris.filter(d=>d.persist).length;}, get settled(){return debris.filter(d=>d.settled).length;} };
+frame();
+</script>
+</body>
+</html>

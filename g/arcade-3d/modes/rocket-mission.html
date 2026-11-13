@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>Arcade 3D — Rocket Mission</title>
+<style>
+  :root{ --ink:#0b0e14; --panel:#121722; --accent:#4aa3ff; --ok:#36d17a; --warn:#f4b740; }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%;overflow:hidden;background:#0b0e14;color:#e8eef6;
+    font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;user-select:none}
+  #app{position:fixed;inset:0}
+  canvas{display:block}
+  .hidden{display:none !important}
+
+  #progress{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;gap:2px;padding:8px 12px;background:linear-gradient(#0b0e14cc,transparent)}
+  #progress .seg{flex:1;height:5px;border-radius:3px;background:#243044}
+  #progress .seg.done{background:var(--accent)} #progress .seg.cur{background:var(--ok)}
+
+  #panel{position:fixed;top:34px;right:14px;width:344px;max-height:calc(100% - 70px);z-index:30;overflow-y:auto;
+    background:rgba(18,23,34,.94);border:1px solid #26344a;border-radius:14px;padding:16px;backdrop-filter:blur(6px)}
+  #stepKicker{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);font-weight:700}
+  #stepTitle{font-size:17px;font-weight:800;margin:4px 0 8px}
+  #stepBody{font-size:12px;line-height:1.65;color:#c4d0df}
+  .learn{background:#0e1420;border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:9px 11px;margin:9px 0;font-size:11.5px;color:#aebccd}
+  .learn b{color:#dce8f6} .learn.warn{border-color:var(--warn)} .learn.ok{border-color:var(--ok)}
+  .data{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;font-size:11px;margin:8px 0;color:#9fb0c4}
+  .data b{color:#dce8f6;text-align:right}
+  #stepActions{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+  .btn{cursor:pointer;font-family:inherit;font-weight:800;text-transform:uppercase;letter-spacing:.1em;font-size:12px;
+    background:var(--accent);color:#04101f;border:none;border-radius:9px;padding:11px 14px;transition:filter .15s}
+  .btn:hover{filter:brightness(1.1)} .btn:disabled{background:#33425a;color:#7689a0;cursor:not-allowed}
+  .opt{cursor:pointer;text-align:left;background:#0e1420;border:1px solid #26344a;border-radius:9px;padding:9px 11px;font-size:12px;color:#dce8f6;margin-top:6px}
+  .opt:hover{border-color:var(--accent)} .opt.sel{border-color:var(--ok);background:#0f2018}
+  .opt.bad{border-color:#e5564b;animation:shake .3s} .opt .t{font-weight:700} .opt .d{font-size:10.5px;color:#90a0b4;margin-top:2px}
+  @keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+
+  /* component / satellite chips */
+  .chips{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0}
+  .chip{cursor:pointer;background:#0e1420;border:1px solid #26344a;border-radius:9px;padding:9px;text-align:center;font-size:11px;position:relative}
+  .chip:hover{border-color:var(--accent)} .chip.ok{border-color:var(--ok)} .chip .ic{font-size:20px;display:block;margin-bottom:3px}
+  .chip.ok::after{content:'✓';position:absolute;top:4px;right:7px;color:var(--ok);font-weight:800}
+
+  #engGrid{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;margin:8px 0}
+  .eng{aspect-ratio:1;border-radius:50%;background:#3a2a14;border:1px solid #5a4420;cursor:pointer;font-size:8px;display:flex;align-items:center;justify-content:center;color:#caa84a}
+  .eng.ok{background:#10301f;border-color:var(--ok);color:var(--ok)}
+  .eng.bad{background:#3a1410;border-color:#e5564b;color:#e5564b;animation:pulse 1s infinite}
+  @keyframes pulse{50%{opacity:.5}}
+  #engStat{font-size:11px;text-align:center;margin-top:4px}
+
+  .gauge{height:14px;background:#0e1420;border:1px solid #26344a;border-radius:7px;overflow:hidden;margin:4px 0}
+  .gauge > div{height:100%;width:0%;transition:width .1s}
+  .lox > div{background:linear-gradient(90deg,#2a6fd6,#5aa3ff)} .ch4 > div{background:linear-gradient(90deg,#b06a2a,#f0a050)}
+  .glabel{display:flex;justify-content:space-between;font-size:10px;color:#90a0b4;margin-top:6px}
+
+  /* drag-to-attach */
+  #dragWrap{margin:10px 0;display:flex;align-items:center;gap:10px}
+  #capChip{cursor:grab;background:#0e1420;border:1px dashed var(--accent);border-radius:10px;padding:12px;text-align:center;font-size:11px;flex:0 0 110px}
+  #capChip:active{cursor:grabbing}
+  #bayDrop{flex:1;min-height:60px;border:2px dashed #33425a;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#7689a0;text-align:center;padding:8px}
+  #bayDrop.over{border-color:var(--ok);color:var(--ok)} #bayDrop.filled{border-style:solid;border-color:var(--ok);color:var(--ok)}
+
+  #telem{position:fixed;left:14px;bottom:14px;z-index:30;background:rgba(18,23,34,.9);border:1px solid #26344a;border-radius:12px;padding:10px 14px;display:none;min-width:180px}
+  #telem .row{display:flex;justify-content:space-between;font-size:12px;padding:1px 0}#telem .row b{color:var(--accent)}
+  #telem .ph{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--warn);margin-bottom:5px}
+  #count{position:fixed;left:50%;top:30%;transform:translate(-50%,-50%);z-index:30;font-size:64px;font-weight:800;color:#fff;text-shadow:0 0 20px #4aa3ff;display:none}
+  #anLabel{position:fixed;left:50%;top:16%;transform:translateX(-50%);z-index:25;font-size:13px;color:var(--warn);letter-spacing:1px;text-transform:uppercase;display:none}
+
+  .overlay{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;background:rgba(5,8,14,.9);backdrop-filter:blur(8px)}
+  .ov{width:min(580px,93vw);background:rgba(18,23,34,.97);border:1px solid #26344a;border-radius:18px;padding:28px;text-align:center;max-height:92vh;overflow-y:auto}
+  .ov h1{font-size:25px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}.ov h1 .a{color:var(--accent)}
+  .ov .sub{font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:#90a0b4;margin-bottom:16px}
+  .ov p{font-size:12.5px;line-height:1.7;color:#c4d0df;margin-bottom:8px}
+  .recap{text-align:left;font-size:12px;color:#bccadb;margin:14px 0;line-height:1.8} .recap li{margin-left:18px}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="progress"></div>
+<div id="panel" class="hidden">
+  <div id="stepKicker">MISSION CONTROL</div>
+  <div id="stepTitle">—</div>
+  <div id="stepBody"></div>
+  <div id="stepActions"></div>
+</div>
+<div id="anLabel"></div>
+<div id="telem">
+  <div class="ph" id="telPhase">ASCENT</div>
+  <div class="row"><span>Altitude</span><b id="telAlt">0 km</b></div>
+  <div class="row"><span>Speed</span><b id="telSpd">0 km/h</b></div>
+  <div class="row"><span>Thrust</span><b id="telThr">74 MN</b></div>
+  <div class="row"><span>TWR</span><b id="telTwr">1.5</b></div>
+  <div class="row"><span>Propellant</span><b id="telFuel">100%</b></div>
+  <div class="row"><span>Stage</span><b id="telStage">1 — Super Heavy</b></div>
+</div>
+<div id="count"></div>
+<div id="camHint" style="position:fixed;left:14px;top:14px;z-index:25;font-size:10px;color:#90a0b4;background:rgba(18,23,34,.7);border:1px solid #26344a;border-radius:8px;padding:5px 9px">🖱️ drag to look around · scroll to zoom · <b style="color:#dce8f6">C</b> = auto-camera</div>
+<div id="shotChip" style="display:none;position:fixed;left:14px;bottom:200px;z-index:30;font-size:11px;font-weight:700;letter-spacing:1px;color:#f4b740;background:rgba(18,23,34,.9);border:1px solid #3a3020;border-radius:9px;padding:6px 11px"></div>
+
+<div class="overlay" id="startOverlay">
+  <div class="ov">
+    <h1>ROCKET <span class="a">MISSION</span></h1>
+    <div class="sub">Factory → Pad → Orbit → Operations</div>
+    <p>YOU run the whole campaign: tour the <b>factory</b>, inspect Raptor engines and steel hulls, pick from <b>8 payloads</b> (Starlink, GPS, weather, telescope, Dragon crew, Moon &amp; Mars cargo…), roll the <b>Super Heavy</b> booster out, let <b>Mechazilla</b> stack it, clear all 33 engines, <b>hold the valves open</b> to load methalox, and launch.</p>
+    <p>Then fly it with <b>live physics telemetry</b> — thrust, TWR, Max-Q, MECO, orbital velocity — watch the booster come back for the catch, and see your satellite <b>operating live in orbit</b>. Finish with the full <b>Moon</b> and <b>Mars</b> mission plans. Every step teaches the real numbers and the "why".</p>
+    <button class="btn" id="startBtn" style="margin-top:8px">Enter Starbase</button>
+  </div>
+</div>
+<div class="overlay hidden" id="doneOverlay">
+  <div class="ov">
+    <h1 id="doneTitle">MISSION <span class="a">SUCCESS</span></h1>
+    <div class="sub" id="doneSub">Payload delivered to orbit</div>
+    <div class="recap" id="doneRecap"></div>
+    <button class="btn" id="againBtn">Fly Another Mission</button>
+  </div>
+</div>
+
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" }}
+</script>
+<script type="module">
+import * as THREE from 'three';
+window.__err=null; addEventListener('error',e=>{ window.__err=(e.message||'')+' @'+(e.lineno||''); });
+
+/* ============================ SCENE ============================ */
+const app=document.getElementById('app');
+const renderer=new THREE.WebGLRenderer({antialias:true}); renderer.setSize(innerWidth,innerHeight);
+renderer.setPixelRatio(Math.min(2,devicePixelRatio)); renderer.shadowMap.enabled=true; app.appendChild(renderer.domElement);
+const scene=new THREE.Scene(); scene.background=new THREE.Color(0x9cc2dd); scene.fog=new THREE.Fog(0x9cc2dd,260,700);
+const camera=new THREE.PerspectiveCamera(55, innerWidth/innerHeight, 0.5, 3000);
+addEventListener('resize',()=>{ camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth,innerHeight); });
+scene.add(new THREE.HemisphereLight(0xdff0ff,0x5a6a55,1.0));
+const sun=new THREE.DirectionalLight(0xffffff,1.0); sun.position.set(80,140,50); sun.castShadow=true;
+sun.shadow.mapSize.set(2048,2048); const sc=sun.shadow.camera; sc.left=-160;sc.right=160;sc.top=160;sc.bottom=-160;sc.near=1;sc.far=400; scene.add(sun);
+const mat=(c)=>new THREE.MeshLambertMaterial({color:c});
+const metal=(c)=>new THREE.MeshStandardMaterial({color:c, metalness:0.7, roughness:0.35});
+
+const ground=new THREE.Mesh(new THREE.CircleGeometry(800,48), mat(0x6f7d52)); ground.rotation.x=-Math.PI/2; ground.receiveShadow=true; scene.add(ground);
+const sea=new THREE.Mesh(new THREE.RingGeometry(220,800,48), mat(0x3a78a8)); sea.rotation.x=-Math.PI/2; sea.position.y=0.05; scene.add(sea);
+// access road from factory to pad
+const road=new THREE.Mesh(new THREE.PlaneGeometry(220,9), mat(0x40444a)); road.rotation.x=-Math.PI/2; road.position.set(-95,0.06,0); scene.add(road);
+
+// pad + mount
+const pad=new THREE.Mesh(new THREE.CylinderGeometry(14,16,3,24), mat(0x4a4f57)); pad.position.y=1.5; pad.receiveShadow=true; scene.add(pad);
+const mount=new THREE.Mesh(new THREE.CylinderGeometry(6,7,7,20), mat(0x2c2f36)); mount.position.y=5; scene.add(mount);
+
+/* ---- Factory (Starbase) ---- */
+const factory=new THREE.Group(); factory.position.set(-185,0,-10);
+const fhall=new THREE.Mesh(new THREE.BoxGeometry(70,34,46), mat(0x8c939c)); fhall.position.y=17; fhall.castShadow=true; factory.add(fhall);
+const froof=new THREE.Mesh(new THREE.CylinderGeometry(24,24,70,16,1,false,0,Math.PI), mat(0xb6bcc4)); froof.rotation.z=Math.PI/2; froof.position.y=34; factory.add(froof);
+for(let i=-2;i<=2;i++){ const bay=new THREE.Mesh(new THREE.BoxGeometry(8,16,1), mat(0x33373c)); bay.position.set(i*12,8,23.2); factory.add(bay); }
+const sign=new THREE.Mesh(new THREE.BoxGeometry(30,5,1), mat(0x1a1c20)); sign.position.set(0,30,23.4); factory.add(sign);
+factory.traverse(o=>o.receiveShadow=true); scene.add(factory);
+
+/* ---- Mechazilla tower with chopstick arms ---- */
+const tower=new THREE.Group(); tower.position.set(-14,0,0);
+const tcol=new THREE.Mesh(new THREE.BoxGeometry(3.4,120,3.4), mat(0x6a7078)); tcol.position.y=60; tower.add(tcol);
+const tcol2=new THREE.Mesh(new THREE.BoxGeometry(3.4,120,3.4), mat(0x5a606a)); tcol2.position.set(0,60,4); tower.add(tcol2);
+// carriage that slides up/down the tower, holding two arms that clamp in Z
+const carriage=new THREE.Group(); carriage.position.set(0,18,2); tower.add(carriage);
+const armGeo=new THREE.BoxGeometry(16,2.2,2.6);
+const armL=new THREE.Mesh(armGeo, mat(0x9aa0a8)); armL.position.set(9,0,-4.5); carriage.add(armL);
+const armR=new THREE.Mesh(armGeo, mat(0x9aa0a8)); armR.position.set(9,0, 4.5); carriage.add(armR);
+tower.traverse(o=>o.castShadow=true); scene.add(tower);
+function setArms(y, gap){ carriage.position.y=y; armL.position.z=-gap; armR.position.z=gap; }
+
+/* ---- Transporter truck ---- */
+const truck=new THREE.Group();
+const bed=new THREE.Mesh(new THREE.BoxGeometry(40,1.6,12), mat(0x2c2f36)); bed.position.y=2.2; truck.add(bed);
+const cab=new THREE.Mesh(new THREE.BoxGeometry(7,5,11), mat(0xd14b4b)); cab.position.set(-22,4.5,0); truck.add(cab);
+for(let i=0;i<10;i++){ for(const z of [-6,6]){ const wh=new THREE.Mesh(new THREE.CylinderGeometry(1.6,1.6,1.4,12), mat(0x111316)); wh.rotation.x=Math.PI/2; wh.position.set(-16+i*4.2,1.6,z); truck.add(wh); } }
+truck.traverse(o=>o.castShadow=true); truck.visible=false; scene.add(truck);
+
+/* ---- Booster (Super Heavy) + 33 Raptors ---- */
+const BOOST_H=40, BOOST_R=4.6, SHIP_H=26, SHIP_R=4.6;
+const booster=new THREE.Group(); booster.visible=false; scene.add(booster);
+const bBody=new THREE.Mesh(new THREE.CylinderGeometry(BOOST_R,BOOST_R,BOOST_H,28), metal(0xc8ccd2)); bBody.position.y=BOOST_H/2+6.5; bBody.castShadow=true; booster.add(bBody);
+for(let i=0;i<4;i++){ const f=new THREE.Mesh(new THREE.BoxGeometry(2.6,2.6,0.3),mat(0x9aa0a8)); const a=i/4*Math.PI*2; f.position.set(Math.cos(a)*(BOOST_R+0.6),BOOST_H+3,Math.sin(a)*(BOOST_R+0.6)); f.rotation.y=-a; booster.add(f); }
+const engineMeshes=[]; const engRoot=new THREE.Group(); engRoot.position.y=6.5; booster.add(engRoot);
+function ring(r,n){ for(let i=0;i<n;i++){ const a=i/n*Math.PI*2; const e=new THREE.Mesh(new THREE.CylinderGeometry(0.5,0.7,1.2,8),metal(0x3a3f47)); e.position.set(Math.cos(a)*r,-0.2,Math.sin(a)*r); engRoot.add(e); engineMeshes.push(e); } }
+ring(0,3); ring(2.4,10); ring(3.9,20);   // 33 Raptors
+const bFlame=new THREE.Mesh(new THREE.ConeGeometry(3.8,15,16,1,true), new THREE.MeshBasicMaterial({color:0xffb347,transparent:true,opacity:0.9,side:THREE.DoubleSide}));
+bFlame.position.y=-1.6; bFlame.rotation.x=Math.PI; bFlame.visible=false; engRoot.add(bFlame);
+
+/* ---- Starship (stage 2) ---- */
+const ship=new THREE.Group(); ship.visible=false; scene.add(ship);
+const sBody=new THREE.Mesh(new THREE.CylinderGeometry(SHIP_R,SHIP_R,SHIP_H,28), metal(0xd6dadf)); sBody.position.y=SHIP_H/2; sBody.castShadow=true; ship.add(sBody);
+const nose=new THREE.Mesh(new THREE.CylinderGeometry(0.4,SHIP_R,9,28), metal(0xd6dadf)); nose.position.y=SHIP_H+4.5; ship.add(nose);
+for(const sgn of [-1,1]){ const fl=new THREE.Mesh(new THREE.BoxGeometry(0.4,5,3),mat(0xaab0b8)); fl.position.set(sgn*(SHIP_R+0.1),SHIP_H-3,0); ship.add(fl); }
+const sFlame=new THREE.Mesh(new THREE.ConeGeometry(2.3,9,12,1,true), new THREE.MeshBasicMaterial({color:0x9ec5ff,transparent:true,opacity:0.9,side:THREE.DoubleSide}));
+sFlame.position.y=-1; sFlame.rotation.x=Math.PI; sFlame.visible=false; ship.add(sFlame);
+let payloadMesh=null; const payloadHolder=new THREE.Group(); payloadHolder.position.y=SHIP_H+2; ship.add(payloadHolder);
+const STACK_Y=BOOST_H+6.5;
+function stackShip(){ ship.position.set(0, STACK_Y, 0); }
+
+/* ---- floating STAGE LABELS: every vehicle in the stack is named while you prep,
+   so Super Heavy (stage 1), Starship (stage 2) and the payload are unmistakable ---- */
+function makeTag(text,color){
+  const cv=document.createElement('canvas'); cv.width=640; cv.height=96; const c=cv.getContext('2d');
+  c.fillStyle='rgba(10,14,22,.88)'; c.fillRect(0,0,640,96);
+  c.strokeStyle=color; c.lineWidth=6; c.strokeRect(3,3,634,90);
+  c.fillStyle=color; c.font='bold 40px ui-monospace,monospace'; c.textAlign='center'; c.textBaseline='middle'; c.fillText(text,320,50);
+  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(cv),transparent:true,depthTest:false}));
+  sp.scale.set(30,4.5,1); sp.visible=false; scene.add(sp); return sp;
+}
+const tagBooster=makeTag('SUPER HEAVY — STAGE 1 · 33 RAPTORS','#4aa3ff');
+const tagShip=makeTag('STARSHIP — STAGE 2 · 6 RAPTORS','#36d17a');
+let tagPay=makeTag('PAYLOAD','#f4b740');
+function setPayTag(text){ scene.remove(tagPay); tagPay=makeTag(text,'#f4b740'); }
+function updateTags(){
+  tagBooster.visible = booster.visible && !S.launching;
+  if(tagBooster.visible) tagBooster.position.set(booster.position.x-24, booster.position.y+30, booster.position.z);
+  tagShip.visible = ship.visible && !S.launching;
+  if(tagShip.visible) tagShip.position.set(ship.position.x+24, ship.position.y+16, ship.position.z);
+  tagPay.visible = !!(payloadMesh && payloadMesh.visible && !S.launching && !S.freePayload);
+  if(tagPay.visible){ const wp=new THREE.Vector3(); payloadHolder.getWorldPosition(wp); tagPay.position.set(wp.x+22, wp.y+4, wp.z); }
+}
+
+/* ---- smoke ---- */
+const smoke=[];
+function puff(x,y,z){ if(smoke.length>200) return; const m=new THREE.Mesh(new THREE.SphereGeometry(1.6+Math.random()*2,6,6), new THREE.MeshLambertMaterial({color:0xdfe4e8,transparent:true,opacity:0.8}));
+  m.position.set(x+(Math.random()*9-4.5),y,z+(Math.random()*9-4.5)); scene.add(m); smoke.push({m,vy:3+Math.random()*4,vx:(Math.random()*2-1)*6,vz:(Math.random()*2-1)*6,life:2.6,s:1}); }
+function updateSmoke(dt){ for(let i=smoke.length-1;i>=0;i--){ const s=smoke[i]; s.m.position.x+=s.vx*dt; s.m.position.y+=s.vy*dt; s.m.position.z+=s.vz*dt; s.s+=dt*1.2; s.m.scale.setScalar(s.s); s.life-=dt; s.m.material.opacity=Math.max(0,s.life/2.6*0.8); if(s.life<=0){ scene.remove(s.m); s.m.geometry.dispose(); s.m.material.dispose(); smoke.splice(i,1);} } }
+
+/* ============================ PAYLOADS / SATELLITES ============================ *
+ * Each payload teaches a different kind of mission. `learn` shows when you pick it;
+ * `live`/`orbit`/`job` drive the LIVE OPERATIONS view after deployment.            */
+const PAYLOADS={
+  starlink:{name:'Starlink (×20)', d:'A flat stack of internet sats.',
+    learn:'<b>Starlink</b> = thousands of ~260 kg sats in <b>low Earth orbit</b> (~550 km) beaming low-latency internet. Launched flat, they spread out and raise orbit with ion thrusters.',
+    orbit:'LEO · ~550 km', job:'beaming broadband internet to dishes below',
+    live:'each sat talks to its neighbours by <b>laser link</b> and hands your data down to ground dishes — that\'s why the beam sweeps the surface.'},
+  satellite:{name:'Comms Satellite', d:'One big GEO satellite + solar wings.',
+    learn:'Rides to <b>geostationary</b> orbit (35,786 km) where it orbits at Earth\'s spin rate, so it stays fixed over one spot for TV & phone links.',
+    orbit:'GEO · 35,786 km', job:'relaying TV & phone links from one fixed spot in the sky',
+    live:'at GEO its orbital period is exactly <b>24 h</b>, so from the ground it never moves — your dish can point at one spot forever.'},
+  gps:{name:'GPS / NavSat', d:'Navigation satellite with atomic clocks.',
+    learn:'<b>GPS</b> sats fly in medium orbit (20,200 km) carrying <b>atomic clocks</b>. Your phone hears 4+ of them and works out where you are from the tiny time differences.',
+    orbit:'MEO · 20,200 km', job:'broadcasting time signals for navigation',
+    live:'it broadcasts "I am here, the time is exactly…" — your phone triangulates from 4 sats at once. Clocks are so precise they must correct for <b>Einstein\'s relativity</b>.'},
+  weather:{name:'Weather Satellite', d:'Storm-watching camera platform.',
+    learn:'Weather sats image clouds, storms and temperatures from orbit. Polar ones scan the whole planet twice a day; GEO ones stare at one hemisphere non-stop.',
+    orbit:'LEO polar · ~800 km', job:'photographing storms and cloud systems below',
+    live:'its infrared camera measures cloud-top temperatures — cold tops = tall storm clouds. Forecasters feed these images straight into weather models.'},
+  telescope:{name:'Space Telescope', d:'An observatory above the air.',
+    learn:'Above the atmosphere there\'s no blur, no weather and no daylight scatter — a telescope in orbit sees the universe razor-sharp, 24/7 (that\'s why Hubble & JWST fly).',
+    orbit:'LEO · ~540 km', job:'observing deep space with zero atmosphere in the way',
+    live:'while it circles Earth it locks onto targets thousands of light-years away, spinning with reaction wheels — no thruster puffs to smear the image.'},
+  cargo:{name:'Cargo / Supplies', d:'Pressurised station resupply.',
+    learn:'Food, water, experiments and spares for a station. Starship can haul <b>100–150 t</b> to LEO — far more than any current rocket.',
+    orbit:'LEO · ~420 km', job:'chasing the station for docking',
+    live:'it phases its orbit to catch the station: fly slightly LOWER = go FASTER around, then rise up to meet it. Orbital mechanics is counter-intuitive!'},
+  crew:{name:'Dragon Crew Capsule', d:'Astronauts in a crew capsule.',
+    learn:'<b>Crew Dragon</b> adds life support, seats, displays and a <b>launch-escape</b> system that can pull the capsule clear in an abort.',
+    orbit:'LEO · ~420 km', job:'carrying astronauts safely around the planet',
+    live:'inside, the crew float in free-fall — "zero-g" is really <b>falling around Earth forever</b>. Life support scrubs CO₂ and recycles the cabin air.'},
+  moon:{name:'Moon Mission Cargo', d:'Lander + supplies for the Moon.',
+    learn:'First stop is still LEO! Going to the <b>Moon</b> (384,400 km) needs a refill in orbit first — tanker Starships top up the ship before the trans-lunar burn.',
+    orbit:'LEO parking orbit', job:'waiting for tanker refills before the trans-lunar burn',
+    live:'it parks in LEO while tankers dock and pump propellant. Full again, one +3.1 km/s burn stretches the orbit all the way to the Moon (3-day cruise).'},
+  mars:{name:'Mars Colony Cargo', d:'Habitat + fuel factory for Mars.',
+    learn:'Mars cargo: habitat, solar panels and a <b>Sabatier fuel factory</b> — because the return fuel gets MADE on Mars from CO₂ air + water ice.',
+    orbit:'LEO parking orbit', job:'lining up for the trans-Mars window',
+    live:'Mars departures only work every <b>26 months</b> when the planets line up. The cruise is 6–9 months across 55–400 million km of deep space.'},
+};
+function buildPayloadMesh(key){
+  if(payloadMesh){ payloadHolder.remove(payloadMesh); payloadMesh=null; }
+  const g=new THREE.Group();
+  if(key==='satellite'){ const b=new THREE.Mesh(new THREE.BoxGeometry(3,3,3),metal(0xb8a050)); g.add(b);
+    for(const s of [-1,1]){ const p=new THREE.Mesh(new THREE.BoxGeometry(6,0.1,2.4),mat(0x223a6a)); p.position.set(s*4.5,0,0); p.userData.wing=s; g.add(p);} g.userData.panels=true; }
+  else if(key==='starlink'){ for(let i=0;i<5;i++){ const p=new THREE.Mesh(new THREE.BoxGeometry(4,0.3,4),metal(0x9aa0b0)); p.position.y=i*0.5-1; g.add(p);} }
+  else if(key==='gps'){ const b=new THREE.Mesh(new THREE.BoxGeometry(2.6,2.6,2.6),metal(0xc8ccd2)); g.add(b);
+    const dish=new THREE.Mesh(new THREE.CylinderGeometry(1.6,0.4,1.0,14),mat(0xeef0f4)); dish.position.y=-2.0; g.add(dish);
+    for(const s of [-1,1]){ const p=new THREE.Mesh(new THREE.BoxGeometry(5,0.1,2),mat(0x223a6a)); p.position.set(s*4,0,0); p.userData.wing=s; g.add(p);} g.userData.panels=true; }
+  else if(key==='weather'){ const drum=new THREE.Mesh(new THREE.CylinderGeometry(2,2,3.4,16),metal(0xb0b8c0)); g.add(drum);
+    const cam=new THREE.Mesh(new THREE.CylinderGeometry(0.7,0.9,1.2,12),mat(0x1a2a3a)); cam.position.y=-2.2; g.add(cam);
+    const p=new THREE.Mesh(new THREE.BoxGeometry(0.1,5,2.2),mat(0x223a6a)); p.position.x=2.8; g.add(p); }
+  else if(key==='telescope'){ const tube=new THREE.Mesh(new THREE.CylinderGeometry(1.8,1.8,6,16),metal(0xd6dadf)); tube.rotation.z=0.5; g.add(tube);
+    const shade=new THREE.Mesh(new THREE.BoxGeometry(6,0.15,4),mat(0xc0a4d0)); shade.position.y=-2.6; g.add(shade);
+    const lens=new THREE.Mesh(new THREE.CylinderGeometry(1.7,1.7,0.2,16),mat(0x111622)); lens.position.set(1.4,2.6,0); lens.rotation.z=0.5; g.add(lens); }
+  else if(key==='cargo'){ g.add(new THREE.Mesh(new THREE.BoxGeometry(3.4,3.4,3.4),mat(0xc08a3a))); }
+  else if(key==='moon'){ const body=new THREE.Mesh(new THREE.CylinderGeometry(2.4,2.8,3,10),metal(0xd8d2b8)); g.add(body);
+    for(let i=0;i<4;i++){ const a=i/4*Math.PI*2; const leg=new THREE.Mesh(new THREE.BoxGeometry(0.25,3,0.25),mat(0x8a8e94));
+      leg.position.set(Math.cos(a)*2.6,-2,Math.sin(a)*2.6); leg.rotation.z=Math.cos(a)*0.4; leg.rotation.x=-Math.sin(a)*0.4; g.add(leg); } }
+  else if(key==='mars'){ const dome=new THREE.Mesh(new THREE.SphereGeometry(2.4,16,12,0,Math.PI*2,0,Math.PI/2),mat(0xd0705a)); g.add(dome);
+    const tank=new THREE.Mesh(new THREE.CylinderGeometry(1,1,2.6,12),metal(0xeef0f4)); tank.position.set(3,0,0); g.add(tank);
+    const p=new THREE.Mesh(new THREE.BoxGeometry(4,0.1,2),mat(0x223a6a)); p.position.set(-3.4,0.4,0); g.add(p); }
+  else { const cap=new THREE.Mesh(new THREE.CylinderGeometry(1.6,2.2,2.6,16),metal(0xeef0f4)); g.add(cap); const tr=new THREE.Mesh(new THREE.CylinderGeometry(2.2,2.2,2,16),mat(0x2a2d34)); tr.position.y=-2.2; g.add(tr); }
+  payloadMesh=g; payloadHolder.add(g); payloadMesh.visible=false;
+  setPayTag(('PAYLOAD — '+PAYLOADS[key].name).toUpperCase());
+}
+
+/* ============================ ANIMATION SYSTEM ============================ */
+let anim=null;
+function startAnim(dur, label, update, done){ anim={t0:S.GT,dur,update,done}; const l=document.getElementById('anLabel'); l.textContent=label; l.style.display=label?'block':'none'; }
+function tickAnim(){ if(!anim) return; let p=(S.GT-anim.t0)/anim.dur; if(p>1)p=1; anim.update(p); if(p>=1){ const d=anim.done; anim=null; document.getElementById('anLabel').style.display='none'; if(d) d(); } }
+const lerp=(a,b,t)=>a+(b-a)*t, clamp01=(x)=>x<0?0:x>1?1:x;
+
+/* ============================ STEP FLOW ============================ */
+const TOTAL_STEPS=9;
+const S={ step:0, payload:null, GT:0, launching:false, phase:'', alt:0, spd:0, vel:0 };
+const panel=document.getElementById('panel'), titleEl=document.getElementById('stepTitle'), bodyEl=document.getElementById('stepBody'), actEl=document.getElementById('stepActions');
+function drawProgress(){ const p=document.getElementById('progress'); p.innerHTML=''; for(let i=0;i<TOTAL_STEPS;i++){ const s=document.createElement('div'); s.className='seg'+(i<S.step?' done':i===S.step?' cur':''); p.appendChild(s);} }
+function setPanel(kicker,title,bodyHTML,actionsHTML){ document.getElementById('stepKicker').textContent=kicker; titleEl.textContent=title; bodyEl.innerHTML=bodyHTML; actEl.innerHTML=actionsHTML; drawProgress(); }
+function nextBtn(label,to){ actEl.innerHTML=`<button class="btn" id="next">${label}</button>`; document.getElementById('next').onclick=()=>goStep(to); }
+function goStep(i){ S.step=i; STEP_FNS[i] && STEP_FNS[i](); }
+
+const STEP_FNS=[
+  /* 0 — Factory / Starbase */
+  function(){ focusCam(-185,44,105);
+    setPanel('Step 1 / '+TOTAL_STEPS,'Welcome to Starbase',
+    `This is the <b>factory</b> where Starship is built and launched — at Boca Chica, Texas.
+     <div class="learn">Starship is made of <b>stainless steel</b> (cheap, strong when cold, handles re-entry heat). Hull "rings" are welded into stacks; <b>Raptor</b> engines come from a separate engine factory.</div>
+     <div class="data"><span>Full stack height</span><b>~121 m</b><span>Diameter</span><b>9 m</b><span>Liftoff thrust</span><b>~74 MN</b><span>Fully reusable?</span><b>Yes (goal)</b></div>`,
+    ``); nextBtn('Inspect the components →',1);
+  },
+  /* 1 — Component inspection */
+  function(){ focusCam(-178,42,100);
+    setPanel('Step 2 / '+TOTAL_STEPS,'Inspect the components',
+    `Quality-check each major part before assembly. Click all four.
+     <div class="chips" id="chips"></div><div id="chipLearn" class="learn" style="display:none"></div>`, ``);
+    const parts=[
+      ['🔧','Raptor engine','Methalox engine using <b>full-flow staged combustion</b> — every drop of fuel & oxidiser runs through turbines first, for record efficiency. 33 power the booster.'],
+      ['🛢️','Steel hull ring','3 mm <b>stainless steel</b> rings welded into the body. Steel keeps strength at cryogenic temps and survives re-entry without heavy exotic alloys.'],
+      ['🟫','Heat-shield tiles','Hexagonal ceramic tiles on the windward side protect the ship from ~1,400 °C re-entry plasma.'],
+      ['🛰️','Payload capsule','Holds the cargo/crew. Sits in the ship\'s nose and is released in space.'],
+    ];
+    const wrap=document.getElementById('chips'); const lr=document.getElementById('chipLearn'); let ok=0;
+    parts.forEach((p,i)=>{ const c=document.createElement('div'); c.className='chip'; c.innerHTML=`<span class="ic">${p[0]}</span>${p[1]}`;
+      c.onclick=()=>{ if(!c.classList.contains('ok')){ c.classList.add('ok'); ok++; } lr.style.display='block'; lr.innerHTML='<b>'+p[1]+'</b> — '+p[2];
+        if(ok===4) nextBtn('Verify the payload →',2); };
+      wrap.appendChild(c); });
+  },
+  /* 2 — Payload verify + choose */
+  function(){ focusCam(-178,42,100);
+    setPanel('Step 3 / '+TOTAL_STEPS,'Verify & pick the payload',
+    `Run a health check on each individual satellite, then choose what flies today.
+     <div class="chips" id="sats"></div>
+     <div id="payOpts" style="display:none"><div style="font-size:11px;color:#90a0b4;margin-top:6px">All sats green — pick the payload:</div><div id="opts"></div></div>`, ``);
+    const sats=document.getElementById('sats'); let v=0;
+    for(let i=0;i<6;i++){ const c=document.createElement('div'); c.className='chip'; c.innerHTML=`<span class="ic">🛰️</span>SAT-${i+1}`;
+      c.onclick=()=>{ if(c.classList.contains('ok'))return; c.classList.add('ok'); v++; if(v===6){ document.getElementById('payOpts').style.display='block';
+        const opts=document.getElementById('opts'); for(const k of Object.keys(PAYLOADS)){ const o=document.createElement('div'); o.className='opt'; o.innerHTML=`<div class="t">${PAYLOADS[k].name}</div><div class="d">${PAYLOADS[k].d}</div>`;
+          o.onclick=()=>{ S.payload=k; buildPayloadMesh(k); opts.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel')); o.classList.add('sel');
+            actEl.innerHTML=`<div class="learn ok">${PAYLOADS[k].learn}</div><button class="btn" id="next">Roll out the booster →</button>`; document.getElementById('next').onclick=()=>goStep(3); };
+          opts.appendChild(o);} } };
+      sats.appendChild(c); }
+  },
+  /* 3 — Transport booster on truck (the camera RIDES alongside so you see the whole trip) */
+  function(){ booster.visible=true; booster.position.set(-150,2,0); truck.visible=true; truck.position.set(-150,0,0); focusCam(-130,26,68);
+    setPanel('Step 4 / '+TOTAL_STEPS,'Roll the booster to the pad',
+    `The <b>Super Heavy</b> booster (stage 1 — see its label) leaves the factory High Bay on a self-propelled transporter and crawls the pad road to the launch mount.
+     <div class="learn">Boosters move on multi-wheeled <b>transporters</b> at walking pace. Super Heavy alone is ~<b>71 m</b> tall and, empty, weighs ~<b>200 t</b>.</div>`,
+    `<button class="btn" id="go">Start the transporter 🚚</button>`);
+    document.getElementById('go').onclick=()=>{ document.getElementById('go').disabled=true; document.getElementById('go').textContent='Rolling…';
+      startAnim(7000,'🚚 Booster rolling out of the High Bay…', (p)=>{
+        const x=lerp(-150,-6,p); truck.position.x=x; booster.position.x=x;
+        camTarget.set(x+12, 13, 0); if(!userOrbit) orbDist=62;                 // ride-along camera
+        document.getElementById('anLabel').textContent =
+          p<0.35 ? '🚚 Booster rolling out of the High Bay — walking pace, ~200 t' :
+          p<0.75 ? '🚚 Crawling down the pad road on the multi-wheel transporter' :
+                   '🚚 Arriving at the launch mount — Mechazilla standing by';
+      }, ()=>{ nextBtn('Hand off to Mechazilla →',4); }); };
+  },
+  /* 4 — Mechazilla lifts booster onto the mount: descend → grip → lift → swing → set → release */
+  function(){ focusCam(-6,40,64); setArms(34,9);
+    setPanel('Step 5 / '+TOTAL_STEPS,'Mechazilla lifts the booster',
+    `The tower's giant arms — nicknamed <b>"Mechazilla / chopsticks"</b> — grip the booster under its grid fins, hoist all ~200 t off the transporter, swing it over the mount and set it down.
+     <div class="learn">The same arms are designed to <b>catch the booster out of the sky</b> on the way back, so it doesn't need landing legs — saving weight for more payload.</div>`,
+    `<button class="btn" id="lift">Engage the arms 🦾</button>`);
+    document.getElementById('lift').onclick=()=>{ document.getElementById('lift').disabled=true; document.getElementById('lift').textContent='Lifting…';
+      const GRAB=43;                                    // grip height on the booster (under the grid fins)
+      startAnim(9000,'🦾 Mechazilla…', (p)=>{
+        const l=document.getElementById('anLabel');
+        let armY=45, gap=9;
+        if(p<0.20){ armY=lerp(34,45,p/0.20); gap=9; l.textContent='🦾 Arms descending to the grab points…'; }
+        else if(p<0.34){ armY=45; gap=lerp(9,5.0,(p-0.20)/0.14); l.textContent='🦾 Chopsticks closing — gripping under the grid fins'; }
+        else if(p<0.55){ const q=(p-0.34)/0.21; armY=lerp(45,60,q); gap=5.0;
+          booster.position.y=2+(armY-45); truck.position.x=lerp(-6,-46,q);
+          l.textContent='🦾 Hoisting ~200 t straight up — the transporter pulls clear'; }
+        else if(p<0.72){ const q=(p-0.55)/0.17; armY=60; gap=5.0;
+          booster.position.x=lerp(-6,0,q); booster.position.y=17;
+          l.textContent='🦾 Swinging the booster over the launch mount'; }
+        else if(p<0.92){ const q=(p-0.72)/0.20; armY=lerp(60,GRAB,q); gap=5.0;
+          booster.position.y=lerp(17,0,q);
+          l.textContent='🦾 Lowering gently onto the mount — millimetre work'; }
+        else { armY=GRAB; gap=lerp(5.0,9,(p-0.92)/0.08); l.textContent='✅ Released — stage 1 is on the mount'; }
+        setArms(armY,gap);
+        camTarget.set(booster.position.x, booster.position.y+28, 0); if(!userOrbit) orbDist=72;   // follow the lift
+      }, ()=>{ truck.visible=false; nextBtn('Check the engines →',5); }); };
+  },
+  /* 5 — Engine check */
+  function(){ focusCam(0,15,28);
+    setPanel('Step 6 / '+TOTAL_STEPS,'Check all 33 Raptor engines',
+    `Health-check the engines (amber ones need a second look) — or hit <b>Run full diagnostic</b> to clear all 33 at once.
+     <div class="learn"><b>Raptor</b> burns methane+oxygen via <b>full-flow staged combustion</b> at ~300 bar chamber pressure — the highest ever flown. Each engine ≈ <b>2.3 MN</b> (230 t) of thrust; 33 together ≈ <b>74 MN</b>, and the rocket can lose a few and still fly.</div>
+     <div id="engGrid"></div><div id="engStat"></div>`, ``);
+    const grid=document.getElementById('engGrid'); const faulty=new Set(); while(faulty.size<3) faulty.add((Math.random()*33)|0); let okCount=0;
+    const stat=document.getElementById('engStat'); const upd=()=>stat.innerHTML=`<b style="color:var(--ok)">${okCount}</b> / 33 nominal`;
+    const finish=()=>{ actEl.innerHTML=`<div class="learn ok">All 33 engines green. ✅</div><button class="btn" id="next">Load propellant →</button>`; document.getElementById('next').onclick=()=>goStep(6); };
+    for(let i=0;i<33;i++){ const e=document.createElement('div'); e.className='eng'+(faulty.has(i)?' bad':''); e.textContent=i+1; engineMeshes[i]&&engineMeshes[i].material.color.set(0x3a3f47);
+      e.onclick=()=>{ if(e.classList.contains('ok'))return; e.classList.remove('bad'); e.classList.add('ok'); okCount++; engineMeshes[i]&&engineMeshes[i].material.color.set(0x36d17a); upd(); if(okCount===33) finish(); };
+      grid.appendChild(e); }
+    upd(); actEl.innerHTML=`<button class="btn" id="all">⚡ Run full diagnostic — check all 33</button>`;
+    document.getElementById('all').onclick=()=>{ grid.querySelectorAll('.eng').forEach((e,i)=>{ e.classList.remove('bad'); e.classList.add('ok'); engineMeshes[i]&&engineMeshes[i].material.color.set(0x36d17a); }); okCount=33; upd(); finish(); };
+  },
+  /* 6 — Fuel */
+  function(){ focusCam(0,40,58);
+    setPanel('Step 7 / '+TOTAL_STEPS,'Load the propellant',
+    `Pick what Starship actually burns, then fill the tanks.
+     <div id="fopts"></div>
+     <div id="fuelLoad" class="hidden"><div class="glabel"><span>LOX (liquid oxygen)</span><span id="loxP">0%</span></div><div class="gauge lox"><div id="loxBar"></div></div>
+       <div class="glabel"><span>CH₄ (liquid methane)</span><span id="ch4P">0%</span></div><div class="gauge ch4"><div id="ch4Bar"></div></div></div>`, ``);
+    const fopts=document.getElementById('fopts');
+    const fuels=[['methalox','Methalox','Liquid methane + liquid oxygen',true],['rp1','RP-1 + LOX','Refined kerosene + oxygen',false],['hydro','Hydrogen + LOX','Liquid hydrogen + oxygen',false],['solid','Solid fuel','Rubbery solid propellant',false]];
+    for(const [k,t,d,ok] of fuels){ const o=document.createElement('div'); o.className='opt'; o.innerHTML=`<div class="t">${t}</div><div class="d">${d}</div>`;
+      o.onclick=()=>{ if(!ok){ o.classList.add('bad'); setTimeout(()=>o.classList.remove('bad'),350); actEl.innerHTML=`<div class="learn warn">Not what Starship uses. ${k==='rp1'?'RP-1 powers Falcon 9 but leaves soot that\'s hard to reuse.':k==='hydro'?'Hydrogen is efficient but ultra-cold and bulky.':'Solid fuel can\'t be throttled or shut off.'} Try again.</div>`; return; }
+        fopts.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel')); o.classList.add('sel'); document.getElementById('fuelLoad').classList.remove('hidden');
+        actEl.innerHTML=`<div class="learn ok">✅ <b>Methalox</b>: clean-burning, dense, and methane can be <b>made on Mars</b> from CO₂ + water (Sabatier), so a ship can refuel there.</div>
+          <button class="btn" id="fill">⛽ HOLD to open the fuel valves</button>
+          <div style="font-size:10px;color:#90a0b4;text-align:center">hold the button to flow propellant — release to pause. YOU are the pad controller.</div>`;
+        const fb=document.getElementById('fill');
+        const flowOn=e=>{ e.preventDefault(); if(!S.fuelDone) S.fueling=true; };
+        const flowOff=()=>{ S.fueling=false; };
+        fb.addEventListener('pointerdown',flowOn); fb.addEventListener('pointerleave',flowOff); addEventListener('pointerup',flowOff); };
+      fopts.appendChild(o); }
+  },
+  /* 7 — Mechazilla stacks the ship on top of the booster (the full 121 m stack) */
+  function(){ ship.visible=true; ship.position.set(-6,2,0); focusCam(-3,60,95); setArms(34,9);
+    setPanel('Step 8 / '+TOTAL_STEPS,'Stack the Starship',
+    `Mechazilla lifts the <b>Starship</b> (stage 2 — see its label) clean over the top of the booster and lowers it on — the <b>full stack</b>.
+     <div class="learn">Stage 2 has its own 6 Raptors. After the booster burns out it separates and the ship's engines push the payload to orbit. Stacked, it's the tallest rocket ever (~121 m).</div>`,
+    `<button class="btn" id="stack">Stack with the arms 🦾</button>`);
+    document.getElementById('stack').onclick=()=>{ document.getElementById('stack').disabled=true; document.getElementById('stack').textContent='Stacking…';
+      const GRABS=24, TOPY=STACK_Y+22;                 // grip height on the ship · carry height above the booster
+      startAnim(9000,'🦾 Mechazilla…', (p)=>{
+        const l=document.getElementById('anLabel');
+        let armY=GRABS, gap=9;
+        if(p<0.18){ armY=lerp(34,GRABS,p/0.18); gap=9; l.textContent='🦾 Arms descending to the Starship…'; }
+        else if(p<0.32){ armY=GRABS; gap=lerp(9,5.0,(p-0.18)/0.14); l.textContent='🦾 Gripping stage 2 at its lift points'; }
+        else if(p<0.58){ const q=(p-0.32)/0.26; armY=lerp(GRABS,TOPY+4,q); gap=5.0;
+          ship.position.y=2+(armY-GRABS);
+          l.textContent='🦾 Hoisting the Starship clear over the booster'; }
+        else if(p<0.74){ const q=(p-0.58)/0.16; armY=TOPY+4; gap=5.0;
+          ship.position.x=lerp(-6,0,q); ship.position.y=2+(TOPY+4-GRABS);
+          l.textContent='🦾 Lining up — nose over the booster'; }
+        else if(p<0.94){ const q=(p-0.74)/0.20; armY=lerp(TOPY+4, GRABS+STACK_Y-2, q); gap=5.0;
+          ship.position.y=lerp(2+(TOPY+4-GRABS), STACK_Y, q);
+          l.textContent='🦾 Lowering onto the booster — the full 121 m stack takes shape'; }
+        else { armY=GRABS+STACK_Y-2; gap=lerp(5.0,9,(p-0.94)/0.06); l.textContent='✅ Stacked — tallest rocket ever assembled'; }
+        setArms(armY,gap);
+        camTarget.set(ship.position.x, ship.position.y+14, 0); if(!userOrbit) orbDist=92;
+      }, ()=>{ stackShip(); nextBtn('Attach the payload →',8); }); };
+  },
+  /* 8 — Attach payload (drag) + countdown */
+  function(){ if(payloadMesh) payloadMesh.visible=true; focusCam(0,98,122);
+    setPanel('Step 9 / '+TOTAL_STEPS,'Attach payload & launch',
+    `<b>Drag the capsule</b> into the ship's payload bay (or tap it) to latch it in. Then run the countdown.
+     <div id="dragWrap"><div id="capChip" draggable="true">🛰️<br>${PAYLOADS[S.payload].name}</div><div id="bayDrop">Payload bay ▸ drop here</div></div>
+     <div class="data"><span>Target orbit</span><b>${PAYLOADS[S.payload].orbit||'LEO ~400 km'}</b>
+       <span>Orbital speed</span><b>7.7 km/s (27,600 km/h)</b>
+       <span>Escape velocity</span><b>11.2 km/s</b>
+       <span>Liftoff thrust</span><b>~74 MN (7,500 t)</b>
+       <span>Liftoff weight</span><b>~5,000 t → TWR 1.5</b></div>
+     <div class="learn">Thrust must beat weight to leave the pad (TWR &gt; 1). But to STAY up you don't out-muscle gravity — you out-run it <b>sideways</b>: the rocket tips into a <b>gravity turn</b> and spends most of its fuel building horizontal speed. Full escape (11.2 km/s) is only for leaving Earth entirely.</div>
+     <div class="learn">The payload is secured in the nose. In space the nose opens and releases it — satellites unfold solar panels; Starlinks spring out as a stack.</div>`,
+    ``);
+    const chip=document.getElementById('capChip'), drop=document.getElementById('bayDrop');
+    const attach=()=>{ if(S.attached)return; S.attached=true; chip.style.opacity=.4; drop.classList.add('filled'); drop.textContent='✓ Capsule latched';
+      // snap payload from above into the holder
+      startAnim(900,'', (p)=>{ if(payloadMesh) payloadMesh.position.y=lerp(8,0,p); }, ()=>{});
+      actEl.innerHTML=`<button class="btn" id="cd">Start countdown 🚀</button>`; document.getElementById('cd').onclick=startCountdown; };
+    chip.addEventListener('dragstart',e=>{ e.dataTransfer.setData('t','cap'); });
+    drop.addEventListener('dragover',e=>{ e.preventDefault(); drop.classList.add('over'); });
+    drop.addEventListener('dragleave',()=>drop.classList.remove('over'));
+    drop.addEventListener('drop',e=>{ e.preventDefault(); attach(); });
+    chip.addEventListener('click',attach);   // tap fallback
+    window.__sxAttach=attach;
+  },
+];
+
+/* ============================ CAMERA (free orbit: drag to rotate, scroll to zoom) ============================ */
+const camTarget=new THREE.Vector3(0,30,0), _cpos=new THREE.Vector3();
+let orbYaw=0.7, orbPitch=0.42, orbDist=110, userOrbit=false;
+function focusCam(tx,height,dist){ camTarget.set(tx,height*0.45,0); orbDist=dist; if(!userOrbit){ orbYaw=0.7; orbPitch=0.42; } }
+/* ---- AUTO DIRECTOR: cinematic shots follow the mission phase — engine cam at
+   ignition, tower wide, tracking, slow-mo separation close-up, booster cam on the
+   way home, catch cam, then Starship to orbit. Drag to take over; C hands it back. */
+let SHOT='';
+function setShot(name){ if(SHOT===name) return; SHOT=name;
+  const el=document.getElementById('shotChip'); el.textContent='📹 '+name; el.style.display='block'; }
+function directorCam(){
+  const t=(S.GT-S.launchT)/1000, shipY=ship.position.y, boostY=booster.position.y;
+  if(t<6){ camTarget.set(0,9,0); orbDist=30; orbPitch=0.16; setShot('ENGINE CAM — 33 Raptors light'); }
+  else if(!ship.detached && S.alt<120){ camTarget.set(0,Math.min(70,S.alt+30),0); orbDist=135; orbPitch=0.30; setShot('TOWER WIDE — clearing the pad'); }
+  else if(!ship.detached){ camTarget.set(0,shipY+8,0); orbDist=88; orbPitch=0.34; setShot('TRACKING CAM — gravity turn'); }
+  else if(S.slowmo>0){ camTarget.set(0,(shipY+boostY)/2+18,0); orbDist=50; orbPitch=0.30; setShot('SEPARATION — SLOW MOTION'); }
+  else if(!S.caught && !S.deployed){
+    if(((t|0)%12)<5){ camTarget.set(0,shipY+6,0); orbDist=72; setShot('STARSHIP CAM — climbing to orbit'); }
+    else { camTarget.set(0,boostY+18,0); orbDist=58; orbPitch=0.34; setShot('BOOSTER CAM — falling home for the catch'); }
+  }
+  else if(!S.caught){ camTarget.set(0,Math.max(22,boostY+14),0); orbDist=52; orbPitch=0.28; setShot('CATCH CAM — Mechazilla arms open'); }
+  else if(!S.deployed){ camTarget.set(0,shipY+6,0); orbDist=78; setShot('STARSHIP CAM — payload run'); }
+  else { camTarget.set(0,shipY+4,0); orbDist=70; setShot('DEPLOY CAM — doors open'); }
+}
+addEventListener('keydown',e=>{ if(e.code==='KeyC') userOrbit=false; });   // hand the camera back to the director
+function updateCamera(){
+  if(S.orbitView && S.freePayload){ camTarget.lerp(S.freePayload.position,0.05); if(!userOrbit){ orbDist=150; setShot('ORBIT CAM — your satellite at work'); } }
+  else if(S.launching){ if(!userOrbit) directorCam(); else setShot('FREE CAM — press C for auto'); }
+  _cpos.set(
+    camTarget.x+Math.sin(orbYaw)*Math.cos(orbPitch)*orbDist,
+    camTarget.y+Math.sin(orbPitch)*orbDist,
+    camTarget.z+Math.cos(orbYaw)*Math.cos(orbPitch)*orbDist);
+  _cpos.y=Math.max(_cpos.y,3);
+  camera.position.lerp(_cpos, userOrbit?0.4:0.07); camera.lookAt(camTarget);
+}
+// drag to orbit, wheel to zoom (only on the 3D area — the panel sits on top of the canvas)
+const cv=renderer.domElement; let dragging=false,lastX=0,lastY=0;
+cv.addEventListener('mousedown',e=>{ dragging=true; lastX=e.clientX; lastY=e.clientY; });
+addEventListener('mouseup',()=>dragging=false);
+addEventListener('mousemove',e=>{ if(!dragging)return; userOrbit=true; orbYaw-=(e.clientX-lastX)*0.006; orbPitch+=(e.clientY-lastY)*0.006; orbPitch=Math.max(0.05,Math.min(1.45,orbPitch)); lastX=e.clientX; lastY=e.clientY; });
+cv.addEventListener('wheel',e=>{ e.preventDefault(); userOrbit=true; orbDist*=(1+Math.sign(e.deltaY)*0.09); orbDist=Math.max(18,Math.min(420,orbDist)); }, {passive:false});
+// touch drag
+cv.addEventListener('touchstart',e=>{ if(e.touches[0]){ dragging=true; lastX=e.touches[0].clientX; lastY=e.touches[0].clientY; } });
+cv.addEventListener('touchmove',e=>{ if(!dragging||!e.touches[0])return; userOrbit=true; orbYaw-=(e.touches[0].clientX-lastX)*0.006; orbPitch+=(e.touches[0].clientY-lastY)*0.006; orbPitch=Math.max(0.05,Math.min(1.45,orbPitch)); lastX=e.touches[0].clientX; lastY=e.touches[0].clientY; },{passive:true});
+addEventListener('touchend',()=>dragging=false);
+
+/* ============================ COUNTDOWN + LAUNCH ============================ */
+let countVal=10;
+function startCountdown(){ panel.classList.add('hidden'); document.getElementById('count').style.display='block'; countVal=10; S.phase='countdown'; S.cdNext=S.GT+1000; document.getElementById('count').textContent=countVal; }
+function igniteLaunch(){ document.getElementById('count').style.display='none'; S.launching=true; S.phase='ignition'; S.launchT=S.GT; S.vel=0; S.alt=0; bFlame.visible=true; document.getElementById('telem').style.display='block'; document.getElementById('progress').classList.add('hidden'); }
+ship.detached=false;
+/* milestone banner: big flight events called out top-centre as they happen */
+let bannerT=null;
+function banner(txt,ms=3400){ const l=document.getElementById('anLabel'); l.textContent=txt; l.style.display='block';
+  clearTimeout(bannerT); bannerT=setTimeout(()=>{ l.style.display='none'; },ms); }
+
+function updateLaunch(dt0){
+  if(!S.launching || S.orbitView) return; const t=(S.GT-S.launchT)/1000;
+  // SLOW MOTION window (separation): time crawls so you can savour the staging
+  let dt=dt0;
+  if(S.slowmo>0){ S.slowmo-=dt0; dt=dt0*0.22;
+    if(S.slowmo<=0) banner('▶️ Normal speed — Starship presses on to orbit'); }
+  if(t<7 && ship.position.y<140){ puff(0,Math.max(2,booster.position.y+4),0); }
+  if(t<1.4){ S.phase='IGNITION — 33 RAPTORS'; bFlame.scale.y=0.5+t; return; }
+  if(S.phase.indexOf('IGNITION')===0){ S.phase='ASCENT — GRAVITY TURN'; banner('🚀 LIFTOFF — thrust beats weight (TWR 1.5)'); }
+  // slower, longer climb — the journey is the show
+  S.vel+=dt*(ship.detached?10:7); S.alt+=S.vel*dt;
+  if(!ship.detached){ booster.position.y=S.alt; ship.position.y=STACK_Y+S.alt; } else booster.position.y=S.boostY;
+  bFlame.scale.y=1.0; S.spd=S.vel*60;
+  // live physics numbers: propellant burns off, so the same thrust pushes harder (TWR climbs)
+  if(!ship.detached){ S.fuelP=Math.max(0,100-(t-1.4)*9); S.thr=74; S.twr=74000/((5000*(0.28+0.72*S.fuelP/100))*9.81); }
+  else { S.fuelP=Math.max(0,100-(t-(S.sepT||t))*8); S.thr=14; S.twr=14000/((1500*(0.25+0.75*S.fuelP/100))*9.81); }
+  // MAX-Q: peak aerodynamic pressure while the air is still thick
+  if(!S.msQ && S.alt*0.7>=11){ S.msQ=true; banner('🌀 MAX-Q — peak air pressure on the hull. Throttle briefly eased.'); }
+  if(!ship.detached && S.alt>260){ ship.detached=true; S.sepT=t; S.boostY=booster.position.y; S.boostVy=S.vel*0.75; bFlame.visible=false; sFlame.visible=true;
+    S.phase='STAGE SEPARATION'; document.getElementById('telStage').textContent='2 — Starship';
+    S.slowmo=4.5;                                       // savour it: staging plays in slow motion
+    banner('🐢 SLOW MOTION — hot-staging: stage 2 lights while the booster lets go'); }
+  if(ship.detached){
+    ship.position.y+=(S.vel+8)*dt;
+    // Super Heavy keeps COASTING UP on its momentum after separation (real boosters arc over ~high apogee),
+    // then falls back at a controlled rate for the catch — no more instant plummet
+    if(S.boostVy>0){ S.boostVy-=dt*14; S.boostY+=S.boostVy*dt; }
+    else { S.boostFall=Math.min(30,(S.boostFall||6)+dt*9); S.boostY-=S.boostFall*dt;
+      if(!S.msBB){ S.msBB=true; banner('🪃 Booster boostback — falling home for the Mechazilla catch'); } }
+    if(S.boostY<6.5){ S.boostY=6.5; if(!S.caught){ S.caught=true; S.phase='BOOSTER CAUGHT'; setArms(8,5.0); bFlame.visible=true; bFlame.scale.y=0.6; for(let i=0;i<14;i++) puff(0,9,0);
+      banner('🦾 CAUGHT! The arms grab the booster — no landing legs needed'); setTimeout(()=>{bFlame.visible=false;},700);} }
+    if(ship.position.y>430 && !S.deployed){ S.deployed=true; S.phase='SECO — ORBIT'; deployPayload();
+      banner('🛰️ SECO — orbital velocity ~27,600 km/h. Payload doors open'); }
+    if(S.deployed && S.GT-S.deployAt>2600) enterOrbitView();
+  }
+}
+
+/* ============================ LIVE ORBIT OPERATIONS ============================ *
+ * After deployment the mission isn't over: watch YOUR satellite circle overhead,
+ * doing its actual job, with the orbital mechanics explained. */
+function enterOrbitView(){
+  if(S.orbitView) return; S.orbitView=true; S.orbAng=Math.PI*0.3; S.phase='IN ORBIT — LEO';
+  const p=PAYLOADS[S.payload];
+  // a working beam cone from the satellite down to the surface (its "job", visualised)
+  S.beam=new THREE.Mesh(new THREE.ConeGeometry(30,130,20,1,true),
+    new THREE.MeshBasicMaterial({color:0x4aa3ff,transparent:true,opacity:0.12,side:THREE.DoubleSide}));
+  scene.add(S.beam);
+  panel.classList.remove('hidden');
+  setPanel('LIVE OPERATIONS','Your satellite is working',
+    `<div class="learn ok"><b>${p.name}</b> — ${p.job||'operating in orbit'}. LIVE: ${p.live||p.learn}</div>
+     <div class="data"><span>Orbit</span><b>${p.orbit||'LEO ~550 km'}</b>
+       <span>Orbital speed</span><b>~27,600 km/h</b>
+       <span>Time per lap of Earth</span><b>~90 min</b>
+       <span>Sunrises per day</span><b>16</b></div>
+     <div class="learn">Why doesn't it fall? <b>It IS falling</b> — but it moves sideways so fast that the ground curves away underneath it. Orbit = falling and forever missing.</div>`,
+    `<button class="btn" id="fin">Complete the mission ▸</button>`);
+  document.getElementById('fin').onclick=finishMission;
+}
+function updateOrbit(dt){
+  if(!S.orbitView || !S.freePayload || S.done) return;
+  S.orbAng+=dt*0.25;
+  const R=110, y=360+Math.sin(S.orbAng*2)*4;   // matches the higher deploy altitude
+  S.freePayload.position.set(Math.cos(S.orbAng)*R, y, Math.sin(S.orbAng)*R);
+  S.freePayload.rotation.y+=dt*0.4;
+  if(S.beam){ S.beam.position.copy(S.freePayload.position); S.beam.position.y-=66; }
+}
+function deployPayload(){ S.deployAt=S.GT; sFlame.visible=false; if(payloadMesh){ const wp=new THREE.Vector3(); payloadHolder.getWorldPosition(wp); scene.add(payloadMesh); payloadMesh.position.copy(wp); S.freePayload=payloadMesh; } }
+function updateDeploy(dt){ if(S.orbitView) return;
+  if(S.freePayload){ S.freePayload.position.y+=6*dt; S.freePayload.rotation.y+=dt*0.6; if(S.freePayload.userData.panels){ for(const c of S.freePayload.children){ if(c.userData.wing) c.position.x+=c.userData.wing*dt*1.2; } } } }
+function renderDoneRecap(){
+  document.getElementById('doneRecap').innerHTML=`<b>What you did & learned:</b><ul>
+    <li>Toured the <b>Starbase factory</b> & checked the parts (steel, Raptor, tiles)</li>
+    <li>Loaded the <b>${PAYLOADS[S.payload].name}</b> and fuelled ~4,600 t of <b>methalox</b> yourself</li>
+    <li><b>Mechazilla</b> stacked booster + ship; you cleared all <b>33 Raptors</b> (~74 MN)</li>
+    <li>Flew the ascent: <b>Max-Q → MECO → stage sep → booster caught → SECO</b></li>
+    <li>Reached <b>LEO at 27,600 km/h</b> and watched your satellite operate LIVE</li></ul>
+    <div style="font-size:11px;color:#90a0b4;text-align:left;margin-top:2px">Where next? Study the full deep-space plans:</div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="btn" id="moonPlan" style="flex:1;background:#8a93a0">🌙 Moon mission plan</button>
+      <button class="btn" id="marsPlan" style="flex:1;background:#c0563a">🔴 Mars mission plan</button>
+    </div>`;
+  document.getElementById('moonPlan').onclick=()=>showPlan('moon');
+  document.getElementById('marsPlan').onclick=()=>showPlan('mars');
+}
+function showPlan(which){
+  const rec=document.getElementById('doneRecap');
+  if(which==='moon'){ rec.innerHTML=`<b>🌙 FULL MOON MISSION PLAN — 384,400 km away</b><ul>
+    <li><b>1 · Launch to LEO</b> (400 km, 27,600 km/h) — every deep-space trip starts from a parking orbit.</li>
+    <li><b>2 · Refill in orbit</b> — ~10 tanker Starships dock and pump propellant. No rocket can carry Moon fuel in one launch; the <b>rocket equation</b> forbids it.</li>
+    <li><b>3 · Trans-lunar injection</b> — one <b>+3.1 km/s</b> burn stretches the orbit out to the Moon.</li>
+    <li><b>4 · Coast 3 days</b> across the vacuum — no engines needed, orbits are free rides.</li>
+    <li><b>5 · Land on the engines</b> — the Moon has <b>no air</b>: no parachutes, no wings. Pure thrust, in 1/6 g.</li>
+    <li><b>6 · Surface operations</b> — deploy the lander cargo, explore, do the science.</li>
+    <li><b>7 · Fly home</b> — <b>+2.4 km/s</b> escapes lunar gravity, then Earth's atmosphere does the braking (aerobrake) for free.</li></ul>
+    <div style="font-size:11px;color:#90a0b4;text-align:left">Earth escape velocity is <b>11.2 km/s</b> — but you never need it in one burn: LEO first at 7.9 km/s, refill, then push on. That's the whole trick.</div>
+    <button class="btn" id="planBack" style="margin-top:10px;width:100%">← back to mission summary</button>`; }
+  else { rec.innerHTML=`<b>🔴 FULL MARS MISSION PLAN — 55 to 400 million km</b><ul>
+    <li><b>1 · Wait for the window</b> — Earth and Mars line up every <b>26 months</b>. Miss it, wait two years.</li>
+    <li><b>2 · Launch to LEO + refill</b> from tanker flights (the same trick as the Moon).</li>
+    <li><b>3 · Trans-Mars injection</b> — burn onto a <b>Hohmann transfer</b>, the minimum-fuel curve between planets.</li>
+    <li><b>4 · Cruise 6–9 months</b> — the crew's enemies are muscle loss, bone loss and radiation, not fuel.</li>
+    <li><b>5 · Aerobrake at Mars</b> — hit the thin CO₂ air at <b>7.5 km/s</b> behind the heat shield, then land on the engines.</li>
+    <li><b>6 · MAKE the return fuel</b> — <b>Sabatier reactor</b>: CO₂ air + water ice + solar power → methalox. This is exactly why Raptor burns methane.</li>
+    <li><b>7 · Live and work ~500 days</b> until the return window opens, then launch home off Mars (only 0.38 g — much easier than Earth).</li></ul>
+    <button class="btn" id="planBack" style="margin-top:10px;width:100%">← back to mission summary</button>`; }
+  document.getElementById('planBack').onclick=renderDoneRecap;
+}
+function finishMission(){ if(S.done)return; S.done=true; S.launching=false; document.getElementById('telem').style.display='none';
+  document.getElementById('shotChip').style.display='none';
+  panel.classList.add('hidden');
+  document.getElementById('doneSub').textContent=PAYLOADS[S.payload].name+' delivered & operating in orbit';
+  renderDoneRecap();
+  document.getElementById('doneOverlay').classList.remove('hidden');
+  // if running as the in-game Mission Control overlay, tell the Explore game to grant the achievement
+  try{ if(window.parent && window.parent!==window) window.parent.postMessage({type:'sx-mission-complete'},'*'); }catch(e){}
+}
+function tickCountdown(){ if(S.phase!=='countdown')return; if(S.GT>=S.cdNext){ countVal--; S.cdNext+=1000; if(countVal>0) document.getElementById('count').textContent=countVal; else if(countVal===0) document.getElementById('count').textContent='LIFTOFF'; else igniteLaunch(); } }
+function tickFuel(dt){ if(S.fuelDone || !S.fueling) return;
+  S.fuelPct=Math.min(100,(S.fuelPct||0)+dt*24);
+  const p=S.fuelPct, lb=document.getElementById('loxBar'),cb=document.getElementById('ch4Bar');
+  if(lb){ lb.style.width=p+'%'; document.getElementById('loxP').textContent=Math.round(3400*p/100).toLocaleString()+' t · '+Math.round(p)+'%';
+    cb.style.width=p*0.92+'%'; document.getElementById('ch4P').textContent=Math.round(1200*p*0.92/100).toLocaleString()+' t · '+Math.round(p*0.92)+'%'; }
+  if(p>=100){ S.fuelDone=true; S.fueling=false;
+    actEl.innerHTML=`<div class="learn ok">Tanks full: <b>~4,600 t</b> of propellant loaded — over 90% of the rocket's weight is fuel. That's the <b>rocket equation</b>'s price for reaching 27,600 km/h.</div><button class="btn" id="next">Stack the ship →</button>`;
+    document.getElementById('next').onclick=()=>goStep(7); } }
+function updateTelem(){ if(!S.launching)return;
+  document.getElementById('telPhase').textContent=S.phase;
+  if(S.orbitView){
+    document.getElementById('telAlt').textContent='≈550 km';
+    document.getElementById('telSpd').textContent='27,600 km/h';
+    document.getElementById('telThr').textContent='0 MN (coasting)';
+    document.getElementById('telTwr').textContent='free-fall';
+    document.getElementById('telFuel').textContent='orbit ops';
+    return;
+  }
+  document.getElementById('telAlt').textContent=(S.alt*0.7).toFixed(1)+' km';
+  document.getElementById('telSpd').textContent=Math.round(S.spd*7).toLocaleString()+' km/h';
+  document.getElementById('telThr').textContent=(S.thr||74)+' MN';
+  document.getElementById('telTwr').textContent=(S.twr||1.5).toFixed(2);
+  document.getElementById('telFuel').textContent=Math.round(S.fuelP===undefined?100:S.fuelP)+'%';
+}
+
+/* ============================ LOOP ============================ */
+function stepSim(dt){ S.GT+=dt*1000;
+  if(bFlame.visible) bFlame.scale.x=bFlame.scale.z=0.9+Math.random()*0.2;
+  tickAnim(); tickCountdown(); tickFuel(dt); updateLaunch(dt); updateDeploy(dt); updateOrbit(dt); updateSmoke(dt); updateTelem(); updateTags();
+}
+function start(){ document.getElementById('startOverlay').classList.add('hidden'); panel.classList.remove('hidden'); goStep(0); }
+document.getElementById('startBtn').onclick=start;
+document.getElementById('againBtn').onclick=()=>location.reload();
+let last=performance.now();
+function frame(){ requestAnimationFrame(frame); const wn=performance.now(); let dt=(wn-last)/1000; last=wn; if(dt>0.05)dt=0.05; stepSim(dt); updateCamera(); renderer.render(scene,camera); }
+focusCam(-185,44,105);
+window.__sx={ step:goStep, sim:stepSim, paint(){ updateCamera(); renderer.render(scene,camera); }, start, startCountdown, attach(){ window.__sxAttach && window.__sxAttach(); },
+  get s(){ return {step:S.step,phase:S.phase,alt:Math.round(S.alt),launching:S.launching,done:!!S.done,payload:S.payload,anim:!!anim}; } };
+frame();
+</script>
+</body>
+</html>

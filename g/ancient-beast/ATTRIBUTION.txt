@@ -1,0 +1,3 @@
+Source: https://github.com/FreezingMoon/AncientBeast
+License: AGPL-3.0; artwork/audio are CC-BY-SA-4.0 per upstream README.
+Built from commit: 2dad015855a07e3d3f75bc15ba892846059c7853
