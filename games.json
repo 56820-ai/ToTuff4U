@@ -551,6 +551,34 @@
       "path": "g/they-are-coming",
       "image": "https://pizzaedition.io/assets/game-covers/they-are-coming.jpg",
       "category": "ACTION"
+    },
+    {
+      "title": "Hextris",
+      "path": "https://hextris.github.io/hextris/",
+      "image": "https://raw.githubusercontent.com/Hextris/hextris/gh-pages/images/facebook-opengraph.png",
+      "category": "PUZZLE",
+      "source": "https://github.com/Hextris/hextris"
+    },
+    {
+      "title": "A Dark Room",
+      "path": "https://adarkroom.doublespeakgames.com/",
+      "image": "https://raw.githubusercontent.com/doublespeakgames/adarkroom/main/img/adr.png",
+      "category": "ADVENTURE",
+      "source": "https://github.com/doublespeakgames/adarkroom"
+    },
+    {
+      "title": "Untrusted",
+      "path": "https://untrustedgame.com/",
+      "image": "https://raw.githubusercontent.com/AlexNisnevich/untrusted/master/images/static.gif",
+      "category": "PUZZLE",
+      "source": "https://github.com/AlexNisnevich/untrusted"
+    },
+    {
+      "title": "HexGL",
+      "path": "https://hexgl.bkcore.com/play/",
+      "image": "https://raw.githubusercontent.com/BKcore/HexGL/master/icon_256.png",
+      "category": "RACING",
+      "source": "https://github.com/BKcore/HexGL"
     }
   ]
 }
