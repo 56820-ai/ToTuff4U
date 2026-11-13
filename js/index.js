@@ -191,10 +191,11 @@
                 gameCard.className = "game-card";
 
                 gameCard.innerHTML = `
-                    <a href="${game.path}" target="_blank" style="text-decoration: none; color: inherit;">
+                    <a href="${game.path}" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: inherit;">
                         <img src="${game.image}" alt="${game.title}" class="game-card-image">
                         <div class="game-card-title">${game.title}</div>
                     </a>
+                    ${game.source ? `<a href="${game.source}" target="_blank" rel="noopener noreferrer" style="font-size: 0.85rem; margin-top: 5px; color: var(--accent-blue); text-decoration: underline;">GitHub source</a>` : ""}
                     <i class="${isFavorite ? 'fas' : 'far'} fa-star favorite-star ${isFavorite ? 'active' : ''}"></i>
                 `;
 
