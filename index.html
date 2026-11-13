@@ -1512,57 +1512,122 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         }
     });
 
+    let cachedGames = [];
+
     async function loadGames() {
         try {
-            const response = await fetch('games.json?v=2026-11-13-icons1');
+            const response = await fetch('games.json?v=2026-11-13-icons2');
+            if (!response.ok) throw new Error('Could not load games.json: ' + response.status);
             const data = await response.json();
-            return data.games;
+            cachedGames = Array.isArray(data.games) ? data.games : [];
+            return cachedGames;
         } catch (error) {
             console.error('Error loading games:', error);
-            return [];
+            return cachedGames;
         }
     }
 
+    function normalizeGamePath(path) {
+        return String(path || '').replace(/\\/+$/, '').toLowerCase();
+    }
+
+    function makeGameIconFallback(game) {
+        const title = String(game.title || 'Game');
+        const category = String(game.category || 'ARCADE').toUpperCase();
+        const initials = title.split(/\\s+/).filter(Boolean).slice(0, 2).map(word => word[0]).join('').toUpperCase() || 'G';
+        const palette = {
+            ACTION: ['#ef4444', '#7f1d1d'],
+            ARCADE: ['#22c55e', '#14532d'],
+            ADVENTURE: ['#f59e0b', '#78350f'],
+            CARD: ['#a78bfa', '#4c1d95'],
+            CASUAL: ['#38bdf8', '#164e63'],
+            ENDLESS: ['#fb7185', '#881337'],
+            FIGHTING: ['#f97316', '#7c2d12'],
+            HORROR: ['#94a3b8', '#1e293b'],
+            IDLE: ['#facc15', '#713f12'],
+            IO: ['#2dd4bf', '#134e4a'],
+            PLATFORMER: ['#60a5fa', '#1e3a8a'],
+            PUZZLE: ['#c084fc', '#581c87'],
+            RACING: ['#f43f5e', '#881337'],
+            SIMULATION: ['#34d399', '#064e3b'],
+            SPORTS: ['#fb923c', '#7c2d12'],
+            STRATEGY: ['#818cf8', '#312e81'],
+            TOOLS: ['#64748b', '#1e293b']
+        };
+        const colors = palette[category] || ['#60a5fa', '#1e3a8a'];
+        const safeInitials = initials.replace(/[^A-Z0-9]/g, '') || 'G';
+        const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="' + colors[0] + '"/><stop offset="1" stop-color="' + colors[1] + '"/></linearGradient></defs><rect width="128" height="128" rx="22" fill="url(#g)"/><path d="M12 92 92 12h24L36 116H12z" fill="#fff" opacity=".08"/><circle cx="64" cy="55" r="34" fill="#fff" opacity=".12"/><text x="64" y="68" text-anchor="middle" font-family="Arial,sans-serif" font-size="' + (safeInitials.length > 1 ? '34' : '48') + '" font-weight="800" fill="#fff">' + safeInitials + '</text><text x="64" y="108" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" font-weight="700" letter-spacing="1.2" fill="#fff" opacity=".9">' + category.slice(0, 12) + '</text></svg>';
+        return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
+    }
+
+    function attachGameIconFallback(img, game) {
+        img.addEventListener('error', function () {
+            if (img.dataset.fallbackApplied === 'true') return;
+            img.dataset.fallbackApplied = 'true';
+            img.src = makeGameIconFallback(game);
+            img.classList.add('game-icon-fallback');
+        });
+    }
+
     function getFavorites() {
-        const favorites = localStorage.getItem("favoriteGames");
-        return favorites ? JSON.parse(favorites) : [];
+        let favorites = [];
+        try {
+            const stored = localStorage.getItem('favoriteGames');
+            favorites = stored ? JSON.parse(stored) : [];
+            if (!Array.isArray(favorites)) favorites = [];
+        } catch (error) {
+            console.warn('Could not read saved favorites:', error);
+            favorites = [];
+        }
+
+        // Refresh saved cards from the current catalog so renamed or repaired icons
+        // are reflected in favorites instead of retaining stale image URLs.
+        const refreshed = favorites.map(favorite => {
+            const current = cachedGames.find(game =>
+                normalizeGamePath(game.path) === normalizeGamePath(favorite.path) ||
+                (game.title && favorite.title && game.title.toLowerCase() === favorite.title.toLowerCase())
+            );
+            return current
+                ? { path: current.path, title: current.title, image: current.image, category: current.category }
+                : favorite;
+        });
+        if (JSON.stringify(refreshed) !== JSON.stringify(favorites)) {
+            localStorage.setItem('favoriteGames', JSON.stringify(refreshed));
+        }
+        return refreshed;
     }
 
     function saveFavorites(favorites) {
-        localStorage.setItem("favoriteGames", JSON.stringify(favorites));
+        localStorage.setItem('favoriteGames', JSON.stringify(favorites));
     }
 
     function toggleFavorite(event) {
         event.stopPropagation();
         event.preventDefault();
 
-        const gameCard = event.target.closest(".game-card");
-        const gameLink = gameCard.querySelector("a");
-        const gamePath = gameLink.getAttribute("href");
-        const gameTitle = gameLink.querySelector(".game-card-title").textContent;
-        const gameImage = gameLink.querySelector(".game-card-image").getAttribute("src");
-
+        const gameCard = event.target.closest('.game-card');
+        const gameLink = gameCard.querySelector('a');
+        const gamePath = normalizeGamePath(gameLink.getAttribute('href'));
+        const gameTitle = gameLink.querySelector('.game-card-title').textContent;
+        const gameImage = gameLink.querySelector('.game-card-image').getAttribute('src');
+        const catalogGame = cachedGames.find(game => normalizeGamePath(game.path) === gamePath);
         const favorites = getFavorites();
-
-        const index = favorites.findIndex((game) => game.path === gamePath);
+        const index = favorites.findIndex(game => normalizeGamePath(game.path) === gamePath);
 
         if (index === -1) {
             favorites.push({
-                path: gamePath,
-                title: gameTitle,
-                image: gameImage
+                path: catalogGame ? catalogGame.path : gamePath,
+                title: catalogGame ? catalogGame.title : gameTitle,
+                image: catalogGame ? catalogGame.image : gameImage,
+                category: catalogGame ? catalogGame.category : 'ARCADE'
             });
-            event.target.classList.remove("far");
-            event.target.classList.add("fas");
-            event.target.classList.add("active");
-            event.target.classList.add("star-animation");
-            setTimeout(() => {
-                event.target.classList.remove("star-animation");
-            }, 500);
+            event.target.classList.remove('far');
+            event.target.classList.add('fas', 'active', 'star-animation');
+            setTimeout(() => event.target.classList.remove('star-animation'), 500);
         } else {
             favorites.splice(index, 1);
-            event.target.classList.remove("fas", "active");
-            event.target.classList.add("far");
+            event.target.classList.remove('fas', 'active');
+            event.target.classList.add('far');
         }
 
         saveFavorites(favorites);
@@ -1571,86 +1636,102 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 
     function updateFavoritesSection() {
         const favorites = getFavorites();
-        const favoritesContainer = document.getElementById("favorites-container");
-        const favoritesSection = document.getElementById("favorites-section");
-        const favoritesHeading = document.getElementById("favorites-heading");
-
-        favoritesContainer.innerHTML = "";
+        const favoritesContainer = document.getElementById('favorites-container');
+        favoritesContainer.innerHTML = '';
 
         if (favorites.length === 0) {
-            const message = document.createElement("div");
-            message.className = "no-favorites-message";
-            message.textContent = "Star your favorite games to see them here!";
+            const message = document.createElement('div');
+            message.className = 'no-favorites-message';
+            message.textContent = 'Star your favorite games to see them here!';
             favoritesContainer.appendChild(message);
-        } else {
-            favorites.forEach((game) => {
-                const gameCard = document.createElement("div");
-                gameCard.className = "game-card";
-                
-                gameCard.innerHTML = `
-                    <a href="${game.path.endsWith('/') ? game.path : game.path + '/'}" target="_blank" style="text-decoration: none; color: inherit;">
-                        <img src="${game.image}" alt="${game.title}" class="game-card-image">
-                        <div class="game-card-title">${game.title}</div>
-                    </a>
-                    <i class="fas fa-star favorite-star active"></i>
-                `;
-                
-                const starIcon = gameCard.querySelector(".favorite-star");
-                starIcon.addEventListener("click", toggleFavorite);
-                
-                favoritesContainer.appendChild(gameCard);
-            });
+            return;
         }
+
+        favorites.forEach(game => {
+            const gameCard = document.createElement('div');
+            gameCard.className = 'game-card';
+            const link = document.createElement('a');
+            link.href = game.path.startsWith('http') ? game.path : (game.path.endsWith('/') ? game.path : game.path + '/');
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            link.style.cssText = 'text-decoration:none;color:inherit';
+            const img = document.createElement('img');
+            img.src = game.image || makeGameIconFallback(game);
+            img.alt = game.title || 'Game icon';
+            img.className = 'game-card-image';
+            attachGameIconFallback(img, game);
+            const title = document.createElement('div');
+            title.className = 'game-card-title';
+            title.textContent = game.title || 'Game';
+            link.append(img, title);
+            const star = document.createElement('i');
+            star.className = 'fas fa-star favorite-star active';
+            star.addEventListener('click', toggleFavorite);
+            gameCard.append(link, star);
+            favoritesContainer.appendChild(gameCard);
+        });
     }
 
     async function searchGames() {
-    const query = document.getElementById("searchInput").value.toLowerCase();
-    const allGamesGrid = document.getElementById("all-games-grid");
-    const favoritesSection = document.getElementById("favorites-section");
-    const favoritesHeading = document.getElementById("favorites-heading");
-    
-    // Toggle favorites section and heading visibility based on search query
-    if (query.trim() === "") {
-        favoritesSection.style.display = "block"; // Show favorites when search is empty
-        favoritesHeading.style.display = "block"; // Show heading when search is empty
-    } else {
-        favoritesSection.style.display = "none"; // Hide favorites when searching
-        favoritesHeading.style.display = "none"; // Hide heading when searching
+        const query = document.getElementById('searchInput').value.toLowerCase();
+        const allGamesGrid = document.getElementById('all-games-grid');
+        const favoritesSection = document.getElementById('favorites-section');
+        const favoritesHeading = document.getElementById('favorites-heading');
+
+        if (query.trim() === '') {
+            favoritesSection.style.display = 'block';
+            favoritesHeading.style.display = 'block';
+        } else {
+            favoritesSection.style.display = 'none';
+            favoritesHeading.style.display = 'none';
+        }
+
+        allGamesGrid.innerHTML = '';
+        const allGames = await loadGames();
+        const filteredGames = allGames.filter(game =>
+            String(game.title || '').toLowerCase().includes(query) ||
+            String(game.category || '').toLowerCase().includes(query)
+        );
+        renderGames(filteredGames, allGamesGrid);
     }
-    
-    allGamesGrid.innerHTML = "";
-    
-    const allGames = await loadGames();
-    
-    const filteredGames = allGames.filter(game => 
-        game.title.toLowerCase().includes(query) || 
-        game.category.toLowerCase().includes(query)
-    );
-    
-    renderGames(filteredGames, allGamesGrid);
-}
 
     function renderGames(games, container) {
         const favorites = getFavorites();
-        
         games.forEach(game => {
-            const isFavorite = favorites.some(fav => fav.path === game.path);
-            
-            const gameCard = document.createElement("div");
-            gameCard.className = "game-card";
-            
-            gameCard.innerHTML = `
-                <a href="${game.path.startsWith('http') ? game.path : (game.path.endsWith('/') ? game.path : game.path + '/')}" target="_blank" rel="noopener noreferrer" style="text-decoration: none; color: inherit;">
-                    <img src="${game.image}" alt="${game.title}" class="game-card-image">
-                    <div class="game-card-title">${game.title}</div>
-                </a>
-                ${game.source ? `<a href="${game.source}" target="_blank" rel="noopener noreferrer" style="font-size: 0.85rem; margin-top: 5px; color: var(--accent-blue); text-decoration: underline;">GitHub source</a>` : ""}
-                <i class="${isFavorite ? 'fas' : 'far'} fa-star favorite-star ${isFavorite ? 'active' : ''}"></i>
-            `;
-            
-            const starIcon = gameCard.querySelector(".favorite-star");
-            starIcon.addEventListener("click", toggleFavorite);
-            
+            const isFavorite = favorites.some(fav => normalizeGamePath(fav.path) === normalizeGamePath(game.path));
+            const gameCard = document.createElement('div');
+            gameCard.className = 'game-card';
+            const link = document.createElement('a');
+            link.href = game.path.startsWith('http') ? game.path : (game.path.endsWith('/') ? game.path : game.path + '/');
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            link.style.cssText = 'text-decoration:none;color:inherit';
+            const img = document.createElement('img');
+            img.src = game.image || makeGameIconFallback(game);
+            img.alt = game.title || 'Game icon';
+            img.className = 'game-card-image';
+            img.loading = 'lazy';
+            attachGameIconFallback(img, game);
+            const title = document.createElement('div');
+            title.className = 'game-card-title';
+            title.textContent = game.title || 'Game';
+            link.append(img, title);
+            if (game.source) {
+                const sourceLink = document.createElement('a');
+                sourceLink.href = game.source;
+                sourceLink.target = '_blank';
+                sourceLink.rel = 'noopener noreferrer';
+                sourceLink.textContent = 'GitHub source';
+                sourceLink.style.cssText = 'font-size:.85rem;margin-top:5px;color:var(--accent-blue);text-decoration:underline';
+                sourceLink.addEventListener('click', event => event.stopPropagation());
+                gameCard.append(link, sourceLink);
+            } else {
+                gameCard.appendChild(link);
+            }
+            const starIcon = document.createElement('i');
+            starIcon.className = (isFavorite ? 'fas' : 'far') + ' fa-star favorite-star ' + (isFavorite ? 'active' : '');
+            starIcon.addEventListener('click', toggleFavorite);
+            gameCard.appendChild(starIcon);
             container.appendChild(gameCard);
         });
     }
