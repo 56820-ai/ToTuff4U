@@ -148,7 +148,7 @@ async function list_all_apps(element) {
     const a = document.createElement("a");
     a.id = appTitle;
     a.className = appCategory;
-    a.href = `/ToTuff4U/duckmath-site/g4m3s/?title=${appTitle}`;
+    a.href = `./g4m3s/?title=${encodeURIComponent(appTitle)}`;
     const img = document.createElement("img");
     img.onmouseover = function () {
       viewFig(this);
