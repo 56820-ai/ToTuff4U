@@ -30,7 +30,7 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     timeout-minutes: 30
     steps:
-      # Browser smoke tests also validate locally imported GitHub games.
+      # Browser smoke tests also validate the imported action arcade game pack.
       - name: Check out Arcade Atlas
         uses: actions/checkout@v4
       - name: Set up Node
