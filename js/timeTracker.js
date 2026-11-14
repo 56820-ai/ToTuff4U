@@ -60,9 +60,19 @@
         playerName = window.ArcadeScores.getPlayerName("Enter your name for the " + (isRetroBowl ? "Retro Bowl" : isBlockyCombat ? "Blocky Combat SWAT" : "Minecraft") + " playtime leaderboard (24 characters max):");
       }
       if (playerName) {
-        window.ArcadeScores.submitSession(gameTitle, pendingSeconds, playerName);
-        pendingSeconds = 0;
+        var submittedSeconds = pendingSeconds;
+        window.ArcadeScores.submitSession(gameTitle, submittedSeconds, playerName).then(function (ok) {
+          if (ok) pendingSeconds = Math.max(0, pendingSeconds - submittedSeconds);
+        }).catch(function () {});
       }
+    }
+  }
+  function checkpointPlaytime() {
+    if (ended || document.visibilityState === "hidden" || segmentStartedAt === null) return;
+    flushSegment();
+    if (!ended && document.visibilityState !== "hidden") {
+      segmentStartedAt = Date.now();
+      updateTimer();
     }
   }
   function onVisibilityChange() {
@@ -76,6 +86,8 @@
   }
   updateTimer();
   window.setInterval(updateTimer, 1000);
+  // Send accumulated playtime every 30 seconds, not only when a tab closes.
+  window.setInterval(checkpointPlaytime, 30000);
   document.addEventListener("visibilitychange", onVisibilityChange);
   window.addEventListener("pagehide", onPageHide);
   window.addEventListener("beforeunload", onPageHide);
