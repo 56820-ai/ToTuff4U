@@ -224,7 +224,7 @@ function renderGameNotFound(message) {
   } catch (e) {
     // As a last resort, fall back to 404 page
     try {
-      window.location.href = "/g404.html";
+      window.location.href = "/ToTuff4U/duckmath-site/g404.html";
     } catch (_) {}
   }
 }

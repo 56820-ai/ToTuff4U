@@ -12,8 +12,8 @@ templatetopnav.innerHTML = `
     <a href="/ToTuff4U/duckmath-site/more/blank.html" class="gr last">about:blank</a>
   </div>
 </div>
-<a href="/about.html">📝ABOUT</a>
-<a href="/leaderboard.html">🏆LEADERBOARD</a>
+<a href="/ToTuff4U/duckmath-site/about.html">📝ABOUT</a>
+<a href="/ToTuff4U/duckmath-site/leaderboard.html">🏆LEADERBOARD</a>
 <a href="/ToTuff4U/duckmath-site/">🎮GAMES</a>
 <div class="centered-fixed-blur"></div>
 <div class="centered-fixed">
@@ -34,8 +34,8 @@ templatetopnav.innerHTML = `
 <ul class="mobile-menu">
   <li><a href="/index.html">HOME</a></li>
   <li><a href="/ToTuff4U/duckmath-site/">GAMES</a></li>
-  <li><a href="/leaderboard.html">LEADERBOARD</a></li>
-  <li><a href="/about.html">ABOUT</a></li>
+  <li><a href="/ToTuff4U/duckmath-site/leaderboard.html">LEADERBOARD</a></li>
+  <li><a href="/ToTuff4U/duckmath-site/about.html">ABOUT</a></li>
   <li>
     <a class="topnavbutton">MORE↓</a>
     <div class="dropdown-content">
@@ -86,11 +86,11 @@ templatefooter.innerHTML = `
       <div>
         <div style="font-weight: 600; margin-bottom: 8px;">Quick Links</div>
         <div style="display: grid; gap: 6px;">
-          <a href="/about.html" style="text-decoration: none; color: inherit; opacity: 0.95;">About</a>
-          <a href="/leaderboard.html" style="text-decoration: none; color: inherit; opacity: 0.95;">Leaderboard</a>
+          <a href="/ToTuff4U/duckmath-site/about.html" style="text-decoration: none; color: inherit; opacity: 0.95;">About</a>
+          <a href="/ToTuff4U/duckmath-site/leaderboard.html" style="text-decoration: none; color: inherit; opacity: 0.95;">Leaderboard</a>
           <a href="/ToTuff4U/duckmath-site/" style="text-decoration: none; color: inherit; opacity: 0.95;">Games</a>
           <a href="/ToTuff4U/duckmath-site/blog/" style="text-decoration: none; color: inherit; opacity: 0.95;">Blog</a>
-          <a href="/advertise.html" style="text-decoration: none; color: inherit; opacity: 0.95;">Advertise</a>
+          <a href="/ToTuff4U/duckmath-site/advertise.html" style="text-decoration: none; color: inherit; opacity: 0.95;">Advertise</a>
           <a href="/ToTuff4U/duckmath-site/more/create-site.html" style="text-decoration: none; color: inherit; opacity: 0.95;">Create Your Own Site</a>
           <a href="/ToTuff4U/duckmath-site/more/apps.html" style="text-decoration: none; color: inherit; opacity: 0.95;">Apps & Unblockers</a>
           <a href="/ToTuff4U/duckmath-site/more/tab-cloak.html" style="text-decoration: none; color: inherit; opacity: 0.95;">Tab Cloak</a>
