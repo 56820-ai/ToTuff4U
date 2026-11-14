@@ -133,6 +133,36 @@
       "category": "RACING"
     },
     {
+      "title": "Neon Racer",
+      "path": "g/neon-racer",
+      "image": "images/icons/neon-racer.svg",
+      "category": "RACING"
+    },
+    {
+      "title": "Sky Hop",
+      "path": "g/sky-hop",
+      "image": "images/icons/sky-hop.svg",
+      "category": "PLATFORMER"
+    },
+    {
+      "title": "Asteroid Rush",
+      "path": "g/asteroid-rush",
+      "image": "images/icons/asteroid-rush.svg",
+      "category": "ARCADE"
+    },
+    {
+      "title": "Gem Maze",
+      "path": "g/gem-maze",
+      "image": "images/icons/gem-maze.svg",
+      "category": "PUZZLE"
+    },
+    {
+      "title": "Color Clash",
+      "path": "g/color-clash",
+      "image": "images/icons/color-clash.svg",
+      "category": "CASUAL"
+    },
+    {
       "title": "Tetris",
       "path": "g/tetris",
       "image": "duckmath-site/assets/img/icons/tetris.webp",
