@@ -14,17 +14,13 @@
   "use strict";
 
   const config = window.ARCADE_ATLAS_SCORE_CONFIG || {};
-  const configured = /^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(config.supabaseUrl || "") &&
-    typeof config.supabaseAnonKey === "string" &&
-    config.supabaseAnonKey.length > 20 &&
-    !config.supabaseAnonKey.includes("YOUR_");
+  const configured = /^https:\/\/[a-z0-9-]+(?:\.[a-z0-9-]+)+$/i.test(config.workerUrl || "");
 
   async function request(path, options) {
     if (!configured) throw new Error("The shared score database has not been configured yet.");
-    const response = await fetch(config.supabaseUrl.replace(/\/$/, "") + "/rest/v1/" + path, {
+    const response = await fetch(config.workerUrl.replace(/\/$/, "") + path, {
       ...options,
       headers: {
-        apikey: config.supabaseAnonKey,
         "Content-Type": "application/json",
         ...(options && options.headers ? options.headers : {})
       }
@@ -46,13 +42,11 @@
 
   async function submitThroughServer(gameTitle, score, playerName, kind, keepalive) {
     if (!configured) throw new Error("The shared score database has not been configured yet.");
-    const endpoint = config.supabaseUrl.replace(/\/$/, "") + "/functions/v1/submit-score";
+    const endpoint = config.workerUrl.replace(/\/$/, "") + "/submit-score";
     const response = await fetch(endpoint, {
       method: "POST",
       keepalive: !!keepalive,
       headers: {
-        apikey: config.supabaseAnonKey,
-        Authorization: "Bearer " + config.supabaseAnonKey,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
@@ -128,28 +122,14 @@
 
   async function getScores() {
     window.ArcadeScores.lastLoadError = "";
-    const pageSize = 500;
-    const allScores = [];
     try {
-      // Use PostgREST's standard limit/offset query parameters. These are
-      // reliably supported by Supabase REST and avoid browser/proxy handling
-      // differences with explicit Range request headers.
-      for (let offset = 0; ; offset += pageSize) {
-        const page = await request(
-          "scores?select=id,player_name,game_title,score,created_at&order=created_at.desc,id.asc&limit=" +
-            pageSize + "&offset=" + offset,
-          { method: "GET" }
-        );
-        if (!Array.isArray(page) || page.length === 0) break;
-        allScores.push(...page);
-        if (page.length < pageSize) break;
-      }
-      return allScores;
+      const scores = await request("/scores", { method: "GET" });
+      if (!Array.isArray(scores)) throw new Error("Score service returned an invalid leaderboard response.");
+      return scores;
     } catch (error) {
       window.ArcadeScores.lastLoadError = error && error.message ? error.message : String(error);
-      console.warn("Arcade Atlas: could not load every score page.", window.ArcadeScores.lastLoadError);
-      // Keep already-loaded rows visible if a later page fails.
-      return allScores;
+      console.warn("Arcade Atlas: could not load leaderboard.", window.ArcadeScores.lastLoadError);
+      return [];
     }
   }
 
