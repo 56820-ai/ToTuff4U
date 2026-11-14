@@ -508,6 +508,36 @@
       return logos[game] || "../images/favicon.png";
     }
 
+    // Cookie Clicker scores can be far beyond Number.MAX_SAFE_INTEGER.
+    // Keep them as decimal strings/BigInts for exact sorting and display.
+    function compareCookieScores(a, b) {
+      const left = BigInt(String(a.score || "0"));
+      const right = BigInt(String(b.score || "0"));
+      return left > right ? -1 : left < right ? 1 : 0;
+    }
+
+    function formatCookieScore(value) {
+      const raw = String(value == null ? "0" : value).trim();
+      if (!/^[0-9]+$/.test(raw)) return raw;
+      const digits = raw.replace(/^0+(?=\\d)/, "");
+      if (digits.length <= 3) return BigInt(digits).toLocaleString("en-US");
+
+      const units = [
+        "", "thousand", "million", "billion", "trillion", "quadrillion",
+        "quintillion", "sextillion", "septillion", "octillion", "nonillion",
+        "decillion", "undecillion", "duodecillion", "tredecillion",
+        "quattuordecillion", "quindecillion", "sexdecillion",
+        "septendecillion", "octodecillion", "novemdecillion", "vigintillion"
+      ];
+      const group = Math.floor((digits.length - 1) / 3);
+      const unit = units[group] || ("10^" + (group * 3));
+      const leadingLength = digits.length - group * 3;
+      const leading = digits.slice(0, leadingLength);
+      const nextDigits = (digits.slice(leadingLength, leadingLength + 2) + "00").slice(0, 2);
+      const fraction = nextDigits.replace(/0+$/, "");
+      return leading + (fraction ? "." + fraction : "") + " " + unit;
+    }
+
     function createPodiumSection(gameTitle, players, timedGames) {
       const section = document.createElement("section");
       section.className = "podium-section";
@@ -536,18 +566,20 @@
           const name = document.createElement("div");
           name.className = "podium-name";
           name.textContent = item.player_name || "Player";
-          const seconds = Math.max(0, Number(item.score) || 0);
           const gameKey = String(item.game_title || "").trim().toLowerCase();
+          const seconds = Math.max(0, Number(item.score) || 0);
           const timed = timedGames.has(gameKey);
           const reaction = gameKey === "reaction test";
           const driftBoss = gameKey === "drift boss";
-          const displayScore = timed
+          const displayScore = gameKey === "cookie clicker" ? formatCookieScore(item.score)
+            : timed
             ? Math.floor(seconds / 86400) + "d " + Math.floor((seconds % 86400) / 3600) + "h " + Math.floor((seconds % 3600) / 60) + "m " + (seconds % 60) + "s"
             : reaction ? Math.max(0, 10000 - seconds).toLocaleString() + " ms"
             : driftBoss ? seconds.toLocaleString() + " m" : seconds.toLocaleString();
           const score = document.createElement("div");
           score.className = "podium-score";
           score.textContent = displayScore;
+          if (gameKey === "cookie clicker") score.title = BigInt(String(item.score || "0")).toLocaleString("en-US") + " cookies";
           const block = document.createElement("div");
           block.className = "podium-block";
           block.textContent = String(place.rank);
@@ -621,8 +653,11 @@
           });
           players = [...totalByPlayer.values()].sort((a,b) => Number(b.score) - Number(a.score));
         } else {
-          // Higher scores rank first for ordinary high-score games.
-          players.sort((a,b) => Number(b.score) - Number(a.score));
+          // Higher scores rank first. Use BigInt for Cookie Clicker to avoid
+          // precision loss when scores reach quadrillions and beyond.
+          players.sort(key === "cookie clicker"
+            ? compareCookieScores
+            : (a,b) => Number(b.score) - Number(a.score));
         }
         // Cookie Clicker ranks each player only once using their personal best.
         // This prevents repeated runs by one person from occupying the whole podium.
@@ -632,11 +667,11 @@
             const playerKey = String(item.player_name || "").trim().toLocaleLowerCase();
             if (!playerKey) return;
             const previous = bestByPlayer.get(playerKey);
-            if (!previous || Number(item.score) > Number(previous.score)) {
+            if (!previous || BigInt(String(item.score || "0")) > BigInt(String(previous.score || "0"))) {
               bestByPlayer.set(playerKey, item);
             }
           });
-          players = [...bestByPlayer.values()].sort((a,b) => Number(b.score) - Number(a.score));
+          players = [...bestByPlayer.values()].sort(compareCookieScores);
         }
         const title = key === "retro bowl time" ? "Retro Bowl · Total Playtime" : key === "blocky combat swat time" ? "Blocky Combat SWAT · Total Playtime" : players[0].game_title;
         createPodiumSection(title, players.slice(0,3), timedGames);
