@@ -31,9 +31,38 @@ function categoryFor(value) {
   if (/action|shooter|fps|fighting/i.test(s)) return "ACTION";
   return "ARCADE";
 }
+function normalizeTitle(value) {
+  return String(value || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+function slugFromGame(game) {
+  const query = String(game?.path || "").split("?")[1] || "";
+  const match = query.match(/(?:^|&)title=([^&]*)/);
+  try { return match ? decodeURIComponent(match[1]) : String(game?.title || ""); }
+  catch { return String(game?.title || ""); }
+}
+function formatGameTitle(value) {
+  const slug = String(value || "").trim().toLowerCase().replace(/[\\s_]+/g, "-");
+  const special = {
+    "snek-io": "Snek.io",
+    "worldguessr": "WorldGuessr",
+    "the-worlds-hardest-game": "The World's Hardest Game",
+    "the-worlds-hardest-game-2": "The World's Hardest Game 2",
+    "worlds-hardest-game": "World's Hardest Game",
+    "fnf-garcello": "FNF Garcello",
+    "cs-online": "CS Online",
+    "cs-surf": "CS Surf",
+    "uno-online": "UNO Online",
+    "ovo-multiplayer": "OvO Multiplayer",
+    "e-life-simulator": "E-Life Simulator",
+    "bffs-black-friday-collection": "BFFs Black Friday Collection"
+  };
+  if (special[slug]) return special[slug];
+  const words = { fnf:"FNF", gta:"GTA", cs:"CS", csgo:"CSGO", uno:"UNO", ovo:"OvO", fps:"FPS", btd:"BTD", f1:"F1", bffs:"BFFs", moto:"Moto", x3m:"X3M", "2d":"2D", "3d":"3D", papas:"Papa's", duckcraft:"DuckCraft", eaglecraft:"EagleCraft", maddoxcraft:"MaddoxCraft", nba:"NBA", nfl:"NFL", io:"io" };
+  return slug.split("-").filter(Boolean).map(word => words[word] || (/^\\d+$/.test(word) ? word : word[0].toUpperCase() + word.slice(1))).join(" ");
+}
 function suitableForMiddleSchool(app) {
   const text = [app?.title, app?.categories, app?.description].flat().join(" ").toLowerCase();
-  return !/(horror|gore|blood|adult|nsfw|sexual|nudity|casino|gambling|mortal kombat|doom|omori|fnaf|five nights at freddy|granny|poppy playtime)/i.test(text);
+  return !/(horror|gore|blood|adult|nsfw|sexual|nudity|casino|gambling|mortal.?kombat|doom|omori|fnaf|five.?nights|granny|poppy.?playtime|ultrakill|doki.?doki|pokemon|super.?mario|street.?fighter|portal|animal.?crossing|grand.?theft|gta|roblox|fortnite|among.?us|super.?smash|hollow.?knight|pizza.?tower|twerk|poop.?clicker|happy.?wheels|binding.?of.?isaac|backrooms|backdooms)/i.test(text);
 }
 function normalizeIcon(icon) {
   if (typeof icon !== "string" || !icon.trim()) return "";
@@ -253,16 +282,14 @@ try {
     if (result?.loaded) {
       if (suitableForMiddleSchool(result.app)) {
         duckmath.verified.push(result.app.title);
-        const titleKey = result.app.title.trim().toLowerCase();
-        if (!catalog.some(g => String(g.title || "").trim().toLowerCase() === titleKey)) {
-          const icon = normalizeIcon(result.app.icon);
-          if (icon) additions.push({
-            title: result.app.title.trim(),
-            path: "duckmath-site/g4m3s/?title=" + encodeURIComponent(result.app.title.trim()),
-            image: icon,
-            category: categoryFor(result.app.categories)
-          });
-        }
+        const slug = String(result.app.title || "").trim();
+        const icon = normalizeIcon(result.app.icon);
+        if (icon) additions.push({
+          title: formatGameTitle(slug),
+          path: "duckmath-site/g4m3s/?title=" + encodeURIComponent(slug),
+          image: icon,
+          category: categoryFor(result.app.categories)
+        });
       } else {
         duckmath.excludedForAge.push(result.app.title);
       }
@@ -280,24 +307,45 @@ try {
   duckmath.error = String(e.message || e).slice(0, 500);
 }
 
-const failedTitles = new Set(results.filter(r => r.hardFailure).map(r => String(r.title || "").trim().toLowerCase()));
-const removedBrokenGames = gamesData.games.filter(g => failedTitles.has(String(g.title || "").trim().toLowerCase()));
-if (removedBrokenGames.length) {
-  gamesData.games = gamesData.games.filter(g => !failedTitles.has(String(g.title || "").trim().toLowerCase()));
-  await writeFile("games.json", JSON.stringify(gamesData, null, 2) + "\\n");
+const failedTitles = new Set(results.filter(r => r.hardFailure).map(r => normalizeTitle(r.title)));
+const removedBrokenGames = gamesData.games.filter(g => failedTitles.has(normalizeTitle(g.title)));
+gamesData.games = gamesData.games.filter(g => !failedTitles.has(normalizeTitle(g.title)));
+
+const importedEntries = gamesData.games.filter(g => String(g.path || "").startsWith("duckmath-site/g4m3s/"));
+const nativeEntries = gamesData.games.filter(g => !String(g.path || "").startsWith("duckmath-site/g4m3s/"));
+const nativeKeys = new Set(nativeEntries.map(g => normalizeTitle(g.title)));
+const excludedKeys = new Set(duckmath.excludedForAge.map(normalizeTitle));
+const seenTitles = new Set(nativeKeys);
+const keptImported = [];
+const removedUnsuitableDuckMath = [];
+const removedDuplicateDuckMath = [];
+for (const game of importedEntries) {
+  const slug = slugFromGame(game);
+  const key = normalizeTitle(slug);
+  if (excludedKeys.has(key) || !suitableForMiddleSchool({ title: slug })) {
+    removedUnsuitableDuckMath.push(game.title);
+    continue;
+  }
+  if (seenTitles.has(key)) {
+    removedDuplicateDuckMath.push(game.title);
+    continue;
+  }
+  game.title = formatGameTitle(slug);
+  seenTitles.add(key);
+  keptImported.push(game);
 }
-const existing = new Set(gamesData.games.map(g => String(g.title || "").trim().toLowerCase()));
-const uniqueAdditions = additions.filter((g, i, arr) => {
-  const key = g.title.toLowerCase();
+gamesData.games = [...nativeEntries, ...keptImported];
+const existing = new Set(gamesData.games.map(g => normalizeTitle(g.title)));
+const uniqueAdditions = additions.filter((game, index, array) => {
+  const key = normalizeTitle(slugFromGame(game));
   if (existing.has(key)) return false;
   existing.add(key);
-  return arr.findIndex(x => x.title.toLowerCase() === key) === i;
+  return array.findIndex(item => normalizeTitle(slugFromGame(item)) === key) === index;
 });
-if (uniqueAdditions.length) {
-  gamesData.games.push(...uniqueAdditions);
-  await writeFile("games.json", JSON.stringify(gamesData, null, 2) + "\n");
+if (uniqueAdditions.length) gamesData.games.push(...uniqueAdditions);
+if (removedBrokenGames.length || removedUnsuitableDuckMath.length || removedDuplicateDuckMath.length || uniqueAdditions.length) {
+  await writeFile("games.json", JSON.stringify(gamesData, null, 2) + "\\n");
 }
-
 const report = {
   generatedAt: new Date().toISOString(),
   catalogCount: catalog.length,
@@ -305,6 +353,8 @@ const report = {
   catalogFailed: results.filter(r => r.hardFailure),
   catalogWarnings: results.filter(r => r.pageErrors.length || r.externalFailures.length || r.localFailures.length),
   removedBrokenGames: removedBrokenGames.map(g => g.title),
+  removedUnsuitableDuckMath,
+  removedDuplicateDuckMath,
   logoAudit,
   brokenLogos: logoAudit.filter(x => !x.ok),
   duckmath,
@@ -320,6 +370,8 @@ if (process.env.GITHUB_STEP_SUMMARY) {
     `- Arcade Atlas pages passing hard checks: ${report.catalogPassed}`,
     `- Arcade Atlas hard failures: ${report.catalogFailed.length}`,
     `- Broken Arcade Atlas games removed: ${removedBrokenGames.length}`,
+    `- Unsuitable DuckMath catalog entries removed: ${removedUnsuitableDuckMath.length}`,
+    `- Duplicate DuckMath catalog entries removed: ${removedDuplicateDuckMath.length}`,
     `- Catalog logos checked: ${logoAudit.length}`,
     `- Broken catalog logos: ${report.brokenLogos.length}`,
     `- DuckMath dynamic games found: ${duckmath.cachedApps}`,
