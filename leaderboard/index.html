@@ -519,7 +519,7 @@
     function formatCookieScore(value) {
       const raw = String(value == null ? "0" : value).trim();
       if (!/^[0-9]+$/.test(raw)) return raw;
-      const digits = raw.replace(/^0+(?=\\d)/, "");
+      const digits = raw.replace(/^0+(?=\d)/, "");
       if (digits.length <= 3) return BigInt(digits).toLocaleString("en-US");
 
       const units = [
