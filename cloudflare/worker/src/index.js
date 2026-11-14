@@ -16,8 +16,8 @@ function json(data, status = 200) {
 
 function getClientIp(request) {
   const ip = request.headers.get("CF-Connecting-IP")?.trim() || "";
-  if (!ip || ip.length > 64 || /[\\s,;]/.test(ip)) return null;
-  return ip.toLowerCase().replace(/^\\[|\\]$/g, "");
+  if (!ip || ip.length > 64 || /[\s,;]/.test(ip)) return null;
+  return ip.toLowerCase().replace(/^\[|\]$/g, "");
 }
 
 async function hashIp(ip, secret) {
