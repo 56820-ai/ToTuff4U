@@ -73,11 +73,11 @@ async function checkGame(game) {
   const missingPage = /(^|\n)\s*(404|page not found|file not found|error response)\s*(\n|$)/i.test(body.slice(0, 900)) ||
     /error response/i.test(title);
   const criticalPageErrors = pageErrors.filter(message =>
-    /Invalid or unexpected token|Unexpected token|Unexpected number|missing \\) after argument list|Invalid regular expression|THREE is not defined|Identifier .* already declared|check is not defined|status 404/i.test(message)
+    /Invalid or unexpected token|Unexpected token|Unexpected number|missing \) after argument list|Invalid regular expression|THREE is not defined|Identifier .* already declared|check is not defined|status 404/i.test(message)
   );
   const missingCoreAssets = localFailures.filter(item =>
-    /\\.(js|wasm|unityweb|data|json)(?:[?#]|$)/i.test(item.url) &&
-    !/(\\/js\\/(main|favicon|panic|gtag|auto-clicker|autoclicker)\\.js|\\/storage\\/js\\/cloak\\.js|save\\.dat|optiondata\\.dat|savedata\\.ini|service.?worker|\\/sw\\.js|\\/cdn-cgi\\/)/i.test(item.url)
+    /\.(js|wasm|unityweb|data|json)(?:[?#]|$)/i.test(item.url) &&
+    !/(\/js\/(main|favicon|panic|gtag|auto-clicker|autoclicker)\.js|\/storage\/js\/cloak\.js|save\.dat|optiondata\.dat|savedata\.ini|service.?worker|\/sw\.js|\/cdn-cgi\/)/i.test(item.url)
   );
   const iframeHosts = frames.map(src => { try { return new URL(src, url).host; } catch { return ""; } }).filter(Boolean);
   const failedGameFrames = externalFailures.filter(item => iframeHosts.some(host => item.url.includes(host)));
