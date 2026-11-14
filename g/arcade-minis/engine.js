@@ -88,7 +88,7 @@ function drawColors(dt){
  text("Time: "+Math.ceil(s.time)+"s",w/2,h-28,19,"#fff","center");
  if(s.tick>.75){s.tick=0;s.target=Math.floor(rand(0,6));}
 }
-function init(){if(mode==="racer")state={lane:1,ob:[],tick:0,road:0};if(mode==="hopper"){state={x:w/2,y:h-46,vy:0,camera:0,grounded:true,prevY:h-46,plats:[{x:w/2-70,y:h-28,w:140},{x:w/2-30,y:h-130,w:110},{x:w/2+80,y:h-225,w:100},{x:w/2-150,y:h-320,w:100}]};}if(mode==="asteroids")state={x:w/2,y:h-65,bullets:[],rocks:[],tick:0};if(mode==="maze")state={map:["##########","#..#.....#","#..#.#...#","#....#.#.#","###..#.#.#","#....#...#","#.####.###","#........#","#.##.##..#","##########"],x:1,y:1,gems:[[4,1],[7,2],[2,5],[7,7],[4,8]],exit:[8,8]};if(mode==="colors")state={target:Math.floor(rand(0,6)),time:30,tiles:Array.from({length:9},()=>Math.floor(rand(0,6))),tick:0};}
+function init(){if(mode==="racer")state={lane:1,ob:[],tick:0,road:0};if(mode==="hopper"){state={x:w/2,y:h-46,vy:0,camera:0,grounded:true,prevY:h-46,plats:[{x:w/2-70,y:h-28,w:140},{x:w/2-30,y:h-130,w:110},{x:w/2+80,y:h-225,w:100},{x:w/2-150,y:h-320,w:100}]};}if(mode==="asteroids")state={x:w/2,y:h-65,bullets:[],rocks:[],tick:0};if(mode==="maze")state={map:["##########","#..#.....#","#..#.#...#","#....#.#.#","###..#.#.#","#....#...#","#.####.###","#........#","#.##.##..#","##########"],x:1,y:1,gems:[[4,1],[7,2],[2,5],[7,7],[4,8]],exit:[8,8]};if(mode==="colors")state={target:Math.floor(rand(0,6)),time:30,tiles:Array.from({length:9}if(mode==="paddle")state={p1:h/2,p2:h/2,x:w/2,y:h/2,vx:260,vy:170,left:0,right:0};if(mode==="whack")state={target:Math.floor(rand(0,9)),time:30,tick:0};,()=>Math.floor(rand(0,6))),tick:0};}
 function drawPaddle(dt){
  const s=state,ph=92,pw=13;
  if(keys.w)s.p1-=330*dt;if(keys.s)s.p1+=330*dt;
