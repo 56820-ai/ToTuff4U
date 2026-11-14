@@ -237,7 +237,7 @@
     {
       "title": "Run 2",
       "path": "g/run2",
-      "image": "duckmath-site/assets/img/icons/run3.webp",
+      "image": "https://img.rocketgames.io/big2x/games/r/run-2/run-2.7e3a40.jpg",
       "category": "ARCADE"
     },
     {
@@ -2964,6 +2964,36 @@
       "path": "duckmath-site/g4m3s/?title=orion-sandbox",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/orion-sandbox.jpg",
       "category": "STRATEGY"
+    },
+    {
+      "title": "Crossy Road",
+      "path": "g/crossyroad",
+      "image": "g/crossyroad/sprites/crossy-road-logo.png",
+      "category": "ARCADE"
+    },
+    {
+      "title": "Cut The Rope",
+      "path": "g/cut-the-rope",
+      "image": "images/cuttherope.png",
+      "category": "PUZZLE"
+    },
+    {
+      "title": "Fireboy & Watergirl",
+      "path": "g/fireboywatergirlforsettemple",
+      "image": "duckmath-site/assets/img/icons/fireboy.webp",
+      "category": "PLATFORMER"
+    },
+    {
+      "title": "Rooftop Snipers 2",
+      "path": "g/rooftop-snipers-2-main",
+      "image": "g/rooftop-snipers-2-main/1-small.jpg",
+      "category": "ACTION"
+    },
+    {
+      "title": "OvO",
+      "path": "g/ovo",
+      "image": "images/ovo.jpg",
+      "category": "PLATFORMER"
     }
   ]
 }
