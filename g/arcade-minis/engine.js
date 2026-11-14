@@ -21,9 +21,9 @@ addEventListener("pointerup",()=>{keys.arrowleft=false;keys.arrowright=false;});
 let state={};
 function init(){
  if(mode==="racer")state={lane:1,ob:[],tick:0,road:0};
- if(mode==="hopper")state={x:w/2,y:h-90,vy:0,plats:[],camera:0,ground:h-40};
+ if(mode==="hopper")state={x:w/2,y:h-46,vy:0,plats:[],camera:0,ground:h-28,grounded:true,prevY:h-46};
  if(mode==="asteroids")state={x:w/2,y:h-65,bullets:[],rocks:[],tick:0};
- if(mode==="maze")state={map:["##########","#..#.....#","#..#.#...#","#....#.#.#","###..#.#.#","#....#...#","#.####.###","#........#","#.##.##..#","##########"],x:1,y:1,gems:[[3,1],[7,2],[2,5],[7,7],[5,8]],exit:[8,8],moves:0};
+ if(mode==="maze")state={map:["##########","#..#.....#","#..#.#...#","#....#.#.#","###..#.#.#","#....#...#","#.####.###","#........#","#.##.##..#","##########"],x:1,y:1,gems:[[4,1],[7,2],[2,5],[7,7],[4,8]],exit:[8,8],moves:0};
  if(mode==="colors")state={target:Math.floor(rand(0,6)),time:30,tiles:Array.from({length:9},()=>Math.floor(rand(0,6))),tick:0};
  if(mode==="racer")state.ob=[];
  if(mode==="hopper"){state.plats=[{x:w/2-70,y:h-35,w:140},{x:w/2-30,y:h-130,w:110},{x:w/2+80,y:h-225,w:100},{x:w/2-150,y:h-320,w:100}];state.y=h-90;}
@@ -48,7 +48,7 @@ function drawHopper(dt){
  if((keys[" "]||keys.arrowup||keys.w)&&Math.abs(s.vy)<1&&s.y>h-120)s.vy=-520;
  s.vy+=1100*dt;s.y+=s.vy*dt;s.x=clamp(s.x,14,w-14);
  for(const p of s.plats){if(s.vy>0&&s.y+18>=p.y&&s.y+18<=p.y+16&&s.x>p.x-10&&s.x<p.x+p.w+10){s.y=p.y-18;s.vy=-500;}}
- if(s.y<h*.38){const dy=h*.38-s.y;s.y=h*.38;s.camera+=dy;for(const p of s.plats)p.y+=dy;setScore(s.camera/8);}
+ if(s.y<h*.38){const dy=h*.38-s.y;s.y=h*.38;s.prevY=s.y;s.camera+=dy;s.ground+=dy;for(const p of s.plats)p.y+=dy;setScore(s.camera/8);}
  s.plats=s.plats.filter(p=>p.y<h+30);while(s.plats.length<7){const top=Math.min(...s.plats.map(p=>p.y));s.plats.push({x:rand(10,w-120),y:top-rand(75,115),w:rand(75,125)});}
  for(const p of s.plats)rect(p.x,p.y,p.w,12,"#55e6a5");
  circle(s.x,s.y,17,"#ffd447");rect(s.x-11,s.y-4,22,5,"#14233b");
@@ -86,7 +86,7 @@ function drawColors(dt){
  text("Time: "+Math.ceil(s.time)+"s",w/2,h-28,19,"#fff","center");
  if(s.tick>.75){s.tick=0;s.target=Math.floor(rand(0,6));}
 }
-function init(){if(mode==="racer")state={lane:1,ob:[],tick:0,road:0};if(mode==="hopper"){state={x:w/2,y:h-90,vy:0,camera:0,plats:[{x:w/2-70,y:h-35,w:140},{x:w/2-30,y:h-130,w:110},{x:w/2+80,y:h-225,w:100},{x:w/2-150,y:h-320,w:100}]};}if(mode==="asteroids")state={x:w/2,y:h-65,bullets:[],rocks:[],tick:0};if(mode==="maze")state={map:["##########","#..#.....#","#..#.#...#","#....#.#.#","###..#.#.#","#....#...#","#.####.###","#........#","#.##.##..#","##########"],x:1,y:1,gems:[[3,1],[7,2],[2,5],[7,7],[5,8]],exit:[8,8]};if(mode==="colors")state={target:Math.floor(rand(0,6)),time:30,tiles:Array.from({length:9},()=>Math.floor(rand(0,6))),tick:0};}
+function init(){if(mode==="racer")state={lane:1,ob:[],tick:0,road:0};if(mode==="hopper"){state={x:w/2,y:h-46,vy:0,camera:0,grounded:true,prevY:h-46,plats:[{x:w/2-70,y:h-28,w:140},{x:w/2-30,y:h-130,w:110},{x:w/2+80,y:h-225,w:100},{x:w/2-150,y:h-320,w:100}]};}if(mode==="asteroids")state={x:w/2,y:h-65,bullets:[],rocks:[],tick:0};if(mode==="maze")state={map:["##########","#..#.....#","#..#.#...#","#....#.#.#","###..#.#.#","#....#...#","#.####.###","#........#","#.##.##..#","##########"],x:1,y:1,gems:[[4,1],[7,2],[2,5],[7,7],[4,8]],exit:[8,8]};if(mode==="colors")state={target:Math.floor(rand(0,6)),time:30,tiles:Array.from({length:9},()=>Math.floor(rand(0,6))),tick:0};}
 function frame(t){if(!last)last=t;const dt=Math.min(.04,(t-last)/1000);last=t;bg();if(!over&&started){if(mode==="racer")drawRacer(dt);if(mode==="hopper")drawHopper(dt);if(mode==="asteroids")drawAsteroids(dt);if(mode==="maze")drawMaze();if(mode==="colors")drawColors(dt);}else if(!started){text(document.title,w/2,h/2-22,32,"#fff","center");text("Press Start to play",w/2,h/2+25,18,"#b7d8e8","center");}requestAnimationFrame(frame);}
 document.getElementById("start").onclick=()=>{reset();};
 canvas.addEventListener("click",e=>{if(mode!=="colors"||!started||over)return;const r=canvas.getBoundingClientRect(),size=Math.min(100,(w-90)/3),gap=15,sx=(w-(size*3+gap*2))/2,sy=160;const col=Math.floor((e.clientX-r.left-sx)/(size+gap)),row=Math.floor((e.clientY-r.top-sy)/(size+gap));if(col<0||col>2||row<0||row>2)return;const idx=row*3+col;if(state.tiles[idx]===state.target){setScore(score+10);state.target=Math.floor(rand(0,6));}else{setScore(Math.max(0,score-5));}}
