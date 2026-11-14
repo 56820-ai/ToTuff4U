@@ -1,0 +1,87 @@
+name: Arcade Atlas Security Scan
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "games.json"
+      - "g/**"
+      - ".github/workflows/security-scan.yml"
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  malware-scan:
+    name: Malware signatures (ClamAV)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install and update ClamAV
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clamav clamav-freshclam
+          sudo systemctl stop clamav-freshclam || true
+          sudo freshclam
+      - name: Scan game files and site
+        run: |
+          set +e
+          clamscan -r --infected --recursive --exclude-dir='^./.git$' --max-filesize=100M --max-scansize=200M --log=clamav-report.txt .
+          result=$?
+          cat clamav-report.txt
+          if [ "$result" -eq 1 ]; then
+            echo "ClamAV detected one or more infected files."
+            exit 1
+          elif [ "$result" -gt 1 ]; then
+            echo "ClamAV encountered a scan error."
+            exit "$result"
+          fi
+      - name: Upload ClamAV report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: clamav-malware-report
+          path: clamav-report.txt
+          if-no-files-found: ignore
+
+  static-analysis:
+    name: JavaScript security analysis (Semgrep)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Semgrep
+        run: python -m pip install --upgrade semgrep
+      - name: Scan JavaScript and HTML
+        run: |
+          set +e
+          semgrep scan --config p/security-audit --json --output semgrep-report.json .
+          result=$?
+          cat semgrep-report.json
+          if [ "$result" -gt 1 ]; then exit "$result"; fi
+      - name: Upload Semgrep report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: semgrep-security-report
+          path: semgrep-report.json
+          if-no-files-found: ignore
+
+  secret-scan:
+    name: Exposed credentials (Gitleaks)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Scan repository history for secrets
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
