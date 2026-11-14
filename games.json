@@ -693,6 +693,12 @@
       "path": "g/worlds-hardest-game",
       "image": "duckmath-site/assets/img/icons/hardgame1.webp",
       "category": "PUZZLE"
+    },
+    {
+      "title": "Agar.io",
+      "path": "g/agario",
+      "image": "duckmath-site/assets/img/icons/agar.webp",
+      "category": "IO"
     }
   ]
 }
