@@ -175,12 +175,6 @@
       "category": "IDLE"
     },
     {
-      "title": "Hide & Smash",
-      "path": "g/hideandsmash",
-      "image": "images/hideandsmash.png",
-      "category": "ACTION"
-    },
-    {
       "title": "MonkeyMart",
       "path": "g/monkey-mart",
       "image": "./duckmath-site/assets/img/icons/monkey-mart.webp",
