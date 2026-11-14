@@ -616,42 +616,6 @@
       "category": "PUZZLE"
     },
     {
-      "title": "Doge Miner",
-      "path": "g/dogeminer",
-      "image": "g/dogeminer/favicon.ico",
-      "category": "IDLE"
-    },
-    {
-      "title": "Deadshot.io",
-      "path": "g/deadshotio",
-      "image": "images/deadshotio.png",
-      "category": "ACTION"
-    },
-    {
-      "title": "Google Snake",
-      "path": "g/googlesnake",
-      "image": "images/googlesnake.jpg",
-      "category": "ARCADE"
-    },
-    {
-      "title": "Paper.io 2",
-      "path": "g/paperio2",
-      "image": "images/paperio2.png",
-      "category": "IO"
-    },
-    {
-      "title": "Tank Trouble",
-      "path": "g/tanktrouble",
-      "image": "g/tanktrouble/icon-256.png",
-      "category": "ACTION"
-    },
-    {
-      "title": "Hide & Smash",
-      "path": "g/hideandsmash",
-      "image": "images/hideandsmash.png",
-      "category": "ACTION"
-    },
-    {
       "title": "Color Clash",
       "path": "g/color-clash",
       "image": "images/color-clash.svg",
@@ -667,12 +631,6 @@
       "title": "Neon Racer",
       "path": "g/neon-racer",
       "image": "images/neon-racer.svg",
-      "category": "RACING"
-    },
-    {
-      "title": "Mario Kart 64",
-      "path": "g/mariokart64",
-      "image": "./duckmath-site/assets/img/icons/supermario64.webp",
       "category": "RACING"
     }
   ]
