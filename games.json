@@ -7,12 +7,6 @@
       "category": "RACING"
     },
     {
-      "title": "Retro Bowl",
-      "path": "g/retro-bowl",
-      "image": "duckmath-site/assets/img/icons/retro_bowl_icon.webp",
-      "category": "SPORTS"
-    },
-    {
       "title": "Gunspin",
       "path": "g/gunspin",
       "image": "images/gunspin.png",
@@ -23,12 +17,6 @@
       "path": "g/1v1lol",
       "image": "duckmath-site/assets/img/icons/1v1.webp",
       "category": "ACTION"
-    },
-    {
-      "title": "Block Blast",
-      "path": "g/blockblast",
-      "image": "images/blockblast.png",
-      "category": "PUZZLE"
     },
     {
       "title": "Idle Breakout",
@@ -133,48 +121,6 @@
       "category": "RACING"
     },
     {
-      "title": "Neon Racer",
-      "path": "g/neon-racer",
-      "image": "images/icons/neon-racer.svg",
-      "category": "RACING"
-    },
-    {
-      "title": "Sky Hop",
-      "path": "g/sky-hop",
-      "image": "images/icons/sky-hop.svg",
-      "category": "PLATFORMER"
-    },
-    {
-      "title": "Asteroid Rush",
-      "path": "g/asteroid-rush",
-      "image": "images/icons/asteroid-rush.svg",
-      "category": "ARCADE"
-    },
-    {
-      "title": "Gem Maze",
-      "path": "g/gem-maze",
-      "image": "images/icons/gem-maze.svg",
-      "category": "PUZZLE"
-    },
-    {
-      "title": "Color Clash",
-      "path": "g/color-clash",
-      "image": "images/icons/color-clash.svg",
-      "category": "CASUAL"
-    },
-    {
-      "title": "Paddle Clash",
-      "path": "g/paddle-clash",
-      "image": "images/icons/paddle-clash.svg",
-      "category": "ARCADE"
-    },
-    {
-      "title": "Whack-a-Mole",
-      "path": "g/whack-a-mole",
-      "image": "images/icons/whack-a-mole.svg",
-      "category": "CASUAL"
-    },
-    {
       "title": "Tetris",
       "path": "g/tetris",
       "image": "duckmath-site/assets/img/icons/tetris.webp",
@@ -245,18 +191,6 @@
       "path": "g/rb-college",
       "image": "duckmath-site/assets/img/icons/retrobowlcollege.webp",
       "category": "SPORTS"
-    },
-    {
-      "title": "Minecraft",
-      "path": "g/mc",
-      "image": "duckmath-site/assets/img/icons/minecraft.webp",
-      "category": "ADVENTURE"
-    },
-    {
-      "title": "Eaglercraft 1.12.2",
-      "path": "g/mc/1.12.2",
-      "image": "duckmath-site/assets/img/icons/mc-multiplayer.webp",
-      "category": "ADVENTURE"
     },
     {
       "title": "Bloons TD5",
@@ -349,12 +283,6 @@
       "category": "ADVENTURE"
     },
     {
-      "title": "2048",
-      "path": "g/2048",
-      "image": "duckmath-site/assets/img/icons/2048.webp",
-      "category": "PUZZLE"
-    },
-    {
       "title": "Bitlife",
       "path": "g/bitlife",
       "image": "duckmath-site/assets/img/icons/bitlife.webp",
@@ -443,12 +371,6 @@
       "path": "g/reaction-test",
       "image": "images/reaction-test.svg",
       "category": "ARCADE"
-    },
-    {
-      "title": "Blocky Combat SWAT",
-      "path": "g/duckdb2-blocky-combat-swat-main",
-      "image": "https://unblocked-games.s3.amazonaws.com/media/posts/425/blocky-combat-swat.jpg",
-      "category": "ACTION"
     },
     {
       "title": "They Are Coming",
@@ -560,18 +482,6 @@
       "category": "ARCADE"
     },
     {
-      "title": "Duck Life 2",
-      "path": "g/ducklife2",
-      "image": "duckmath-site/assets/img/icons/dl2.webp",
-      "category": "SIMULATION"
-    },
-    {
-      "title": "Duck Life 3",
-      "path": "g/ducklife3",
-      "image": "duckmath-site/assets/img/icons/dl3.webp",
-      "category": "SIMULATION"
-    },
-    {
       "title": "Duck Life 5",
       "path": "g/ducklife5",
       "image": "images/ducklife5.png",
@@ -590,28 +500,10 @@
       "category": "ARCADE"
     },
     {
-      "title": "Global Guesser",
-      "path": "g/geoguesser",
-      "image": "images/geoguesser.png",
-      "category": "PUZZLE"
-    },
-    {
-      "title": "Google Baseball",
-      "path": "g/googlebaseball",
-      "image": "https://www.gstatic.com/marketing-cms/58/02/0e5531774177bd36df300f55717c/xx.png",
-      "category": "SPORTS"
-    },
-    {
       "title": "Neon Dodge",
       "path": "g/neon-dodge",
       "image": "images/neon-dodge.svg",
       "category": "ARCADE"
-    },
-    {
-      "title": "Waterworks",
-      "path": "g/waterworks",
-      "image": "g/waterworks/icon.png",
-      "category": "STRATEGY"
     },
     {
       "title": "World's Hardest Game",
@@ -2946,6 +2838,36 @@
       "path": "duckmath-site/g4m3s/?title=orion-sandbox",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/orion-sandbox.jpg",
       "category": "STRATEGY"
+    },
+    {
+      "title": "Global Guesser",
+      "path": "duckmath-site/g4m3s/?title=global-guesser",
+      "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img3/global-guesser.webp",
+      "category": "ARCADE"
+    },
+    {
+      "title": "Block Blast",
+      "path": "duckmath-site/g4m3s/?title=block-blast",
+      "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/block-blast.jpg",
+      "category": "PUZZLE"
+    },
+    {
+      "title": "Duck Life 3",
+      "path": "duckmath-site/g4m3s/?title=duck-life-3",
+      "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/dl3.webp",
+      "category": "SPORTS"
+    },
+    {
+      "title": "Duck Life 2",
+      "path": "duckmath-site/g4m3s/?title=duck-life-2",
+      "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/dl2.webp",
+      "category": "SPORTS"
+    },
+    {
+      "title": "2048",
+      "path": "duckmath-site/g4m3s/?title=2048",
+      "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/2048.webp",
+      "category": "PUZZLE"
     }
   ]
 }
