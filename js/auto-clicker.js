@@ -1,3 +1,6 @@
+(function () {
+  "use strict";
+
 // Default settings (can be customized in the settings page)
 let autoclickerInterval = 10; // Auto-click interval in milliseconds
 let autoclickerKeybind = '[';   // Default key to start/stop auto-clicking
@@ -55,3 +58,5 @@ function updateAutoclickerSettings(interval, keybind) {
     }
     console.log("Auto-clicker settings updated:", { autoclickerInterval, autoclickerKeybind });
 }
+
+})();
