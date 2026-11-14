@@ -3,13 +3,13 @@
     {
       "title": "Slope",
       "path": "g/slope",
-      "image": "images/slope.png",
+      "image": "duckmath-site/assets/img/icons/slope.webp",
       "category": "RACING"
     },
     {
       "title": "Retro Bowl",
       "path": "g/retro-bowl",
-      "image": "images/retrobowl.jpg",
+      "image": "duckmath-site/assets/img/icons/retro_bowl_icon.webp",
       "category": "SPORTS"
     },
     {
@@ -27,7 +27,7 @@
     {
       "title": "1v1.lol",
       "path": "g/1v1lol",
-      "image": "https://play-lh.googleusercontent.com/QYGRIDJbyVO7L7jH8CwiKJ4NumTGgcTVqU3ITooLWxro-eeNns1RZ0uwGGFe-r8M4co",
+      "image": "duckmath-site/assets/img/icons/1v1.webp",
       "category": "ACTION"
     },
     {
@@ -45,13 +45,13 @@
     {
       "title": "Learn To Fly",
       "path": "g/learntofly",
-      "image": "g/learntofly/1/icon.png",
+      "image": "duckmath-site/assets/img/icons/learntofly2.webp",
       "category": "ARCADE"
     },
     {
       "title": "Baldi's Basics",
       "path": "g/baldisbasics",
-      "image": "images/baldisbasics.png",
+      "image": "duckmath-site/assets/img/icons/baldis.webp",
       "category": "HORROR"
     },
     {
@@ -73,34 +73,16 @@
       "category": "ARCADE"
     },
     {
-      "title": "FNAF 1",
-      "path": "g/fnaf",
-      "image": "images/fnaf.png",
-      "category": "HORROR"
-    },
-    {
-      "title": "FNAF 2",
-      "path": "g/fnaf-2",
-      "image": "images/fnaf2.png",
-      "category": "HORROR"
-    },
-    {
       "title": "Drift Boss",
       "path": "g/driftboss",
-      "image": "images/driftboss.png",
+      "image": "duckmath-site/assets/img/icons/driftboss.webp",
       "category": "RACING"
     },
     {
       "title": "Jack Smith",
       "path": "g/jacksmith",
-      "image": "images/jacksmith.png",
+      "image": "duckmath-site/assets/img/icons/jackSmith.webp",
       "category": "ADVENTURE"
-    },
-    {
-      "title": "Image Tracer",
-      "path": "/imagetracer",
-      "image": "images/imagetracer.png",
-      "category": "TOOLS"
     },
     {
       "title": "Infinite Craft",
@@ -129,7 +111,7 @@
     {
       "title": "Hole.io",
       "path": "g/holeio",
-      "image": "images/holeio.png",
+      "image": "duckmath-site/assets/img/icons/hole.io.webp",
       "category": "IO"
     },
     {
@@ -143,12 +125,6 @@
       "path": "g/tanktrouble",
       "image": "images/tanktrouble.png",
       "category": "ACTION"
-    },
-    {
-      "title": "Drift Hunters",
-      "path": "g/drifthunters",
-      "image": "images/drifthunters.png",
-      "category": "RACING"
     },
     {
       "title": "Volley Random",
@@ -177,13 +153,13 @@
     {
       "title": "Snow Rider 3D",
       "path": "g/snowrider3d",
-      "image": "images/snowrider3d.png",
+      "image": "duckmath-site/assets/img/icons/snowrider3d.webp",
       "category": "RACING"
     },
     {
       "title": "Tetris",
       "path": "g/tetris",
-      "image": "images/tetris.png",
+      "image": "duckmath-site/assets/img/icons/tetris.webp",
       "category": "PUZZLE"
     },
     {
@@ -195,7 +171,7 @@
     {
       "title": "Fireboy & Watergirl",
       "path": "g/fireboywatergirlforsettemple",
-      "image": "images/fireboywatergirl.jpeg",
+      "image": "duckmath-site/assets/img/icons/fireboy.webp",
       "category": "PUZZLE"
     },
     {
@@ -225,19 +201,19 @@
     {
       "title": "Crossy Road",
       "path": "g/crossyroad",
-      "image": "images/crossyroad.png",
+      "image": "duckmath-site/assets/img/icons/crossyroad.webp",
       "category": "ARCADE"
     },
     {
       "title": "Rooftop Sniper",
       "path": "g/rooftopsnipers",
-      "image": "images/rooftopsnipers.png",
+      "image": "duckmath-site/assets/img/icons/rooftop.webp",
       "category": "ACTION"
     },
     {
       "title": "Rooftop Snipers 2",
       "path": "g/rooftop-snipers-2-main",
-      "image": "g/rooftop-snipers-2-main/895b299e7e49558ca383b23648314860.jpg",
+      "image": "duckmath-site/assets/img/icons/rooftop.webp",
       "category": "ACTION"
     },
     {
@@ -261,37 +237,31 @@
     {
       "title": "MonkeyMart",
       "path": "g/monkey-mart",
-      "image": "images/monkeymart.png",
+      "image": "duckmath-site/assets/img/icons/monkey-mart.webp",
       "category": "SIMULATION"
     },
     {
       "title": "Retro Bowl College",
       "path": "g/rb-college",
-      "image": "images/retrobowlcollege.jpg",
+      "image": "duckmath-site/assets/img/icons/retrobowlcollege.webp",
       "category": "SPORTS"
-    },
-    {
-      "title": "Windows Desktop",
-      "path": "server",
-      "image": "images/windows.png",
-      "category": "SIMULATION"
     },
     {
       "title": "Minecraft",
       "path": "g/mc",
-      "image": "images/mc.png",
+      "image": "duckmath-site/assets/img/icons/minecraft.webp",
       "category": "ADVENTURE"
     },
     {
       "title": "Eaglercraft 1.12.2",
       "path": "g/mc/1.12.2",
-      "image": "images/mc.png",
+      "image": "duckmath-site/assets/img/icons/mc-multiplayer.webp",
       "category": "ADVENTURE"
     },
     {
       "title": "Bloons TD5",
       "path": "g/btd5",
-      "image": "images/btd5.png",
+      "image": "duckmath-site/assets/img/icons/bloons1.webp",
       "category": "STRATEGY"
     },
     {
@@ -303,13 +273,13 @@
     {
       "title": "Run 2",
       "path": "g/run2",
-      "image": "images/run2.png",
+      "image": "duckmath-site/assets/img/icons/run3.webp",
       "category": "ARCADE"
     },
     {
       "title": "Run 3",
       "path": "g/run3",
-      "image": "images/run3.png",
+      "image": "duckmath-site/assets/img/icons/run3.webp",
       "category": "ARCADE"
     },
     {
@@ -321,13 +291,13 @@
     {
       "title": "Plants V Zombies",
       "path": "g/pvz",
-      "image": "images/pvz.png",
+      "image": "duckmath-site/assets/img/icons/pvz.webp",
       "category": "STRATEGY"
     },
     {
       "title": "Duck Life",
       "path": "g/ducklife",
-      "image": "images/ducklife.png",
+      "image": "duckmath-site/assets/img/icons/dl1.webp",
       "category": "SIMULATION"
     },
     {
@@ -335,12 +305,6 @@
       "path": "g/minesweeper",
       "image": "images/minesweeper.png",
       "category": "PUZZLE"
-    },
-    {
-      "title": "Pixel Gun",
-      "path": "g/pixelgun",
-      "image": "images/pixelgun.png",
-      "category": "ACTION"
     },
     {
       "title": "Google Snake",
@@ -363,7 +327,7 @@
     {
       "title": "Basketball Stars",
       "path": "g/basketballstars",
-      "image": "images/basketballstars.png",
+      "image": "duckmath-site/assets/img/icons/basketball-stars.webp",
       "category": "SPORTS"
     },
     {
@@ -403,39 +367,27 @@
       "category": "ADVENTURE"
     },
     {
-      "title": "Vex Games",
-      "path": "g/vex",
-      "image": "https://play-lh.googleusercontent.com/0OnVFzHIMuLLeMjvACoNzxRbungfOH1zH4hUWQnIg5KfM2va_mFssFuRGq26WqWA",
-      "category": "PLATFORMER"
-    },
-    {
       "title": "2048",
       "path": "g/2048",
-      "image": "images/2048.png",
+      "image": "duckmath-site/assets/img/icons/2048.webp",
       "category": "PUZZLE"
     },
     {
       "title": "Paper.io 2",
       "path": "g/paperio2",
-      "image": "images/paperio2.png",
+      "image": "duckmath-site/assets/img/icons/paper.webp",
       "category": "IO"
     },
     {
       "title": "Bitlife",
       "path": "g/bitlife",
-      "image": "https://play-lh.googleusercontent.com/fUM-UyywXxjC8soxAZdIlxJrlRRXmql8wkE426SHzft4lJycSKVd2jCYQQX1BEG9Xw",
+      "image": "duckmath-site/assets/img/icons/bitlife.webp",
       "category": "SIMULATION"
-    },
-    {
-      "title": "2048",
-      "path": "g/1",
-      "image": "https://d3nsrxdg84ic1d.cloudfront.net/uploads/5a145eaa-3696-4de4-8c1d-41400e3d296c/e8ccaaae.PNG?v=0",
-      "category": "PUZZLE"
     },
     {
       "title": "Subway Surfers",
       "path": "g/subway-surfers",
-      "image": "https://img.poki.com/cdn-cgi/image/quality=78,width=314,height=314,fit=cover,f=auto/81a0a3f18cf0ee129e56edb50fc52c3b.png",
+      "image": "duckmath-site/assets/img/icons/subway.webp",
       "category": "ENDLESS RUNNER"
     },
     {
@@ -447,19 +399,19 @@
     {
       "title": "MotoX3M",
       "path": "g/motox3m",
-      "image": "images/motocross.png",
+      "image": "duckmath-site/assets/img/icons/motox3m.webp",
       "category": "RACING"
     },
     {
       "title": "Cookie Clicker",
       "path": "g/cookieclicker",
-      "image": "https://play-lh.googleusercontent.com/Z1MOuuiD05ZN5LkVmMEvKF0mqAc-FknaQ2j8s4dZiO-LSPQX4EEA3RVJdlQEtxe96ok",
+      "image": "duckmath-site/assets/img/icons/cookieclicker.webp",
       "category": "IDLE"
     },
     {
       "title": "Temple Run 2",
       "path": "g/temple-run-2",
-      "image": "https://play-lh.googleusercontent.com/go4XqS4mYs-G2tZymiVLF4wJYXIi5QrvwixNRzssk4G_vRBHrAdg4E1ddNwy9c2cZA",
+      "image": "duckmath-site/assets/img/icons/templerun2.webp",
       "category": "ENDLESS RUNNER"
     },
     {
@@ -475,12 +427,6 @@
       "category": "STRATEGY"
     },
     {
-      "title": "Riddle School Games",
-      "path": "g/riddleschool",
-      "image": "https://i.ytimg.com/vi/Ls5rT-7_4d4/sddefault.jpg",
-      "category": "ADVENTURE"
-    },
-    {
       "title": "Cupcake 2048",
       "path": "g/cupcake2048",
       "image": "images/cupcake2048.png",
@@ -489,19 +435,19 @@
     {
       "title": "Jetpack Joyride",
       "path": "g/jetpack-joyride",
-      "image": "images/jetpackjoyride.png",
+      "image": "duckmath-site/assets/img/icons/jetpackjoyride.webp",
       "category": "ARCADE"
     },
     {
       "title": "Geometry Dash",
       "path": "g/geodash",
-      "image": "images/geodash.jpg",
+      "image": "duckmath-site/assets/img/icons/geometrydash.webp",
       "category": "PLATFORMER"
     },
     {
       "title": "Duck Life 1",
       "path": "g/ducklife1",
-      "image": "images/ducklife1.png",
+      "image": "duckmath-site/assets/img/icons/dl1.webp",
       "category": "SIMULATION"
     },
     {
@@ -537,13 +483,13 @@
     {
       "title": "Brotato: Abyssal Terrors",
       "path": "g/brotato-abyssal-terrors",
-      "image": "g/brotato-abyssal-terrors/index.png",
+      "image": "duckmath-site/assets/img/icons/brotato.webp",
       "category": "ACTION"
     },
     {
       "title": "Blocky Combat SWAT",
       "path": "g/duckdb2-blocky-combat-swat-main",
-      "image": "images/blocky-combat-swat.svg",
+      "image": "https://img.gamepost.com/cloud/v2-y8-thumbs-big-thumbnails-001/101159/big.gif",
       "category": "ACTION"
     },
     {
@@ -673,8 +619,80 @@
     {
       "title": "DuckMath",
       "path": "duckmath-site",
-      "image": "duckmath-site/assets/img/duck.webp",
+      "image": "duckmath-site/assets/img/icons/duck.webp",
       "category": "ARCADE"
+    },
+    {
+      "title": "Doge Miner",
+      "path": "g/dogeminer",
+      "image": "g/dogeminer/img/dogeminer_300x300.png",
+      "category": "IDLE"
+    },
+    {
+      "title": "Duck Life 2",
+      "path": "g/ducklife2",
+      "image": "duckmath-site/assets/img/icons/dl2.webp",
+      "category": "SIMULATION"
+    },
+    {
+      "title": "Duck Life 3",
+      "path": "g/ducklife3",
+      "image": "duckmath-site/assets/img/icons/dl3.webp",
+      "category": "SIMULATION"
+    },
+    {
+      "title": "Duck Life 4",
+      "path": "g/ducklife4",
+      "image": "duckmath-site/assets/img/icons/dl4.webp",
+      "category": "SIMULATION"
+    },
+    {
+      "title": "Duck Life 5",
+      "path": "g/ducklife5",
+      "image": "images/ducklife5.png",
+      "category": "SIMULATION"
+    },
+    {
+      "title": "Flappy Bird",
+      "path": "g/flappy-bird",
+      "image": "g/flappy-bird/assets/thumb.png",
+      "category": "ARCADE"
+    },
+    {
+      "title": "Flappy 2048",
+      "path": "g/flappy-2048",
+      "image": "g/flappy-2048/meta/apple-touch-icon.png",
+      "category": "ARCADE"
+    },
+    {
+      "title": "Global Guesser",
+      "path": "g/geoguesser",
+      "image": "images/geoguesser.png",
+      "category": "PUZZLE"
+    },
+    {
+      "title": "Google Baseball",
+      "path": "g/googlebaseball",
+      "image": "images/google.png",
+      "category": "SPORTS"
+    },
+    {
+      "title": "Neon Dodge",
+      "path": "g/neon-dodge",
+      "image": "images/neon-dodge.svg",
+      "category": "ARCADE"
+    },
+    {
+      "title": "Waterworks",
+      "path": "g/waterworks",
+      "image": "g/waterworks/icon.png",
+      "category": "STRATEGY"
+    },
+    {
+      "title": "World's Hardest Game",
+      "path": "g/worlds-hardest-game",
+      "image": "duckmath-site/assets/img/icons/hardgame1.webp",
+      "category": "PUZZLE"
     }
   ]
 }
