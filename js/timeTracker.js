@@ -18,7 +18,7 @@
   var path = location.pathname.replace(/\/+$/, "").toLowerCase();
   var isMinecraft = /\/g\/mc\/1\.12\.2$/.test(path);
   var isRetroBowl = /\/g\/retro-bowl$/.test(path);
-  var isBlockyCombat = /\\/g\\/duckdb2-blocky-combat-swat-main$/.test(path);
+  var isBlockyCombat = /\/g\/duckdb2-blocky-combat-swat-main$/.test(path);
   var miniGameTitles = { "neon-racer": "Neon Racer Time", "sky-hop": "Sky Hop Time", "asteroid-rush": "Asteroid Rush Time", "gem-maze": "Gem Maze Time", "color-clash": "Color Clash Time", "paddle-clash": "Paddle Clash Time", "whack-a-mole": "Whack-a-Mole Time" };
   var miniGameTitle = miniGameTitles[path.split("/").pop()] || "";
   if (!isMinecraft && !isRetroBowl && !isBlockyCombat && !miniGameTitle) return;
