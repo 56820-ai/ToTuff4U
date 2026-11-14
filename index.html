@@ -1529,6 +1529,16 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         }
     }
 
+    function buildGameHref(path) {
+        const value = String(path || '').trim();
+        if (/^https?:\/\//i.test(value)) return value;
+        const queryIndex = value.indexOf('?');
+        const pathname = queryIndex === -1 ? value : value.slice(0, queryIndex);
+        const query = queryIndex === -1 ? '' : value.slice(queryIndex);
+        const normalizedPath = pathname.endsWith('/') ? pathname : pathname + '/';
+        return normalizedPath + query;
+    }
+
     function normalizeGamePath(path) {
         return String(path || '').replace(/\/+$/, '').toLowerCase();
     }
@@ -1653,7 +1663,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
             const gameCard = document.createElement('div');
             gameCard.className = 'game-card';
             const link = document.createElement('a');
-            link.href = game.path.startsWith('http') ? game.path : (game.path.endsWith('/') ? game.path : game.path + '/');
+            link.href = buildGameHref(game.path);
             link.target = '_blank';
             link.rel = 'noopener noreferrer';
             link.style.cssText = 'text-decoration:none;color:inherit';
@@ -1705,7 +1715,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
             const gameCard = document.createElement('div');
             gameCard.className = 'game-card';
             const link = document.createElement('a');
-            link.href = game.path.startsWith('http') ? game.path : (game.path.endsWith('/') ? game.path : game.path + '/');
+            link.href = buildGameHref(game.path);
             link.target = '_blank';
             link.rel = 'noopener noreferrer';
             link.style.cssText = 'text-decoration:none;color:inherit';
