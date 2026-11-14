@@ -580,30 +580,6 @@
       "category": "ACTION"
     },
     {
-      "title": "Basketball Stars",
-      "path": "g/basketballstars",
-      "image": "images/basketballstars.png",
-      "category": "SPORTS"
-    },
-    {
-      "title": "Cupcake 2048",
-      "path": "g/cupcake2048",
-      "image": "images/cupcake2048.png",
-      "category": "PUZZLE"
-    },
-    {
-      "title": "Deadshot.io",
-      "path": "g/deadshotio",
-      "image": "images/deadshotio.png",
-      "category": "ACTION"
-    },
-    {
-      "title": "Doge Miner",
-      "path": "g/dogeminer",
-      "image": "g/dogeminer/favicon.ico",
-      "category": "IDLE"
-    },
-    {
       "title": "DuckCraft",
       "path": "g/duckcraft-quacklab",
       "image": "g/duckcraft-quacklab/index.icon.png",
@@ -616,22 +592,10 @@
       "category": "PUZZLE"
     },
     {
-      "title": "Hide and Smash",
-      "path": "g/hideandsmash",
-      "image": "images/hideandsmash.png",
-      "category": "ACTION"
-    },
-    {
       "title": "Minecraft 1.12.2",
       "path": "g/mc",
       "image": "images/mc.png",
       "category": "SANDBOX"
-    },
-    {
-      "title": "Paper.io 2",
-      "path": "g/paperio2",
-      "image": "images/paperio2.png",
-      "category": "IO"
     },
     {
       "title": "Retro Bowl",
@@ -640,21 +604,9 @@
       "category": "SPORTS"
     },
     {
-      "title": "Sandboxels",
-      "path": "g/sandboxels",
-      "image": "g/sandboxels/icons/icon.png",
-      "category": "SANDBOX"
-    },
-    {
       "title": "Survev.io",
       "path": "g/survev",
       "image": "images/survev.png",
-      "category": "ACTION"
-    },
-    {
-      "title": "Tank Trouble",
-      "path": "g/tanktrouble",
-      "image": "images/tanktrouble.png",
       "category": "ACTION"
     },
     {
