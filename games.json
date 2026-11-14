@@ -669,6 +669,12 @@
       "path": "https://unblocked-games.s3.amazonaws.com/duckcraft.html",
       "image": "https://unblocked-games.s3.amazonaws.com/media/posts/745/duckcraft-unblocked.webp",
       "category": "ADVENTURE"
+    },
+    {
+      "title": "DuckCraft (Quack Lab)",
+      "path": "g/duckcraft-quacklab",
+      "image": "g/duckcraft-quacklab/index.icon.png",
+      "category": "ADVENTURE"
     }
   ]
 }
