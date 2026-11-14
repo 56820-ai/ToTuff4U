@@ -31,6 +31,10 @@ function categoryFor(value) {
   if (/action|shooter|fps|fighting/i.test(s)) return "ACTION";
   return "ARCADE";
 }
+function suitableForMiddleSchool(app) {
+  const text = [app?.title, app?.categories, app?.description].flat().join(" ").toLowerCase();
+  return !/(horror|gore|blood|adult|nsfw|sexual|nudity|18\\+|casino|gambling|mortal kombat|doom|omori|fnaf|five nights at freddy|granny|poppy playtime)/i.test(text);
+}
 function normalizeIcon(icon) {
   if (typeof icon !== "string" || !icon.trim()) return "";
   if (icon.startsWith("/assets/")) return "duckmath-site" + icon;
@@ -115,7 +119,7 @@ try {
   duckmath.cachedApps = state.apps.length;
   await home.close();
 
-  const apps = state.apps.filter(a => a && typeof a.title === "string" && a.title.trim()).slice(0, 500);
+  const apps = (Array.isArray(state.apps) ? state.apps : []).filter(a => a && typeof a.title === "string" && a.title.trim()).slice(0, 500);
   duckmath.checked = apps.length;
   let appCursor = 0;
   const appResults = new Array(apps.length);
@@ -157,7 +161,7 @@ try {
     }
   }));
   for (const result of appResults) {
-    if (result?.loaded) {
+    if (result?.loaded && suitableForMiddleSchool(result.app)) {
       duckmath.verified.push(result.app.title);
       const titleKey = result.app.title.trim().toLowerCase();
       if (!catalog.some(g => String(g.title || "").trim().toLowerCase() === titleKey)) {
