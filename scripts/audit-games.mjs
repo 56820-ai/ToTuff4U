@@ -93,11 +93,12 @@ async function checkGame(game) {
 const logoPage = await browser.newPage();
 const logoUrls = catalog.map(game => {
   const image = String(game.image || "");
+  const remote = image.startsWith("https://") || image.startsWith("http://") ||
+    image.startsWith("data:") || image.startsWith("blob:");
+  const cleanImage = image.startsWith("/") ? image.slice(1) : image;
   return {
     title: game.title,
-    url: /^https?:\\/\\//i.test(image) || image.startsWith("data:") || image.startsWith("blob:")
-      ? image
-      : BASE + "/" + image.replace(/^\\/+/, "")
+    url: remote ? image : BASE + "/" + cleanImage
   };
 });
 const logoAudit = await logoPage.evaluate(async items => {
