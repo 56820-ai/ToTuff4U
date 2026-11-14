@@ -13,7 +13,10 @@ const ignoreUrl = /googletagmanager|google-analytics|doubleclick|pagead|adsbygoo
 
 function gameUrl(game) {
   const p = String(game.path || "");
-  return /^https?:\/\//i.test(p) ? p : BASE + "/" + p.replace(/^\/+/, "").replace(/\/+$/, "") + "/";
+  if (/^https?:\/\//i.test(p)) return p;
+  const [pathPart, queryPart] = p.split("?", 2);
+  const normalizedPath = pathPart.replace(/^\/+/, "").replace(/\/+$/, "");
+  return BASE + "/" + normalizedPath + (queryPart !== undefined ? "?" + queryPart : "/");
 }
 function categoryFor(value) {
   const s = Array.isArray(value) ? value.join(" ") : String(value || "");
@@ -31,6 +34,7 @@ function categoryFor(value) {
 function normalizeIcon(icon) {
   if (typeof icon !== "string" || !icon.trim()) return "";
   if (icon.startsWith("/assets/")) return "duckmath-site" + icon;
+  if (icon.startsWith("assets/")) return "duckmath-site/" + icon;
   if (icon.startsWith("/ToTuff4U/duckmath-site/")) return icon.slice("/ToTuff4U/".length);
   return icon;
 }
@@ -102,7 +106,7 @@ try {
   await home.waitForFunction(() => {
     try { return JSON.parse(localStorage.getItem("apps11") || "[]").length > 0; }
     catch { return false; }
-  }, { timeout: 18000 }).catch(() => {});
+  }, undefined, { timeout: 18000 }).catch(() => {});
   const state = await home.evaluate(() => ({
     cards: document.querySelectorAll("#icon_image a").length,
     apps: JSON.parse(localStorage.getItem("apps11") || "[]")
@@ -135,7 +139,7 @@ try {
         await page.waitForFunction(() => {
           const f = document.getElementById("gameFrame");
           return !!f && !!f.getAttribute("src") && f.getAttribute("src") !== "about:blank";
-        }, { timeout: 7000 }).catch(() => {});
+        }, undefined, { timeout: 7000 }).catch(() => {});
         iframeSrc = await page.locator("#gameFrame").getAttribute("src").catch(() => "") || "";
         await page.waitForTimeout(500);
         const childFrames = page.frames().filter(f => f !== page.mainFrame()).map(f => f.url());
