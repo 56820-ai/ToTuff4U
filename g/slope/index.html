@@ -123,41 +123,7 @@
             status.style.cssText = "position:fixed;left:10px;bottom:10px;z-index:2147483647;padding:8px 11px;border-radius:8px;background:#101525;color:#fff;border:1px solid #6bffd9;font:12px sans-serif;max-width:min(90vw,420px);";
             status.textContent = "Slope leaderboard: loading automatic detector.";
             document.body.appendChild(status);
-            // Always-visible fallback form. Browser prompt dialogs can be blocked or
-            // suppressed by embedded Unity pages, so collect the name and score in-page.
-            var manualPanel = document.createElement("form");
-            manualPanel.id = "slope-score-form";
-            manualPanel.style.cssText = "position:fixed;right:12px;bottom:12px;z-index:2147483647;display:flex;flex-wrap:wrap;gap:7px;align-items:center;max-width:min(94vw,520px);padding:10px;border:1px solid #6bffd9;border-radius:10px;background:#101525;color:#fff;font:13px sans-serif;box-shadow:0 4px 20px #0008;";
-            manualPanel.innerHTML = '<label style="display:flex;gap:5px;align-items:center">Name <input id="slope-player-name" maxlength="24" autocomplete="nickname" required style="width:105px;padding:7px;border-radius:5px;border:1px solid #718096;background:#fff;color:#111"></label><label style="display:flex;gap:5px;align-items:center">Score <input id="slope-player-score" type="number" min="1" max="1500" step="1" required inputmode="numeric" placeholder="1–1500" style="width:78px;padding:7px;border-radius:5px;border:1px solid #718096;background:#fff;color:#111"></label><button id="slope-submit-score" type="submit" style="padding:8px 11px;border:0;border-radius:6px;background:#6bffd9;color:#101525;font-weight:700;cursor:pointer">Submit score</button>';
-            document.body.appendChild(manualPanel);
-            var savedPlayerName = "";
-            try { savedPlayerName = localStorage.getItem("arcadeLeaderboardPlayerName") || ""; } catch (e) {}
-            manualPanel.querySelector("#slope-player-name").value = savedPlayerName.slice(0,24);
-            manualPanel.addEventListener("submit", async function (event) {
-              event.preventDefault();
-              var nameInput = manualPanel.querySelector("#slope-player-name");
-              var scoreInput = manualPanel.querySelector("#slope-player-score");
-              var submitButton = manualPanel.querySelector("#slope-submit-score");
-              var playerName = String(nameInput.value || "").trim().slice(0,24);
-              var score = Number(scoreInput.value);
-              if (!leaderboardReady || !window.ArcadeScores) {
-                setStatus("leaderboard connection is not configured");
-                window.alert("The Slope leaderboard connection is not configured. Please tell the site owner.");
-                return;
-              }
-              if (!playerName || !Number.isSafeInteger(score) || score < 1 || score > 1500) {
-                setStatus("enter a name and a whole-number score from 1 to 1,500");
-                return;
-              }
-              try { localStorage.setItem("arcadeLeaderboardPlayerName", playerName); } catch (e) {}
-              submitButton.disabled = true;
-              submitButton.textContent = "Submitting…";
-              setStatus("submitting score " + score + " for " + playerName);
-              var ok = await window.ArcadeScores.submit("Slope", score, playerName);
-              submitButton.disabled = false;
-              submitButton.textContent = ok ? "Submitted ✓" : "Submit score";
-              setStatus(ok ? "score submitted: " + score : "submission failed — check the error message");
-            });
+            // Scores are submitted only from OCR readings of the actual Unity canvas.
             function setStatus(message) { status.textContent = "Slope leaderboard: " + message; }
             function promptOcrIssue(message) {
               setStatus(message);
@@ -381,8 +347,15 @@
                             Number(endScoreReading.confidence) >= 45) {
                             maxScore = Math.max(maxScore, endScoreReading.value);
                             latestScore = Math.max(latestScore, endScoreReading.value);
-                            endScoreCandidate = endScoreReading.value;
-                            endScoreCandidateHits = 2;
+                            if (endScoreCandidate === endScoreReading.value) {
+                                endScoreCandidateHits++;
+                            } else {
+                                endScoreCandidate = endScoreReading.value;
+                                endScoreCandidateHits = 1;
+                            }
+                            if (endScoreCandidateHits >= 2) {
+                                maxScore = Math.max(maxScore, endScoreCandidate);
+                            }
                         }
                     }
                     if (!gameStarted) setStatus("waiting for gameplay motion (" + motionHits + "/3)");
@@ -393,12 +366,15 @@
                     // Wait for the same end-screen score to be read confidently twice.
                     // Previously textEnded bypassed confirmation and submitted maxScore
                     // while it was still zero on the first OCR pass.
-                    if ((textEnded || endScreenHits >= 2) && maxScore > 0 && !handled) {
+                    if ((textEnded || endScreenHits >= 2) && endScoreCandidateHits >= 2 && maxScore > 0 && !handled) {
                         handled = true;
                         var score = maxScore;
                         if (score > 0 && leaderboardReady && window.ArcadeScores) {
                             setStatus("game ended · submitting detected score " + score);
-                            var playerName = window.ArcadeScores.getPlayerName("Enter your name for the Slope leaderboard (24 characters max):");
+                            // Ask for a name for every verified run, even if a previous
+                            // player name was saved in this browser.
+                            var playerName = window.prompt("Verified Slope score: " + score + "\\nEnter your name for the leaderboard (24 characters max):", "");
+                            playerName = playerName === null ? "" : playerName.trim().slice(0, 24);
                             if (playerName) {
                                 var submitted = await window.ArcadeScores.submit("Slope", score, playerName);
                                 setStatus(submitted ? "score submitted: " + score : "score submission failed");
@@ -427,8 +403,7 @@
             // This prevents casual score fabrication through the page UI, but client-side
             // OCR is not tamper-proof; strong anti-cheat requires server-side validation.
 
-            // OCR is optional; keep the manual submit button available even if OCR or
-            // leaderboard configuration is unavailable.
+            // OCR is required for score submission; never accept a typed score.
             {
               var script = document.createElement("script");
               script.src = "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
