@@ -43,7 +43,10 @@ Deno.serve(async (req: Request) => {
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-  const ipHashSecret = Deno.env.get("IP_HASH_SECRET");
+  // IP_HASH_SECRET is preferred, but use the server-only service-role key as
+  // a fallback so a missing optional secret cannot disable every game board.
+  // The service-role key is never sent to the browser or written to the DB.
+  const ipHashSecret = Deno.env.get("IP_HASH_SECRET") || serviceRoleKey;
   if (!supabaseUrl || !serviceRoleKey || !ipHashSecret || ipHashSecret.length < 32) {
     console.error("Missing server configuration for score submission.");
     return json({ error: "Score submission is not configured on the server yet." }, 503);
