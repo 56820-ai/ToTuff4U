@@ -542,18 +542,6 @@
       "image": "./duckmath-site/assets/img/icons/doodle.webp",
       "category": "PLATFORMER",
       "source": "https://github.com/freemany/gamedoh"
-    },
-    {
-      "title": "Paper.io 2",
-      "path": "g/paperio2",
-      "image": "./duckmath-site/assets/img/icons/paper.webp",
-      "category": "IO"
-    },
-    {
-      "title": "Tank Trouble",
-      "path": "g/tanktrouble",
-      "image": "g/tanktrouble/icon-256.png",
-      "category": "MULTIPLAYER"
     }
   ]
 }
