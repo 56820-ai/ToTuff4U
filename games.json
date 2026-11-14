@@ -566,12 +566,6 @@
       "category": "ARCADE"
     },
     {
-      "title": "Laser Fortress",
-      "path": "g/one-button-collection/?laserfortress",
-      "image": "g/one-button-collection/laserfortress/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
       "title": "Froooog",
       "path": "g/one-button-collection/?froooog",
       "image": "g/one-button-collection/froooog/screenshot.gif",
@@ -590,21 +584,9 @@
       "category": "ARCADE"
     },
     {
-      "title": "Thrust LR",
-      "path": "g/one-button-collection/?thrustlr",
-      "image": "g/one-button-collection/thrustlr/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
       "title": "Accel B",
       "path": "g/one-button-collection/?accelb",
       "image": "g/one-button-collection/accelb/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
-      "title": "Future Wake",
-      "path": "g/one-button-collection/?futurewake",
-      "image": "g/one-button-collection/futurewake/screenshot.gif",
       "category": "ARCADE"
     },
     {
@@ -620,21 +602,9 @@
       "category": "ARCADE"
     },
     {
-      "title": "Counter B",
-      "path": "g/one-button-collection/?counterb",
-      "image": "g/one-button-collection/counterb/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
       "title": "M Rider",
       "path": "g/one-button-collection/?mrider",
       "image": "g/one-button-collection/mrider/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
-      "title": "Charge Beam",
-      "path": "g/one-button-collection/?chargebeam",
-      "image": "g/one-button-collection/chargebeam/screenshot.gif",
       "category": "ARCADE"
     },
     {
@@ -656,21 +626,9 @@
       "category": "ARCADE"
     },
     {
-      "title": "T Lanes",
-      "path": "g/one-button-collection/?tlanes",
-      "image": "g/one-button-collection/tlanes/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
       "title": "L Rain",
       "path": "g/one-button-collection/?lrain",
       "image": "g/one-button-collection/lrain/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
-      "title": "Scrambird",
-      "path": "g/one-button-collection/?scrambird",
-      "image": "g/one-button-collection/scrambird/screenshot.gif",
       "category": "ARCADE"
     },
     {
@@ -734,12 +692,6 @@
       "category": "ARCADE"
     },
     {
-      "title": "D Pistols",
-      "path": "g/one-button-collection/?dpistols",
-      "image": "g/one-button-collection/dpistols/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
       "title": "Grenadier",
       "path": "g/one-button-collection/?grenadier",
       "image": "g/one-button-collection/grenadier/screenshot.gif",
@@ -776,12 +728,6 @@
       "category": "ARCADE"
     },
     {
-      "title": "B Blast",
-      "path": "g/one-button-collection/?bblast",
-      "image": "g/one-button-collection/bblast/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
       "title": "Smoke G",
       "path": "g/one-button-collection/?smokeg",
       "image": "g/one-button-collection/smokeg/screenshot.gif",
@@ -800,12 +746,6 @@
       "category": "ARCADE"
     },
     {
-      "title": "Graveler",
-      "path": "g/one-button-collection/?graveler",
-      "image": "g/one-button-collection/graveler/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
       "title": "Throw M",
       "path": "g/one-button-collection/?throwm",
       "image": "g/one-button-collection/throwm/screenshot.gif",
@@ -815,12 +755,6 @@
       "title": "Orbit Man",
       "path": "g/one-button-collection/?orbitman",
       "image": "g/one-button-collection/orbitman/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
-      "title": "Embattled",
-      "path": "g/one-button-collection/?embattled",
-      "image": "g/one-button-collection/embattled/screenshot.gif",
       "category": "ARCADE"
     },
     {
