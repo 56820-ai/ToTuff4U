@@ -1700,7 +1700,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         const favoritesSection = document.getElementById('favorites-section');
         const favoritesHeading = document.getElementById('favorites-heading');
 
-        if (query.trim() === '') {
+        if (query === '' && !category) {
             favoritesSection.style.display = 'block';
             favoritesHeading.style.display = 'block';
         } else {
@@ -1716,7 +1716,11 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
             const matchesCategory = !category || String(game.category || '').toUpperCase() === category;
             return matchesQuery && matchesCategory;
         });
-        renderGames(filteredGames, allGamesGrid);
+        if (filteredGames.length) {
+            renderGames(filteredGames, allGamesGrid);
+        } else {
+            allGamesGrid.innerHTML = '<p class="empty-games-message" role="status">No games found. Try a different title or category.</p>';
+        }
     }
 
     function populateCategoryFilter(games) {
@@ -2139,8 +2143,9 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 .patch-notes-reopen{position:fixed;right:18px;bottom:18px;z-index:9999;box-shadow:0 5px 20px #0007;display:none}
 @media(max-width:520px){.patch-notes-modal{padding:22px 18px}.patch-notes-content li{font-size:14px}.patch-notes-actions{align-items:flex-start;flex-direction:column}.patch-notes-actions button{width:100%}}
 
+        .empty-games-message{grid-column:1/-1;padding:24px;border:1px dashed rgba(160,185,220,.25);border-radius:14px;color:#aebbd0;text-align:center;background:rgba(17,29,50,.55)}
         .catalog-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 18px}
-        #categoryFilter,.surprise-button{min-height:42px;border:1px solid rgba(160,185,220,.2);border-radius:11px;background:#111d32;color:#eaf1ff;padding:0 14px;font:600 13px inherit}
+        #categoryFilter,.surprise-button{min-height:42px;border:1px solid rgba(160,185,220,.2);border-radius:11px;background:#111d32;color:#eaf1ff;padding:0 14px;font-family:inherit;font-size:13px;font-weight:600}
         #categoryFilter{min-width:180px;cursor:pointer}
         .surprise-button{cursor:pointer;background:linear-gradient(135deg,#6848d8,#286acb);border-color:transparent;transition:transform .18s ease,filter .18s ease}
         .surprise-button:hover{transform:translateY(-2px);filter:brightness(1.12)}
