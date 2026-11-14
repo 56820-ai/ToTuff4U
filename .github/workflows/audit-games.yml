@@ -1,0 +1,66 @@
+name: Audit and import verified games
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "games.json"
+      - "g/**"
+      - "duckmath-site/**"
+      - "scripts/audit-games.mjs"
+      - ".github/workflows/audit-games.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: arcade-atlas-game-audit
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  browser-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out Arcade Atlas
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Start local static server
+        run: |
+          python3 -m http.server 4173 > /tmp/arcade-server.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/arcade-server.log
+          exit 1
+      - name: Audit Arcade Atlas and DuckMath in Chromium
+        run: node scripts/audit-games.mjs
+      - name: Commit verified DuckMath catalog additions
+        if: success()
+        run: |
+          if git diff --quiet -- games.json; then
+            echo "No new verified DuckMath games to add."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add games.json
+          git commit -m "Add verified DuckMath games to Arcade Atlas"
+          git pull --rebase origin main
+          git push
+      - name: Upload browser audit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: arcade-atlas-game-audit
+          path: arcade-atlas-game-audit.json
+          if-no-files-found: ignore
