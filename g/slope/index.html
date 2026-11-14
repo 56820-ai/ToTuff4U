@@ -328,7 +328,10 @@
                     // Check for the end screen as soon as the first still frame appears.
                     // The explicit end-screen text is strong evidence; stillness alone
                     // takes a few more samples so a brief pause during play won't end a run.
-                    stoppedHits = gameStarted && !moving ? stoppedHits + 1 : 0;
+                    // Count still frames even if gameplay-motion detection missed the run.
+                    // The OCR end-screen phrase check below distinguishes the crash screen
+                    // from a static title/menu screen.
+                    stoppedHits = !moving ? stoppedHits + 1 : 0;
                     var textEnded = false;
                     // The death screen can appear even when the motion sampler misses
                     // gameplay (for example, a small/letterboxed Unity canvas). Inspect
