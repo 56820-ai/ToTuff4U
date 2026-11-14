@@ -619,13 +619,13 @@
     {
       "title": "DuckMath",
       "path": "duckmath-site",
-      "image": "duckmath-site/assets/img/icons/duck.webp",
+      "image": "duckmath-site/assets/img/duck.webp",
       "category": "ARCADE"
     },
     {
       "title": "Doge Miner",
       "path": "g/dogeminer",
-      "image": "g/dogeminer/img/dogeminer_300x300.png",
+      "image": "g/dogeminer/img/dogecoin-d.png",
       "category": "IDLE"
     },
     {
