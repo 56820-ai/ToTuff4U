@@ -7,7 +7,7 @@ TMP="$(mktemp -d)"
 SOURCE="$TMP/crisp-game-lib-games"
 
 slugs=(
-  rebirth intow castn thunder descents laserfortress froooog rwheel pizzaarrow thrustlr accelb futurewake updownpress ladderdrop counterb mrider chargebeam sshake zoneb mjamming tlanes lrain scrambird dlaser islash raid catapult rring gpress holes snaky mirrorfloor subjump photonline upshot rolls tpunch bblast smokeg mortar turbulent graveler throwm pillars3d pressm orbitman embattled fromtwosides udcave antlion
+  rebirth intow castn thunder descents laserfortress froooog rwheel pizzaarrow thrustlr accelb futurewake updownpress ladderdrop counterb mrider chargebeam sshake zoneb mjamming tlanes lrain scrambird dlaser islash raid catapult rring tpunch dfight ballsbombs dmissile vbomb dpistols grenadier bcannon hyperlaser bombup upshot rolls bblast smokeg mortar turbulent graveler throwm orbitman embattled udcave darkcave
 )
 
 if [[ "${#slugs[@]}" -ne 50 ]]; then
@@ -154,28 +154,44 @@ cat > "$RUNNER_TEMP/games-additions.json" <<'GAMES'
     "slug": "rring"
   },
   {
-    "title": "G Press",
-    "slug": "gpress"
+    "title": "T Punch",
+    "slug": "tpunch"
   },
   {
-    "title": "Holes",
-    "slug": "holes"
+    "title": "D Fight",
+    "slug": "dfight"
   },
   {
-    "title": "Snaky",
-    "slug": "snaky"
+    "title": "Balls Bombs",
+    "slug": "ballsbombs"
   },
   {
-    "title": "Mirror Floor",
-    "slug": "mirrorfloor"
+    "title": "D Missile",
+    "slug": "dmissile"
   },
   {
-    "title": "Sub Jump",
-    "slug": "subjump"
+    "title": "V Bomb",
+    "slug": "vbomb"
   },
   {
-    "title": "Photon Line",
-    "slug": "photonline"
+    "title": "D Pistols",
+    "slug": "dpistols"
+  },
+  {
+    "title": "Grenadier",
+    "slug": "grenadier"
+  },
+  {
+    "title": "B Cannon",
+    "slug": "bcannon"
+  },
+  {
+    "title": "Hyper Laser",
+    "slug": "hyperlaser"
+  },
+  {
+    "title": "Bomb Up",
+    "slug": "bombup"
   },
   {
     "title": "Up Shot",
@@ -184,10 +200,6 @@ cat > "$RUNNER_TEMP/games-additions.json" <<'GAMES'
   {
     "title": "Roll S",
     "slug": "rolls"
-  },
-  {
-    "title": "T Punch",
-    "slug": "tpunch"
   },
   {
     "title": "B Blast",
@@ -214,14 +226,6 @@ cat > "$RUNNER_TEMP/games-additions.json" <<'GAMES'
     "slug": "throwm"
   },
   {
-    "title": "Pillars 3D",
-    "slug": "pillars3d"
-  },
-  {
-    "title": "Press M",
-    "slug": "pressm"
-  },
-  {
     "title": "Orbit Man",
     "slug": "orbitman"
   },
@@ -230,16 +234,12 @@ cat > "$RUNNER_TEMP/games-additions.json" <<'GAMES'
     "slug": "embattled"
   },
   {
-    "title": "From Two Sides",
-    "slug": "fromtwosides"
-  },
-  {
     "title": "UD Cave",
     "slug": "udcave"
   },
   {
-    "title": "Ant Lion",
-    "slug": "antlion"
+    "title": "Dark Cave",
+    "slug": "darkcave"
   }
 ]
 GAMES
