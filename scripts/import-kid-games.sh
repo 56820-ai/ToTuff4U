@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Curated action/skill arcade pack; source files are copied from the MIT-licensed upstream repo.
 REPO="https://github.com/abagames/crisp-game-lib-games.git"
 DEST="g/one-button-collection"
 TMP="$(mktemp -d)"
