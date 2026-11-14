@@ -471,7 +471,7 @@
     },
     {
       "title": "DuckMath",
-      "path": "duckmath-site",
+      "path": "./duckmath-site/",
       "image": "./duckmath-site/assets/img/duck.webp",
       "category": "ARCADE"
     },
