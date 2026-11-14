@@ -402,9 +402,10 @@
       }
     }
   
-    /* Responsive layout: keep the document scrollable instead of trapping content. */
-    html { height: auto; min-height: 100%; overflow-y: auto; }
-    body { height: auto; min-height: 100vh; overflow-x: hidden; overflow-y: auto; }
+    /* The parent page resizes this iframe to the full leaderboard height,
+       so scrolling belongs to the parent document, not this embedded page. */
+    html { height: auto; min-height: 100%; overflow-x: hidden; overflow-y: hidden !important; }
+    body { height: auto; min-height: 100vh; overflow-x: hidden; overflow-y: hidden !important; }
     .leaderboard-container { width: min(100%, 1000px); min-width: 0; padding: clamp(0.75rem, 4vw, 2.5rem); }
     .leaderboard { height: auto !important; max-height: none !important; overflow: visible !important; }
     #score-list { min-width: 0; }
@@ -607,16 +608,12 @@
       const onlineScores = loadedScores.filter(item =>
         String(item.game_title || "").trim().toLowerCase() !== "slope" || Number(item.score) <= 1500
       );
-      if (!onlineScores.length) {
+      if (!window.ArcadeScores || !window.ArcadeScores.configured || window.ArcadeScores.lastLoadError) {
         const empty = document.createElement("p");
         empty.className = "leaderboard-empty";
         empty.style.cssText = "text-align:center;padding:2rem;color:#c0c0d0;overflow-wrap:anywhere;";
-        if (!window.ArcadeScores || !window.ArcadeScores.configured || window.ArcadeScores.lastLoadError) {
-          empty.textContent = "The leaderboard couldn't connect to the score database. " +
-            (window.ArcadeScores && window.ArcadeScores.lastLoadError ? "Error: " + window.ArcadeScores.lastLoadError : "Check the score database configuration and try again.");
-        } else {
-          empty.textContent = "No real scores have been recorded yet. Play a supported game to add the first score!";
-        }
+        empty.textContent = "The leaderboard couldn't connect to the score database. " +
+          (window.ArcadeScores && window.ArcadeScores.lastLoadError ? "Error: " + window.ArcadeScores.lastLoadError : "Check the score database configuration and try again.");
         scoreList.appendChild(empty);
         return;
       }
@@ -624,7 +621,21 @@
       // Keep every submitted score as its own leaderboard record.
       // A player may appear multiple times when they submit multiple runs.
       const timedGames = new Set(["minecraft", "retro bowl time", "blocky combat swat time"]);
-      const byGame = new Map();
+      // These are the games that currently submit scores or playtime to the leaderboard.
+      // Pre-create their sections so compatible games remain visible before the first submission.
+      const supportedGames = [
+        ["2048", "2048"],
+        ["blocky combat swat time", "Blocky Combat SWAT · Total Playtime"],
+        ["breakout", "Breakout"],
+        ["cookie clicker", "Cookie Clicker"],
+        ["drift boss", "Drift Boss"],
+        ["minecraft", "Minecraft"],
+        ["reaction test", "Reaction Test"],
+        ["retro bowl time", "Retro Bowl · Total Playtime"],
+        ["slope", "Slope"],
+        ["stacktris", "Stacktris"]
+      ];
+      const byGame = new Map(supportedGames.map(([key]) => [key, []]));
       onlineScores.forEach(item => {
         const key = String(item.game_title || "Game").trim().toLowerCase();
         if (!byGame.has(key)) byGame.set(key, []);
@@ -674,7 +685,10 @@
           });
           players = [...bestByPlayer.values()].sort(compareCookieScores);
         }
-        const title = key === "retro bowl time" ? "Retro Bowl · Total Playtime" : key === "blocky combat swat time" ? "Blocky Combat SWAT · Total Playtime" : players[0].game_title;
+        const knownTitle = supportedGames.find(([gameKey]) => gameKey === key);
+        const title = key === "retro bowl time" ? "Retro Bowl · Total Playtime"
+          : key === "blocky combat swat time" ? "Blocky Combat SWAT · Total Playtime"
+          : (players[0] && players[0].game_title) || (knownTitle && knownTitle[1]) || key;
         createPodiumSection(title, players.slice(0,3), timedGames);
       });
     }
