@@ -85,12 +85,6 @@
       "category": "PUZZLE"
     },
     {
-      "title": "Crazy Tunnel 3D",
-      "path": "g/crazytunnel3d",
-      "image": "images/crazytunnel3d.png",
-      "category": "RACING"
-    },
-    {
       "title": "Lazy Jump 3D",
       "path": "g/lazyjump3d",
       "image": "images/lazyjump3d.png",
@@ -590,6 +584,36 @@
       "category": "IO"
     },
     {
+      "title": "Crossy Road",
+      "path": "g/crossyroad",
+      "image": "g/crossyroad/sprites/crossy-road-logo.png",
+      "category": "ARCADE"
+    },
+    {
+      "title": "Cut The Rope",
+      "path": "g/cut-the-rope",
+      "image": "images/cuttherope.png",
+      "category": "PUZZLE"
+    },
+    {
+      "title": "Fireboy & Watergirl",
+      "path": "g/fireboywatergirlforsettemple",
+      "image": "duckmath-site/assets/img/icons/fireboy.webp",
+      "category": "PLATFORMER"
+    },
+    {
+      "title": "Rooftop Snipers 2",
+      "path": "g/rooftop-snipers-2-main",
+      "image": "g/rooftop-snipers-2-main/1-small.jpg",
+      "category": "ACTION"
+    },
+    {
+      "title": "OvO",
+      "path": "g/ovo",
+      "image": "images/ovo.jpg",
+      "category": "PLATFORMER"
+    },
+    {
       "title": "Super Star Car",
       "path": "duckmath-site/g4m3s/?title=super-star-car",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/superstarcar.webp",
@@ -758,12 +782,6 @@
       "category": "SPORTS"
     },
     {
-      "title": "Obby But Youre On A Bike",
-      "path": "duckmath-site/g4m3s/?title=obby-but-youre-on-a-bike",
-      "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/obby-but-youre-on-a-bike.jpg",
-      "category": "SPORTS"
-    },
-    {
       "title": "Solar Smash",
       "path": "duckmath-site/g4m3s/?title=solar-smash",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/solar-smash.png",
@@ -786,12 +804,6 @@
       "path": "duckmath-site/g4m3s/?title=masked-special-forces",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/masked-special-forces.jpg",
       "category": "STRATEGY"
-    },
-    {
-      "title": "Galatrix",
-      "path": "duckmath-site/g4m3s/?title=galatrix",
-      "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img3/galatrix-512.webp",
-      "category": "PLATFORMER"
     },
     {
       "title": "Real Flight Simulator",
@@ -834,12 +846,6 @@
       "path": "duckmath-site/g4m3s/?title=ducky-clicker",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img3/ducky-clicker.webp",
       "category": "SIMULATION"
-    },
-    {
-      "title": "Brookhaven",
-      "path": "duckmath-site/g4m3s/?title=brookhaven",
-      "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/brookhaven.jpg",
-      "category": "ADVENTURE"
     },
     {
       "title": "Drift Hunters Pro",
@@ -890,12 +896,6 @@
       "category": "SPORTS"
     },
     {
-      "title": "Steal Brainrot Duel",
-      "path": "duckmath-site/g4m3s/?title=steal-brainrot-duel",
-      "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/steal-brainrot-duel-2.webp",
-      "category": "STRATEGY"
-    },
-    {
       "title": "Crazy Roll",
       "path": "duckmath-site/g4m3s/?title=crazy-roll",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/crazy-roll.webp",
@@ -942,12 +942,6 @@
       "path": "duckmath-site/g4m3s/?title=edys-car-simulator",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Edys-Car-Simulator-Online.jpg",
       "category": "RACING"
-    },
-    {
-      "title": "Dublix",
-      "path": "duckmath-site/g4m3s/?title=dublix",
-      "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/dublix.webp",
-      "category": "SPORTS"
     },
     {
       "title": "Pixel Path",
@@ -1032,12 +1026,6 @@
       "path": "duckmath-site/g4m3s/?title=traffic-jam",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Traffic-Jam.jpg",
       "category": "RACING"
-    },
-    {
-      "title": "Ink Game",
-      "path": "duckmath-site/g4m3s/?title=ink-game",
-      "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/ink-game.png",
-      "category": "STRATEGY"
     },
     {
       "title": "Burrito Bison",
@@ -1136,12 +1124,6 @@
       "category": "ADVENTURE"
     },
     {
-      "title": "Steal Brainrot Heist",
-      "path": "duckmath-site/g4m3s/?title=steal-brainrot-heist",
-      "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/steal-brainrot-heist-2.webp",
-      "category": "ARCADE"
-    },
-    {
       "title": "Plants Vs Zombie Hybrid Story Mod",
       "path": "duckmath-site/g4m3s/?title=plants-vs-zombie-hybrid-story-mod",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/plants-vs-zombie-hybrid-story-mod.webp",
@@ -1181,12 +1163,6 @@
       "title": "Clash Royale",
       "path": "duckmath-site/g4m3s/?title=clash-royale",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/clash-royale.jpg",
-      "category": "STRATEGY"
-    },
-    {
-      "title": "Grow A Garden",
-      "path": "duckmath-site/g4m3s/?title=grow-a-garden",
-      "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/grow-a-garden.jpg",
       "category": "STRATEGY"
     },
     {
@@ -1340,12 +1316,6 @@
       "category": "STRATEGY"
     },
     {
-      "title": "Fish It",
-      "path": "duckmath-site/g4m3s/?title=fish-it",
-      "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/fish-it.jpg",
-      "category": "SPORTS"
-    },
-    {
       "title": "Time Shooter Swat",
       "path": "duckmath-site/g4m3s/?title=time-shooter-swat",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/time-shooter-swat.jpg",
@@ -1418,12 +1388,6 @@
       "category": "STRATEGY"
     },
     {
-      "title": "Escape Tsunami For Brainrots",
-      "path": "duckmath-site/g4m3s/?title=escape-tsunami-for-brainrots",
-      "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/escape-tsunami-for-brainrots.webp",
-      "category": "ARCADE"
-    },
-    {
       "title": "Armed Forces io",
       "path": "duckmath-site/g4m3s/?title=armed-forces-io",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Armed-Forces-io.jpg",
@@ -1440,12 +1404,6 @@
       "path": "duckmath-site/g4m3s/?title=crazy-cars",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/crazycars.webp",
       "category": "SPORTS"
-    },
-    {
-      "title": "Growden io",
-      "path": "duckmath-site/g4m3s/?title=growden-io",
-      "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/growden-io.jpeg",
-      "category": "STRATEGY"
     },
     {
       "title": "Geometry Escape",
@@ -1619,12 +1577,6 @@
       "title": "Spartahoppers",
       "path": "duckmath-site/g4m3s/?title=spartahoppers",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/spartahoppers.webp",
-      "category": "STRATEGY"
-    },
-    {
-      "title": "Plants Vs Brainrots",
-      "path": "duckmath-site/g4m3s/?title=plants-vs-brainrots",
-      "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/plants-vs-brainrots.jpg",
       "category": "STRATEGY"
     },
     {
@@ -1938,12 +1890,6 @@
       "path": "duckmath-site/g4m3s/?title=the-worlds-hardest-game-2",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/hardgame2.webp",
       "category": "PUZZLE"
-    },
-    {
-      "title": "Steal A Brainrot Temu Version",
-      "path": "duckmath-site/g4m3s/?title=steal-a-brainrot-temu-version",
-      "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/steal-a-brainrot-temu-version.jpg",
-      "category": "STRATEGY"
     },
     {
       "title": "Burnout Racers",
@@ -2930,12 +2876,6 @@
       "category": "ARCADE"
     },
     {
-      "title": "Cloud",
-      "path": "duckmath-site/g4m3s/?title=cloud",
-      "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/cloud-gaming.webp",
-      "category": "ARCADE"
-    },
-    {
       "title": "E-Life Simulator",
       "path": "duckmath-site/g4m3s/?title=e-life-simulator",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/life-simulator.jpg",
@@ -2964,36 +2904,6 @@
       "path": "duckmath-site/g4m3s/?title=orion-sandbox",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/orion-sandbox.jpg",
       "category": "STRATEGY"
-    },
-    {
-      "title": "Crossy Road",
-      "path": "g/crossyroad",
-      "image": "g/crossyroad/sprites/crossy-road-logo.png",
-      "category": "ARCADE"
-    },
-    {
-      "title": "Cut The Rope",
-      "path": "g/cut-the-rope",
-      "image": "images/cuttherope.png",
-      "category": "PUZZLE"
-    },
-    {
-      "title": "Fireboy & Watergirl",
-      "path": "g/fireboywatergirlforsettemple",
-      "image": "duckmath-site/assets/img/icons/fireboy.webp",
-      "category": "PLATFORMER"
-    },
-    {
-      "title": "Rooftop Snipers 2",
-      "path": "g/rooftop-snipers-2-main",
-      "image": "g/rooftop-snipers-2-main/1-small.jpg",
-      "category": "ACTION"
-    },
-    {
-      "title": "OvO",
-      "path": "g/ovo",
-      "image": "images/ovo.jpg",
-      "category": "PLATFORMER"
     }
   ]
 }
