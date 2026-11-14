@@ -459,9 +459,34 @@
   <script src="../js/arcade-scores.js?v=f0d8ef5"></script>
   <script>
     const scoreList = document.getElementById("score-list");
+    const catalogLogos = new Map();
+
+    async function loadCatalogLogos() {
+      try {
+        const response = await fetch("../games.json", { cache: "no-cache" });
+        if (!response.ok) return;
+        const data = await response.json();
+        (data.games || []).forEach(game => {
+          const key = String(game.title || "").trim().toLowerCase();
+          const image = String(game.image || "").trim();
+          if (!key || !image) return;
+          const external = image.startsWith("https://") || image.startsWith("http://") ||
+            image.startsWith("data:") || image.startsWith("blob:") || image.startsWith("//");
+          const resolved = external ? image :
+            image.startsWith("/ToTuff4U/") ? image : "../" + image.replace(/^\\/+/, "");
+          catalogLogos.set(key, resolved);
+        });
+      } catch (error) {
+        console.warn("Arcade Atlas: game logo catalog could not be loaded.", error);
+      }
+    }
+
 
     function getGameLogo(gameTitle) {
       const game = String(gameTitle || "").trim().toLowerCase();
+      const alias = game === "retro bowl time" ? "retro bowl" : game === "blocky combat swat time" ? "blocky combat swat" : game;
+      const catalogImage = catalogLogos.get(alias);
+      if (catalogImage) return catalogImage;
       const logos = {
         "slope": "../images/slope.png",
         "retro bowl": "../images/retrobowl.jpg",
@@ -542,6 +567,7 @@
     }
 
     async function renderLeaderboard() {
+      await loadCatalogLogos();
       const loadedScores = window.ArcadeScores ? await window.ArcadeScores.getScores() : [];
       // Hide legacy/invalid Slope entries above the 1,500-point limit.
       const onlineScores = loadedScores.filter(item =>
