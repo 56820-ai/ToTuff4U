@@ -536,87 +536,9 @@
       "category": "PLATFORMER"
     },
     {
-      "title": "Tap Pump",
-      "path": "g/one-button-collection/?tappump",
-      "image": "g/one-button-collection/tappump/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
-      "title": "G Press",
-      "path": "g/one-button-collection/?gpress",
-      "image": "g/one-button-collection/gpress/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
-      "title": "Portal Jump",
-      "path": "g/one-button-collection/?portalj",
-      "image": "g/one-button-collection/portalj/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
-      "title": "Circle W",
-      "path": "g/one-button-collection/?circlew",
-      "image": "g/one-button-collection/circlew/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
-      "title": "Revolve A",
-      "path": "g/one-button-collection/?revolvea",
-      "image": "g/one-button-collection/revolvea/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
-      "title": "M Rider",
-      "path": "g/one-button-collection/?mrider",
-      "image": "g/one-button-collection/mrider/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
-      "title": "Tower of Hanoi",
-      "path": "g/one-button-collection/?thanoi",
-      "image": "g/one-button-collection/thanoi/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
-      "title": "Sum Ten",
-      "path": "g/one-button-collection/?sumten",
-      "image": "g/one-button-collection/sumten/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
-      "title": "TT Fence",
-      "path": "g/one-button-collection/?ttfence",
-      "image": "g/one-button-collection/ttfence/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
-      "title": "GeoCent",
-      "path": "g/one-button-collection/?geocent",
-      "image": "g/one-button-collection/geocent/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
-      "title": "BS Fish",
-      "path": "g/one-button-collection/?bsfish",
-      "image": "g/one-button-collection/bsfish/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
-      "title": "G Tail",
-      "path": "g/one-button-collection/?gtail",
-      "image": "g/one-button-collection/gtail/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
-      "title": "Breed C",
-      "path": "g/one-button-collection/?breedc",
-      "image": "g/one-button-collection/breedc/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
-      "title": "Kite",
-      "path": "g/one-button-collection/?kite",
-      "image": "g/one-button-collection/kite/screenshot.gif",
+      "title": "Rebirth",
+      "path": "g/one-button-collection/?rebirth",
+      "image": "g/one-button-collection/rebirth/screenshot.gif",
       "category": "ARCADE"
     },
     {
@@ -626,111 +548,27 @@
       "category": "ARCADE"
     },
     {
-      "title": "Wiper",
-      "path": "g/one-button-collection/?wiper",
-      "image": "g/one-button-collection/wiper/screenshot.gif",
+      "title": "Cast N",
+      "path": "g/one-button-collection/?castn",
+      "image": "g/one-button-collection/castn/screenshot.gif",
       "category": "ARCADE"
     },
     {
-      "title": "R Wheel",
-      "path": "g/one-button-collection/?rwheel",
-      "image": "g/one-button-collection/rwheel/screenshot.gif",
+      "title": "Thunder",
+      "path": "g/one-button-collection/?thunder",
+      "image": "g/one-button-collection/thunder/screenshot.gif",
       "category": "ARCADE"
     },
     {
-      "title": "Zoomio",
-      "path": "g/one-button-collection/?zoomio",
-      "image": "g/one-button-collection/zoomio/screenshot.gif",
+      "title": "Descent S",
+      "path": "g/one-button-collection/?descents",
+      "image": "g/one-button-collection/descents/screenshot.gif",
       "category": "ARCADE"
     },
     {
-      "title": "Number Line",
-      "path": "g/one-button-collection/?numberline",
-      "image": "g/one-button-collection/numberline/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
-      "title": "Make Maze",
-      "path": "g/one-button-collection/?makemaze",
-      "image": "g/one-button-collection/makemaze/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
-      "title": "Square Bar",
-      "path": "g/one-button-collection/?squarebar",
-      "image": "g/one-button-collection/squarebar/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
-      "title": "Teeter",
-      "path": "g/one-button-collection/?teeter",
-      "image": "g/one-button-collection/teeter/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
-      "title": "Reflector",
-      "path": "g/one-button-collection/?reflector",
-      "image": "g/one-button-collection/reflector/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
-      "title": "Lift Up",
-      "path": "g/one-button-collection/?liftup",
-      "image": "g/one-button-collection/liftup/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
-      "title": "Rock Paper Scissors",
-      "path": "g/one-button-collection/?rps",
-      "image": "g/one-button-collection/rps/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
-      "title": "Number Ball",
-      "path": "g/one-button-collection/?numberball",
-      "image": "g/one-button-collection/numberball/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
-      "title": "Mirror Floor",
-      "path": "g/one-button-collection/?mirrorfloor",
-      "image": "g/one-button-collection/mirrorfloor/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
-      "title": "Cross Line",
-      "path": "g/one-button-collection/?crossline",
-      "image": "g/one-button-collection/crossline/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
-      "title": "Scaffold",
-      "path": "g/one-button-collection/?scaffold",
-      "image": "g/one-button-collection/scaffold/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
-      "title": "Aerial Bar",
-      "path": "g/one-button-collection/?aerialbar",
-      "image": "g/one-button-collection/aerialbar/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
-      "title": "Pin Climb",
-      "path": "g/one-button-collection/?pinclimb",
-      "image": "g/one-button-collection/pinclimb/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
-      "title": "Parking",
-      "path": "g/one-button-collection/?parking",
-      "image": "g/one-button-collection/parking/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
-      "title": "Bamboo",
-      "path": "g/one-button-collection/?bamboo",
-      "image": "g/one-button-collection/bamboo/screenshot.gif",
+      "title": "Laser Fortress",
+      "path": "g/one-button-collection/?laserfortress",
+      "image": "g/one-button-collection/laserfortress/screenshot.gif",
       "category": "ARCADE"
     },
     {
@@ -740,45 +578,261 @@
       "category": "ARCADE"
     },
     {
-      "title": "Find a Star",
-      "path": "g/one-button-collection/?findastar",
-      "image": "g/one-button-collection/findastar/screenshot.gif",
+      "title": "R Wheel",
+      "path": "g/one-button-collection/?rwheel",
+      "image": "g/one-button-collection/rwheel/screenshot.gif",
       "category": "ARCADE"
     },
     {
-      "title": "Pairs Drop",
-      "path": "g/one-button-collection/?pairsdrop",
-      "image": "g/one-button-collection/pairsdrop/screenshot.gif",
+      "title": "Pizza Arrow",
+      "path": "g/one-button-collection/?pizzaarrow",
+      "image": "g/one-button-collection/pizzaarrow/screenshot.gif",
       "category": "ARCADE"
     },
     {
-      "title": "Card Q",
-      "path": "g/one-button-collection/?cardq",
-      "image": "g/one-button-collection/cardq/screenshot.gif",
+      "title": "Thrust LR",
+      "path": "g/one-button-collection/?thrustlr",
+      "image": "g/one-button-collection/thrustlr/screenshot.gif",
       "category": "ARCADE"
     },
     {
-      "title": "Shiny",
-      "path": "g/one-button-collection/?shiny",
-      "image": "g/one-button-collection/shiny/screenshot.gif",
+      "title": "Accel B",
+      "path": "g/one-button-collection/?accelb",
+      "image": "g/one-button-collection/accelb/screenshot.gif",
       "category": "ARCADE"
     },
     {
-      "title": "Floater",
-      "path": "g/one-button-collection/?floater",
-      "image": "g/one-button-collection/floater/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
-      "title": "Hopping P",
-      "path": "g/one-button-collection/?hoppingp",
-      "image": "g/one-button-collection/hoppingp/screenshot.gif",
+      "title": "Future Wake",
+      "path": "g/one-button-collection/?futurewake",
+      "image": "g/one-button-collection/futurewake/screenshot.gif",
       "category": "ARCADE"
     },
     {
       "title": "Up Down Press",
       "path": "g/one-button-collection/?updownpress",
       "image": "g/one-button-collection/updownpress/screenshot.gif",
+      "category": "ARCADE"
+    },
+    {
+      "title": "Ladder Drop",
+      "path": "g/one-button-collection/?ladderdrop",
+      "image": "g/one-button-collection/ladderdrop/screenshot.gif",
+      "category": "ARCADE"
+    },
+    {
+      "title": "Counter B",
+      "path": "g/one-button-collection/?counterb",
+      "image": "g/one-button-collection/counterb/screenshot.gif",
+      "category": "ARCADE"
+    },
+    {
+      "title": "M Rider",
+      "path": "g/one-button-collection/?mrider",
+      "image": "g/one-button-collection/mrider/screenshot.gif",
+      "category": "ARCADE"
+    },
+    {
+      "title": "Charge Beam",
+      "path": "g/one-button-collection/?chargebeam",
+      "image": "g/one-button-collection/chargebeam/screenshot.gif",
+      "category": "ARCADE"
+    },
+    {
+      "title": "S Shake",
+      "path": "g/one-button-collection/?sshake",
+      "image": "g/one-button-collection/sshake/screenshot.gif",
+      "category": "ARCADE"
+    },
+    {
+      "title": "Zone B",
+      "path": "g/one-button-collection/?zoneb",
+      "image": "g/one-button-collection/zoneb/screenshot.gif",
+      "category": "ARCADE"
+    },
+    {
+      "title": "M Jamming",
+      "path": "g/one-button-collection/?mjamming",
+      "image": "g/one-button-collection/mjamming/screenshot.gif",
+      "category": "ARCADE"
+    },
+    {
+      "title": "T Lanes",
+      "path": "g/one-button-collection/?tlanes",
+      "image": "g/one-button-collection/tlanes/screenshot.gif",
+      "category": "ARCADE"
+    },
+    {
+      "title": "L Rain",
+      "path": "g/one-button-collection/?lrain",
+      "image": "g/one-button-collection/lrain/screenshot.gif",
+      "category": "ARCADE"
+    },
+    {
+      "title": "Scrambird",
+      "path": "g/one-button-collection/?scrambird",
+      "image": "g/one-button-collection/scrambird/screenshot.gif",
+      "category": "ARCADE"
+    },
+    {
+      "title": "D Laser",
+      "path": "g/one-button-collection/?dlaser",
+      "image": "g/one-button-collection/dlaser/screenshot.gif",
+      "category": "ARCADE"
+    },
+    {
+      "title": "I Slash",
+      "path": "g/one-button-collection/?islash",
+      "image": "g/one-button-collection/islash/screenshot.gif",
+      "category": "ARCADE"
+    },
+    {
+      "title": "Raid",
+      "path": "g/one-button-collection/?raid",
+      "image": "g/one-button-collection/raid/screenshot.gif",
+      "category": "ARCADE"
+    },
+    {
+      "title": "Catapult",
+      "path": "g/one-button-collection/?catapult",
+      "image": "g/one-button-collection/catapult/screenshot.gif",
+      "category": "ARCADE"
+    },
+    {
+      "title": "R Ring",
+      "path": "g/one-button-collection/?rring",
+      "image": "g/one-button-collection/rring/screenshot.gif",
+      "category": "ARCADE"
+    },
+    {
+      "title": "G Press",
+      "path": "g/one-button-collection/?gpress",
+      "image": "g/one-button-collection/gpress/screenshot.gif",
+      "category": "ARCADE"
+    },
+    {
+      "title": "Holes",
+      "path": "g/one-button-collection/?holes",
+      "image": "g/one-button-collection/holes/screenshot.gif",
+      "category": "ARCADE"
+    },
+    {
+      "title": "Snaky",
+      "path": "g/one-button-collection/?snaky",
+      "image": "g/one-button-collection/snaky/screenshot.gif",
+      "category": "ARCADE"
+    },
+    {
+      "title": "Mirror Floor",
+      "path": "g/one-button-collection/?mirrorfloor",
+      "image": "g/one-button-collection/mirrorfloor/screenshot.gif",
+      "category": "ARCADE"
+    },
+    {
+      "title": "Sub Jump",
+      "path": "g/one-button-collection/?subjump",
+      "image": "g/one-button-collection/subjump/screenshot.gif",
+      "category": "ARCADE"
+    },
+    {
+      "title": "Photon Line",
+      "path": "g/one-button-collection/?photonline",
+      "image": "g/one-button-collection/photonline/screenshot.gif",
+      "category": "ARCADE"
+    },
+    {
+      "title": "Up Shot",
+      "path": "g/one-button-collection/?upshot",
+      "image": "g/one-button-collection/upshot/screenshot.gif",
+      "category": "ARCADE"
+    },
+    {
+      "title": "Roll S",
+      "path": "g/one-button-collection/?rolls",
+      "image": "g/one-button-collection/rolls/screenshot.gif",
+      "category": "ARCADE"
+    },
+    {
+      "title": "T Punch",
+      "path": "g/one-button-collection/?tpunch",
+      "image": "g/one-button-collection/tpunch/screenshot.gif",
+      "category": "ARCADE"
+    },
+    {
+      "title": "B Blast",
+      "path": "g/one-button-collection/?bblast",
+      "image": "g/one-button-collection/bblast/screenshot.gif",
+      "category": "ARCADE"
+    },
+    {
+      "title": "Smoke G",
+      "path": "g/one-button-collection/?smokeg",
+      "image": "g/one-button-collection/smokeg/screenshot.gif",
+      "category": "ARCADE"
+    },
+    {
+      "title": "Mortar",
+      "path": "g/one-button-collection/?mortar",
+      "image": "g/one-button-collection/mortar/screenshot.gif",
+      "category": "ARCADE"
+    },
+    {
+      "title": "Turbulent",
+      "path": "g/one-button-collection/?turbulent",
+      "image": "g/one-button-collection/turbulent/screenshot.gif",
+      "category": "ARCADE"
+    },
+    {
+      "title": "Graveler",
+      "path": "g/one-button-collection/?graveler",
+      "image": "g/one-button-collection/graveler/screenshot.gif",
+      "category": "ARCADE"
+    },
+    {
+      "title": "Throw M",
+      "path": "g/one-button-collection/?throwm",
+      "image": "g/one-button-collection/throwm/screenshot.gif",
+      "category": "ARCADE"
+    },
+    {
+      "title": "Pillars 3D",
+      "path": "g/one-button-collection/?pillars3d",
+      "image": "g/one-button-collection/pillars3d/screenshot.gif",
+      "category": "ARCADE"
+    },
+    {
+      "title": "Press M",
+      "path": "g/one-button-collection/?pressm",
+      "image": "g/one-button-collection/pressm/screenshot.gif",
+      "category": "ARCADE"
+    },
+    {
+      "title": "Orbit Man",
+      "path": "g/one-button-collection/?orbitman",
+      "image": "g/one-button-collection/orbitman/screenshot.gif",
+      "category": "ARCADE"
+    },
+    {
+      "title": "Embattled",
+      "path": "g/one-button-collection/?embattled",
+      "image": "g/one-button-collection/embattled/screenshot.gif",
+      "category": "ARCADE"
+    },
+    {
+      "title": "From Two Sides",
+      "path": "g/one-button-collection/?fromtwosides",
+      "image": "g/one-button-collection/fromtwosides/screenshot.gif",
+      "category": "ARCADE"
+    },
+    {
+      "title": "UD Cave",
+      "path": "g/one-button-collection/?udcave",
+      "image": "g/one-button-collection/udcave/screenshot.gif",
+      "category": "ARCADE"
+    },
+    {
+      "title": "Ant Lion",
+      "path": "g/one-button-collection/?antlion",
+      "image": "g/one-button-collection/antlion/screenshot.gif",
       "category": "ARCADE"
     }
   ]
