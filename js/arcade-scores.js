@@ -77,19 +77,21 @@
 
   async function submit(gameTitle, score, playerName) {
     playerName = typeof playerName === "string" ? playerName.trim().slice(0, 24) : "";
-    const numericScore = Number(score);
+    const scoreText = typeof score === "bigint" ? score.toString() :
+      typeof score === "string" ? score.trim() :
+      Number.isSafeInteger(score) && score >= 0 ? String(score) : "";
     if (!playerName) {
       console.info("Arcade Atlas: a player name is required to submit a high score.");
       return false;
     }
-    if (!Number.isSafeInteger(numericScore) || numericScore < 0 || !gameTitle) return false;
-    if (String(gameTitle).trim().toLowerCase() === "slope" && numericScore > 1500) {
+    if (!/^[0-9]{1,100}$/.test(scoreText) || !gameTitle) return false;
+    if (String(gameTitle).trim().toLowerCase() === "slope" && BigInt(scoreText) > 1500n) {
       console.warn("Arcade Atlas: Slope score rejected (maximum 1,500).");
       window.alert("That Slope score was rejected. The leaderboard limit is 1,500.");
       return false;
     }
     try {
-      await submitThroughServer(gameTitle, numericScore, playerName, "score", false);
+      await submitThroughServer(gameTitle, scoreText, playerName, "score", false);
       console.info("Arcade Atlas: high score submitted.");
       return true;
     } catch (error) {
