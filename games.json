@@ -201,7 +201,7 @@
     {
       "title": "Run 2",
       "path": "g/run2",
-      "image": "https://img.rocketgames.io/big2x/games/r/run-2/run-2.7e3a40.jpg",
+      "image": "images/run2.png",
       "category": "ARCADE"
     },
     {
@@ -273,7 +273,7 @@
     {
       "title": "Stickman Golf",
       "path": "g/stickman-golf",
-      "image": "https://cdn2.steamgriddb.com/icon/9f61408e3afb633e50cdf1b20de6f466.png",
+      "image": "images/stickman.png",
       "category": "ADVENTURE"
     },
     {
@@ -291,7 +291,7 @@
     {
       "title": "Basketball Random",
       "path": "g/basketball-random",
-      "image": "https://play-lh.googleusercontent.com/gP8T5Z1O-ngxIloiwcBZzrzyLPYDp0R_1BDNKUDZboIRPVImeyWI8-7aExvB9gAGNKc=w240-h480-rw",
+      "image": "images/basketball-random.png",
       "category": "SPORTS"
     },
     {
