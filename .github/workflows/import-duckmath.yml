@@ -23,14 +23,14 @@ jobs:
           tmp="$(mktemp -d)"
           git clone --depth 1 https://github.com/Neruvy/duckmath.git "$tmp/duckmath"
           mkdir -p duckmath-site
-          rsync -a --delete --exclude='.git' --exclude='.github' --exclude='.idea' "$tmp/duckmath/" duckmath-site/
+          rsync -a --delete --exclude='.git' --exclude='.github' --exclude='.idea' --exclude='disabled-games.json' --exclude='assets/js/app_functions.js' "$tmp/duckmath/" duckmath-site/
           python3 - <<'PY'
           from pathlib import Path
           import re
           root = Path("duckmath-site")
           prefix = "/ToTuff4U/duckmath-site"
-          path_pattern = re.compile(r'(?<![A-Za-z0-9:])/(assets|g4m3s|more|blog)(?=/)')
-          page_pattern = re.compile(r'(?<![A-Za-z0-9:])/(index|about|leaderboard|advertise|404|g404|loading)\.html')
+          path_pattern = re.compile(r'(?<![A-Za-z0-9:/-])/(assets|g4m3s|more|blog)(?=/)')
+          page_pattern = re.compile(r'(?<![A-Za-z0-9:/-])/(index|about|leaderboard|advertise|404|g404|loading)\.html')
           for file in root.rglob("*"):
               if not file.is_file() or file.suffix.lower() not in {".html", ".js", ".css", ".json", ".xml", ".txt"}:
                   continue
