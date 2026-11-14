@@ -446,7 +446,7 @@
   <div class="leaderboard-container">
     <header class="leaderboard-header">
       <h1>Game High Scores <span class="beta-label">BETA</span></h1>
-      <p class="submit-note">Scores are collected automatically in supported games. Enter your name when prompted; it is remembered for future games. Minecraft ranks by total playtime.</p>
+      <p class="submit-note">Scores are collected automatically in supported games. Enter your name when prompted; it is remembered for future games. Minecraft, Retro Bowl, and Blocky Combat SWAT rank by total playtime.</p>
       <a href="../">
       </a>
     </header>
@@ -589,7 +589,7 @@
           });
           players = [...bestByPlayer.values()].sort((a,b) => Number(b.score) - Number(a.score));
         }
-        const title = key === "retro bowl time" ? "Retro Bowl · Total Playtime" : players[0].game_title;
+        const title = key === "retro bowl time" ? "Retro Bowl · Total Playtime" : key === "blocky combat swat time" ? "Blocky Combat SWAT · Total Playtime" : players[0].game_title;
         createPodiumSection(title, players.slice(0,3), timedGames);
       });
     }
