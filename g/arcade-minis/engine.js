@@ -45,9 +45,9 @@ function drawRacer(dt){
 function drawHopper(dt){
  const s=state;rect(0,h-28,w,28,"#1b594c");
  if(keys.arrowleft||keys.a)s.x-=300*dt;if(keys.arrowright||keys.d)s.x+=300*dt;
- if((keys[" "]||keys.arrowup||keys.w)&&Math.abs(s.vy)<1&&s.y>h-120)s.vy=-520;
- s.vy+=1100*dt;s.y+=s.vy*dt;s.x=clamp(s.x,14,w-14);
- for(const p of s.plats){if(s.vy>0&&s.y+18>=p.y&&s.y+18<=p.y+16&&s.x>p.x-10&&s.x<p.x+p.w+10){s.y=p.y-18;s.vy=-500;}}
+ if((keys[" "]||keys.arrowup||keys.w)&&s.grounded){s.vy=-540;s.grounded=false;keys[" "]=keys.arrowup=keys.w=false;}
+ s.prevY=s.y;s.vy+=1150*dt;s.y+=s.vy*dt;s.x=clamp(s.x,14,w-14);s.grounded=false;
+ if(s.vy>=0){for(const p of s.plats){if(s.prevY+18<=p.y&&s.y+18>=p.y&&s.x>p.x-10&&s.x<p.x+p.w+10){s.y=p.y-18;s.vy=0;s.grounded=true;}}if(s.prevY+18<=s.ground&&s.y+18>=s.ground){s.y=s.ground-18;s.vy=0;s.grounded=true;}}
  if(s.y<h*.38){const dy=h*.38-s.y;s.y=h*.38;s.prevY=s.y;s.camera+=dy;s.ground+=dy;for(const p of s.plats)p.y+=dy;setScore(s.camera/8);}
  s.plats=s.plats.filter(p=>p.y<h+30);while(s.plats.length<7){const top=Math.min(...s.plats.map(p=>p.y));s.plats.push({x:rand(10,w-120),y:top-rand(75,115),w:rand(75,125)});}
  for(const p of s.plats)rect(p.x,p.y,p.w,12,"#55e6a5");
