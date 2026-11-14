@@ -98,6 +98,41 @@ await Promise.all(Array.from({ length: workers }, async () => {
   }
 }));
 
+// Check the two custom interfaces touched by this maintenance pass.
+const uiAudit = { leaderboard: {}, blockyCombat: {} };
+try {
+  const page = await browser.newPage({ viewport: { width: 1365, height: 768 } });
+  const errors = [];
+  page.on("pageerror", e => errors.push(String(e.message || e).slice(0, 220)));
+  const response = await page.goto(BASE + "/leaderboard/", { waitUntil: "domcontentloaded", timeout: 16000 });
+  await page.waitForTimeout(1200);
+  const state = await page.evaluate(() => ({
+    hasScoreList: !!document.getElementById("score-list"),
+    hasLogoFunction: typeof getGameLogo === "function",
+    logoCount: typeof catalogLogos !== "undefined" ? catalogLogos.size : 0,
+    blockyLogo: typeof getGameLogo === "function" ? getGameLogo("Blocky Combat SWAT Time") : ""
+  })).catch(() => ({ hasScoreList: false, hasLogoFunction: false, logoCount: 0, blockyLogo: "" }));
+  uiAudit.leaderboard = { status: response?.status() || null, ...state, errors };
+  await page.close();
+} catch (e) {
+  uiAudit.leaderboard.error = String(e.message || e).slice(0, 300);
+}
+try {
+  const page = await browser.newPage({ viewport: { width: 1365, height: 768 } });
+  const errors = [];
+  page.on("pageerror", e => errors.push(String(e.message || e).slice(0, 220)));
+  const response = await page.goto(BASE + "/g/duckdb2-blocky-combat-swat-main/", { waitUntil: "domcontentloaded", timeout: 16000 });
+  await page.waitForTimeout(1200);
+  const state = await page.evaluate(() => ({
+    timer: document.getElementById("arcade-playtime-timer")?.textContent || "",
+    scoreService: !!(window.ArcadeScores && typeof window.ArcadeScores.submitSession === "function")
+  }));
+  uiAudit.blockyCombat = { status: response?.status() || null, ...state, errors };
+  await page.close();
+} catch (e) {
+  uiAudit.blockyCombat.error = String(e.message || e).slice(0, 300);
+}
+
 // DuckMath is backed by its own live catalog service. Verify its app list and
 // test each returned game's page wrapper before adding it to Arcade Atlas.
 const duckmath = { homeStatus: null, dynamicCards: 0, cachedApps: 0, checked: 0, verified: [], broken: [], error: "" };
@@ -200,6 +235,7 @@ const report = {
   catalogFailed: results.filter(r => r.hardFailure),
   catalogWarnings: results.filter(r => r.pageErrors.length || r.externalFailures.length),
   duckmath,
+  uiAudit,
   duckmathAddedToArcadeAtlas: uniqueAdditions.map(g => g.title)
 };
 await writeFile("arcade-atlas-game-audit.json", JSON.stringify(report, null, 2) + "\n");
@@ -215,6 +251,8 @@ if (process.env.GITHUB_STEP_SUMMARY) {
     `- DuckMath game pages verified: ${duckmath.verified.length}`,
     `- DuckMath game pages not verified: ${duckmath.broken.length}`,
     `- New DuckMath games added to Arcade Atlas: ${uniqueAdditions.length}`,
+    `- Leaderboard logo map loaded: ${uiAudit.leaderboard.logoCount || 0}`,
+    `- Blocky Combat timer detected: ${!!uiAudit.blockyCombat.timer}`,
     "",
     "## Arcade Atlas hard failures",
     ...report.catalogFailed.map(x => `- ${x.title}: HTTP ${x.status || "no response"}; ${x.navigationError || x.localFailures.map(y => y.url).join(", ")}`),
