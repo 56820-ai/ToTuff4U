@@ -92,10 +92,12 @@
     }
     try {
       await submitThroughServer(gameTitle, scoreText, playerName, "score", false);
+      window.ArcadeScores.lastSubmitError = "";
       console.info("Arcade Atlas: high score submitted.");
       return true;
     } catch (error) {
-      console.warn("Arcade Atlas: high score was not submitted.", error.message);
+      window.ArcadeScores.lastSubmitError = error && error.message ? error.message : String(error);
+      console.warn("Arcade Atlas: high score was not submitted.", window.ArcadeScores.lastSubmitError);
       window.alert("Your score could not be added to the leaderboard.\\n\\nReason: " + error.message);
       return false;
     }
@@ -156,5 +158,5 @@
     return submit(gameTitle, score, playerName);
   }
 
-  window.ArcadeScores = { configured, submit, submitSession, getScores, getPlayerName, promptAndSubmit, lastLoadError: "" };
+  window.ArcadeScores = { configured, submit, submitSession, getScores, getPlayerName, promptAndSubmit, lastLoadError: "", lastSubmitError: "" };
 })();
