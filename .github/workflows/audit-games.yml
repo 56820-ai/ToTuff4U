@@ -6,6 +6,8 @@ on:
     paths:
       - "games.json"
       - "g/**"
+      - "images/**"
+      - "index.html"
       - "duckmath-site/**"
       - "scripts/audit-games.mjs"
       - "leaderboard/index.html"
