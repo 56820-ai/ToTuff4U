@@ -1,5 +1,9 @@
 name: Import DuckMath portal
 
+concurrency:
+  group: duckmath-import
+  cancel-in-progress: false
+
 on:
   workflow_dispatch:
   push:
