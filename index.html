@@ -2134,10 +2134,12 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
     <button class="patch-notes-close" id="closePatchNotes" aria-label="Close patch notes">&times;</button>
     <div class="patch-notes-kicker">WHAT'S NEW</div>
     <h2 id="patchNotesTitle">Arcade Atlas Update</h2>
-    <p class="patch-notes-date">November 13, 2026 · Latest updates</p>
+    <p class="patch-notes-date">November 14, 2026 · Latest updates</p>
     <div class="patch-notes-content">
       <h3>🎮 New games</h3>
       <ul>
+        <li>Added Doge Miner, Deadshot.io, Google Snake, Paper.io 2, Tank Trouble, and Hide & Smash.</li>
+        <li>Added Color Clash, Whack-a-Mole, Neon Racer, and Mario Kart 64.</li>
         <li>Added Arcade 3D, with five browser-playable 3D modes.</li>
         <li>Added Nightmaze, an original Unity 6 WebGL horror game.</li>
         <li>Added Cube Libre, a browser-based WebGL 2 3D survival game.</li>
@@ -2167,6 +2169,8 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
       </ul>
       <h3>🛠️ Site updates</h3>
       <ul>
+        <li>Added a Recently Played row that remembers your last eight games on this device.</li>
+        <li>Updated Arcade Atlas browser-tab branding and created original artwork for new games.</li>
         <li>Added a Privacy Policy and linked it in the sidebar and footer.</li>
         <li>Added a What's New popup with a link to the full patch notes.</li>
         <li>Cleaned up advertising snippets and kept the Google AdSense integration.</li>
@@ -2209,7 +2213,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 </style>
 <script>
 (function(){
-  const version="2026-11-13-5";
+  const version="2026-11-14-1";
   const overlay=document.getElementById("patchNotesOverlay");
   const reopen=document.getElementById("reopenPatchNotes");
   const close=()=>{overlay.classList.remove("visible");overlay.setAttribute("aria-hidden","true");localStorage.setItem("arcadeAtlasPatchNotesSeen",version);reopen.style.display="block";};
