@@ -33,7 +33,7 @@ function categoryFor(value) {
 }
 function suitableForMiddleSchool(app) {
   const text = [app?.title, app?.categories, app?.description].flat().join(" ").toLowerCase();
-  return !/(horror|gore|blood|adult|nsfw|sexual|nudity|18\\+|casino|gambling|mortal kombat|doom|omori|fnaf|five nights at freddy|granny|poppy playtime)/i.test(text);
+  return !/(horror|gore|blood|adult|nsfw|sexual|nudity|casino|gambling|mortal kombat|doom|omori|fnaf|five nights at freddy|granny|poppy playtime)/i.test(text);
 }
 function normalizeIcon(icon) {
   if (typeof icon !== "string" || !icon.trim()) return "";
