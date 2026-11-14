@@ -128,15 +128,22 @@
 
   async function getScores() {
     window.ArcadeScores.lastLoadError = "";
+    const pageSize = 500;
+    const allScores = [];
     try {
-      // Fetch the entire score history in pages. A single 1,000-row query can
-      // hide games whose scores are older or smaller than the busiest games.
-      const pageSize = 1000;
-      const allScores = [];
+      // Use PostgREST's Range headers for explicit, stable pagination.
+      // A unique secondary key prevents records sharing a timestamp from
+      // shifting between pages and being skipped.
       for (let offset = 0; ; offset += pageSize) {
         const page = await request(
-          "scores?select=id,player_name,game_title,score,created_at&order=created_at.desc,id.asc&limit=" + pageSize + "&offset=" + offset,
-          { method: "GET" }
+          "scores?select=id,player_name,game_title,score,created_at&order=created_at.desc,id.asc",
+          {
+            method: "GET",
+            headers: {
+              "Range-Unit": "items",
+              "Range": offset + "-" + (offset + pageSize - 1)
+            }
+          }
         );
         if (!Array.isArray(page) || page.length === 0) break;
         allScores.push(...page);
@@ -145,8 +152,9 @@
       return allScores;
     } catch (error) {
       window.ArcadeScores.lastLoadError = error && error.message ? error.message : String(error);
-      console.warn("Arcade Atlas: could not load online scores.", window.ArcadeScores.lastLoadError);
-      return [];
+      console.warn("Arcade Atlas: could not load every score page.", window.ArcadeScores.lastLoadError);
+      // Keep already-loaded rows visible if a later page fails.
+      return allScores;
     }
   }
 
