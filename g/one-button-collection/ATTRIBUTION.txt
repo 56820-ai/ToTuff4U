@@ -1,5 +1,0 @@
-Source repository: https://github.com/abagames/crisp-game-lib-games
-Upstream author: abagames
-License: MIT (see LICENSE.txt and README-UPSTREAM.md)
-Upstream commit: cfb39d2f988feb5918eb83697145b5a35adabf58
-Game source files and screenshots are stored locally. The upstream index.html loads crisp-game-lib and helper libraries from their published CDN URLs.
