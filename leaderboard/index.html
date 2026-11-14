@@ -574,7 +574,29 @@
       [...byGame.entries()].sort((a,b) => a[0].localeCompare(b[0])).forEach(([key, players]) => {
         // Reaction Test stores an inverted score (10000 - milliseconds),
         // so a higher stored value means a faster reaction and ranks first.
-        players.sort((a,b) => Number(b.score) - Number(a.score));
+        if (timedGames.has(key)) {
+          // Session records are accumulated so the podium ranks each player
+          // by their total visible playtime, not their longest single session.
+          const totalByPlayer = new Map();
+          players.forEach(item => {
+            const playerKey = String(item.player_name || "").trim().toLocaleLowerCase();
+            if (!playerKey) return;
+            const seconds = Math.max(0, Number(item.score) || 0);
+            const previous = totalByPlayer.get(playerKey);
+            if (!previous) {
+              totalByPlayer.set(playerKey, { ...item, score: seconds });
+            } else {
+              previous.score += seconds;
+              if (item.created_at && (!previous.created_at || new Date(item.created_at) > new Date(previous.created_at))) {
+                previous.created_at = item.created_at;
+              }
+            }
+          });
+          players = [...totalByPlayer.values()].sort((a,b) => Number(b.score) - Number(a.score));
+        } else {
+          // Higher scores rank first for ordinary high-score games.
+          players.sort((a,b) => Number(b.score) - Number(a.score));
+        }
         // Cookie Clicker ranks each player only once using their personal best.
         // This prevents repeated runs by one person from occupying the whole podium.
         if (key === "cookie clicker") {
