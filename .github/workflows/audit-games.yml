@@ -59,13 +59,13 @@ jobs:
         if: success()
         run: |
           if git diff --quiet -- games.json duckmath-site/disabled-games.json; then
-            echo "No new verified DuckMath games to add."
+            echo "No catalog changes needed."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add games.json duckmath-site/disabled-games.json
-          git commit -m "Add verified DuckMath games to Arcade Atlas"
+          git commit -m "Commit verified Arcade Atlas catalog cleanup"
           git pull --rebase origin main
           git push
       - name: Upload browser audit report
