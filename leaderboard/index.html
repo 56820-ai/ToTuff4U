@@ -472,8 +472,8 @@
           if (!key || !image) return;
           const external = image.startsWith("https://") || image.startsWith("http://") ||
             image.startsWith("data:") || image.startsWith("blob:") || image.startsWith("//");
-          const resolved = external ? image :
-            image.startsWith("/ToTuff4U/") ? image : "../" + image.replace(/^\/+/, "");
+          const cleanImage = image.startsWith("/") ? image.slice(1) : image;
+          const resolved = external ? image : image.startsWith("/ToTuff4U/") ? image : "../" + cleanImage;
           catalogLogos.set(key, resolved);
         });
       } catch (error) {
