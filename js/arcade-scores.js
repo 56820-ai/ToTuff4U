@@ -58,7 +58,7 @@
       body: JSON.stringify({
         player_name: playerName,
         game_title: String(gameTitle).slice(0, 60),
-        score: Number(score),
+        score: typeof score === "bigint" ? score.toString() : String(score),
         kind: kind
       })
     });
