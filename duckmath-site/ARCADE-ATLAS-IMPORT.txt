@@ -1,0 +1,1 @@
+Source: https://github.com/Neruvy/duckmath\nUpstream license: Apache-2.0 (repository LICENSE).\nImported from commit: 754add4cb0ae01d76128692ba797d57cf5224adb\nNote: the games catalog and individual game builds are served by DuckMath's upstream services; this mirror hosts the portal files.\n

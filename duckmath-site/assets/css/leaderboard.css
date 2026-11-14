@@ -1,0 +1,115 @@
+/*? Default CSS */
+@import url("https://fonts.googleapis.com/css2?family=Space+Mono&display=swap");
+
+body {
+  background-color: #1f2028;
+}
+
+/* Remove huge padding-bottom set inline on this page */
+body.body {
+  padding-bottom: 0 !important;
+}
+
+.main {
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  position: relative;
+  width: 80%;
+  min-height: 60vh;
+  margin: 10rem auto 3rem;
+  transform: none;
+}
+
+.leaderboard-title {
+  text-align: center;
+  color: #ff0000;
+  font-size: 7.5rem;
+  font-weight: 600;
+  margin: 0;
+  margin-top: 3rem;
+  cursor: default;
+}
+
+/** Score Cards */
+.score-card {
+  display: flex;
+  flex-direction: row;
+  margin-top: 35px;
+  margin-bottom: 35px;
+  border-radius: 1rem;
+  font-family: "Space Mono", monospace;
+  background: rgba(255, 0, 0, 1);
+  width: 65%;
+  transform: translate(27.5%, 27.5%);
+  padding: 15px;
+  padding-left: 1.5rem;
+  justify-content: space-between;
+  transition: all 0.25s ease-in-out;
+}
+
+.score-card:hover {
+  box-shadow: rgba(255, 0, 0, 0.1) 0px 1px 0px,
+    rgba(255, 0, 0, 0.1) 0px 8px 24px, rgba(255, 0, 0, 0.1) 0px 16px 48px;
+}
+
+.game-icon {
+  width: 200px;
+  height: 200px;
+  border-radius: 10px;
+  transition: all 0.25s cubic-bezier(0.05, 0.75, 0.12, 0.97);
+}
+
+.game-icon:hover {
+  transform: scale(1.025);
+}
+
+.game-icon:active {
+  transform: scale(0.975);
+}
+
+.card-text-align {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.card-text {
+  color: black;
+  margin: 0px;
+  min-width: 20rem;
+  cursor: default;
+}
+
+.game-icon-container {
+  width: 200px;
+  height: 200px;
+}
+
+/** Submit Button */
+.submit-score {
+  margin-top: 2rem;
+  font-size: 4rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  background-color: rgba(39, 48, 67, 0.5);
+  color: #fff;
+  border-radius: 1rem;
+  max-width: max-content;
+  padding: 0px 30px 0px 30px;
+  transition: all 0.25s cubic-bezier(0.05, 0.75, 0.12, 0.97);
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+}
+
+.submit-score:hover {
+  transform: scale(0.95);
+}
+
+.submit-score:active {
+  transform: scale(0.925);
+}
+
+.center-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

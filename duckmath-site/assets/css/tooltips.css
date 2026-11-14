@@ -1,0 +1,47 @@
+.tooltip {
+  visibility: visible;
+}
+
+.tooltiptext {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  font-size: 16px;
+  visibility: hidden;
+  width: 312px;
+  color: rgb(199, 190, 12);
+  text-align: left;
+  border-radius: 6px;
+  padding: 1px 2px;
+  position: absolute;
+  z-index: 1;
+  border: 3px dotted rgb(89, 88, 88);
+  left: 2px;
+  top: 105px;
+  opacity: 0;
+  transition: opacity 0.5s;
+  line-height: 150%;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
+
+.tooltip .tooltiptext:hover {
+  visibility: hidden;
+  opacity: 0;
+}
+.tag {
+  position: absolute;
+  width: auto;
+}
+
+.message {
+  width: 100rem;
+  align-items: center;
+  justify-content: center;
+  margin-left: 2rem;
+  padding-left: 10px;
+}

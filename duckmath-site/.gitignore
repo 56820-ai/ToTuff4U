@@ -1,0 +1,12 @@
+*.idea
+*.iml
+/node_modules/
+/package.json
+/package-lock.json
+.vscode
+/firebase/files/
+.env
+.env/
+.env/firebase_config.env
+env/
+ignore
