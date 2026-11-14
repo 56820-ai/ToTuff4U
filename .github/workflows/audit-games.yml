@@ -1,4 +1,4 @@
-name: Audit and import verified games
+name: Audit Arcade Atlas games
 
 on:
   push:
@@ -30,6 +30,7 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     timeout-minutes: 30
     steps:
+      # Browser smoke tests also validate locally imported GitHub games.
       - name: Check out Arcade Atlas
         uses: actions/checkout@v4
       - name: Set up Node
@@ -52,9 +53,9 @@ jobs:
           done
           cat /tmp/arcade-server.log
           exit 1
-      - name: Audit Arcade Atlas and DuckMath in Chromium
+      - name: Audit Arcade Atlas games in Chromium
         run: node scripts/audit-games.mjs
-      - name: Commit verified DuckMath catalog additions
+      - name: Commit verified game catalog cleanup
         if: success()
         run: |
           if git diff --quiet -- games.json duckmath-site/disabled-games.json; then
