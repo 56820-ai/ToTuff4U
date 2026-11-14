@@ -12,7 +12,7 @@
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8390067368864065"
      crossorigin="anonymous"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home-Classroom</title>
+    <title>Arcade Atlas | Free Online Games</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 48 48%27%3E%3Crect width=%2748%27 height=%2748%27 rx=%279%27 fill=%27%230F9D58%27/%3E%3Cpath d=%27M8 12h32v24H8z%27 fill=%27white%27/%3E%3Cpath d=%27M12 16h24v16H12z%27 fill=%27%234285F4%27/%3E%3Ccircle cx=%2724%27 cy=%2720%27 r=%274%27 fill=%27%23F4B400%27/%3E%3Cpath d=%27M16 30c1-5 4-7 8-7s7 2 8 7%27 fill=%27%23F4B400%27/%3E%3C/svg%3E">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
@@ -1306,6 +1306,11 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
                     </div>
                 </div>
 
+                <section id="recent-games-section" aria-label="Recently played games">
+                    <h2 class="section-title">RECENTLY PLAYED</h2>
+                    <div class="games-grid" id="recent-games-grid"></div>
+                </section>
+
                 <h2 class="section-title">ALL GAMES</h2>
                 <div class="catalog-tools">
                     <label class="sr-only" for="categoryFilter">Filter games by category</label>
@@ -1675,6 +1680,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
             link.target = '_blank';
             link.rel = 'noopener noreferrer';
             link.style.cssText = 'text-decoration:none;color:inherit';
+            link.addEventListener('click', () => recordRecentGame(game));
             const img = document.createElement('img');
             img.src = game.image || makeGameIconFallback(game);
             img.alt = game.title || 'Game icon';
@@ -1693,19 +1699,64 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         });
     }
 
+    function getRecentGames() {
+        try {
+            const saved = JSON.parse(localStorage.getItem('recentGames') || '[]');
+            if (!Array.isArray(saved)) return [];
+            return saved.slice(0, 8).map(item => {
+                const current = cachedGames.find(game => normalizeGamePath(game.path) === normalizeGamePath(item.path));
+                return current || item;
+            }).filter(game => game && game.path);
+        } catch (error) {
+            console.warn('Could not read recent games:', error);
+            return [];
+        }
+    }
+
+    function recordRecentGame(game) {
+        if (!game || !game.path) return;
+        try {
+            const current = getRecentGames().filter(item => normalizeGamePath(item.path) !== normalizeGamePath(game.path));
+            current.unshift({ path: game.path, title: game.title || 'Game', image: game.image || '', category: game.category || 'ARCADE' });
+            localStorage.setItem('recentGames', JSON.stringify(current.slice(0, 8)));
+            updateRecentSection();
+        } catch (error) {
+            console.warn('Could not save recent game:', error);
+        }
+    }
+
+    function updateRecentSection() {
+        const section = document.getElementById('recent-games-section');
+        const container = document.getElementById('recent-games-grid');
+        if (!section || !container) return;
+        const recent = getRecentGames();
+        container.innerHTML = '';
+        if (!recent.length) {
+            const message = document.createElement('p');
+            message.className = 'no-favorites-message';
+            message.textContent = 'Games you open will show up here for quick access.';
+            container.appendChild(message);
+            return;
+        }
+        renderGames(recent, container);
+    }
+
     async function searchGames() {
         const query = document.getElementById('searchInput').value.toLowerCase().trim();
         const category = (document.getElementById('categoryFilter') || {}).value || '';
         const allGamesGrid = document.getElementById('all-games-grid');
         const favoritesSection = document.getElementById('favorites-section');
         const favoritesHeading = document.getElementById('favorites-heading');
+        const recentSection = document.getElementById('recent-games-section');
 
         if (query === '' && !category) {
             favoritesSection.style.display = 'block';
             favoritesHeading.style.display = 'block';
+            if (recentSection) recentSection.style.display = 'block';
         } else {
             favoritesSection.style.display = 'none';
             favoritesHeading.style.display = 'none';
+            if (recentSection) recentSection.style.display = 'none';
         }
 
         allGamesGrid.innerHTML = '';
@@ -1750,6 +1801,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
             return;
         }
         const game = eligible[Math.floor(Math.random() * eligible.length)];
+        recordRecentGame(game);
         window.open(buildGameHref(game.path), '_blank', 'noopener,noreferrer');
     }
 
@@ -1764,6 +1816,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
             link.target = '_blank';
             link.rel = 'noopener noreferrer';
             link.style.cssText = 'text-decoration:none;color:inherit';
+            link.addEventListener('click', () => recordRecentGame(game));
             const img = document.createElement('img');
             img.src = game.image || makeGameIconFallback(game);
             img.alt = game.title || 'Game icon';
@@ -2057,6 +2110,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         renderGames(allGames, allGamesGrid);
         
         updateFavoritesSection();
+        updateRecentSection();
         
         function updateTime() {
             const timeElement = document.getElementById("time");
@@ -2180,7 +2234,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         google: ['Google', 'https://www.google.com/favicon.ico'],
         classroom: ['Google Classroom', 'https://ssl.gstatic.com/classroom/favicon.png'],
         docs: ['Google Docs', new URL('favicon/googledocs.png', document.baseURI).href],
-        default: ['Home-Classroom', defaultIcon]
+        default: ['Arcade Atlas', defaultIcon]
     };
     function applyCloak(type) {
         const selected = choices[type] || choices.default;
