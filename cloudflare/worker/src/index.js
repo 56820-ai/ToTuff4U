@@ -107,9 +107,70 @@ export default {
       const limit = Number.isSafeInteger(rawLimit) ? Math.max(1, Math.min(rawLimit, 20000)) : 20000;
       const offset = Number.isSafeInteger(rawOffset) ? Math.max(0, rawOffset) : 0;
       try {
-        const result = await env.DB.prepare(
-          "SELECT id, player_name, game_title, score, created_at FROM scores ORDER BY created_at DESC, id ASC LIMIT ? OFFSET ?"
-        ).bind(limit, offset).all();
+        // Return only the three podium entries per game. This keeps browser
+        // responses small instead of sending the entire score history.
+        const result = await env.DB.prepare(`
+          WITH base AS (
+            SELECT
+              id, player_name, game_title, score, created_at,
+              lower(trim(game_title)) AS game_key,
+              lower(trim(player_name)) AS player_key,
+              CASE WHEN ltrim(score, '0') = '' THEN '0' ELSE ltrim(score, '0') END AS normalized_score
+            FROM scores
+          ),
+          cookie_best AS (
+            SELECT *,
+              ROW_NUMBER() OVER (
+                PARTITION BY player_key
+                ORDER BY length(normalized_score) DESC, normalized_score DESC, created_at DESC, id ASC
+              ) AS player_rank
+            FROM base
+            WHERE game_key = 'cookie clicker'
+          ),
+          cookie_top AS (
+            SELECT *,
+              ROW_NUMBER() OVER (
+                ORDER BY length(normalized_score) DESC, normalized_score DESC, created_at DESC, id ASC
+              ) AS game_rank
+            FROM cookie_best
+            WHERE player_rank = 1
+          ),
+          timed_totals AS (
+            SELECT game_key, player_key, SUM(CAST(score AS INTEGER)) AS total_score,
+              MAX(created_at) AS latest_created_at
+            FROM base
+            WHERE game_key IN ('minecraft', 'retro bowl time', 'blocky combat swat time')
+            GROUP BY game_key, player_key
+          ),
+          timed_top AS (
+            SELECT
+              (SELECT b.id FROM base b WHERE b.game_key = t.game_key AND b.player_key = t.player_key ORDER BY b.created_at DESC, b.id ASC LIMIT 1) AS id,
+              (SELECT b.player_name FROM base b WHERE b.game_key = t.game_key AND b.player_key = t.player_key ORDER BY b.created_at DESC, b.id ASC LIMIT 1) AS player_name,
+              (SELECT b.game_title FROM base b WHERE b.game_key = t.game_key AND b.player_key = t.player_key ORDER BY b.created_at DESC, b.id ASC LIMIT 1) AS game_title,
+              CAST(t.total_score AS TEXT) AS score,
+              t.latest_created_at AS created_at,
+              ROW_NUMBER() OVER (
+                PARTITION BY t.game_key
+                ORDER BY t.total_score DESC, t.latest_created_at DESC, t.player_key ASC
+              ) AS game_rank
+            FROM timed_totals t
+          ),
+          normal_top AS (
+            SELECT *,
+              ROW_NUMBER() OVER (
+                PARTITION BY game_key
+                ORDER BY length(normalized_score) DESC, normalized_score DESC, created_at DESC, id ASC
+              ) AS game_rank
+            FROM base
+            WHERE game_key NOT IN ('cookie clicker', 'minecraft', 'retro bowl time', 'blocky combat swat time')
+              AND (game_key <> 'slope' OR CAST(score AS INTEGER) <= 1500)
+          )
+          SELECT id, player_name, game_title, score, created_at FROM normal_top WHERE game_rank <= 3
+          UNION ALL
+          SELECT id, player_name, game_title, score, created_at FROM cookie_top WHERE game_rank <= 3
+          UNION ALL
+          SELECT id, player_name, game_title, score, created_at FROM timed_top WHERE game_rank <= 3
+        `).all();
         return json(result.results || []);
       } catch (error) {
         console.error("Leaderboard read failed:", error);
