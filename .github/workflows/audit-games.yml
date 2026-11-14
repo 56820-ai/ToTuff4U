@@ -8,6 +8,8 @@ on:
       - "g/**"
       - "duckmath-site/**"
       - "scripts/audit-games.mjs"
+      - "leaderboard/index.html"
+      - "js/timeTracker.js"
       - ".github/workflows/audit-games.yml"
   workflow_dispatch:
 
@@ -40,9 +42,12 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Start local static server
         run: |
+          mkdir -p /tmp/arcade-web
+          ln -s "$GITHUB_WORKSPACE" /tmp/arcade-web/ToTuff4U
+          cd /tmp/arcade-web
           python3 -m http.server 4173 > /tmp/arcade-server.log 2>&1 &
           for i in $(seq 1 30); do
-            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then exit 0; fi
+            if curl -fsS http://127.0.0.1:4173/ToTuff4U/ >/dev/null; then exit 0; fi
             sleep 1
           done
           cat /tmp/arcade-server.log
