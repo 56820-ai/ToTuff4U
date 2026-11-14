@@ -1,0 +1,62 @@
+name: Import DuckMath portal
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/import-duckmath.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  import-duckmath:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Arcade Atlas
+        uses: actions/checkout@v4
+      - name: Import DuckMath static site
+        shell: bash
+        run: |
+          set -euo pipefail
+          tmp="$(mktemp -d)"
+          git clone --depth 1 https://github.com/Neruvy/duckmath.git "$tmp/duckmath"
+          mkdir -p duckmath-site
+          rsync -a --delete --exclude='.git' --exclude='.github' --exclude='.idea' "$tmp/duckmath/" duckmath-site/
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          root = Path("duckmath-site")
+          prefix = "/ToTuff4U/duckmath-site"
+          path_pattern = re.compile(r'(?<![A-Za-z0-9:])/(assets|g4m3s|more|blog)(?=/)')
+          page_pattern = re.compile(r'(?<![A-Za-z0-9:])/(about|leaderboard|advertise|404|g404|loading)\\.html')
+          for file in root.rglob("*"):
+              if not file.is_file() or file.suffix.lower() not in {".html", ".js", ".css", ".json", ".xml", ".txt"}:
+                  continue
+              try:
+                  text = file.read_text(encoding="utf-8")
+              except UnicodeDecodeError:
+                  continue
+              text = path_pattern.sub(lambda m: prefix + "/" + m.group(1), text)
+              text = page_pattern.sub(lambda m: prefix + "/" + m.group(1) + ".html", text)
+              text = text.replace('href="/"', 'href="' + prefix + '/"')
+              text = text.replace("href='/'", "href='" + prefix + "/'")
+              text = text.replace('a.href = "/"', 'a.href = "' + prefix + '/"')
+              text = text.replace('window.location.href = "/"', 'window.location.href = "' + prefix + '/"')
+              file.write_text(text, encoding="utf-8")
+          PY
+          test -f duckmath-site/index.html
+          test -f duckmath-site/g4m3s/index.html
+          test -f duckmath-site/assets/img/duck.webp
+          printf '%s\\n' "Source: https://github.com/Neruvy/duckmath" "Upstream license: Apache-2.0 (repository LICENSE)." "Imported from commit: $(git -C "$tmp/duckmath" rev-parse HEAD)" "Note: the games catalog and individual game builds are served by DuckMath's upstream services; this mirror hosts the portal files." > duckmath-site/ARCADE-ATLAS-IMPORT.txt
+      - name: Commit imported site
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add duckmath-site
+          git commit -m "Import DuckMath portal source" || echo "No upstream changes to import"
+          git pull --rebase origin main
+          git push
