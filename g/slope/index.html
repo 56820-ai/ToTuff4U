@@ -152,7 +152,7 @@
                     rawText = data.words.map(function (word) { return word.text || ""; }).join(" ");
                 }
                 var t = normalized(rawText);
-                return /leader ?board|play again|try again|game over|you crashed|crash(ed)?|run over|restart|new game/.test(t);
+                return /play again|try again|game over|you crashed|crash(ed)?|run over/.test(t);
             }
             function extractScore(result) {
                 var data = result && result.data || {};
@@ -330,15 +330,18 @@
                     // takes a few more samples so a brief pause during play won't end a run.
                     stoppedHits = gameStarted && !moving ? stoppedHits + 1 : 0;
                     var textEnded = false;
-                    if (gameStarted && !moving && stoppedHits >= 1) {
+                    // The death screen can appear even when the motion sampler misses
+                    // gameplay (for example, a small/letterboxed Unity canvas). Inspect
+                    // the full canvas after it settles; do not gate this on gameStarted.
+                    if (!moving && stoppedHits >= 2) {
                         var screenText = await readGameState(canvas);
                         textEnded = isRunEnded(screenText);
                     }
 
-                    // Faster stillness fallback: 3 half-second samples instead of 4
-                    // 1.1-second samples. Text-confirmed death can submit immediately.
+                    // Explicit end-screen text is sufficient evidence by itself.
+                    // Stillness alone remains a fallback only after actual gameplay.
                     var ended = textEnded || (gameStarted && stoppedHits >= 3);
-                    if (ended && gameStarted) {
+                    if (ended) {
                         var endScoreReading = await readEndScreenScore(canvas);
                         // A single clear end-screen reading is enough to submit.
                         // Requiring identical OCR on two consecutive scans was too
