@@ -16,7 +16,7 @@ function reset(){score=0;over=false;started=true;last=0;statusEl.textContent="";
 document.getElementById("restart").onclick=reset;
 addEventListener("keydown",e=>{keys[e.key.toLowerCase()]=true;if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"," "].includes(e.key))e.preventDefault();if(e.key.toLowerCase()==="r"&&over)reset();});
 addEventListener("keyup",e=>keys[e.key.toLowerCase()]=false);
-canvas.addEventListener("pointerdown",e=>{const r=canvas.getBoundingClientRect();touchX=e.clientX-r.left;keys[touchX<r.width/2?"arrowleft":"arrowright"]=true;});
+canvas.addEventListener("pointerdown",e=>{const r=canvas.getBoundingClientRect();touchX=e.clientX-r.left;if(mode==="asteroids"){state.x=clamp(touchX,20,w-20);state.bullets.push({x:state.x,y:state.y-20});}else if(mode==="hopper"&&e.clientY-r.top<r.height*.65){keys[" "]=true;}else if(mode==="maze"){const cell=Math.min((w-30)/10,(h-90)/10),ox=(w-cell*10)/2,oy=(h-cell*10)/2,tx=Math.floor((touchX-ox)/cell),ty=Math.floor((e.clientY-r.top-oy)/cell);if(tx>state.x)keys.arrowright=true;else if(tx<state.x)keys.arrowleft=true;else if(ty>state.y)keys.arrowdown=true;else if(ty<state.y)keys.arrowup=true;}else keys[touchX<r.width/2?"arrowleft":"arrowright"]=true;});
 addEventListener("pointerup",()=>{keys.arrowleft=false;keys.arrowright=false;});
 let state={};
 function init(){
@@ -81,7 +81,7 @@ function drawMaze(){
 function drawColors(dt){
  const s=state;s.time-=dt;if(s.time<=0){s.time=0;finish("Time's up! Score: "+score);return;}
  s.tick+=dt;rect(0,0,w,h,"#101b37");text("TAP THE TARGET COLOR",w/2,68,26,"#fff","center");text(colors[s.target].toUpperCase(),w/2,116,23,colors[s.target],"center");
- const size=Math.min(100,(w-90)/3),gap=15,startX=(w-(size*3+gap*2))/2,startY=160;
+ const size=Math.min(100,(w-60)/3,(h-160)/3),gap=10,startX=(w-(size*3+gap*2))/2,startY=130;
  s.tiles.forEach((c,i)=>{const x=startX+(i%3)*(size+gap),y=startY+Math.floor(i/3)*(size+gap);rect(x,y,size,size,colors[c]);ctx.strokeStyle="#fff";ctx.lineWidth=3;ctx.strokeRect(x,y,size,size);});
  text("Time: "+Math.ceil(s.time)+"s",w/2,h-28,19,"#fff","center");
  if(s.tick>.75){s.tick=0;s.target=Math.floor(rand(0,6));}
@@ -89,7 +89,7 @@ function drawColors(dt){
 function init(){if(mode==="racer")state={lane:1,ob:[],tick:0,road:0};if(mode==="hopper"){state={x:w/2,y:h-46,vy:0,camera:0,grounded:true,prevY:h-46,plats:[{x:w/2-70,y:h-28,w:140},{x:w/2-30,y:h-130,w:110},{x:w/2+80,y:h-225,w:100},{x:w/2-150,y:h-320,w:100}]};}if(mode==="asteroids")state={x:w/2,y:h-65,bullets:[],rocks:[],tick:0};if(mode==="maze")state={map:["##########","#..#.....#","#..#.#...#","#....#.#.#","###..#.#.#","#....#...#","#.####.###","#........#","#.##.##..#","##########"],x:1,y:1,gems:[[4,1],[7,2],[2,5],[7,7],[4,8]],exit:[8,8]};if(mode==="colors")state={target:Math.floor(rand(0,6)),time:30,tiles:Array.from({length:9},()=>Math.floor(rand(0,6))),tick:0};}
 function frame(t){if(!last)last=t;const dt=Math.min(.04,(t-last)/1000);last=t;bg();if(!over&&started){if(mode==="racer")drawRacer(dt);if(mode==="hopper")drawHopper(dt);if(mode==="asteroids")drawAsteroids(dt);if(mode==="maze")drawMaze();if(mode==="colors")drawColors(dt);}else if(!started){text(document.title,w/2,h/2-22,32,"#fff","center");text("Press Start to play",w/2,h/2+25,18,"#b7d8e8","center");}requestAnimationFrame(frame);}
 document.getElementById("start").onclick=()=>{reset();};
-canvas.addEventListener("click",e=>{if(mode!=="colors"||!started||over)return;const r=canvas.getBoundingClientRect(),size=Math.min(100,(w-90)/3),gap=15,sx=(w-(size*3+gap*2))/2,sy=160;const col=Math.floor((e.clientX-r.left-sx)/(size+gap)),row=Math.floor((e.clientY-r.top-sy)/(size+gap));if(col<0||col>2||row<0||row>2)return;const idx=row*3+col;if(state.tiles[idx]===state.target){setScore(score+10);state.target=Math.floor(rand(0,6));}else{setScore(Math.max(0,score-5));}}
+canvas.addEventListener("click",e=>{if(mode!=="colors"||!started||over)return;const r=canvas.getBoundingClientRect(),size=Math.min(100,(w-60)/3,(h-160)/3),gap=10,sx=(w-(size*3+gap*2))/2,sy=130;const col=Math.floor((e.clientX-r.left-sx)/(size+gap)),row=Math.floor((e.clientY-r.top-sy)/(size+gap));if(col<0||col>2||row<0||row>2)return;const idx=row*3+col;if(state.tiles[idx]===state.target){setScore(score+10);state.target=Math.floor(rand(0,6));}else{setScore(Math.max(0,score-5));}}
 );
 init();requestAnimationFrame(frame);
 })();
