@@ -34,10 +34,19 @@
   timer.style.cssText = "position:fixed;top:10px;right:10px;z-index:2147483647;padding:7px 11px;background:rgba(0,0,0,.82);color:#fff;border:1px solid #6bffd9;border-radius:8px;font:bold 14px/1.3 monospace;pointer-events:none;";
   (document.body || document.documentElement).appendChild(timer);
 
+  // Persist the per-game total so restarting Blocky Combat does not reset it.
+  var storageKey = "arcadeAtlasPlaytimeTotal:" + path;
   var totalSeconds = 0;
+  try {
+    var savedTotal = Number(localStorage.getItem(storageKey));
+    if (Number.isFinite(savedTotal) && savedTotal > 0) totalSeconds = Math.floor(savedTotal);
+  } catch (e) {}
   var pendingSeconds = 0;
   var segmentStartedAt = document.visibilityState === "hidden" ? null : Date.now();
   var ended = false;
+  function saveTotalSeconds() {
+    try { localStorage.setItem(storageKey, String(totalSeconds)); } catch (e) {}
+  }
   function formatTime(seconds) {
     var d = Math.floor(seconds / 86400);
     var h = Math.floor((seconds % 86400) / 3600);
@@ -56,6 +65,7 @@
     totalSeconds += segmentSeconds;
     pendingSeconds += segmentSeconds;
     segmentStartedAt = null;
+    saveTotalSeconds();
     updateTimer();
     if (pendingSeconds >= 5 && window.ArcadeScores && typeof window.ArcadeScores.submitSession === "function") {
       if (!playerName && typeof window.ArcadeScores.getPlayerName === "function") {
