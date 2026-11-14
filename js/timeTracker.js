@@ -18,9 +18,11 @@
   var path = location.pathname.replace(/\/+$/, "").toLowerCase();
   var isMinecraft = /\/g\/mc\/1\.12\.2$/.test(path);
   var isRetroBowl = /\/g\/retro-bowl$/.test(path);
-  var isBlockyCombat = /\/g\/duckdb2-blocky-combat-swat-main$/.test(path);
-  if (!isMinecraft && !isRetroBowl && !isBlockyCombat) return;
-  var gameTitle = isRetroBowl ? "Retro Bowl Time" : isBlockyCombat ? "Blocky Combat SWAT Time" : "Minecraft";
+  var isBlockyCombat = /\\/g\\/duckdb2-blocky-combat-swat-main$/.test(path);
+  var miniGameTitles = { "neon-racer": "Neon Racer Time", "sky-hop": "Sky Hop Time", "asteroid-rush": "Asteroid Rush Time", "gem-maze": "Gem Maze Time", "color-clash": "Color Clash Time" };
+  var miniGameTitle = miniGameTitles[path.split("/").pop()] || "";
+  if (!isMinecraft && !isRetroBowl && !isBlockyCombat && !miniGameTitle) return;
+  var gameTitle = isRetroBowl ? "Retro Bowl Time" : isBlockyCombat ? "Blocky Combat SWAT Time" : miniGameTitle || "Minecraft";
   var playerName = "";
   try { playerName = (localStorage.getItem("arcadeLeaderboardPlayerName") || "").trim().slice(0, 24); } catch (e) {}
   
@@ -57,7 +59,7 @@
     updateTimer();
     if (pendingSeconds >= 5 && window.ArcadeScores && typeof window.ArcadeScores.submitSession === "function") {
       if (!playerName && typeof window.ArcadeScores.getPlayerName === "function") {
-        playerName = window.ArcadeScores.getPlayerName("Enter your name for the " + (isRetroBowl ? "Retro Bowl" : isBlockyCombat ? "Blocky Combat SWAT" : "Minecraft") + " playtime leaderboard (24 characters max):");
+        playerName = window.ArcadeScores.getPlayerName("Enter your name for the " + gameTitle.replace(/ Time$/, "") + " playtime leaderboard (24 characters max):");
       }
       if (playerName) {
         var submittedSeconds = pendingSeconds;
