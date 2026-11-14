@@ -18,6 +18,7 @@
   var path = location.pathname.replace(/\/+$/, "").toLowerCase();
   var isMinecraft = /\/g\/mc\/1\.12\.2$/.test(path);
   var isRetroBowl = /\/g\/retro-bowl$/.test(path);
+  var isBlockyCombat = /\/g\/duckdb2-blocky-combat-swat-main$/.test(path);
   if (!isMinecraft && !isRetroBowl && !isBlockyCombat) return;
   var gameTitle = isRetroBowl ? "Retro Bowl Time" : isBlockyCombat ? "Blocky Combat SWAT Time" : "Minecraft";
   var playerName = "";
