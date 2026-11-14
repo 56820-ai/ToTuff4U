@@ -542,6 +542,31 @@
       "image": "./duckmath-site/assets/img/icons/doodle.webp",
       "category": "PLATFORMER",
       "source": "https://github.com/freemany/gamedoh"
+    },
+    {
+      "title": "Duck Life 2",
+      "path": "g/ducklife2",
+      "image": "./duckmath-site/assets/img/icons/dl2.webp"
+    },
+    {
+      "title": "Duck Life 3",
+      "path": "g/ducklife3",
+      "image": "./duckmath-site/assets/img/icons/dl3.webp"
+    },
+    {
+      "title": "Duck Life 4",
+      "path": "g/ducklife4",
+      "image": "./duckmath-site/assets/img/icons/dl4.webp"
+    },
+    {
+      "title": "Sandboxels",
+      "path": "g/sandboxels",
+      "image": "g/sandboxels/icons/android-chrome-192x192.png"
+    },
+    {
+      "title": "Doge Miner",
+      "path": "g/dogeminer",
+      "image": "g/dogeminer/img/dogecoin-d.png"
     }
   ]
 }
