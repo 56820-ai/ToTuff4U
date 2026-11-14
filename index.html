@@ -1307,7 +1307,15 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
                 </div>
 
                 <h2 class="section-title">ALL GAMES</h2>
-                
+                <div class="catalog-tools">
+                    <label class="sr-only" for="categoryFilter">Filter games by category</label>
+                    <select id="categoryFilter" onchange="searchGames()" aria-label="Filter games by category">
+                        <option value="">All categories</option>
+                    </select>
+                    <button type="button" class="surprise-button" onclick="playRandomGame()">
+                        <i class="fas fa-dice"></i> Surprise me
+                    </button>
+                </div>
                 <div class="games-grid" id="all-games-grid">
                 </div>
             </div>
@@ -1686,7 +1694,8 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
     }
 
     async function searchGames() {
-        const query = document.getElementById('searchInput').value.toLowerCase();
+        const query = document.getElementById('searchInput').value.toLowerCase().trim();
+        const category = (document.getElementById('categoryFilter') || {}).value || '';
         const allGamesGrid = document.getElementById('all-games-grid');
         const favoritesSection = document.getElementById('favorites-section');
         const favoritesHeading = document.getElementById('favorites-heading');
@@ -1701,11 +1710,43 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 
         allGamesGrid.innerHTML = '';
         const allGames = await loadGames();
-        const filteredGames = allGames.filter(game =>
-            String(game.title || '').toLowerCase().includes(query) ||
-            String(game.category || '').toLowerCase().includes(query)
-        );
+        const filteredGames = allGames.filter(game => {
+            const matchesQuery = String(game.title || '').toLowerCase().includes(query) ||
+                String(game.category || '').toLowerCase().includes(query);
+            const matchesCategory = !category || String(game.category || '').toUpperCase() === category;
+            return matchesQuery && matchesCategory;
+        });
         renderGames(filteredGames, allGamesGrid);
+    }
+
+    function populateCategoryFilter(games) {
+        const filter = document.getElementById('categoryFilter');
+        if (!filter) return;
+        const categories = [...new Set(games.map(game => String(game.category || 'ARCADE').toUpperCase()))].sort();
+        filter.querySelectorAll('option:not(:first-child)').forEach(option => option.remove());
+        categories.forEach(category => {
+            const option = document.createElement('option');
+            option.value = category;
+            option.textContent = category.replace(/-/g, ' ');
+            filter.appendChild(option);
+        });
+    }
+
+    function playRandomGame() {
+        const query = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
+        const category = document.getElementById('categoryFilter')?.value || '';
+        const eligible = cachedGames.filter(game => {
+            const matchesQuery = !query || String(game.title || '').toLowerCase().includes(query) ||
+                String(game.category || '').toLowerCase().includes(query);
+            const matchesCategory = !category || String(game.category || '').toUpperCase() === category;
+            return matchesQuery && matchesCategory && game.path;
+        });
+        if (!eligible.length) {
+            alert('No games match those filters. Try another search or category.');
+            return;
+        }
+        const game = eligible[Math.floor(Math.random() * eligible.length)];
+        window.open(buildGameHref(game.path), '_blank', 'noopener,noreferrer');
     }
 
     function renderGames(games, container) {
@@ -2006,6 +2047,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         }
         
         const allGames = await loadGames();
+        populateCategoryFilter(allGames);
         
         const allGamesGrid = document.getElementById("all-games-grid");
         renderGames(allGames, allGamesGrid);
@@ -2096,6 +2138,15 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 .patch-notes-actions button,.patch-notes-reopen{border:0;border-radius:9px;padding:10px 17px;background:linear-gradient(120deg,#ff6b9d,#9d6bff);color:white;font-weight:bold;cursor:pointer}
 .patch-notes-reopen{position:fixed;right:18px;bottom:18px;z-index:9999;box-shadow:0 5px 20px #0007;display:none}
 @media(max-width:520px){.patch-notes-modal{padding:22px 18px}.patch-notes-content li{font-size:14px}.patch-notes-actions{align-items:flex-start;flex-direction:column}.patch-notes-actions button{width:100%}}
+
+        .catalog-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 18px}
+        #categoryFilter,.surprise-button{min-height:42px;border:1px solid rgba(160,185,220,.2);border-radius:11px;background:#111d32;color:#eaf1ff;padding:0 14px;font:600 13px inherit}
+        #categoryFilter{min-width:180px;cursor:pointer}
+        .surprise-button{cursor:pointer;background:linear-gradient(135deg,#6848d8,#286acb);border-color:transparent;transition:transform .18s ease,filter .18s ease}
+        .surprise-button:hover{transform:translateY(-2px);filter:brightness(1.12)}
+        .surprise-button:focus-visible,#categoryFilter:focus-visible{outline:3px solid #70d9ff;outline-offset:2px}
+        .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+        @media(max-width:560px){.catalog-tools{gap:8px}#categoryFilter,.surprise-button{flex:1;min-width:0}}
 </style>
 <script>
 (function(){
