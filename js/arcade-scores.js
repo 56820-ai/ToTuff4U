@@ -81,15 +81,25 @@
       typeof score === "string" ? score.trim() :
       Number.isSafeInteger(score) && score >= 0 ? String(score) : "";
     if (!playerName) {
+      window.ArcadeScores.lastSubmitError = "No player name was supplied.";
       console.info("Arcade Atlas: a player name is required to submit a high score.");
       return false;
     }
-    if (!/^[0-9]{1,100}$/.test(scoreText) || !gameTitle) return false;
+    if (!/^[0-9]{1,100}$/.test(scoreText)) {
+      window.ArcadeScores.lastSubmitError = "The detected score was not a valid 1–100 digit whole number (received " + (scoreText ? scoreText.length + " characters" : "an empty value") + ").";
+      return false;
+    }
+    if (!gameTitle || !String(gameTitle).trim()) {
+      window.ArcadeScores.lastSubmitError = "The game title is missing.";
+      return false;
+    }
     if (String(gameTitle).trim().toLowerCase() === "slope" && BigInt(scoreText) > 1500n) {
+      window.ArcadeScores.lastSubmitError = "Slope scores are limited to 1,500.";
       console.warn("Arcade Atlas: Slope score rejected (maximum 1,500).");
       window.alert("That Slope score was rejected. The leaderboard limit is 1,500.");
       return false;
     }
+    window.ArcadeScores.lastSubmitError = "Submission started but did not complete; check the browser console for a network or script error.";
     try {
       await submitThroughServer(gameTitle, scoreText, playerName, "score", false);
       window.ArcadeScores.lastSubmitError = "";
