@@ -90,6 +90,9 @@ async function checkGame(game) {
   try {
     response = await page.goto(url, { waitUntil: "domcontentloaded", timeout: 16000 });
     await page.waitForTimeout(900);
+    if (String(game.path || "").startsWith("g/one-button-collection/?")) {
+      await page.waitForFunction(() => document.querySelector("canvas"), undefined, { timeout: 10000 }).catch(() => {});
+    }
   } catch (e) {
     navigationError = String(e.message || e).slice(0, 260);
   }
@@ -98,6 +101,8 @@ async function checkGame(game) {
   const body = await page.locator("body").innerText({ timeout: 1500 }).catch(() => "");
   const frames = await page.locator("iframe").evaluateAll(els => els.map(f => f.getAttribute("src") || f.src).filter(Boolean)).catch(() => []);
   const canvases = await page.locator("canvas").count().catch(() => 0);
+  const requiresCanvas = String(game.path || "").startsWith("g/one-button-collection/?");
+  const missingCanvas = requiresCanvas && canvases === 0;
   const mainFrameUrl = page.url();
   const missingPage = /(^|\n)\s*(404|page not found|file not found|error response)\s*(\n|$)/i.test(body.slice(0, 900)) ||
     /error response/i.test(title);
@@ -111,7 +116,7 @@ async function checkGame(game) {
   const iframeHosts = frames.map(src => { try { return new URL(src, url).host; } catch { return ""; } }).filter(Boolean);
   const failedGameFrames = externalFailures.filter(item => iframeHosts.some(host => item.url.includes(host)));
   const hardFailure = !response || status >= 400 || missingPage || !!navigationError ||
-    criticalPageErrors.length > 0 || missingCoreAssets.length > 0 || failedGameFrames.length > 0;
+    criticalPageErrors.length > 0 || missingCoreAssets.length > 0 || failedGameFrames.length > 0 || missingCanvas;
   await page.close().catch(() => {});
   return {
     title: game.title,
@@ -128,7 +133,8 @@ async function checkGame(game) {
     externalFailures: externalFailures.slice(0, 8),
     pageErrors: pageErrors.slice(0, 8),
     iframeSources: frames.slice(0, 5),
-    canvasCount: canvases
+    canvasCount: canvases,
+    missingCanvas
   };
 }
 
@@ -219,93 +225,8 @@ try {
 // test each returned game's page wrapper before adding it to Arcade Atlas.
 const duckmath = { homeStatus: null, dynamicCards: 0, cachedApps: 0, checked: 0, verified: [], broken: [], excludedForAge: [], error: "" };
 let additions = [];
-const duckContext = await browser.newContext({ viewport: { width: 1365, height: 768 } });
-try {
-  const home = await duckContext.newPage();
-  home.on("dialog", d => d.accept().catch(() => {}));
-  const r = await home.goto(BASE + "/duckmath-site/", { waitUntil: "domcontentloaded", timeout: 20000 });
-  duckmath.homeStatus = r ? r.status() : null;
-  await home.waitForFunction(() => {
-    try { return JSON.parse(localStorage.getItem("apps11") || "[]").length > 0; }
-    catch { return false; }
-  }, undefined, { timeout: 18000 }).catch(() => {});
-  const state = await home.evaluate(() => ({
-    cards: document.querySelectorAll("#icon_image a").length,
-    apps: JSON.parse(localStorage.getItem("apps11") || "[]")
-  })).catch(() => ({ cards: 0, apps: [] }));
-  duckmath.dynamicCards = state.cards;
-  duckmath.cachedApps = state.apps.length;
-  await home.close();
+// DuckMath catalog importing is intentionally disabled: Arcade Atlas removed all DuckMath games.
 
-  const apps = (Array.isArray(state.apps) ? state.apps : []).filter(a => a && typeof a.title === "string" && a.title.trim());
-  duckmath.checked = apps.length;
-  let appCursor = 0;
-  const appResults = new Array(apps.length);
-  await Promise.all(Array.from({ length: 5 }, async () => {
-    while (appCursor < apps.length) {
-      const i = appCursor++;
-      const app = apps[i];
-      const page = await duckContext.newPage();
-      const failures = [];
-      page.on("dialog", d => d.accept().catch(() => {}));
-      page.on("response", resp => {
-        if (resp.status() >= 400 && !ignoreUrl.test(resp.url())) failures.push({ status: resp.status(), url: resp.url().slice(0, 250) });
-      });
-      let loaded = false;
-      let iframeSrc = "";
-      let error = "";
-      try {
-        const target = BASE + "/duckmath-site/g4m3s/?title=" + encodeURIComponent(app.title);
-        const res = await page.goto(target, { waitUntil: "domcontentloaded", timeout: 12000 });
-        if (!res || res.status() >= 400) error = "game page HTTP " + (res ? res.status() : "no response");
-        await page.waitForFunction(() => {
-          const f = document.getElementById("gameFrame");
-          return !!f && !!f.getAttribute("src") && f.getAttribute("src") !== "about:blank";
-        }, undefined, { timeout: 7000 }).catch(() => {});
-        iframeSrc = await page.locator("#gameFrame").getAttribute("src").catch(() => "") || "";
-        await page.waitForTimeout(500);
-        const childFrames = page.frames().filter(f => f !== page.mainFrame()).map(f => f.url());
-        loaded = !!iframeSrc && childFrames.some(u => u && u !== "about:blank" && !u.startsWith("chrome-error:"));
-        if (!loaded && !error) error = "game iframe did not navigate";
-        if (failures.some(f => f.status >= 400 && (f.url === iframeSrc || f.url.includes(new URL(iframeSrc, BASE).host)))) {
-          loaded = false;
-          error = "game iframe returned an HTTP error";
-        }
-      } catch (e) {
-        error = String(e.message || e).slice(0, 220);
-      }
-      appResults[i] = { app, loaded, iframeSrc, error, failures: failures.slice(0, 5) };
-      await page.close().catch(() => {});
-    }
-  }));
-  for (const result of appResults) {
-    if (result?.loaded) {
-      if (suitableForMiddleSchool(result.app)) {
-        duckmath.verified.push(result.app.title);
-        const slug = String(result.app.title || "").trim();
-        const icon = normalizeIcon(result.app.icon);
-        if (icon) additions.push({
-          title: formatGameTitle(slug),
-          path: "duckmath-site/g4m3s/?title=" + encodeURIComponent(slug),
-          image: icon,
-          category: categoryFor(result.app.categories)
-        });
-      } else {
-        duckmath.excludedForAge.push(result.app.title);
-      }
-    } else if (result) {
-      duckmath.broken.push({ title: result.app.title, error: result.error, iframeSrc: result.iframeSrc, failures: result.failures });
-    }
-  }
-  if (duckmath.checked > 0) {
-    const disabledTitles = [...new Set(duckmath.broken.map(x => String(x.title || "").trim()).filter(Boolean))];
-    await writeFile("duckmath-site/disabled-games.json", JSON.stringify(disabledTitles, null, 2) + "\n");
-  }
-  await duckContext.close();
-} catch (e) {
-  await duckContext.close().catch(() => {});
-  duckmath.error = String(e.message || e).slice(0, 500);
-}
 
 const failedTitles = new Set(results.filter(r => r.hardFailure).map(r => normalizeTitle(r.title)));
 const removedBrokenGames = gamesData.games.filter(g => failedTitles.has(normalizeTitle(g.title)));
