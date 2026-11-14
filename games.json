@@ -669,6 +669,12 @@
       "path": "g/duckcraft-quacklab",
       "image": "g/duckcraft-quacklab/index.icon.png",
       "category": "ADVENTURE"
+    },
+    {
+      "title": "DuckMath",
+      "path": "duckmath-site",
+      "image": "duckmath-site/assets/img/duck.webp",
+      "category": "ARCADE"
     }
   ]
 }
