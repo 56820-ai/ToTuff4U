@@ -260,7 +260,7 @@ var App=typeof App==='undefined'?0:App;
         try { localStorage.setItem(RUN_KEY, String(score)); } catch (e) {}
         status("submitted " + BigInt(score).toLocaleString() + " cookies earned for " + name + " ✓");
       } else {
-        status("submission failed · you can retry by reloading the save");
+        status("submission failed · " + (window.ArcadeScores.lastSubmitError || "unknown server error") + " · your save is unchanged");
       }
     } catch (error) {
       console.warn("Cookie Clicker leaderboard check failed:", error);
