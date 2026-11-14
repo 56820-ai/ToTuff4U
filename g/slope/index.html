@@ -123,6 +123,34 @@
             status.style.cssText = "position:fixed;left:10px;bottom:10px;z-index:2147483647;padding:8px 11px;border-radius:8px;background:#101525;color:#fff;border:1px solid #6bffd9;font:12px sans-serif;max-width:min(90vw,420px);";
             status.textContent = "Slope leaderboard: loading automatic detector.";
             document.body.appendChild(status);
+            // Visible manual fallback: users can still submit a real run if OCR
+            // fails to recognize their end screen or the OCR CDN is blocked.
+            var manualButton = document.createElement("button");
+            manualButton.type = "button";
+            manualButton.textContent = "Submit Slope score";
+            manualButton.style.cssText = "position:fixed;right:12px;bottom:12px;z-index:2147483647;padding:10px 14px;border:1px solid #6bffd9;border-radius:9px;background:#101525;color:#fff;font:600 13px sans-serif;cursor:pointer;";
+            manualButton.addEventListener("click", async function () {
+              if (!leaderboardReady || !window.ArcadeScores) {
+                window.alert("The Slope leaderboard connection is not configured.");
+                return;
+              }
+              var playerName = window.ArcadeScores.getPlayerName("Enter your name for the Slope leaderboard (24 characters max):");
+              if (!playerName) return;
+              var entered = window.prompt("Enter the score shown on your Slope crash screen (1–1,500):", "");
+              if (entered === null) return;
+              var score = Number(String(entered).replace(/,/g, "").trim());
+              if (!Number.isSafeInteger(score) || score < 1 || score > 1500) {
+                window.alert("Enter a whole-number Slope score from 1 to 1,500.");
+                return;
+              }
+              manualButton.disabled = true;
+              manualButton.textContent = "Submitting…";
+              var ok = await window.ArcadeScores.submit("Slope", score, playerName);
+              manualButton.disabled = false;
+              manualButton.textContent = ok ? "Score submitted ✓" : "Submit Slope score";
+              setStatus(ok ? "manual score submitted: " + score : "manual score submission failed");
+            });
+            document.body.appendChild(manualButton);
             function setStatus(message) { status.textContent = "Slope leaderboard: " + message; }
             function promptOcrIssue(message) {
               setStatus(message);
@@ -339,18 +367,15 @@
                     var ended = textEnded || (gameStarted && stoppedHits >= 3);
                     if (ended && gameStarted) {
                         var endScoreReading = await readEndScreenScore(canvas);
-                        // Require a capped, confident score to match across two distinct frames.
+                        // A single clear end-screen reading is enough to submit.
+                        // Requiring identical OCR on two consecutive scans was too
+                        // brittle: small OCR variations could prevent the name prompt forever.
                         if (endScoreReading.value > 0 && endScoreReading.value <= 1500 &&
-                            Number(endScoreReading.confidence) >= 55) {
-                            if (endScoreCandidate === endScoreReading.value) endScoreCandidateHits++;
-                            else { endScoreCandidate = endScoreReading.value; endScoreCandidateHits = 1; }
-                            if (endScoreCandidateHits >= 2) {
-                                maxScore = Math.max(maxScore, endScoreCandidate);
-                                latestScore = Math.max(latestScore, endScoreCandidate);
-                            }
-                        } else {
-                            endScoreCandidate = null;
-                            endScoreCandidateHits = 0;
+                            Number(endScoreReading.confidence) >= 45) {
+                            maxScore = Math.max(maxScore, endScoreReading.value);
+                            latestScore = Math.max(latestScore, endScoreReading.value);
+                            endScoreCandidate = endScoreReading.value;
+                            endScoreCandidateHits = 2;
                         }
                     }
                     if (!gameStarted) setStatus("waiting for gameplay motion (" + motionHits + "/3)");
@@ -361,7 +386,7 @@
                     // Wait for the same end-screen score to be read confidently twice.
                     // Previously textEnded bypassed confirmation and submitted maxScore
                     // while it was still zero on the first OCR pass.
-                    if ((textEnded || endScreenHits >= 2) && endScoreCandidateHits >= 2 && maxScore > 0 && !handled) {
+                    if ((textEnded || endScreenHits >= 2) && maxScore > 0 && !handled) {
                         handled = true;
                         var score = maxScore;
                         if (score > 0 && leaderboardReady && window.ArcadeScores) {
