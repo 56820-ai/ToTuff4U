@@ -89,6 +89,44 @@ async function checkGame(game) {
   };
 }
 
+// Verify every catalog logo actually loads in Chromium.
+const logoPage = await browser.newPage();
+const logoUrls = catalog.map(game => {
+  const image = String(game.image || "");
+  return {
+    title: game.title,
+    url: /^https?:\\/\\//i.test(image) || image.startsWith("data:") || image.startsWith("blob:")
+      ? image
+      : BASE + "/" + image.replace(/^\\/+/, "")
+  };
+});
+const logoAudit = await logoPage.evaluate(async items => {
+  let cursor = 0;
+  const results = new Array(items.length);
+  async function worker() {
+    while (cursor < items.length) {
+      const i = cursor++;
+      const item = items[i];
+      results[i] = await new Promise(resolve => {
+        const image = new Image();
+        const timeout = setTimeout(() => resolve({ title: item.title, url: item.url, ok: false, reason: "timeout" }), 9000);
+        image.onload = () => {
+          clearTimeout(timeout);
+          resolve({ title: item.title, url: item.url, ok: image.naturalWidth > 0, width: image.naturalWidth, height: image.naturalHeight });
+        };
+        image.onerror = () => {
+          clearTimeout(timeout);
+          resolve({ title: item.title, url: item.url, ok: false, reason: "image load error" });
+        };
+        image.src = item.url;
+      });
+    }
+  }
+  await Promise.all(Array.from({ length: 10 }, worker));
+  return results;
+}, logoUrls, { timeout: 180000 }).catch(error => [{ title: "Logo audit", ok: false, reason: String(error.message || error) }]);
+await logoPage.close();
+
 const workers = 4;
 let cursor = 0;
 await Promise.all(Array.from({ length: workers }, async () => {
@@ -245,6 +283,8 @@ const report = {
   catalogPassed: results.filter(r => !r.hardFailure).length,
   catalogFailed: results.filter(r => r.hardFailure),
   catalogWarnings: results.filter(r => r.pageErrors.length || r.externalFailures.length),
+  logoAudit,
+  brokenLogos: logoAudit.filter(x => !x.ok),
   duckmath,
   uiAudit,
   duckmathAddedToArcadeAtlas: uniqueAdditions.map(g => g.title)
@@ -257,6 +297,8 @@ if (process.env.GITHUB_STEP_SUMMARY) {
     `- Arcade Atlas entries tested: ${report.catalogCount}`,
     `- Arcade Atlas pages passing hard checks: ${report.catalogPassed}`,
     `- Arcade Atlas hard failures: ${report.catalogFailed.length}`,
+    `- Catalog logos checked: ${logoAudit.length}`,
+    `- Broken catalog logos: ${report.brokenLogos.length}`,
     `- DuckMath dynamic games found: ${duckmath.cachedApps}`,
     `- DuckMath game pages tested: ${duckmath.checked}`,
     `- DuckMath game pages verified: ${duckmath.verified.length}`,
@@ -265,6 +307,9 @@ if (process.env.GITHUB_STEP_SUMMARY) {
     `- New DuckMath games added to Arcade Atlas: ${uniqueAdditions.length}`,
     `- Leaderboard logo map loaded: ${uiAudit.leaderboard.logoCount || 0}`,
     `- Blocky Combat timer detected: ${!!uiAudit.blockyCombat.timer}`,
+    "",
+    "## Broken catalog logos",
+    ...report.brokenLogos.map(x => `- ${x.title}: ${x.reason || (x.width + "x" + x.height)} (${x.url})`),
     "",
     "## Arcade Atlas hard failures",
     ...report.catalogFailed.map(x => `- ${x.title}: HTTP ${x.status || "no response"}; ${x.navigationError || x.localFailures.map(y => y.url).join(", ")}`),
