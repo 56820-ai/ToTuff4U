@@ -2862,6 +2862,12 @@
       "path": "./duckmath-site/g4m3s/?title=2048",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/2048.webp",
       "category": "PUZZLE"
+    },
+    {
+      "title": "DuckCraft",
+      "path": "duckmath-site/g4m3s/?title=duckcraft",
+      "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/duckcraft-game.webp",
+      "category": "ARCADE"
     }
   ]
 }
