@@ -47,7 +47,32 @@ function create_in_article_ad() {
 }
 const APP_VER = "apps11";
 const REQUERY_TIME = 5; // in days
+const disabledGameTitles = new Set();
+let disabledGameTitlesLoaded = false;
+async function loadDisabledGameTitles() {
+  if (disabledGameTitlesLoaded) return;
+  disabledGameTitlesLoaded = true;
+  try {
+    const response = await fetch("/ToTuff4U/duckmath-site/disabled-games.json", { cache: "no-store" });
+    if (!response.ok) return;
+    const titles = await response.json();
+    if (Array.isArray(titles)) {
+      titles.forEach(title => {
+        const key = String(title || "").trim().toLowerCase();
+        if (key) disabledGameTitles.add(key);
+      });
+    }
+  } catch (error) {
+    console.warn("DuckMath local game-health filter could not be loaded.", error);
+  }
+}
+function filterDisabledApps(apps) {
+  return Array.isArray(apps)
+    ? apps.filter(app => !disabledGameTitles.has(String(app?.title || "").trim().toLowerCase()))
+    : apps;
+}
 async function get_all_apps() {
+  await loadDisabledGameTitles();
   const date_last_queryed = JSON.parse(localStorage.getItem("dlq"));
   const local_apps = JSON.parse(localStorage.getItem(APP_VER));
   // console.log((new Date().getTime() - date_last_queryed) / 1000 / 60 / 60 / 24);
@@ -62,7 +87,7 @@ async function get_all_apps() {
     local_apps?.[0] !== null
   ) {
     console.log("Using local apps data.");
-    return local_apps;
+    return filterDisabledApps(local_apps);
   } else {
     console.log("Fetching apps data from Supabase.");
     const { data, error } = await supabaseClient.rpc(
@@ -78,7 +103,7 @@ async function get_all_apps() {
     // Store the data in local storage with a timestamp
     localStorage.setItem(APP_VER, JSON.stringify(data));
     localStorage.setItem("dlq", JSON.stringify(new Date().getTime()));
-    return data;
+    return filterDisabledApps(data);
   }
 }
 
