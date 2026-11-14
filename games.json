@@ -704,39 +704,63 @@
       "category": "ARCADE"
     },
     {
-      "title": "G Press",
-      "path": "g/one-button-collection/?gpress",
-      "image": "g/one-button-collection/gpress/screenshot.gif",
+      "title": "T Punch",
+      "path": "g/one-button-collection/?tpunch",
+      "image": "g/one-button-collection/tpunch/screenshot.gif",
       "category": "ARCADE"
     },
     {
-      "title": "Holes",
-      "path": "g/one-button-collection/?holes",
-      "image": "g/one-button-collection/holes/screenshot.gif",
+      "title": "D Fight",
+      "path": "g/one-button-collection/?dfight",
+      "image": "g/one-button-collection/dfight/screenshot.gif",
       "category": "ARCADE"
     },
     {
-      "title": "Snaky",
-      "path": "g/one-button-collection/?snaky",
-      "image": "g/one-button-collection/snaky/screenshot.gif",
+      "title": "Balls Bombs",
+      "path": "g/one-button-collection/?ballsbombs",
+      "image": "g/one-button-collection/ballsbombs/screenshot.gif",
       "category": "ARCADE"
     },
     {
-      "title": "Mirror Floor",
-      "path": "g/one-button-collection/?mirrorfloor",
-      "image": "g/one-button-collection/mirrorfloor/screenshot.gif",
+      "title": "D Missile",
+      "path": "g/one-button-collection/?dmissile",
+      "image": "g/one-button-collection/dmissile/screenshot.gif",
       "category": "ARCADE"
     },
     {
-      "title": "Sub Jump",
-      "path": "g/one-button-collection/?subjump",
-      "image": "g/one-button-collection/subjump/screenshot.gif",
+      "title": "V Bomb",
+      "path": "g/one-button-collection/?vbomb",
+      "image": "g/one-button-collection/vbomb/screenshot.gif",
       "category": "ARCADE"
     },
     {
-      "title": "Photon Line",
-      "path": "g/one-button-collection/?photonline",
-      "image": "g/one-button-collection/photonline/screenshot.gif",
+      "title": "D Pistols",
+      "path": "g/one-button-collection/?dpistols",
+      "image": "g/one-button-collection/dpistols/screenshot.gif",
+      "category": "ARCADE"
+    },
+    {
+      "title": "Grenadier",
+      "path": "g/one-button-collection/?grenadier",
+      "image": "g/one-button-collection/grenadier/screenshot.gif",
+      "category": "ARCADE"
+    },
+    {
+      "title": "B Cannon",
+      "path": "g/one-button-collection/?bcannon",
+      "image": "g/one-button-collection/bcannon/screenshot.gif",
+      "category": "ARCADE"
+    },
+    {
+      "title": "Hyper Laser",
+      "path": "g/one-button-collection/?hyperlaser",
+      "image": "g/one-button-collection/hyperlaser/screenshot.gif",
+      "category": "ARCADE"
+    },
+    {
+      "title": "Bomb Up",
+      "path": "g/one-button-collection/?bombup",
+      "image": "g/one-button-collection/bombup/screenshot.gif",
       "category": "ARCADE"
     },
     {
@@ -749,12 +773,6 @@
       "title": "Roll S",
       "path": "g/one-button-collection/?rolls",
       "image": "g/one-button-collection/rolls/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
-      "title": "T Punch",
-      "path": "g/one-button-collection/?tpunch",
-      "image": "g/one-button-collection/tpunch/screenshot.gif",
       "category": "ARCADE"
     },
     {
@@ -794,18 +812,6 @@
       "category": "ARCADE"
     },
     {
-      "title": "Pillars 3D",
-      "path": "g/one-button-collection/?pillars3d",
-      "image": "g/one-button-collection/pillars3d/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
-      "title": "Press M",
-      "path": "g/one-button-collection/?pressm",
-      "image": "g/one-button-collection/pressm/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
       "title": "Orbit Man",
       "path": "g/one-button-collection/?orbitman",
       "image": "g/one-button-collection/orbitman/screenshot.gif",
@@ -818,21 +824,15 @@
       "category": "ARCADE"
     },
     {
-      "title": "From Two Sides",
-      "path": "g/one-button-collection/?fromtwosides",
-      "image": "g/one-button-collection/fromtwosides/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
       "title": "UD Cave",
       "path": "g/one-button-collection/?udcave",
       "image": "g/one-button-collection/udcave/screenshot.gif",
       "category": "ARCADE"
     },
     {
-      "title": "Ant Lion",
-      "path": "g/one-button-collection/?antlion",
-      "image": "g/one-button-collection/antlion/screenshot.gif",
+      "title": "Dark Cave",
+      "path": "g/one-button-collection/?darkcave",
+      "image": "g/one-button-collection/darkcave/screenshot.gif",
       "category": "ARCADE"
     }
   ]
