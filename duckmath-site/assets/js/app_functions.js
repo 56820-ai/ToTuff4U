@@ -53,7 +53,8 @@ async function loadDisabledGameTitles() {
   if (disabledGameTitlesLoaded) return;
   disabledGameTitlesLoaded = true;
   try {
-    const response = await fetch("/ToTuff4U/duckmath-site/disabled-games.json", { cache: "no-store" });
+    const disabledUrl = location.pathname.includes("/duckmath-site/g4m3s/") ? "../disabled-games.json" : "disabled-games.json";
+    const response = await fetch(disabledUrl, { cache: "no-store" });
     if (!response.ok) return;
     const titles = await response.json();
     if (Array.isArray(titles)) {
