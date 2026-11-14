@@ -135,7 +135,7 @@
       const allScores = [];
       for (let offset = 0; ; offset += pageSize) {
         const page = await request(
-          "scores?select=id,player_name,game_title,score,created_at&order=created_at.desc&limit=" + pageSize + "&offset=" + offset,
+          "scores?select=id,player_name,game_title,score,created_at&order=created_at.desc,id.asc&limit=" + pageSize + "&offset=" + offset,
           { method: "GET" }
         );
         if (!Array.isArray(page) || page.length === 0) break;
