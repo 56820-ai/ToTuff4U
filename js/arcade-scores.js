@@ -85,8 +85,8 @@
       console.info("Arcade Atlas: a player name is required to submit a high score.");
       return false;
     }
-    if (!/^[0-9]{1,100}$/.test(scoreText)) {
-      window.ArcadeScores.lastSubmitError = "The detected score was not a valid 1–100 digit whole number (received " + (scoreText ? scoreText.length + " characters" : "an empty value") + ").";
+    if (!/^[0-9]{1,500}$/.test(scoreText)) {
+      window.ArcadeScores.lastSubmitError = "The detected score was not a valid 1–500 digit whole number (received " + (scoreText ? scoreText.length + " characters" : "an empty value") + ").";
       return false;
     }
     if (!gameTitle || !String(gameTitle).trim()) {
