@@ -131,19 +131,14 @@
     const pageSize = 500;
     const allScores = [];
     try {
-      // Use PostgREST's Range headers for explicit, stable pagination.
-      // A unique secondary key prevents records sharing a timestamp from
-      // shifting between pages and being skipped.
+      // Use PostgREST's standard limit/offset query parameters. These are
+      // reliably supported by Supabase REST and avoid browser/proxy handling
+      // differences with explicit Range request headers.
       for (let offset = 0; ; offset += pageSize) {
         const page = await request(
-          "scores?select=id,player_name,game_title,score,created_at&order=created_at.desc,id.asc",
-          {
-            method: "GET",
-            headers: {
-              "Range-Unit": "items",
-              "Range": offset + "-" + (offset + pageSize - 1)
-            }
-          }
+          "scores?select=id,player_name,game_title,score,created_at&order=created_at.desc,id.asc&limit=" +
+            pageSize + "&offset=" + offset,
+          { method: "GET" }
         );
         if (!Array.isArray(page) || page.length === 0) break;
         allScores.push(...page);
