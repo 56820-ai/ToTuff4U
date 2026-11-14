@@ -135,7 +135,7 @@ try {
 
 // DuckMath is backed by its own live catalog service. Verify its app list and
 // test each returned game's page wrapper before adding it to Arcade Atlas.
-const duckmath = { homeStatus: null, dynamicCards: 0, cachedApps: 0, checked: 0, verified: [], broken: [], error: "" };
+const duckmath = { homeStatus: null, dynamicCards: 0, cachedApps: 0, checked: 0, verified: [], broken: [], excludedForAge: [], error: "" };
 let additions = [];
 try {
   const home = await browser.newPage({ viewport: { width: 1365, height: 768 } });
@@ -196,21 +196,29 @@ try {
     }
   }));
   for (const result of appResults) {
-    if (result?.loaded && suitableForMiddleSchool(result.app)) {
-      duckmath.verified.push(result.app.title);
-      const titleKey = result.app.title.trim().toLowerCase();
-      if (!catalog.some(g => String(g.title || "").trim().toLowerCase() === titleKey)) {
-        const icon = normalizeIcon(result.app.icon);
-        if (icon) additions.push({
-          title: result.app.title.trim(),
-          path: "duckmath-site/g4m3s/?title=" + encodeURIComponent(result.app.title.trim()),
-          image: icon,
-          category: categoryFor(result.app.categories)
-        });
+    if (result?.loaded) {
+      if (suitableForMiddleSchool(result.app)) {
+        duckmath.verified.push(result.app.title);
+        const titleKey = result.app.title.trim().toLowerCase();
+        if (!catalog.some(g => String(g.title || "").trim().toLowerCase() === titleKey)) {
+          const icon = normalizeIcon(result.app.icon);
+          if (icon) additions.push({
+            title: result.app.title.trim(),
+            path: "duckmath-site/g4m3s/?title=" + encodeURIComponent(result.app.title.trim()),
+            image: icon,
+            category: categoryFor(result.app.categories)
+          });
+        }
+      } else {
+        duckmath.excludedForAge.push(result.app.title);
       }
     } else if (result) {
       duckmath.broken.push({ title: result.app.title, error: result.error, iframeSrc: result.iframeSrc, failures: result.failures });
     }
+  }
+  if (duckmath.checked > 0) {
+    const disabledTitles = [...new Set(duckmath.broken.map(x => String(x.title || "").trim()).filter(Boolean))];
+    await writeFile("duckmath-site/disabled-games.json", JSON.stringify(disabledTitles, null, 2) + "\n");
   }
 } catch (e) {
   duckmath.error = String(e.message || e).slice(0, 500);
@@ -250,6 +258,7 @@ if (process.env.GITHUB_STEP_SUMMARY) {
     `- DuckMath game pages tested: ${duckmath.checked}`,
     `- DuckMath game pages verified: ${duckmath.verified.length}`,
     `- DuckMath game pages not verified: ${duckmath.broken.length}`,
+    `- DuckMath titles excluded for middle-school suitability: ${duckmath.excludedForAge.length}`,
     `- New DuckMath games added to Arcade Atlas: ${uniqueAdditions.length}`,
     `- Leaderboard logo map loaded: ${uiAudit.leaderboard.logoCount || 0}`,
     `- Blocky Combat timer detected: ${!!uiAudit.blockyCombat.timer}`,
