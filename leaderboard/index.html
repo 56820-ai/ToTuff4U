@@ -473,7 +473,7 @@
           const external = image.startsWith("https://") || image.startsWith("http://") ||
             image.startsWith("data:") || image.startsWith("blob:") || image.startsWith("//");
           const resolved = external ? image :
-            image.startsWith("/ToTuff4U/") ? image : "../" + image.replace(/^\\/+/, "");
+            image.startsWith("/ToTuff4U/") ? image : "../" + image.replace(/^\/+/, "");
           catalogLogos.set(key, resolved);
         });
       } catch (error) {
