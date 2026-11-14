@@ -16,7 +16,7 @@ function gameUrl(game) {
   if (/^https?:\/\//i.test(p)) return p;
   const [pathPart, queryPart] = p.split("?", 2);
   const normalizedPath = pathPart.replace(/^\/+/, "").replace(/\/+$/, "");
-  return BASE + "/" + normalizedPath + (queryPart !== undefined ? "?" + queryPart : "/");
+  return BASE + "/" + normalizedPath + "/" + (queryPart !== undefined ? "?" + queryPart : "");
 }
 function categoryFor(value) {
   const s = Array.isArray(value) ? value.join(" ") : String(value || "");
