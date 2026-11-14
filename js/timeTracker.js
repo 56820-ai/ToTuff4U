@@ -18,8 +18,8 @@
   var path = location.pathname.replace(/\/+$/, "").toLowerCase();
   var isMinecraft = /\/g\/mc\/1\.12\.2$/.test(path);
   var isRetroBowl = /\/g\/retro-bowl$/.test(path);
-  if (!isMinecraft && !isRetroBowl) return;
-  var gameTitle = isRetroBowl ? "Retro Bowl Time" : "Minecraft";
+  if (!isMinecraft && !isRetroBowl && !isBlockyCombat) return;
+  var gameTitle = isRetroBowl ? "Retro Bowl Time" : isBlockyCombat ? "Blocky Combat SWAT Time" : "Minecraft";
   var playerName = "";
   try { playerName = (localStorage.getItem("arcadeLeaderboardPlayerName") || "").trim().slice(0, 24); } catch (e) {}
   
@@ -56,7 +56,7 @@
     updateTimer();
     if (pendingSeconds >= 5 && window.ArcadeScores && typeof window.ArcadeScores.submitSession === "function") {
       if (!playerName && typeof window.ArcadeScores.getPlayerName === "function") {
-        playerName = window.ArcadeScores.getPlayerName("Enter your name for the " + (isRetroBowl ? "Retro Bowl" : "Minecraft") + " playtime leaderboard (24 characters max):");
+        playerName = window.ArcadeScores.getPlayerName("Enter your name for the " + (isRetroBowl ? "Retro Bowl" : isBlockyCombat ? "Blocky Combat SWAT" : "Minecraft") + " playtime leaderboard (24 characters max):");
       }
       if (playerName) {
         window.ArcadeScores.submitSession(gameTitle, pendingSeconds, playerName);
