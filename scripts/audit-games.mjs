@@ -6,7 +6,7 @@ const gamesData = JSON.parse(await readFile("games.json", "utf8"));
 const catalog = Array.isArray(gamesData.games) ? gamesData.games : [];
 const browser = await chromium.launch({
   headless: true,
-  args: ["--no-sandbox", "--disable-dev-shm-usage", "--enable-webgl", "--ignore-gpu-blocklist", "--use-gl=angle", "--enable-unsafe-swiftshader"]
+  args: ["--no-sandbox", "--disable-dev-shm-usage", "--enable-webgl", "--ignore-gpu-blocklist", "--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader"]
 });
 const results = [];
 const ignoreUrl = /googletagmanager|google-analytics|doubleclick|pagead|adsbygoogle|hotjar|posthog|favicon|apple-touch-icon|manifest|source-map/i;
