@@ -7,12 +7,7 @@ TMP="$(mktemp -d)"
 SOURCE="$TMP/crisp-game-lib-games"
 
 slugs=(
-  tappump gpress portalj circlew revolvea mrider tlanes holes flipo thanoi
-  sumten ttfence ctower growth geocent bsfish gtail breedc kite intow
-  snaky wiper rwheel zoomio numberline lineb makemaze squarebar teeter reflector
-  liftup rps numberball mirrorfloor crossline subjump scaffold aerialbar pinclimb
-  parking balance bamboo froooog findastar pairsdrop cardq shiny floater hoppingp
-  updownpress
+  rebirth intow castn thunder descents laserfortress froooog rwheel pizzaarrow thrustlr accelb futurewake updownpress ladderdrop counterb mrider chargebeam sshake zoneb mjamming tlanes lrain scrambird dlaser islash raid catapult rring gpress holes snaky mirrorfloor subjump photonline upshot rolls tpunch bblast smokeg mortar turbulent graveler throwm pillars3d pressm orbitman embattled fromtwosides udcave antlion
 )
 
 if [[ "${#slugs[@]}" -ne 50 ]]; then
@@ -30,6 +25,7 @@ git sparse-checkout set --no-cone "${patterns[@]}"
 source_commit="$(git rev-parse HEAD)"
 cd "$GITHUB_WORKSPACE"
 
+rm -rf "$DEST"
 mkdir -p "$DEST"
 cp "$SOURCE/docs/index.html" "$DEST/index.html"
 cp "$SOURCE/LICENSE.txt" "$DEST/LICENSE.txt"
@@ -46,204 +42,204 @@ done
 cat > "$RUNNER_TEMP/games-additions.json" <<'GAMES'
 [
   {
-    "title": "Tap Pump",
-    "slug": "tappump"
-  },
-  {
-    "title": "G Press",
-    "slug": "gpress"
-  },
-  {
-    "title": "Portal Jump",
-    "slug": "portalj"
-  },
-  {
-    "title": "Circle W",
-    "slug": "circlew"
-  },
-  {
-    "title": "Revolve A",
-    "slug": "revolvea"
-  },
-  {
-    "title": "M Rider",
-    "slug": "mrider"
-  },
-  {
-    "title": "T Lanes",
-    "slug": "tlanes"
-  },
-  {
-    "title": "Holes",
-    "slug": "holes"
-  },
-  {
-    "title": "Flip O",
-    "slug": "flipo"
-  },
-  {
-    "title": "Tower of Hanoi",
-    "slug": "thanoi"
-  },
-  {
-    "title": "Sum Ten",
-    "slug": "sumten"
-  },
-  {
-    "title": "TT Fence",
-    "slug": "ttfence"
-  },
-  {
-    "title": "C Tower",
-    "slug": "ctower"
-  },
-  {
-    "title": "Growth",
-    "slug": "growth"
-  },
-  {
-    "title": "GeoCent",
-    "slug": "geocent"
-  },
-  {
-    "title": "BS Fish",
-    "slug": "bsfish"
-  },
-  {
-    "title": "G Tail",
-    "slug": "gtail"
-  },
-  {
-    "title": "Breed C",
-    "slug": "breedc"
-  },
-  {
-    "title": "Kite",
-    "slug": "kite"
+    "title": "Rebirth",
+    "slug": "rebirth"
   },
   {
     "title": "In Tow",
     "slug": "intow"
   },
   {
-    "title": "Snaky",
-    "slug": "snaky"
+    "title": "Cast N",
+    "slug": "castn"
   },
   {
-    "title": "Wiper",
-    "slug": "wiper"
+    "title": "Thunder",
+    "slug": "thunder"
   },
   {
-    "title": "R Wheel",
-    "slug": "rwheel"
+    "title": "Descent S",
+    "slug": "descents"
   },
   {
-    "title": "Zoomio",
-    "slug": "zoomio"
-  },
-  {
-    "title": "Number Line",
-    "slug": "numberline"
-  },
-  {
-    "title": "Line B",
-    "slug": "lineb"
-  },
-  {
-    "title": "Make Maze",
-    "slug": "makemaze"
-  },
-  {
-    "title": "Square Bar",
-    "slug": "squarebar"
-  },
-  {
-    "title": "Teeter",
-    "slug": "teeter"
-  },
-  {
-    "title": "Reflector",
-    "slug": "reflector"
-  },
-  {
-    "title": "Lift Up",
-    "slug": "liftup"
-  },
-  {
-    "title": "Rock Paper Scissors",
-    "slug": "rps"
-  },
-  {
-    "title": "Number Ball",
-    "slug": "numberball"
-  },
-  {
-    "title": "Mirror Floor",
-    "slug": "mirrorfloor"
-  },
-  {
-    "title": "Cross Line",
-    "slug": "crossline"
-  },
-  {
-    "title": "Sub Jump",
-    "slug": "subjump"
-  },
-  {
-    "title": "Scaffold",
-    "slug": "scaffold"
-  },
-  {
-    "title": "Aerial Bar",
-    "slug": "aerialbar"
-  },
-  {
-    "title": "Pin Climb",
-    "slug": "pinclimb"
-  },
-  {
-    "title": "Parking",
-    "slug": "parking"
-  },
-  {
-    "title": "Balance",
-    "slug": "balance"
-  },
-  {
-    "title": "Bamboo",
-    "slug": "bamboo"
+    "title": "Laser Fortress",
+    "slug": "laserfortress"
   },
   {
     "title": "Froooog",
     "slug": "froooog"
   },
   {
-    "title": "Find a Star",
-    "slug": "findastar"
+    "title": "R Wheel",
+    "slug": "rwheel"
   },
   {
-    "title": "Pairs Drop",
-    "slug": "pairsdrop"
+    "title": "Pizza Arrow",
+    "slug": "pizzaarrow"
   },
   {
-    "title": "Card Q",
-    "slug": "cardq"
+    "title": "Thrust LR",
+    "slug": "thrustlr"
   },
   {
-    "title": "Shiny",
-    "slug": "shiny"
+    "title": "Accel B",
+    "slug": "accelb"
   },
   {
-    "title": "Floater",
-    "slug": "floater"
-  },
-  {
-    "title": "Hopping P",
-    "slug": "hoppingp"
+    "title": "Future Wake",
+    "slug": "futurewake"
   },
   {
     "title": "Up Down Press",
     "slug": "updownpress"
+  },
+  {
+    "title": "Ladder Drop",
+    "slug": "ladderdrop"
+  },
+  {
+    "title": "Counter B",
+    "slug": "counterb"
+  },
+  {
+    "title": "M Rider",
+    "slug": "mrider"
+  },
+  {
+    "title": "Charge Beam",
+    "slug": "chargebeam"
+  },
+  {
+    "title": "S Shake",
+    "slug": "sshake"
+  },
+  {
+    "title": "Zone B",
+    "slug": "zoneb"
+  },
+  {
+    "title": "M Jamming",
+    "slug": "mjamming"
+  },
+  {
+    "title": "T Lanes",
+    "slug": "tlanes"
+  },
+  {
+    "title": "L Rain",
+    "slug": "lrain"
+  },
+  {
+    "title": "Scrambird",
+    "slug": "scrambird"
+  },
+  {
+    "title": "D Laser",
+    "slug": "dlaser"
+  },
+  {
+    "title": "I Slash",
+    "slug": "islash"
+  },
+  {
+    "title": "Raid",
+    "slug": "raid"
+  },
+  {
+    "title": "Catapult",
+    "slug": "catapult"
+  },
+  {
+    "title": "R Ring",
+    "slug": "rring"
+  },
+  {
+    "title": "G Press",
+    "slug": "gpress"
+  },
+  {
+    "title": "Holes",
+    "slug": "holes"
+  },
+  {
+    "title": "Snaky",
+    "slug": "snaky"
+  },
+  {
+    "title": "Mirror Floor",
+    "slug": "mirrorfloor"
+  },
+  {
+    "title": "Sub Jump",
+    "slug": "subjump"
+  },
+  {
+    "title": "Photon Line",
+    "slug": "photonline"
+  },
+  {
+    "title": "Up Shot",
+    "slug": "upshot"
+  },
+  {
+    "title": "Roll S",
+    "slug": "rolls"
+  },
+  {
+    "title": "T Punch",
+    "slug": "tpunch"
+  },
+  {
+    "title": "B Blast",
+    "slug": "bblast"
+  },
+  {
+    "title": "Smoke G",
+    "slug": "smokeg"
+  },
+  {
+    "title": "Mortar",
+    "slug": "mortar"
+  },
+  {
+    "title": "Turbulent",
+    "slug": "turbulent"
+  },
+  {
+    "title": "Graveler",
+    "slug": "graveler"
+  },
+  {
+    "title": "Throw M",
+    "slug": "throwm"
+  },
+  {
+    "title": "Pillars 3D",
+    "slug": "pillars3d"
+  },
+  {
+    "title": "Press M",
+    "slug": "pressm"
+  },
+  {
+    "title": "Orbit Man",
+    "slug": "orbitman"
+  },
+  {
+    "title": "Embattled",
+    "slug": "embattled"
+  },
+  {
+    "title": "From Two Sides",
+    "slug": "fromtwosides"
+  },
+  {
+    "title": "UD Cave",
+    "slug": "udcave"
+  },
+  {
+    "title": "Ant Lion",
+    "slug": "antlion"
   }
 ]
 GAMES
@@ -253,6 +249,7 @@ const fs = require("node:fs");
 const additions = JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP + "/games-additions.json", "utf8"));
 const normalize = value => String(value || "").toLowerCase().replace(/[^a-z0-9]/g, "");
 const catalog = JSON.parse(fs.readFileSync("games.json", "utf8"));
+catalog.games = catalog.games.filter(game => !String(game.path || "").startsWith("g/one-button-collection/?"));
 for (const item of additions) {
   const path = "g/one-button-collection/?" + item.slug;
   const existing = catalog.games.find(game => normalize(game.title) === normalize(item.title));
@@ -277,7 +274,7 @@ for (const item of additions) {
   if (!fs.existsSync("g/one-button-collection/" + item.slug + "/screenshot.gif")) throw new Error("Missing thumbnail: " + item.slug);
 }
 fs.writeFileSync("games.json", JSON.stringify(catalog, null, 2) + "\n");
-console.log("Verified 50 new game entries. Total catalog: " + catalog.games.length);
+console.log("Verified replacement pack of 50 action/skill games. Total catalog: " + catalog.games.length);
 NODE
 
 cat > "$DEST/ATTRIBUTION.txt" <<EOF
