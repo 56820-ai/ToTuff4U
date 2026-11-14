@@ -163,6 +163,18 @@
       "category": "CASUAL"
     },
     {
+      "title": "Paddle Clash",
+      "path": "g/paddle-clash",
+      "image": "images/icons/paddle-clash.svg",
+      "category": "ARCADE"
+    },
+    {
+      "title": "Whack-a-Mole",
+      "path": "g/whack-a-mole",
+      "image": "images/icons/whack-a-mole.svg",
+      "category": "CASUAL"
+    },
+    {
       "title": "Tetris",
       "path": "g/tetris",
       "image": "duckmath-site/assets/img/icons/tetris.webp",
