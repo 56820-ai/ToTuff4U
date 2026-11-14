@@ -154,7 +154,7 @@ try {
   duckmath.cachedApps = state.apps.length;
   await home.close();
 
-  const apps = (Array.isArray(state.apps) ? state.apps : []).filter(a => a && typeof a.title === "string" && a.title.trim()).slice(0, 500);
+  const apps = (Array.isArray(state.apps) ? state.apps : []).filter(a => a && typeof a.title === "string" && a.title.trim());
   duckmath.checked = apps.length;
   let appCursor = 0;
   const appResults = new Array(apps.length);
