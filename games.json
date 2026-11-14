@@ -3,7 +3,7 @@
     {
       "title": "Slope",
       "path": "g/slope",
-      "image": "duckmath-site/assets/img/icons/slope.webp",
+      "image": "./duckmath-site/assets/img/icons/slope.webp",
       "category": "RACING"
     },
     {
@@ -15,7 +15,7 @@
     {
       "title": "1v1.lol",
       "path": "g/1v1lol",
-      "image": "duckmath-site/assets/img/icons/1v1.webp",
+      "image": "./duckmath-site/assets/img/icons/1v1.webp",
       "category": "ACTION"
     },
     {
@@ -27,13 +27,13 @@
     {
       "title": "Learn To Fly",
       "path": "g/learntofly",
-      "image": "duckmath-site/assets/img/icons/learntofly2.webp",
+      "image": "./duckmath-site/assets/img/icons/learntofly2.webp",
       "category": "ARCADE"
     },
     {
       "title": "Baldi's Basics",
       "path": "g/baldisbasics",
-      "image": "duckmath-site/assets/img/icons/baldis.webp",
+      "image": "./duckmath-site/assets/img/icons/baldis.webp",
       "category": "HORROR"
     },
     {
@@ -57,13 +57,13 @@
     {
       "title": "Drift Boss",
       "path": "g/driftboss",
-      "image": "duckmath-site/assets/img/icons/driftboss.webp",
+      "image": "./duckmath-site/assets/img/icons/driftboss.webp",
       "category": "RACING"
     },
     {
       "title": "Jack Smith",
       "path": "g/jacksmith",
-      "image": "duckmath-site/assets/img/icons/jackSmith.webp",
+      "image": "./duckmath-site/assets/img/icons/jackSmith.webp",
       "category": "ADVENTURE"
     },
     {
@@ -87,7 +87,7 @@
     {
       "title": "Hole.io",
       "path": "g/holeio",
-      "image": "duckmath-site/assets/img/icons/hole.io.webp",
+      "image": "./duckmath-site/assets/img/icons/hole.io.webp",
       "category": "IO"
     },
     {
@@ -117,13 +117,13 @@
     {
       "title": "Snow Rider 3D",
       "path": "g/snowrider3d",
-      "image": "duckmath-site/assets/img/icons/snowrider3d.webp",
+      "image": "./duckmath-site/assets/img/icons/snowrider3d.webp",
       "category": "RACING"
     },
     {
       "title": "Tetris",
       "path": "g/tetris",
-      "image": "duckmath-site/assets/img/icons/tetris.webp",
+      "image": "./duckmath-site/assets/img/icons/tetris.webp",
       "category": "PUZZLE"
     },
     {
@@ -159,7 +159,7 @@
     {
       "title": "Rooftop Sniper",
       "path": "g/rooftopsnipers",
-      "image": "duckmath-site/assets/img/icons/rooftop.webp",
+      "image": "./duckmath-site/assets/img/icons/rooftop.webp",
       "category": "ACTION"
     },
     {
@@ -183,19 +183,19 @@
     {
       "title": "MonkeyMart",
       "path": "g/monkey-mart",
-      "image": "duckmath-site/assets/img/icons/monkey-mart.webp",
+      "image": "./duckmath-site/assets/img/icons/monkey-mart.webp",
       "category": "SIMULATION"
     },
     {
       "title": "Retro Bowl College",
       "path": "g/rb-college",
-      "image": "duckmath-site/assets/img/icons/retrobowlcollege.webp",
+      "image": "./duckmath-site/assets/img/icons/retrobowlcollege.webp",
       "category": "SPORTS"
     },
     {
       "title": "Bloons TD5",
       "path": "g/btd5",
-      "image": "duckmath-site/assets/img/icons/bloons1.webp",
+      "image": "./duckmath-site/assets/img/icons/bloons1.webp",
       "category": "STRATEGY"
     },
     {
@@ -213,7 +213,7 @@
     {
       "title": "Run 3",
       "path": "g/run3",
-      "image": "duckmath-site/assets/img/icons/run3.webp",
+      "image": "./duckmath-site/assets/img/icons/run3.webp",
       "category": "ARCADE"
     },
     {
@@ -225,13 +225,13 @@
     {
       "title": "Plants V Zombies",
       "path": "g/pvz",
-      "image": "duckmath-site/assets/img/icons/pvz.webp",
+      "image": "./duckmath-site/assets/img/icons/pvz.webp",
       "category": "STRATEGY"
     },
     {
       "title": "Duck Life",
       "path": "g/ducklife",
-      "image": "duckmath-site/assets/img/icons/dl1.webp",
+      "image": "./duckmath-site/assets/img/icons/dl1.webp",
       "category": "SIMULATION"
     },
     {
@@ -285,13 +285,13 @@
     {
       "title": "Bitlife",
       "path": "g/bitlife",
-      "image": "duckmath-site/assets/img/icons/bitlife.webp",
+      "image": "./duckmath-site/assets/img/icons/bitlife.webp",
       "category": "SIMULATION"
     },
     {
       "title": "Subway Surfers",
       "path": "g/subway-surfers",
-      "image": "duckmath-site/assets/img/icons/subway.webp",
+      "image": "./duckmath-site/assets/img/icons/subway.webp",
       "category": "ENDLESS RUNNER"
     },
     {
@@ -303,19 +303,19 @@
     {
       "title": "MotoX3M",
       "path": "g/motox3m",
-      "image": "duckmath-site/assets/img/icons/motox3m.webp",
+      "image": "./duckmath-site/assets/img/icons/motox3m.webp",
       "category": "RACING"
     },
     {
       "title": "Cookie Clicker",
       "path": "g/cookieclicker",
-      "image": "duckmath-site/assets/img/icons/cookieclicker.webp",
+      "image": "./duckmath-site/assets/img/icons/cookieclicker.webp",
       "category": "IDLE"
     },
     {
       "title": "Temple Run 2",
       "path": "g/temple-run-2",
-      "image": "duckmath-site/assets/img/icons/templerun2.webp",
+      "image": "./duckmath-site/assets/img/icons/templerun2.webp",
       "category": "ENDLESS RUNNER"
     },
     {
@@ -333,19 +333,19 @@
     {
       "title": "Jetpack Joyride",
       "path": "g/jetpack-joyride",
-      "image": "duckmath-site/assets/img/icons/jetpackjoyride.webp",
+      "image": "./duckmath-site/assets/img/icons/jetpackjoyride.webp",
       "category": "ARCADE"
     },
     {
       "title": "Geometry Dash",
       "path": "g/geodash",
-      "image": "duckmath-site/assets/img/icons/geometrydash.webp",
+      "image": "./duckmath-site/assets/img/icons/geometrydash.webp",
       "category": "PLATFORMER"
     },
     {
       "title": "Duck Life 1",
       "path": "g/ducklife1",
-      "image": "duckmath-site/assets/img/icons/dl1.webp",
+      "image": "./duckmath-site/assets/img/icons/dl1.webp",
       "category": "SIMULATION"
     },
     {
@@ -470,15 +470,9 @@
       "source": "https://github.com/Thommynator/AgeOfWarGame"
     },
     {
-      "title": "DuckCraft",
-      "path": "g/duckcraft-quacklab",
-      "image": "g/duckcraft-quacklab/index.icon.png",
-      "category": "ADVENTURE"
-    },
-    {
       "title": "DuckMath",
       "path": "duckmath-site",
-      "image": "duckmath-site/assets/img/duck.webp",
+      "image": "./duckmath-site/assets/img/duck.webp",
       "category": "ARCADE"
     },
     {
@@ -508,13 +502,13 @@
     {
       "title": "World's Hardest Game",
       "path": "g/worlds-hardest-game",
-      "image": "duckmath-site/assets/img/icons/hardgame1.webp",
+      "image": "./duckmath-site/assets/img/icons/hardgame1.webp",
       "category": "PUZZLE"
     },
     {
       "title": "Agar.io",
       "path": "g/agario",
-      "image": "duckmath-site/assets/img/icons/agar.webp",
+      "image": "./duckmath-site/assets/img/icons/agar.webp",
       "category": "IO"
     },
     {
@@ -532,7 +526,7 @@
     {
       "title": "Fireboy & Watergirl",
       "path": "g/fireboywatergirlforsettemple",
-      "image": "duckmath-site/assets/img/icons/fireboy.webp",
+      "image": "./duckmath-site/assets/img/icons/fireboy.webp",
       "category": "PLATFORMER"
     },
     {
@@ -549,2323 +543,2323 @@
     },
     {
       "title": "Super Star Car",
-      "path": "duckmath-site/g4m3s/?title=super-star-car",
+      "path": "./duckmath-site/g4m3s/?title=super-star-car",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/superstarcar.webp",
       "category": "SPORTS"
     },
     {
       "title": "Basket Random",
-      "path": "duckmath-site/g4m3s/?title=basket-random",
+      "path": "./duckmath-site/g4m3s/?title=basket-random",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Basket-Random.jpg",
       "category": "SPORTS"
     },
     {
       "title": "Wordle",
-      "path": "duckmath-site/g4m3s/?title=wordle",
+      "path": "./duckmath-site/g4m3s/?title=wordle",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/wordle.jpg",
       "category": "PUZZLE"
     },
     {
       "title": "Eagle Craft",
-      "path": "duckmath-site/g4m3s/?title=eagle-craft",
+      "path": "./duckmath-site/g4m3s/?title=eagle-craft",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/eagle-craft.jpg",
       "category": "STRATEGY"
     },
     {
       "title": "Race Survival Arena King",
-      "path": "duckmath-site/g4m3s/?title=race-survival-arena-king",
+      "path": "./duckmath-site/g4m3s/?title=race-survival-arena-king",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/race-survival-arena-king.jpg",
       "category": "SPORTS"
     },
     {
       "title": "Golf Orbit",
-      "path": "duckmath-site/g4m3s/?title=golf-orbit",
+      "path": "./duckmath-site/g4m3s/?title=golf-orbit",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Golf-Orbit-Play-Online.jpg",
       "category": "SPORTS"
     },
     {
       "title": "Ragdoll Archers",
-      "path": "duckmath-site/g4m3s/?title=ragdoll-archers",
+      "path": "./duckmath-site/g4m3s/?title=ragdoll-archers",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/ragdoll-archers.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Love Tester",
-      "path": "duckmath-site/g4m3s/?title=love-tester",
+      "path": "./duckmath-site/g4m3s/?title=love-tester",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/love-tester.jpg ",
       "category": "PUZZLE"
     },
     {
       "title": "Drift King",
-      "path": "duckmath-site/g4m3s/?title=drift-king",
+      "path": "./duckmath-site/g4m3s/?title=drift-king",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Drift-King.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Ragdoll Hit",
-      "path": "duckmath-site/g4m3s/?title=ragdoll-hit",
+      "path": "./duckmath-site/g4m3s/?title=ragdoll-hit",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/ragdoll-hit.jpg",
       "category": "PLATFORMER"
     },
     {
       "title": "Eagle DuckCraft",
-      "path": "duckmath-site/g4m3s/?title=eagle-duckcraft",
+      "path": "./duckmath-site/g4m3s/?title=eagle-duckcraft",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/eagle-duckcraft-new.webp",
       "category": "STRATEGY"
     },
     {
       "title": "Football Bros",
-      "path": "duckmath-site/g4m3s/?title=football-bros",
+      "path": "./duckmath-site/g4m3s/?title=football-bros",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/football-bros.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Highway Traffic",
-      "path": "duckmath-site/g4m3s/?title=highway-traffic",
+      "path": "./duckmath-site/g4m3s/?title=highway-traffic",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Highway-Traffic-2.jpg",
       "category": "RACING"
     },
     {
       "title": "Friday Night Funkin",
-      "path": "duckmath-site/g4m3s/?title=friday-night-funkin",
+      "path": "./duckmath-site/g4m3s/?title=friday-night-funkin",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/friday.webp",
       "category": "PUZZLE"
     },
     {
       "title": "Backflip Challenge",
-      "path": "duckmath-site/g4m3s/?title=backflip-challenge",
+      "path": "./duckmath-site/g4m3s/?title=backflip-challenge",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/backflip-challenge-game-lg.webp",
       "category": "SIMULATION"
     },
     {
       "title": "Super Liquid Soccer",
-      "path": "duckmath-site/g4m3s/?title=super-liquid-soccer",
+      "path": "./duckmath-site/g4m3s/?title=super-liquid-soccer",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/super-liquid-soccer.jpg",
       "category": "SPORTS"
     },
     {
       "title": "Velocity Rush",
-      "path": "duckmath-site/g4m3s/?title=velocity-rush",
+      "path": "./duckmath-site/g4m3s/?title=velocity-rush",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img3/velocity-rush.webp",
       "category": "ARCADE"
     },
     {
       "title": "Bridge Race",
-      "path": "duckmath-site/g4m3s/?title=bridge-race",
+      "path": "./duckmath-site/g4m3s/?title=bridge-race",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/bridge-race.jpg",
       "category": "STRATEGY"
     },
     {
       "title": "Thorns And Ballons",
-      "path": "duckmath-site/g4m3s/?title=thorns-and-ballons",
+      "path": "./duckmath-site/g4m3s/?title=thorns-and-ballons",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/thorns-and-ballons.jpg",
       "category": "PUZZLE"
     },
     {
       "title": "Escape Car",
-      "path": "duckmath-site/g4m3s/?title=escape-car",
+      "path": "./duckmath-site/g4m3s/?title=escape-car",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Escape-Car.jpg",
       "category": "SPORTS"
     },
     {
       "title": "Steal Brainrots Multiplayer",
-      "path": "duckmath-site/g4m3s/?title=steal-brainrots-multiplayer",
+      "path": "./duckmath-site/g4m3s/?title=steal-brainrots-multiplayer",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img3/steal-brainrots-multiplayer.webp",
       "category": "ARCADE"
     },
     {
       "title": "Sh3llsh0ck",
-      "path": "duckmath-site/g4m3s/?title=sh3llsh0ck",
+      "path": "./duckmath-site/g4m3s/?title=sh3llsh0ck",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/shell-shockers.webp",
       "category": "STRATEGY"
     },
     {
       "title": "Stack Fire Ball",
-      "path": "duckmath-site/g4m3s/?title=stack-fire-ball",
+      "path": "./duckmath-site/g4m3s/?title=stack-fire-ball",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Stack-Fire-Ball-Game.jpg",
       "category": "SIMULATION"
     },
     {
       "title": "Baseball Bros",
-      "path": "duckmath-site/g4m3s/?title=baseball-bros",
+      "path": "./duckmath-site/g4m3s/?title=baseball-bros",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/baseball-bros.jpg",
       "category": "SPORTS"
     },
     {
       "title": "Geometry Vector",
-      "path": "duckmath-site/g4m3s/?title=geometry-vector",
+      "path": "./duckmath-site/g4m3s/?title=geometry-vector",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img3/geometry-vector.webp",
       "category": "ARCADE"
     },
     {
       "title": "Crazy Cattle 3D Pro",
-      "path": "duckmath-site/g4m3s/?title=crazy-cattle-3d-pro",
+      "path": "./duckmath-site/g4m3s/?title=crazy-cattle-3d-pro",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/crazy-cattle-3d.webp",
       "category": "ADVENTURE"
     },
     {
       "title": "Wheelie Bike",
-      "path": "duckmath-site/g4m3s/?title=wheelie-bike",
+      "path": "./duckmath-site/g4m3s/?title=wheelie-bike",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/wheelie-bike.jpg",
       "category": "SPORTS"
     },
     {
       "title": "Basketball Stars",
-      "path": "duckmath-site/g4m3s/?title=basketball-stars",
+      "path": "./duckmath-site/g4m3s/?title=basketball-stars",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/basketball-stars.webp",
       "category": "SPORTS"
     },
     {
       "title": "Solar Smash",
-      "path": "duckmath-site/g4m3s/?title=solar-smash",
+      "path": "./duckmath-site/g4m3s/?title=solar-smash",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/solar-smash.png",
       "category": "STRATEGY"
     },
     {
       "title": "Drift Hunters 2024",
-      "path": "duckmath-site/g4m3s/?title=drift-hunters-2024",
+      "path": "./duckmath-site/g4m3s/?title=drift-hunters-2024",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/drift-hunters-2024-freezenova.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Tomodachi Collection",
-      "path": "duckmath-site/g4m3s/?title=tomodachi-collection",
+      "path": "./duckmath-site/g4m3s/?title=tomodachi-collection",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img3/tomodachi-collection.webp",
       "category": "ARCADE"
     },
     {
       "title": "Masked Special Forces",
-      "path": "duckmath-site/g4m3s/?title=masked-special-forces",
+      "path": "./duckmath-site/g4m3s/?title=masked-special-forces",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/masked-special-forces.jpg",
       "category": "STRATEGY"
     },
     {
       "title": "Real Flight Simulator",
-      "path": "duckmath-site/g4m3s/?title=real-flight-simulator",
+      "path": "./duckmath-site/g4m3s/?title=real-flight-simulator",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Real-Flight-Simulator-2.jpg",
       "category": "ADVENTURE"
     },
     {
       "title": "Escape Car 2",
-      "path": "duckmath-site/g4m3s/?title=escape-car-2",
+      "path": "./duckmath-site/g4m3s/?title=escape-car-2",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img3/escape-car-2.webp",
       "category": "RACING"
     },
     {
       "title": "Snek.io",
-      "path": "duckmath-site/g4m3s/?title=snek-io",
+      "path": "./duckmath-site/g4m3s/?title=snek-io",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/snek-io.webp",
       "category": "ARCADE"
     },
     {
       "title": "Undertale Yellow",
-      "path": "duckmath-site/g4m3s/?title=undertale-yellow",
+      "path": "./duckmath-site/g4m3s/?title=undertale-yellow",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Undertale-Yellow.webp",
       "category": "ARCADE"
     },
     {
       "title": "Spider Dude Parkour",
-      "path": "duckmath-site/g4m3s/?title=spider-dude-parkour",
+      "path": "./duckmath-site/g4m3s/?title=spider-dude-parkour",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/spider-dude-parkour.jpg",
       "category": "PLATFORMER"
     },
     {
       "title": "Steal A Brainrot",
-      "path": "duckmath-site/g4m3s/?title=steal-a-brainrot",
+      "path": "./duckmath-site/g4m3s/?title=steal-a-brainrot",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/steal-a-brainrot.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Ducky Clicker",
-      "path": "duckmath-site/g4m3s/?title=ducky-clicker",
+      "path": "./duckmath-site/g4m3s/?title=ducky-clicker",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img3/ducky-clicker.webp",
       "category": "SIMULATION"
     },
     {
       "title": "Drift Hunters Pro",
-      "path": "duckmath-site/g4m3s/?title=drift-hunters-pro",
+      "path": "./duckmath-site/g4m3s/?title=drift-hunters-pro",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Drift-Hunters-Pro.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Geometry Dash Scratch",
-      "path": "duckmath-site/g4m3s/?title=geometry-dash-scratch",
+      "path": "./duckmath-site/g4m3s/?title=geometry-dash-scratch",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/Geometry-Dash-Scratch.webp",
       "category": "SIMULATION"
     },
     {
       "title": "WorldGuessr",
-      "path": "duckmath-site/g4m3s/?title=worldguessr",
+      "path": "./duckmath-site/g4m3s/?title=worldguessr",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img3/world-guesser.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Basket Bros",
-      "path": "duckmath-site/g4m3s/?title=basket-bros",
+      "path": "./duckmath-site/g4m3s/?title=basket-bros",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/basket-bros.jpeg",
       "category": "SPORTS"
     },
     {
       "title": "Ants Clicker",
-      "path": "duckmath-site/g4m3s/?title=ants-clicker",
+      "path": "./duckmath-site/g4m3s/?title=ants-clicker",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img3/ants-clicker.webp",
       "category": "SIMULATION"
     },
     {
       "title": "Troll Level",
-      "path": "duckmath-site/g4m3s/?title=troll-level",
+      "path": "./duckmath-site/g4m3s/?title=troll-level",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/troll-level-game.webp",
       "category": "STRATEGY"
     },
     {
       "title": "Blocky Puzzle",
-      "path": "duckmath-site/g4m3s/?title=blocky-puzzle",
+      "path": "./duckmath-site/g4m3s/?title=blocky-puzzle",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/blocky-puzzle.jpg",
       "category": "PUZZLE"
     },
     {
       "title": "Penalty King",
-      "path": "duckmath-site/g4m3s/?title=penalty-king",
+      "path": "./duckmath-site/g4m3s/?title=penalty-king",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/penalty-king.webp",
       "category": "SPORTS"
     },
     {
       "title": "Crazy Roll",
-      "path": "duckmath-site/g4m3s/?title=crazy-roll",
+      "path": "./duckmath-site/g4m3s/?title=crazy-roll",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/crazy-roll.webp",
       "category": "SPORTS"
     },
     {
       "title": "FNF Mods",
-      "path": "duckmath-site/g4m3s/?title=fnf-mods",
+      "path": "./duckmath-site/g4m3s/?title=fnf-mods",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img3/fnf-mods.webp",
       "category": "ARCADE"
     },
     {
       "title": "Smash Karts",
-      "path": "duckmath-site/g4m3s/?title=smash-karts",
+      "path": "./duckmath-site/g4m3s/?title=smash-karts",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/smashkarts.webp",
       "category": "ARCADE"
     },
     {
       "title": "Soviet Sniper",
-      "path": "duckmath-site/g4m3s/?title=soviet-sniper",
+      "path": "./duckmath-site/g4m3s/?title=soviet-sniper",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/cod.webp",
       "category": "STRATEGY"
     },
     {
       "title": "Funny Shooter 2",
-      "path": "duckmath-site/g4m3s/?title=funny-shooter-2",
+      "path": "./duckmath-site/g4m3s/?title=funny-shooter-2",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/funntshooes.webp",
       "category": "ARCADE"
     },
     {
       "title": "Incredibox",
-      "path": "duckmath-site/g4m3s/?title=incredibox",
+      "path": "./duckmath-site/g4m3s/?title=incredibox",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/incredibox.webp",
       "category": "ARCADE"
     },
     {
       "title": "Stickman Parkour",
-      "path": "duckmath-site/g4m3s/?title=stickman-parkour",
+      "path": "./duckmath-site/g4m3s/?title=stickman-parkour",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/stickman-parkour.webp",
       "category": "SPORTS"
     },
     {
       "title": "Edys Car Simulator",
-      "path": "duckmath-site/g4m3s/?title=edys-car-simulator",
+      "path": "./duckmath-site/g4m3s/?title=edys-car-simulator",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Edys-Car-Simulator-Online.jpg",
       "category": "RACING"
     },
     {
       "title": "Pixel Path",
-      "path": "duckmath-site/g4m3s/?title=pixel-path",
+      "path": "./duckmath-site/g4m3s/?title=pixel-path",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/pixel-path.webp",
       "category": "PUZZLE"
     },
     {
       "title": "DuckCraft 12",
-      "path": "duckmath-site/g4m3s/?title=duckcraft-12",
+      "path": "./duckmath-site/g4m3s/?title=duckcraft-12",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img3/duckcraft-12.webp",
       "category": "ARCADE"
     },
     {
       "title": "Stickman Destruction",
-      "path": "duckmath-site/g4m3s/?title=stickman-destruction",
+      "path": "./duckmath-site/g4m3s/?title=stickman-destruction",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Stickman-Destruction.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Su Battle Royale",
-      "path": "duckmath-site/g4m3s/?title=su-battle-royale",
+      "path": "./duckmath-site/g4m3s/?title=su-battle-royale",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Su-Battle-Royale.jpg",
       "category": "STRATEGY"
     },
     {
       "title": "Escaping The Prison",
-      "path": "duckmath-site/g4m3s/?title=escaping-the-prison",
+      "path": "./duckmath-site/g4m3s/?title=escaping-the-prison",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/escapeprison.webp",
       "category": "PUZZLE"
     },
     {
       "title": "Moto X3M Winter",
-      "path": "duckmath-site/g4m3s/?title=moto-x3m-winter",
+      "path": "./duckmath-site/g4m3s/?title=moto-x3m-winter",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/motox3mwinter.webp",
       "category": "SPORTS"
     },
     {
       "title": "Cluster Reborn",
-      "path": "duckmath-site/g4m3s/?title=cluster-reborn",
+      "path": "./duckmath-site/g4m3s/?title=cluster-reborn",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img3/cluster-reborn.webp",
       "category": "ARCADE"
     },
     {
       "title": "Golf Bit",
-      "path": "duckmath-site/g4m3s/?title=golf-bit",
+      "path": "./duckmath-site/g4m3s/?title=golf-bit",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img3/golf-bit.webp",
       "category": "ARCADE"
     },
     {
       "title": "Warstrike",
-      "path": "duckmath-site/g4m3s/?title=warstrike",
+      "path": "./duckmath-site/g4m3s/?title=warstrike",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/WarStrike-Online.jpg",
       "category": "ADVENTURE"
     },
     {
       "title": "DuckCraft World",
-      "path": "duckmath-site/g4m3s/?title=duckcraft-world",
+      "path": "./duckmath-site/g4m3s/?title=duckcraft-world",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img3/duckcraft-world-1.webp",
       "category": "ARCADE"
     },
     {
       "title": "Fighter Aircraft Pilot",
-      "path": "duckmath-site/g4m3s/?title=fighter-aircraft-pilot",
+      "path": "./duckmath-site/g4m3s/?title=fighter-aircraft-pilot",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/fighter-aircraft-pilotb.webp",
       "category": "STRATEGY"
     },
     {
       "title": "Spiral Roll",
-      "path": "duckmath-site/g4m3s/?title=spiral-roll",
+      "path": "./duckmath-site/g4m3s/?title=spiral-roll",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/spiralroll.webp",
       "category": "PUZZLE"
     },
     {
       "title": "Survival Karts",
-      "path": "duckmath-site/g4m3s/?title=survival-karts",
+      "path": "./duckmath-site/g4m3s/?title=survival-karts",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/survival-karts-play.jpg",
       "category": "RACING"
     },
     {
       "title": "Traffic Jam",
-      "path": "duckmath-site/g4m3s/?title=traffic-jam",
+      "path": "./duckmath-site/g4m3s/?title=traffic-jam",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Traffic-Jam.jpg",
       "category": "RACING"
     },
     {
       "title": "Burrito Bison",
-      "path": "duckmath-site/g4m3s/?title=burrito-bison",
+      "path": "./duckmath-site/g4m3s/?title=burrito-bison",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/burrito-bison.jpg",
       "category": "SPORTS"
     },
     {
       "title": "Eggy Car",
-      "path": "duckmath-site/g4m3s/?title=eggy-car",
+      "path": "./duckmath-site/g4m3s/?title=eggy-car",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/eggy-car.webp",
       "category": "RACING"
     },
     {
       "title": "Spacebar Clicker",
-      "path": "duckmath-site/g4m3s/?title=spacebar-clicker",
+      "path": "./duckmath-site/g4m3s/?title=spacebar-clicker",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Spacebar-Clicker.jpg",
       "category": "SIMULATION"
     },
     {
       "title": "Fast Food Manager",
-      "path": "duckmath-site/g4m3s/?title=fast-food-manager",
+      "path": "./duckmath-site/g4m3s/?title=fast-food-manager",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/fast-food-manager.webp",
       "category": "STRATEGY"
     },
     {
       "title": "Drift Hunters",
-      "path": "duckmath-site/g4m3s/?title=drift-hunters",
+      "path": "./duckmath-site/g4m3s/?title=drift-hunters",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Drift-Hunters-Game.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Arrow Master",
-      "path": "duckmath-site/g4m3s/?title=arrow-master",
+      "path": "./duckmath-site/g4m3s/?title=arrow-master",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/arrowmaster.oi.webp",
       "category": "SPORTS"
     },
     {
       "title": "Plants Vs Zombies",
-      "path": "duckmath-site/g4m3s/?title=plants-vs-zombies",
+      "path": "./duckmath-site/g4m3s/?title=plants-vs-zombies",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/pvz.webp",
       "category": "PUZZLE"
     },
     {
       "title": "FPS Strike",
-      "path": "duckmath-site/g4m3s/?title=fps-strike",
+      "path": "./duckmath-site/g4m3s/?title=fps-strike",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/fps-strike-online.jpg",
       "category": "STRATEGY"
     },
     {
       "title": "Life Simulator",
-      "path": "duckmath-site/g4m3s/?title=life-simulator",
+      "path": "./duckmath-site/g4m3s/?title=life-simulator",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/life-simulator.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Moto X3M 3",
-      "path": "duckmath-site/g4m3s/?title=moto-x3m-3",
+      "path": "./duckmath-site/g4m3s/?title=moto-x3m-3",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/moto-x3m-3.jpg",
       "category": "SPORTS"
     },
     {
       "title": "Dune",
-      "path": "duckmath-site/g4m3s/?title=dune",
+      "path": "./duckmath-site/g4m3s/?title=dune",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/dune.jpg",
       "category": "STRATEGY"
     },
     {
       "title": "Davo",
-      "path": "duckmath-site/g4m3s/?title=davo",
+      "path": "./duckmath-site/g4m3s/?title=davo",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/davo.webp",
       "category": "ARCADE"
     },
     {
       "title": "Moto X3M Pool Party",
-      "path": "duckmath-site/g4m3s/?title=moto-x3m-pool-party",
+      "path": "./duckmath-site/g4m3s/?title=moto-x3m-pool-party",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/Moto-X3M-Pool-Party-512x512.jpg",
       "category": "SPORTS"
     },
     {
       "title": "We Become What We Behold",
-      "path": "duckmath-site/g4m3s/?title=we-become-what-we-behold",
+      "path": "./duckmath-site/g4m3s/?title=we-become-what-we-behold",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/we-become-what-we-behold-game.webp",
       "category": "SIMULATION"
     },
     {
       "title": "Elastic Man",
-      "path": "duckmath-site/g4m3s/?title=elastic-man",
+      "path": "./duckmath-site/g4m3s/?title=elastic-man",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Elastic-Man-Game-2.jpg",
       "category": "SIMULATION"
     },
     {
       "title": "99 Nights Forest Survival",
-      "path": "duckmath-site/g4m3s/?title=99-nights-forest-survival",
+      "path": "./duckmath-site/g4m3s/?title=99-nights-forest-survival",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/99-nights-in-the-forest-survival-lg.webp",
       "category": "ADVENTURE"
     },
     {
       "title": "Plants Vs Zombie Hybrid Story Mod",
-      "path": "duckmath-site/g4m3s/?title=plants-vs-zombie-hybrid-story-mod",
+      "path": "./duckmath-site/g4m3s/?title=plants-vs-zombie-hybrid-story-mod",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/plants-vs-zombie-hybrid-story-mod.webp",
       "category": "STRATEGY"
     },
     {
       "title": "Papa's Freezeria",
-      "path": "duckmath-site/g4m3s/?title=papas-freezeria",
+      "path": "./duckmath-site/g4m3s/?title=papas-freezeria",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/icecream.webp",
       "category": "STRATEGY"
     },
     {
       "title": "Sprunki",
-      "path": "duckmath-site/g4m3s/?title=sprunki",
+      "path": "./duckmath-site/g4m3s/?title=sprunki",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Sprunki.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Capybara Clicker",
-      "path": "duckmath-site/g4m3s/?title=capybara-clicker",
+      "path": "./duckmath-site/g4m3s/?title=capybara-clicker",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/capybara-clicker.jpg",
       "category": "STRATEGY"
     },
     {
       "title": "Super Car Driving",
-      "path": "duckmath-site/g4m3s/?title=super-car-driving",
+      "path": "./duckmath-site/g4m3s/?title=super-car-driving",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/supercardriving-2.jpg",
       "category": "RACING"
     },
     {
       "title": "The Impossible Quiz",
-      "path": "duckmath-site/g4m3s/?title=the-impossible-quiz",
+      "path": "./duckmath-site/g4m3s/?title=the-impossible-quiz",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/impossible.webp",
       "category": "PUZZLE"
     },
     {
       "title": "Clash Royale",
-      "path": "duckmath-site/g4m3s/?title=clash-royale",
+      "path": "./duckmath-site/g4m3s/?title=clash-royale",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/clash-royale.jpg",
       "category": "STRATEGY"
     },
     {
       "title": "Bit Planes",
-      "path": "duckmath-site/g4m3s/?title=bit-planes",
+      "path": "./duckmath-site/g4m3s/?title=bit-planes",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/bit-planes.webp",
       "category": "ARCADE"
     },
     {
       "title": "FNF Garcello",
-      "path": "duckmath-site/g4m3s/?title=fnf-garcello",
+      "path": "./duckmath-site/g4m3s/?title=fnf-garcello",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/fnf-garcello.webp",
       "category": "ARCADE"
     },
     {
       "title": "Duck Life 4",
-      "path": "duckmath-site/g4m3s/?title=duck-life-4",
+      "path": "./duckmath-site/g4m3s/?title=duck-life-4",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/dl4.webp",
       "category": "SPORTS"
     },
     {
       "title": "Fall Brainrots",
-      "path": "duckmath-site/g4m3s/?title=fall-brainrots",
+      "path": "./duckmath-site/g4m3s/?title=fall-brainrots",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/fall-brainrots-game-lg.webp",
       "category": "ARCADE"
     },
     {
       "title": "Crazycattle3d",
-      "path": "duckmath-site/g4m3s/?title=crazycattle3d",
+      "path": "./duckmath-site/g4m3s/?title=crazycattle3d",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Crazy-Cattle-3D.jpg",
       "category": "STRATEGY"
     },
     {
       "title": "Football Legends",
-      "path": "duckmath-site/g4m3s/?title=football-legends",
+      "path": "./duckmath-site/g4m3s/?title=football-legends",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Football-Legends.jpg",
       "category": "SPORTS"
     },
     {
       "title": "Highway Moto",
-      "path": "duckmath-site/g4m3s/?title=highway-moto",
+      "path": "./duckmath-site/g4m3s/?title=highway-moto",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/highway-moto-512.webp",
       "category": "ARCADE"
     },
     {
       "title": "Basket Random Pro",
-      "path": "duckmath-site/g4m3s/?title=basket-random-pro",
+      "path": "./duckmath-site/g4m3s/?title=basket-random-pro",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/basket-random-pro.webp",
       "category": "SPORTS"
     },
     {
       "title": "FPS Simulator",
-      "path": "duckmath-site/g4m3s/?title=fps-simulator",
+      "path": "./duckmath-site/g4m3s/?title=fps-simulator",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Fps-simulator.jpg",
       "category": "ACTION"
     },
     {
       "title": "Cubecraft Survival",
-      "path": "duckmath-site/g4m3s/?title=cubecraft-survival",
+      "path": "./duckmath-site/g4m3s/?title=cubecraft-survival",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/cubecraft-survival.webp",
       "category": "ADVENTURE"
     },
     {
       "title": "Basketball Legends",
-      "path": "duckmath-site/g4m3s/?title=basketball-legends",
+      "path": "./duckmath-site/g4m3s/?title=basketball-legends",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/basketball-legends.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Head Soccer",
-      "path": "duckmath-site/g4m3s/?title=head-soccer",
+      "path": "./duckmath-site/g4m3s/?title=head-soccer",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/head-soccer.jpg",
       "category": "SPORTS"
     },
     {
       "title": "Axis Football League",
-      "path": "duckmath-site/g4m3s/?title=axis-football-league",
+      "path": "./duckmath-site/g4m3s/?title=axis-football-league",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/axis-football-league-game.webp",
       "category": "SPORTS"
     },
     {
       "title": "Police Chase Drifter",
-      "path": "duckmath-site/g4m3s/?title=police-chase-drifter",
+      "path": "./duckmath-site/g4m3s/?title=police-chase-drifter",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Police-Chase-Drifter-Online.jpg",
       "category": "ADVENTURE"
     },
     {
       "title": "Pocket Champions",
-      "path": "duckmath-site/g4m3s/?title=pocket-champions",
+      "path": "./duckmath-site/g4m3s/?title=pocket-champions",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/pocket-champions.jpg",
       "category": "SPORTS"
     },
     {
       "title": "Archer Hero",
-      "path": "duckmath-site/g4m3s/?title=archer-hero",
+      "path": "./duckmath-site/g4m3s/?title=archer-hero",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Archer-Hero-Online.jpg",
       "category": "ADVENTURE"
     },
     {
       "title": "CS Online",
-      "path": "duckmath-site/g4m3s/?title=cs-online",
+      "path": "./duckmath-site/g4m3s/?title=cs-online",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/1.6.webp",
       "category": "STRATEGY"
     },
     {
       "title": "Stealing The Diamond",
-      "path": "duckmath-site/g4m3s/?title=stealing-the-diamond",
+      "path": "./duckmath-site/g4m3s/?title=stealing-the-diamond",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/stealdiamond.webp",
       "category": "PUZZLE"
     },
     {
       "title": "UNO",
-      "path": "duckmath-site/g4m3s/?title=uno",
+      "path": "./duckmath-site/g4m3s/?title=uno",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/uno.webp",
       "category": "PUZZLE"
     },
     {
       "title": "Penalty Challenge",
-      "path": "duckmath-site/g4m3s/?title=penalty-challenge",
+      "path": "./duckmath-site/g4m3s/?title=penalty-challenge",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/penalty-challenge-512.jpg",
       "category": "SPORTS"
     },
     {
       "title": "Drift Rider",
-      "path": "duckmath-site/g4m3s/?title=drift-rider",
+      "path": "./duckmath-site/g4m3s/?title=drift-rider",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Drift-Rider.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Fast Food Rush",
-      "path": "duckmath-site/g4m3s/?title=fast-food-rush",
+      "path": "./duckmath-site/g4m3s/?title=fast-food-rush",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/fast-food-rush.jpg",
       "category": "ADVENTURE"
     },
     {
       "title": "Wrestle Bros",
-      "path": "duckmath-site/g4m3s/?title=wrestle-bros",
+      "path": "./duckmath-site/g4m3s/?title=wrestle-bros",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/wheelie-bike.jpg",
       "category": "SPORTS"
     },
     {
       "title": "Madalin Stunt Cars Pro",
-      "path": "duckmath-site/g4m3s/?title=madalin-stunt-cars-pro",
+      "path": "./duckmath-site/g4m3s/?title=madalin-stunt-cars-pro",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Madalin-Stunt-Cars-Pro-Game.jpg",
       "category": "RACING"
     },
     {
       "title": "Chess",
-      "path": "duckmath-site/g4m3s/?title=chess",
+      "path": "./duckmath-site/g4m3s/?title=chess",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/chess-freezenova.webp",
       "category": "STRATEGY"
     },
     {
       "title": "Time Shooter Swat",
-      "path": "duckmath-site/g4m3s/?title=time-shooter-swat",
+      "path": "./duckmath-site/g4m3s/?title=time-shooter-swat",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/time-shooter-swat.jpg",
       "category": "STRATEGY"
     },
     {
       "title": "Learn 2 Fly 2",
-      "path": "duckmath-site/g4m3s/?title=learn-2-fly-2",
+      "path": "./duckmath-site/g4m3s/?title=learn-2-fly-2",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/learntofly2.webp",
       "category": "SPORTS"
     },
     {
       "title": "Run 3 Freezenova",
-      "path": "duckmath-site/g4m3s/?title=run-3-freezenova",
+      "path": "./duckmath-site/g4m3s/?title=run-3-freezenova",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/run-freezenova.webp",
       "category": "ARCADE"
     },
     {
       "title": "Time Shooter 2",
-      "path": "duckmath-site/g4m3s/?title=time-shooter-2",
+      "path": "./duckmath-site/g4m3s/?title=time-shooter-2",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Time-Shooter-2.jpg",
       "category": "PUZZLE"
     },
     {
       "title": "Highway Driver",
-      "path": "duckmath-site/g4m3s/?title=highway-driver",
+      "path": "./duckmath-site/g4m3s/?title=highway-driver",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/highway-driver-512.webp",
       "category": "RACING"
     },
     {
       "title": "Tap Tap Shots",
-      "path": "duckmath-site/g4m3s/?title=tap-tap-shots",
+      "path": "./duckmath-site/g4m3s/?title=tap-tap-shots",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/TapTap-Shots.jpg",
       "category": "SPORTS"
     },
     {
       "title": "Rooftop Snipers",
-      "path": "duckmath-site/g4m3s/?title=rooftop-snipers",
+      "path": "./duckmath-site/g4m3s/?title=rooftop-snipers",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/rooftop.webp",
       "category": "ACTION"
     },
     {
       "title": "Bob The Robber 4",
-      "path": "duckmath-site/g4m3s/?title=bob-the-robber-4",
+      "path": "./duckmath-site/g4m3s/?title=bob-the-robber-4",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/bob-the-robber-4.jpg",
       "category": "PUZZLE"
     },
     {
       "title": "Burnout City",
-      "path": "duckmath-site/g4m3s/?title=burnout-city",
+      "path": "./duckmath-site/g4m3s/?title=burnout-city",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/burnoutcity.jpg",
       "category": "ADVENTURE"
     },
     {
       "title": "Stick Battle",
-      "path": "duckmath-site/g4m3s/?title=stick-battle",
+      "path": "./duckmath-site/g4m3s/?title=stick-battle",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/stick-battle-unblocked.jpg",
       "category": "ACTION"
     },
     {
       "title": "Electric Man 2",
-      "path": "duckmath-site/g4m3s/?title=electric-man-2",
+      "path": "./duckmath-site/g4m3s/?title=electric-man-2",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/electric.webp",
       "category": "ACTION"
     },
     {
       "title": "Doge Miner",
-      "path": "duckmath-site/g4m3s/?title=doge-miner",
+      "path": "./duckmath-site/g4m3s/?title=doge-miner",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/doge-miner.jpg",
       "category": "STRATEGY"
     },
     {
       "title": "Armed Forces io",
-      "path": "duckmath-site/g4m3s/?title=armed-forces-io",
+      "path": "./duckmath-site/g4m3s/?title=armed-forces-io",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Armed-Forces-io.jpg",
       "category": "ACTION"
     },
     {
       "title": "Papa's Scooperia",
-      "path": "duckmath-site/g4m3s/?title=papas-scooperia",
+      "path": "./duckmath-site/g4m3s/?title=papas-scooperia",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/papas-scooperia.webp",
       "category": "ARCADE"
     },
     {
       "title": "Crazy Cars",
-      "path": "duckmath-site/g4m3s/?title=crazy-cars",
+      "path": "./duckmath-site/g4m3s/?title=crazy-cars",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/crazycars.webp",
       "category": "SPORTS"
     },
     {
       "title": "Geometry Escape",
-      "path": "duckmath-site/g4m3s/?title=geometry-escape",
+      "path": "./duckmath-site/g4m3s/?title=geometry-escape",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Geometry-Escape.jpg",
       "category": "PUZZLE"
     },
     {
       "title": "Staggering Beauty",
-      "path": "duckmath-site/g4m3s/?title=staggering-beauty",
+      "path": "./duckmath-site/g4m3s/?title=staggering-beauty",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/staggering-beauty.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Bloxorz",
-      "path": "duckmath-site/g4m3s/?title=bloxorz",
+      "path": "./duckmath-site/g4m3s/?title=bloxorz",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/bloxorz.webp",
       "category": "PUZZLE"
     },
     {
       "title": "Papa's Tacomia",
-      "path": "duckmath-site/g4m3s/?title=papas-tacomia",
+      "path": "./duckmath-site/g4m3s/?title=papas-tacomia",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/taco.webp",
       "category": "STRATEGY"
     },
     {
       "title": "Tanuki Sunset",
-      "path": "duckmath-site/g4m3s/?title=tanuki-sunset",
+      "path": "./duckmath-site/g4m3s/?title=tanuki-sunset",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/tanuki.webp",
       "category": "SPORTS"
     },
     {
       "title": "Cluster Rush",
-      "path": "duckmath-site/g4m3s/?title=cluster-rush",
+      "path": "./duckmath-site/g4m3s/?title=cluster-rush",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/cluster_rush.webp",
       "category": "PLATFORMER"
     },
     {
       "title": "Basket Hoop",
-      "path": "duckmath-site/g4m3s/?title=basket-hoop",
+      "path": "./duckmath-site/g4m3s/?title=basket-hoop",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Basket-Hoop.jpg",
       "category": "SPORTS"
     },
     {
       "title": "Pac Man",
-      "path": "duckmath-site/g4m3s/?title=pac-man",
+      "path": "./duckmath-site/g4m3s/?title=pac-man",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/pacman.webp",
       "category": "PUZZLE"
     },
     {
       "title": "The World's Hardest Game",
-      "path": "duckmath-site/g4m3s/?title=the-worlds-hardest-game",
+      "path": "./duckmath-site/g4m3s/?title=the-worlds-hardest-game",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/hardgame1.webp",
       "category": "PUZZLE"
     },
     {
       "title": "Rocket Hero Clicker",
-      "path": "duckmath-site/g4m3s/?title=rocket-hero-clicker",
+      "path": "./duckmath-site/g4m3s/?title=rocket-hero-clicker",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/rocket-hero-clicker.webp",
       "category": "ADVENTURE"
     },
     {
       "title": "Madalin Stunt Cars 2",
-      "path": "duckmath-site/g4m3s/?title=madalin-stunt-cars-2",
+      "path": "./duckmath-site/g4m3s/?title=madalin-stunt-cars-2",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/madalin.webp",
       "category": "SPORTS"
     },
     {
       "title": "Highway Racer Pro",
-      "path": "duckmath-site/g4m3s/?title=highway-racer-pro",
+      "path": "./duckmath-site/g4m3s/?title=highway-racer-pro",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Highway-Racer-Pro.jpg",
       "category": "RACING"
     },
     {
       "title": "Famidash",
-      "path": "duckmath-site/g4m3s/?title=famidash",
+      "path": "./duckmath-site/g4m3s/?title=famidash",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img3/famidash.webp",
       "category": "PLATFORMER"
     },
     {
       "title": "Stunt Rider",
-      "path": "duckmath-site/g4m3s/?title=stunt-rider",
+      "path": "./duckmath-site/g4m3s/?title=stunt-rider",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/stunt-rider.webp",
       "category": "ARCADE"
     },
     {
       "title": "Car Football",
-      "path": "duckmath-site/g4m3s/?title=car-football",
+      "path": "./duckmath-site/g4m3s/?title=car-football",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Car-Football.jpg",
       "category": "SPORTS"
     },
     {
       "title": "Battle Simulator",
-      "path": "duckmath-site/g4m3s/?title=battle-simulator",
+      "path": "./duckmath-site/g4m3s/?title=battle-simulator",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/tabs.webp",
       "category": "STRATEGY"
     },
     {
       "title": "Red Ball 4",
-      "path": "duckmath-site/g4m3s/?title=red-ball-4",
+      "path": "./duckmath-site/g4m3s/?title=red-ball-4",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/red-ball-4.jpg",
       "category": "PUZZLE"
     },
     {
       "title": "Fleeing The Complex",
-      "path": "duckmath-site/g4m3s/?title=fleeing-the-complex",
+      "path": "./duckmath-site/g4m3s/?title=fleeing-the-complex",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/complex.webp",
       "category": "PUZZLE"
     },
     {
       "title": "Infiltrating The Airship",
-      "path": "duckmath-site/g4m3s/?title=infiltrating-the-airship",
+      "path": "./duckmath-site/g4m3s/?title=infiltrating-the-airship",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/airship.webp",
       "category": "PUZZLE"
     },
     {
       "title": "Playground Latest Version",
-      "path": "duckmath-site/g4m3s/?title=playground-latest-version",
+      "path": "./duckmath-site/g4m3s/?title=playground-latest-version",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/playground-latest-version.jpg",
       "category": "STRATEGY"
     },
     {
       "title": "BFFs Black Friday Collection",
-      "path": "duckmath-site/g4m3s/?title=bffs-black-friday-collection",
+      "path": "./duckmath-site/g4m3s/?title=bffs-black-friday-collection",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/bffs-black-friday-collection.webp",
       "category": "ARCADE"
     },
     {
       "title": "Little Alchemy 2",
-      "path": "duckmath-site/g4m3s/?title=little-alchemy-2",
+      "path": "./duckmath-site/g4m3s/?title=little-alchemy-2",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/little-alchemy-2.jpg",
       "category": "PUZZLE"
     },
     {
       "title": "Jungle Mart",
-      "path": "duckmath-site/g4m3s/?title=jungle-mart",
+      "path": "./duckmath-site/g4m3s/?title=jungle-mart",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img3/jungle-mart.webp",
       "category": "SIMULATION"
     },
     {
       "title": "Extreme Run 3D",
-      "path": "duckmath-site/g4m3s/?title=extreme-run-3d",
+      "path": "./duckmath-site/g4m3s/?title=extreme-run-3d",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img3/extreme-run-3d.webp",
       "category": "ARCADE"
     },
     {
       "title": "Soccer Random Pro",
-      "path": "duckmath-site/g4m3s/?title=soccer-random-pro",
+      "path": "./duckmath-site/g4m3s/?title=soccer-random-pro",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/soccer-random-pro.jpg",
       "category": "SPORTS"
     },
     {
       "title": "Elastic Duck",
-      "path": "duckmath-site/g4m3s/?title=elastic-duck",
+      "path": "./duckmath-site/g4m3s/?title=elastic-duck",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img3/elastic-duck.webp",
       "category": "SIMULATION"
     },
     {
       "title": "Fire And Water",
-      "path": "duckmath-site/g4m3s/?title=fire-and-water",
+      "path": "./duckmath-site/g4m3s/?title=fire-and-water",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/fireboy.webp",
       "category": "PUZZLE"
     },
     {
       "title": "Crazy Christmas 3D",
-      "path": "duckmath-site/g4m3s/?title=crazy-christmas-3d",
+      "path": "./duckmath-site/g4m3s/?title=crazy-christmas-3d",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/crazy-christmas-game.webp",
       "category": "ADVENTURE"
     },
     {
       "title": "Spartahoppers",
-      "path": "duckmath-site/g4m3s/?title=spartahoppers",
+      "path": "./duckmath-site/g4m3s/?title=spartahoppers",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/spartahoppers.webp",
       "category": "STRATEGY"
     },
     {
       "title": "Tennis Masters",
-      "path": "duckmath-site/g4m3s/?title=tennis-masters",
+      "path": "./duckmath-site/g4m3s/?title=tennis-masters",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Tennis-Masters-2.jpg",
       "category": "SPORTS"
     },
     {
       "title": "CS Surf",
-      "path": "duckmath-site/g4m3s/?title=cs-surf",
+      "path": "./duckmath-site/g4m3s/?title=cs-surf",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/cssurf.webp",
       "category": "SPORTS"
     },
     {
       "title": "Papa's Sushiria",
-      "path": "duckmath-site/g4m3s/?title=papas-sushiria",
+      "path": "./duckmath-site/g4m3s/?title=papas-sushiria",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/papas-sushiria.webp",
       "category": "ARCADE"
     },
     {
       "title": "Meat Boy",
-      "path": "duckmath-site/g4m3s/?title=meat-boy",
+      "path": "./duckmath-site/g4m3s/?title=meat-boy",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/meat.webp",
       "category": "PLATFORMER"
     },
     {
       "title": "Rally Point",
-      "path": "duckmath-site/g4m3s/?title=rally-point",
+      "path": "./duckmath-site/g4m3s/?title=rally-point",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/rallypoint.webp",
       "category": "SPORTS"
     },
     {
       "title": "Cat Simulator",
-      "path": "duckmath-site/g4m3s/?title=cat-simulator",
+      "path": "./duckmath-site/g4m3s/?title=cat-simulator",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Cat-Simulator-Online.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Learn To Fly 3",
-      "path": "duckmath-site/g4m3s/?title=learn-to-fly-3",
+      "path": "./duckmath-site/g4m3s/?title=learn-to-fly-3",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/learn-to-fly-3.webp",
       "category": "ARCADE"
     },
     {
       "title": "Papa's Pizzeria",
-      "path": "duckmath-site/g4m3s/?title=papas-pizzeria",
+      "path": "./duckmath-site/g4m3s/?title=papas-pizzeria",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/papapizza.webp",
       "category": "STRATEGY"
     },
     {
       "title": "Papa's Cheeseria",
-      "path": "duckmath-site/g4m3s/?title=papas-cheeseria",
+      "path": "./duckmath-site/g4m3s/?title=papas-cheeseria",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/papas-cheeseria.webp",
       "category": "ARCADE"
     },
     {
       "title": "Papa's Burgeria",
-      "path": "duckmath-site/g4m3s/?title=papas-burgeria",
+      "path": "./duckmath-site/g4m3s/?title=papas-burgeria",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/burger.webp",
       "category": "STRATEGY"
     },
     {
       "title": "Papa's Wingeria",
-      "path": "duckmath-site/g4m3s/?title=papas-wingeria",
+      "path": "./duckmath-site/g4m3s/?title=papas-wingeria",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/papas-wingeria.webp",
       "category": "ARCADE"
     },
     {
       "title": "Car Stunt King",
-      "path": "duckmath-site/g4m3s/?title=car-stunt-king",
+      "path": "./duckmath-site/g4m3s/?title=car-stunt-king",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Car-Stunt-King.jpg",
       "category": "RACING"
     },
     {
       "title": "Cheese Chompers 3D",
-      "path": "duckmath-site/g4m3s/?title=cheese-chompers-3d",
+      "path": "./duckmath-site/g4m3s/?title=cheese-chompers-3d",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/cheese-chompers-3d.jpeg",
       "category": "STRATEGY"
     },
     {
       "title": "Papa's Cupcakeria",
-      "path": "duckmath-site/g4m3s/?title=papas-cupcakeria",
+      "path": "./duckmath-site/g4m3s/?title=papas-cupcakeria",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/papas-cupcakeria.webp",
       "category": "ARCADE"
     },
     {
       "title": "Jasmine Beauty Salon",
-      "path": "duckmath-site/g4m3s/?title=jasmine-beauty-salon",
+      "path": "./duckmath-site/g4m3s/?title=jasmine-beauty-salon",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/Jasmine-Beauty-Salon.webp",
       "category": "ARCADE"
     },
     {
       "title": "Fancy Pants Adventures World 3",
-      "path": "duckmath-site/g4m3s/?title=fancy-pants-adventures-world-3",
+      "path": "./duckmath-site/g4m3s/?title=fancy-pants-adventures-world-3",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/fpaw3.webp",
       "category": "PLATFORMER"
     },
     {
       "title": "House Painter",
-      "path": "duckmath-site/g4m3s/?title=house-painter",
+      "path": "./duckmath-site/g4m3s/?title=house-painter",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/house-painter-512.jpg",
       "category": "PUZZLE"
     },
     {
       "title": "Simple Loot Idle",
-      "path": "duckmath-site/g4m3s/?title=simple-loot-idle",
+      "path": "./duckmath-site/g4m3s/?title=simple-loot-idle",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/simple-loot-idle.jpg",
       "category": "SIMULATION"
     },
     {
       "title": "Classic Craft",
-      "path": "duckmath-site/g4m3s/?title=classic-craft",
+      "path": "./duckmath-site/g4m3s/?title=classic-craft",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/mc-classic.webp",
       "category": "PLATFORMER"
     },
     {
       "title": "Subway Runner Barcelona",
-      "path": "duckmath-site/g4m3s/?title=subway-runner-barcelona",
+      "path": "./duckmath-site/g4m3s/?title=subway-runner-barcelona",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/subway-runner-barcelona.jpg",
       "category": "PLATFORMER"
     },
     {
       "title": "Papa's Donuteria",
-      "path": "duckmath-site/g4m3s/?title=papas-donuteria",
+      "path": "./duckmath-site/g4m3s/?title=papas-donuteria",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/donuteria.webp",
       "category": "ARCADE"
     },
     {
       "title": "Papa's Pancakeria",
-      "path": "duckmath-site/g4m3s/?title=papas-pancakeria",
+      "path": "./duckmath-site/g4m3s/?title=papas-pancakeria",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/papas-pancakeria.webp",
       "category": "ARCADE"
     },
     {
       "title": "Papa's Bakeria",
-      "path": "duckmath-site/g4m3s/?title=papas-bakeria",
+      "path": "./duckmath-site/g4m3s/?title=papas-bakeria",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/papas-bakeria.webp",
       "category": "ARCADE"
     },
     {
       "title": "Drift City",
-      "path": "duckmath-site/g4m3s/?title=drift-city",
+      "path": "./duckmath-site/g4m3s/?title=drift-city",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/drift-city-unblocked.jpg",
       "category": "ARCADE"
     },
     {
       "title": "President Simulator",
-      "path": "duckmath-site/g4m3s/?title=president-simulator",
+      "path": "./duckmath-site/g4m3s/?title=president-simulator",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/pres_sim.webp",
       "category": "STRATEGY"
     },
     {
       "title": "Swords And Souls",
-      "path": "duckmath-site/g4m3s/?title=swords-and-souls",
+      "path": "./duckmath-site/g4m3s/?title=swords-and-souls",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/swords-and-souls-512.webp",
       "category": "ACTION"
     },
     {
       "title": "Discus",
-      "path": "duckmath-site/g4m3s/?title=discus",
+      "path": "./duckmath-site/g4m3s/?title=discus",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/disc_us.webp",
       "category": "SPORTS"
     },
     {
       "title": "Simply Up",
-      "path": "duckmath-site/g4m3s/?title=simply-up",
+      "path": "./duckmath-site/g4m3s/?title=simply-up",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/simply-up.jpg",
       "category": "SPORTS"
     },
     {
       "title": "Getting Over It",
-      "path": "duckmath-site/g4m3s/?title=getting-over-it",
+      "path": "./duckmath-site/g4m3s/?title=getting-over-it",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Getting-Over-It.jpg",
       "category": "PUZZLE"
     },
     {
       "title": "Basketball King",
-      "path": "duckmath-site/g4m3s/?title=basketball-king",
+      "path": "./duckmath-site/g4m3s/?title=basketball-king",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/basketball-king.jpg",
       "category": "SPORTS"
     },
     {
       "title": "Papa's Pastaria",
-      "path": "duckmath-site/g4m3s/?title=papas-pastaria",
+      "path": "./duckmath-site/g4m3s/?title=papas-pastaria",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/papas-pastaria.webp",
       "category": "ARCADE"
     },
     {
       "title": "Cross Roads",
-      "path": "duckmath-site/g4m3s/?title=cross-roads",
+      "path": "./duckmath-site/g4m3s/?title=cross-roads",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/crossyroad.webp",
       "category": "PLATFORMER"
     },
     {
       "title": "Car Parkour",
-      "path": "duckmath-site/g4m3s/?title=car-parkour",
+      "path": "./duckmath-site/g4m3s/?title=car-parkour",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/Car-Parkour.webp",
       "category": "RACING"
     },
     {
       "title": "Interactive Buddy",
-      "path": "duckmath-site/g4m3s/?title=interactive-buddy",
+      "path": "./duckmath-site/g4m3s/?title=interactive-buddy",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/interactive-buddy-game.webp",
       "category": "ARCADE"
     },
     {
       "title": "City Stunts",
-      "path": "duckmath-site/g4m3s/?title=city-stunts",
+      "path": "./duckmath-site/g4m3s/?title=city-stunts",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/City-Stunts-Game.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Storm The House 2",
-      "path": "duckmath-site/g4m3s/?title=storm-the-house-2",
+      "path": "./duckmath-site/g4m3s/?title=storm-the-house-2",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/storm-the-house-2.webp",
       "category": "STRATEGY"
     },
     {
       "title": "Doodle Jump",
-      "path": "duckmath-site/g4m3s/?title=doodle-jump",
+      "path": "./duckmath-site/g4m3s/?title=doodle-jump",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/doodle.webp",
       "category": "SIMULATION"
     },
     {
       "title": "Watermelon Game",
-      "path": "duckmath-site/g4m3s/?title=watermelon-game",
+      "path": "./duckmath-site/g4m3s/?title=watermelon-game",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Watermelon-Game-Online.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Fancy Pants Adventures World 2",
-      "path": "duckmath-site/g4m3s/?title=fancy-pants-adventures-world-2",
+      "path": "./duckmath-site/g4m3s/?title=fancy-pants-adventures-world-2",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/fpaw2.webp",
       "category": "PLATFORMER"
     },
     {
       "title": "Supercars Drift",
-      "path": "duckmath-site/g4m3s/?title=supercars-drift",
+      "path": "./duckmath-site/g4m3s/?title=supercars-drift",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/SuperCars-Drift.jpg",
       "category": "RACING"
     },
     {
       "title": "Turn Turn",
-      "path": "duckmath-site/g4m3s/?title=turn-turn",
+      "path": "./duckmath-site/g4m3s/?title=turn-turn",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/turn-turn.webp",
       "category": "PUZZLE"
     },
     {
       "title": "Justfall.lol",
-      "path": "duckmath-site/g4m3s/?title=justfall.lol",
+      "path": "./duckmath-site/g4m3s/?title=justfall.lol",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/justfall-lol.jpeg",
       "category": "SPORTS"
     },
     {
       "title": "Idle Duck Breakout",
-      "path": "duckmath-site/g4m3s/?title=idle-duck-breakout",
+      "path": "./duckmath-site/g4m3s/?title=idle-duck-breakout",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img3/idle-duck-breakout.webp",
       "category": "SIMULATION"
     },
     {
       "title": "Ado Cars Drifter",
-      "path": "duckmath-site/g4m3s/?title=ado-cars-drifter",
+      "path": "./duckmath-site/g4m3s/?title=ado-cars-drifter",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/ado-cars-drifter.jpg",
       "category": "RACING"
     },
     {
       "title": "Dark Forest Idle",
-      "path": "duckmath-site/g4m3s/?title=dark-forest-idle",
+      "path": "./duckmath-site/g4m3s/?title=dark-forest-idle",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/dark-forest-idle-512.webp",
       "category": "SIMULATION"
     },
     {
       "title": "Secret Sniper Agent",
-      "path": "duckmath-site/g4m3s/?title=secret-sniper-agent",
+      "path": "./duckmath-site/g4m3s/?title=secret-sniper-agent",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Secret-Sniper-Agent.jpg",
       "category": "ADVENTURE"
     },
     {
       "title": "Crazy Parking Fury",
-      "path": "duckmath-site/g4m3s/?title=crazy-parking-fury",
+      "path": "./duckmath-site/g4m3s/?title=crazy-parking-fury",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Crazy-Parking-Fury.jpg",
       "category": "RACING"
     },
     {
       "title": "Kart Bros",
-      "path": "duckmath-site/g4m3s/?title=kart-bros",
+      "path": "./duckmath-site/g4m3s/?title=kart-bros",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/kart-bros.jpg",
       "category": "SPORTS"
     },
     {
       "title": "Idle Dev Startup",
-      "path": "duckmath-site/g4m3s/?title=idle-dev-startup",
+      "path": "./duckmath-site/g4m3s/?title=idle-dev-startup",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/idle-dev-startup.jpg",
       "category": "STRATEGY"
     },
     {
       "title": "Deepest Sword",
-      "path": "duckmath-site/g4m3s/?title=deepest-sword",
+      "path": "./duckmath-site/g4m3s/?title=deepest-sword",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/deepest-sword.jpg",
       "category": "PLATFORMER"
     },
     {
       "title": "Drift Fury",
-      "path": "duckmath-site/g4m3s/?title=drift-fury",
+      "path": "./duckmath-site/g4m3s/?title=drift-fury",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Drift-Fury.jpg",
       "category": "ARCADE"
     },
     {
       "title": "The World's Hardest Game 2",
-      "path": "duckmath-site/g4m3s/?title=the-worlds-hardest-game-2",
+      "path": "./duckmath-site/g4m3s/?title=the-worlds-hardest-game-2",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/hardgame2.webp",
       "category": "PUZZLE"
     },
     {
       "title": "Burnout Racers",
-      "path": "duckmath-site/g4m3s/?title=burnout-racers",
+      "path": "./duckmath-site/g4m3s/?title=burnout-racers",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Burnout-Racers.jpg",
       "category": "RACING"
     },
     {
       "title": "Vex 8",
-      "path": "duckmath-site/g4m3s/?title=vex-8",
+      "path": "./duckmath-site/g4m3s/?title=vex-8",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/vex-8.webp",
       "category": "PUZZLE"
     },
     {
       "title": "Mini Golf",
-      "path": "duckmath-site/g4m3s/?title=mini-golf",
+      "path": "./duckmath-site/g4m3s/?title=mini-golf",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/golfmini.webp",
       "category": "SPORTS"
     },
     {
       "title": "Alien Sky Invasion",
-      "path": "duckmath-site/g4m3s/?title=alien-sky-invasion",
+      "path": "./duckmath-site/g4m3s/?title=alien-sky-invasion",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Alien-Sky-Invasion.jpg",
       "category": "ADVENTURE"
     },
     {
       "title": "Archer Master 3D Castle Defender",
-      "path": "duckmath-site/g4m3s/?title=archer-master-3d-castle-defender",
+      "path": "./duckmath-site/g4m3s/?title=archer-master-3d-castle-defender",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/archer-master-3d-castle-defender.jpg",
       "category": "SPORTS"
     },
     {
       "title": "Math Duck",
-      "path": "duckmath-site/g4m3s/?title=math-duck",
+      "path": "./duckmath-site/g4m3s/?title=math-duck",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/math-duck.webp",
       "category": "PUZZLE"
     },
     {
       "title": "Head Ball Online",
-      "path": "duckmath-site/g4m3s/?title=head-ball-online",
+      "path": "./duckmath-site/g4m3s/?title=head-ball-online",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/head-ball-online-512.webp",
       "category": "SPORTS"
     },
     {
       "title": "Crazy Karts",
-      "path": "duckmath-site/g4m3s/?title=crazy-karts",
+      "path": "./duckmath-site/g4m3s/?title=crazy-karts",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/crazy-karts.webp",
       "category": "STRATEGY"
     },
     {
       "title": "Cool Cookie Clicker",
-      "path": "duckmath-site/g4m3s/?title=cool-cookie-clicker",
+      "path": "./duckmath-site/g4m3s/?title=cool-cookie-clicker",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/cool-cookie-clicker.webp",
       "category": "SIMULATION"
     },
     {
       "title": "Funny Shooter Bro",
-      "path": "duckmath-site/g4m3s/?title=funny-shooter-bro",
+      "path": "./duckmath-site/g4m3s/?title=funny-shooter-bro",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Funny-Shooter-Bro.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Cargo Jeep Racing",
-      "path": "duckmath-site/g4m3s/?title=cargo-jeep-racing",
+      "path": "./duckmath-site/g4m3s/?title=cargo-jeep-racing",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/Cargo-Jeep-Racing.webp",
       "category": "RACING"
     },
     {
       "title": "Dreamlike Room",
-      "path": "duckmath-site/g4m3s/?title=dreamlike-room",
+      "path": "./duckmath-site/g4m3s/?title=dreamlike-room",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/dreamlike-room.webp",
       "category": "ARCADE"
     },
     {
       "title": "Egg Car Racing",
-      "path": "duckmath-site/g4m3s/?title=egg-car-racing",
+      "path": "./duckmath-site/g4m3s/?title=egg-car-racing",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/egg-car-racing.jpg",
       "category": "RACING"
     },
     {
       "title": "Hero Dragon Power",
-      "path": "duckmath-site/g4m3s/?title=hero-dragon-power",
+      "path": "./duckmath-site/g4m3s/?title=hero-dragon-power",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Hero-Dragon-Power-Game.jpg",
       "category": "ADVENTURE"
     },
     {
       "title": "The Impossible Quiz 2",
-      "path": "duckmath-site/g4m3s/?title=the-impossible-quiz-2",
+      "path": "./duckmath-site/g4m3s/?title=the-impossible-quiz-2",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/impossible2.webp",
       "category": "PUZZLE"
     },
     {
       "title": "Raft Wars 2",
-      "path": "duckmath-site/g4m3s/?title=raft-wars-2",
+      "path": "./duckmath-site/g4m3s/?title=raft-wars-2",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/rw2.webp",
       "category": "STRATEGY"
     },
     {
       "title": "Wheres My Water",
-      "path": "duckmath-site/g4m3s/?title=wheres-my-water",
+      "path": "./duckmath-site/g4m3s/?title=wheres-my-water",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/wheresmywater.webp",
       "category": "PUZZLE"
     },
     {
       "title": "Breaking The Bank",
-      "path": "duckmath-site/g4m3s/?title=breaking-the-bank",
+      "path": "./duckmath-site/g4m3s/?title=breaking-the-bank",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/breakbank.webp",
       "category": "PUZZLE"
     },
     {
       "title": "Basketball Slam Dunk",
-      "path": "duckmath-site/g4m3s/?title=basketball-slam-dunk",
+      "path": "./duckmath-site/g4m3s/?title=basketball-slam-dunk",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Basketball-Slam-Dunk.jpg",
       "category": "SPORTS"
     },
     {
       "title": "Deer Hunter",
-      "path": "duckmath-site/g4m3s/?title=deer-hunter",
+      "path": "./duckmath-site/g4m3s/?title=deer-hunter",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Deer-Hunter.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Learn To Fly Idle",
-      "path": "duckmath-site/g4m3s/?title=learn-to-fly-idle",
+      "path": "./duckmath-site/g4m3s/?title=learn-to-fly-idle",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/learn-to-fly-idle.webp",
       "category": "SIMULATION"
     },
     {
       "title": "Papa's Hot Doggeria",
-      "path": "duckmath-site/g4m3s/?title=papas-hot-doggeria",
+      "path": "./duckmath-site/g4m3s/?title=papas-hot-doggeria",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/hot-doggeria.webp",
       "category": "ARCADE"
     },
     {
       "title": "Crown Defense",
-      "path": "duckmath-site/g4m3s/?title=crown-defense",
+      "path": "./duckmath-site/g4m3s/?title=crown-defense",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/crown-defense-online.webp",
       "category": "ADVENTURE"
     },
     {
       "title": "F1 Drift Racer",
-      "path": "duckmath-site/g4m3s/?title=f1-drift-racer",
+      "path": "./duckmath-site/g4m3s/?title=f1-drift-racer",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/F1-Drift-Racer.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Agent Smith",
-      "path": "duckmath-site/g4m3s/?title=agent-smith",
+      "path": "./duckmath-site/g4m3s/?title=agent-smith",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Agent-Smith-2.jpg",
       "category": "ADVENTURE"
     },
     {
       "title": "Tractor Farming Simulator",
-      "path": "duckmath-site/g4m3s/?title=tractor-farming-simulator",
+      "path": "./duckmath-site/g4m3s/?title=tractor-farming-simulator",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Tractor-Farming-Simulator.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Burnout Drift Hunter",
-      "path": "duckmath-site/g4m3s/?title=burnout-drift-hunter",
+      "path": "./duckmath-site/g4m3s/?title=burnout-drift-hunter",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Burnout-Drift-Hunter-Online.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Tunnel Rush 2",
-      "path": "duckmath-site/g4m3s/?title=tunnel-rush-2",
+      "path": "./duckmath-site/g4m3s/?title=tunnel-rush-2",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/tunnelrush.webp",
       "category": "PLATFORMER"
     },
     {
       "title": "Awesome Tanks 2",
-      "path": "duckmath-site/g4m3s/?title=awesome-tanks-2",
+      "path": "./duckmath-site/g4m3s/?title=awesome-tanks-2",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/awesome-tanks-2.webp",
       "category": "STRATEGY"
     },
     {
       "title": "8 Ball Pool Billiard",
-      "path": "duckmath-site/g4m3s/?title=8-ball-pool-billiard",
+      "path": "./duckmath-site/g4m3s/?title=8-ball-pool-billiard",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/8-Ball-Pool-Billiard.jpg",
       "category": "STRATEGY"
     },
     {
       "title": "Kawaii Shooter",
-      "path": "duckmath-site/g4m3s/?title=kawaii-shooter",
+      "path": "./duckmath-site/g4m3s/?title=kawaii-shooter",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Kawaii-Shooter.jpg",
       "category": "ACTION"
     },
     {
       "title": "Pixelmon Town",
-      "path": "duckmath-site/g4m3s/?title=pixelmon-town",
+      "path": "./duckmath-site/g4m3s/?title=pixelmon-town",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/pixelmon-town-game-512.webp",
       "category": "ARCADE"
     },
     {
       "title": "Among Impostor",
-      "path": "duckmath-site/g4m3s/?title=among-impostor",
+      "path": "./duckmath-site/g4m3s/?title=among-impostor",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/among-impostor-512.jpg",
       "category": "ADVENTURE"
     },
     {
       "title": "Super Mini Racing",
-      "path": "duckmath-site/g4m3s/?title=super-mini-racing",
+      "path": "./duckmath-site/g4m3s/?title=super-mini-racing",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Super-Mini-Racing.jpg",
       "category": "RACING"
     },
     {
       "title": "Fall Boys",
-      "path": "duckmath-site/g4m3s/?title=fall-boys",
+      "path": "./duckmath-site/g4m3s/?title=fall-boys",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Fall-Boys.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Classicube",
-      "path": "duckmath-site/g4m3s/?title=classicube",
+      "path": "./duckmath-site/g4m3s/?title=classicube",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/classicube.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Darkness Survivors",
-      "path": "duckmath-site/g4m3s/?title=darkness-survivors",
+      "path": "./duckmath-site/g4m3s/?title=darkness-survivors",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Darkness-Survivors.jpg",
       "category": "ADVENTURE"
     },
     {
       "title": "Rooftop Duel",
-      "path": "duckmath-site/g4m3s/?title=rooftop-duel",
+      "path": "./duckmath-site/g4m3s/?title=rooftop-duel",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Rooftop-Duel-Online.jpg",
       "category": "SIMULATION"
     },
     {
       "title": "Crazy Stickman Physics",
-      "path": "duckmath-site/g4m3s/?title=crazy-stickman-physics",
+      "path": "./duckmath-site/g4m3s/?title=crazy-stickman-physics",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Crazy-Stickman-Physics.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Neon Moto Driver",
-      "path": "duckmath-site/g4m3s/?title=neon-moto-driver",
+      "path": "./duckmath-site/g4m3s/?title=neon-moto-driver",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/neon-moto-driver.webp",
       "category": "ARCADE"
     },
     {
       "title": "Alien Hominid",
-      "path": "duckmath-site/g4m3s/?title=alien-hominid",
+      "path": "./duckmath-site/g4m3s/?title=alien-hominid",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/alien.webp",
       "category": "PLATFORMER"
     },
     {
       "title": "UNO Online",
-      "path": "duckmath-site/g4m3s/?title=uno-online",
+      "path": "./duckmath-site/g4m3s/?title=uno-online",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Uno-Online-2.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Papa Louie 2 When Burgers Attack",
-      "path": "duckmath-site/g4m3s/?title=papa-louie-2-when-burgers-attack",
+      "path": "./duckmath-site/g4m3s/?title=papa-louie-2-when-burgers-attack",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/papalouie2_100x100%20(1).webp",
       "category": "PLATFORMER"
     },
     {
       "title": "Xtreme Paintball Wars",
-      "path": "duckmath-site/g4m3s/?title=xtreme-paintball-wars",
+      "path": "./duckmath-site/g4m3s/?title=xtreme-paintball-wars",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Xtreme-Paintball-Wars.jpg",
       "category": "ADVENTURE"
     },
     {
       "title": "Marble Skies",
-      "path": "duckmath-site/g4m3s/?title=marble-skies",
+      "path": "./duckmath-site/g4m3s/?title=marble-skies",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/marble_skies.webp",
       "category": "SPORTS"
     },
     {
       "title": "Stickman Peacekeeper",
-      "path": "duckmath-site/g4m3s/?title=stickman-peacekeeper",
+      "path": "./duckmath-site/g4m3s/?title=stickman-peacekeeper",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/stickmanpeace.webp",
       "category": "STRATEGY"
     },
     {
       "title": "Yeti Sensation",
-      "path": "duckmath-site/g4m3s/?title=yeti-sensation",
+      "path": "./duckmath-site/g4m3s/?title=yeti-sensation",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/yetidash.webp",
       "category": "PLATFORMER"
     },
     {
       "title": "Run 1",
-      "path": "duckmath-site/g4m3s/?title=run-1",
+      "path": "./duckmath-site/g4m3s/?title=run-1",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/run-1-game.webp",
       "category": "ARCADE"
     },
     {
       "title": "Ultimate Moto",
-      "path": "duckmath-site/g4m3s/?title=ultimate-moto",
+      "path": "./duckmath-site/g4m3s/?title=ultimate-moto",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/ultimate-moto.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Wheres My Pizza",
-      "path": "duckmath-site/g4m3s/?title=wheres-my-pizza",
+      "path": "./duckmath-site/g4m3s/?title=wheres-my-pizza",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/wheres-my-pizza-game.webp",
       "category": "ADVENTURE"
     },
     {
       "title": "Nova Craft",
-      "path": "duckmath-site/g4m3s/?title=nova-craft",
+      "path": "./duckmath-site/g4m3s/?title=nova-craft",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Nova-Craft.jpg",
       "category": "PUZZLE"
     },
     {
       "title": "Cube Worlds",
-      "path": "duckmath-site/g4m3s/?title=cube-worlds",
+      "path": "./duckmath-site/g4m3s/?title=cube-worlds",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Cube-Worlds.jpg",
       "category": "ADVENTURE"
     },
     {
       "title": "Fun Party Makeup",
-      "path": "duckmath-site/g4m3s/?title=fun-party-makeup",
+      "path": "./duckmath-site/g4m3s/?title=fun-party-makeup",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Fun-Party-Makeup.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Potty Racers 2",
-      "path": "duckmath-site/g4m3s/?title=potty-racers-2",
+      "path": "./duckmath-site/g4m3s/?title=potty-racers-2",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/potty-racers-2.jpg",
       "category": "SIMULATION"
     },
     {
       "title": "Storm The House",
-      "path": "duckmath-site/g4m3s/?title=storm-the-house",
+      "path": "./duckmath-site/g4m3s/?title=storm-the-house",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/stormthehouse.webp",
       "category": "STRATEGY"
     },
     {
       "title": "Awesome Tanks",
-      "path": "duckmath-site/g4m3s/?title=awesome-tanks",
+      "path": "./duckmath-site/g4m3s/?title=awesome-tanks",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/awesometanks1.webp",
       "category": "STRATEGY"
     },
     {
       "title": "Awesome Pirates",
-      "path": "duckmath-site/g4m3s/?title=awesome-pirates",
+      "path": "./duckmath-site/g4m3s/?title=awesome-pirates",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/awesome-pirates-512.webp",
       "category": "ACTION"
     },
     {
       "title": "Age Of Battle",
-      "path": "duckmath-site/g4m3s/?title=age-of-battle",
+      "path": "./duckmath-site/g4m3s/?title=age-of-battle",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/age-of-battle-game-lg.webp",
       "category": "STRATEGY"
     },
     {
       "title": "Hexa Puzzle",
-      "path": "duckmath-site/g4m3s/?title=hexa-puzzle",
+      "path": "./duckmath-site/g4m3s/?title=hexa-puzzle",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/hexa-puzzle-512.webp",
       "category": "PUZZLE"
     },
     {
       "title": "2 Player Crazy Racer",
-      "path": "duckmath-site/g4m3s/?title=2-player-crazy-racer",
+      "path": "./duckmath-site/g4m3s/?title=2-player-crazy-racer",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/2-Player-Crazy-Racer.jpg",
       "category": "RACING"
     },
     {
       "title": "Nova Clicker",
-      "path": "duckmath-site/g4m3s/?title=nova-clicker",
+      "path": "./duckmath-site/g4m3s/?title=nova-clicker",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Nova-Clicker.jpg",
       "category": "SIMULATION"
     },
     {
       "title": "Diggy",
-      "path": "duckmath-site/g4m3s/?title=diggy",
+      "path": "./duckmath-site/g4m3s/?title=diggy",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/diggy.webp",
       "category": "ARCADE"
     },
     {
       "title": "Paper Craft",
-      "path": "duckmath-site/g4m3s/?title=paper-craft",
+      "path": "./duckmath-site/g4m3s/?title=paper-craft",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Paper-Minecraft.jpg",
       "category": "PLATFORMER"
     },
     {
       "title": "Snaker io",
-      "path": "duckmath-site/g4m3s/?title=snaker-io",
+      "path": "./duckmath-site/g4m3s/?title=snaker-io",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img3/snaker-io.webp",
       "category": "ARCADE"
     },
     {
       "title": "Raft Wars",
-      "path": "duckmath-site/g4m3s/?title=raft-wars",
+      "path": "./duckmath-site/g4m3s/?title=raft-wars",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/rw1.webp",
       "category": "STRATEGY"
     },
     {
       "title": "Draw The Bridge",
-      "path": "duckmath-site/g4m3s/?title=draw-the-bridge",
+      "path": "./duckmath-site/g4m3s/?title=draw-the-bridge",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/draw_bridge.webp",
       "category": "PUZZLE"
     },
     {
       "title": "OvO Multiplayer",
-      "path": "duckmath-site/g4m3s/?title=ovo-multiplayer",
+      "path": "./duckmath-site/g4m3s/?title=ovo-multiplayer",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/ovo-multiplayer.jpg",
       "category": "PUZZLE"
     },
     {
       "title": "Bloonstd 2",
-      "path": "duckmath-site/g4m3s/?title=bloonstd-2",
+      "path": "./duckmath-site/g4m3s/?title=bloonstd-2",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/bloons2.webp",
       "category": "STRATEGY"
     },
     {
       "title": "Mini Cars Racing",
-      "path": "duckmath-site/g4m3s/?title=mini-cars-racing",
+      "path": "./duckmath-site/g4m3s/?title=mini-cars-racing",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Mini-Cars-Racing.jpg",
       "category": "RACING"
     },
     {
       "title": "Cobraz io Classic",
-      "path": "duckmath-site/g4m3s/?title=cobraz-io-classic",
+      "path": "./duckmath-site/g4m3s/?title=cobraz-io-classic",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Cobraz.io-Classic.jpg",
       "category": "ACTION"
     },
     {
       "title": "Conquer Kingdoms",
-      "path": "duckmath-site/g4m3s/?title=conquer-kingdoms",
+      "path": "./duckmath-site/g4m3s/?title=conquer-kingdoms",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/conquer-kingdoms.webp",
       "category": "ADVENTURE"
     },
     {
       "title": "Stunt Simulator 2",
-      "path": "duckmath-site/g4m3s/?title=stunt-simulator-2",
+      "path": "./duckmath-site/g4m3s/?title=stunt-simulator-2",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Stunt-simulator-2.jpg",
       "category": "RACING"
     },
     {
       "title": "Crazy Moto Racing",
-      "path": "duckmath-site/g4m3s/?title=crazy-moto-racing",
+      "path": "./duckmath-site/g4m3s/?title=crazy-moto-racing",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/crazy-moto-racing.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Xmas Cookie Clicker",
-      "path": "duckmath-site/g4m3s/?title=xmas-cookie-clicker",
+      "path": "./duckmath-site/g4m3s/?title=xmas-cookie-clicker",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Xmas-Cookie-Clicker.jpg",
       "category": "SIMULATION"
     },
     {
       "title": "Storm The House 3",
-      "path": "duckmath-site/g4m3s/?title=storm-the-house-3",
+      "path": "./duckmath-site/g4m3s/?title=storm-the-house-3",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/storm-house-3.webp",
       "category": "STRATEGY"
     },
     {
       "title": "Subway Idle 3D",
-      "path": "duckmath-site/g4m3s/?title=subway-idle-3d",
+      "path": "./duckmath-site/g4m3s/?title=subway-idle-3d",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Subway-Idle.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Stick Guys Defense",
-      "path": "duckmath-site/g4m3s/?title=stick-guys-defense",
+      "path": "./duckmath-site/g4m3s/?title=stick-guys-defense",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Stick-Guys-Defense.jpg",
       "category": "STRATEGY"
     },
     {
       "title": "Helix Jump",
-      "path": "duckmath-site/g4m3s/?title=helix-jump",
+      "path": "./duckmath-site/g4m3s/?title=helix-jump",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/helix-jump.jpg",
       "category": "PUZZLE"
     },
     {
       "title": "Ducklingsio",
-      "path": "duckmath-site/g4m3s/?title=ducklingsio",
+      "path": "./duckmath-site/g4m3s/?title=ducklingsio",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/ducklingsio.jpg",
       "category": "STRATEGY"
     },
     {
       "title": "Swords And Sandals 2",
-      "path": "duckmath-site/g4m3s/?title=swords-and-sandals-2",
+      "path": "./duckmath-site/g4m3s/?title=swords-and-sandals-2",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/sas2.webp",
       "category": "STRATEGY"
     },
     {
       "title": "Monster Survivors",
-      "path": "duckmath-site/g4m3s/?title=monster-survivors",
+      "path": "./duckmath-site/g4m3s/?title=monster-survivors",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Monster-survivors.jpg",
       "category": "ADVENTURE"
     },
     {
       "title": "Super Stickman Golf",
-      "path": "duckmath-site/g4m3s/?title=super-stickman-golf",
+      "path": "./duckmath-site/g4m3s/?title=super-stickman-golf",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/super-stickman-golf.jpg",
       "category": "SPORTS"
     },
     {
       "title": "State io Wars",
-      "path": "duckmath-site/g4m3s/?title=state-io-wars",
+      "path": "./duckmath-site/g4m3s/?title=state-io-wars",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/State-io-Wars.jpg",
       "category": "STRATEGY"
     },
     {
       "title": "Idle Restaurant",
-      "path": "duckmath-site/g4m3s/?title=idle-restaurant",
+      "path": "./duckmath-site/g4m3s/?title=idle-restaurant",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Idle-Restaurant.jpg",
       "category": "SIMULATION"
     },
     {
       "title": "Endless Lake",
-      "path": "duckmath-site/g4m3s/?title=endless-lake",
+      "path": "./duckmath-site/g4m3s/?title=endless-lake",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/endlesslake.webp",
       "category": "PLATFORMER"
     },
     {
       "title": "Rogue Soul 2",
-      "path": "duckmath-site/g4m3s/?title=rogue-soul-2",
+      "path": "./duckmath-site/g4m3s/?title=rogue-soul-2",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/rogue-soul-2-512.webp",
       "category": "ARCADE"
     },
     {
       "title": "Cat Miner 2",
-      "path": "duckmath-site/g4m3s/?title=cat-miner-2",
+      "path": "./duckmath-site/g4m3s/?title=cat-miner-2",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/cat-miner.webp",
       "category": "STRATEGY"
     },
     {
       "title": "Bloonstd",
-      "path": "duckmath-site/g4m3s/?title=bloonstd",
+      "path": "./duckmath-site/g4m3s/?title=bloonstd",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/bloons1.webp",
       "category": "STRATEGY"
     },
     {
       "title": "Bloonstd 3",
-      "path": "duckmath-site/g4m3s/?title=bloonstd-3",
+      "path": "./duckmath-site/g4m3s/?title=bloonstd-3",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/bloons3.webp",
       "category": "STRATEGY"
     },
     {
       "title": "Squad Shooter",
-      "path": "duckmath-site/g4m3s/?title=squad-shooter",
+      "path": "./duckmath-site/g4m3s/?title=squad-shooter",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/squad-shooter-512.webp",
       "category": "ACTION"
     },
     {
       "title": "Supermarket Simulator",
-      "path": "duckmath-site/g4m3s/?title=supermarket-simulator",
+      "path": "./duckmath-site/g4m3s/?title=supermarket-simulator",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Supermarket-Simulator-Online.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Kingdom Rush Frontiers",
-      "path": "duckmath-site/g4m3s/?title=kingdom-rush-frontiers",
+      "path": "./duckmath-site/g4m3s/?title=kingdom-rush-frontiers",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/kingdom-rush-frontiers-512.webp",
       "category": "ACTION"
     },
     {
       "title": "Car Wash",
-      "path": "duckmath-site/g4m3s/?title=car-wash",
+      "path": "./duckmath-site/g4m3s/?title=car-wash",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Car-Wash-Online-Game.jpg",
       "category": "RACING"
     },
     {
       "title": "Hero Rush Tower Defense",
-      "path": "duckmath-site/g4m3s/?title=hero-rush-tower-defense",
+      "path": "./duckmath-site/g4m3s/?title=hero-rush-tower-defense",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Hero-Rush-Tower-Defense-Play.jpg",
       "category": "ADVENTURE"
     },
     {
       "title": "American Touchdown",
-      "path": "duckmath-site/g4m3s/?title=american-touchdown",
+      "path": "./duckmath-site/g4m3s/?title=american-touchdown",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/American-Touchdown-Game.jpg",
       "category": "SPORTS"
     },
     {
       "title": "Freeway Fury 2",
-      "path": "duckmath-site/g4m3s/?title=freeway-fury-2",
+      "path": "./duckmath-site/g4m3s/?title=freeway-fury-2",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/freewayfury2.webp",
       "category": "ARCADE"
     },
     {
       "title": "War Simulator",
-      "path": "duckmath-site/g4m3s/?title=war-simulator",
+      "path": "./duckmath-site/g4m3s/?title=war-simulator",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/War-Simulator.jpg",
       "category": "ACTION"
     },
     {
       "title": "Run 3 Space",
-      "path": "duckmath-site/g4m3s/?title=run-3-space",
+      "path": "./duckmath-site/g4m3s/?title=run-3-space",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Run-3-Space.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Kingdom Attack",
-      "path": "duckmath-site/g4m3s/?title=kingdom-attack",
+      "path": "./duckmath-site/g4m3s/?title=kingdom-attack",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io//img2/kingdom-battle-3d.webp",
       "category": "STRATEGY"
     },
     {
       "title": "Choppy Orc",
-      "path": "duckmath-site/g4m3s/?title=choppy-orc",
+      "path": "./duckmath-site/g4m3s/?title=choppy-orc",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/choppy-orc.jpg",
       "category": "PUZZLE"
     },
     {
       "title": "Mini Zombie Shooters",
-      "path": "duckmath-site/g4m3s/?title=mini-zombie-shooters",
+      "path": "./duckmath-site/g4m3s/?title=mini-zombie-shooters",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/Mini-Zombie-Shooters.webp",
       "category": "ACTION"
     },
     {
       "title": "Vapor Trails",
-      "path": "duckmath-site/g4m3s/?title=vapor-trails",
+      "path": "./duckmath-site/g4m3s/?title=vapor-trails",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/vapor-trails.jpg",
       "category": "PLATFORMER"
     },
     {
       "title": "Kawai Run 2",
-      "path": "duckmath-site/g4m3s/?title=kawai-run-2",
+      "path": "./duckmath-site/g4m3s/?title=kawai-run-2",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/kawai-run-2.jpg",
       "category": "SPORTS"
     },
     {
       "title": "War Of Ships io",
-      "path": "duckmath-site/g4m3s/?title=war-of-ships-io",
+      "path": "./duckmath-site/g4m3s/?title=war-of-ships-io",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/War-of-Ships-io.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Snake Wars",
-      "path": "duckmath-site/g4m3s/?title=snake-wars",
+      "path": "./duckmath-site/g4m3s/?title=snake-wars",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Snake-Wars-Free-Game.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Find It",
-      "path": "duckmath-site/g4m3s/?title=find-it",
+      "path": "./duckmath-site/g4m3s/?title=find-it",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Find-It.jpg",
       "category": "ADVENTURE"
     },
     {
       "title": "Farming Island",
-      "path": "duckmath-site/g4m3s/?title=farming-island",
+      "path": "./duckmath-site/g4m3s/?title=farming-island",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/farming-island.jpg",
       "category": "PUZZLE"
     },
     {
       "title": "Doggo Clicker",
-      "path": "duckmath-site/g4m3s/?title=doggo-clicker",
+      "path": "./duckmath-site/g4m3s/?title=doggo-clicker",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Doggo-Clicker.jpg",
       "category": "SIMULATION"
     },
     {
       "title": "Kingdom Battle 3D",
-      "path": "duckmath-site/g4m3s/?title=kingdom-battle-3d",
+      "path": "./duckmath-site/g4m3s/?title=kingdom-battle-3d",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/kingdom-battle-3d.webp",
       "category": "STRATEGY"
     },
     {
       "title": "Nuts And Bolts Puzzle",
-      "path": "duckmath-site/g4m3s/?title=nuts-and-bolts-puzzle",
+      "path": "./duckmath-site/g4m3s/?title=nuts-and-bolts-puzzle",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/nuts-and-bolts-puzzle.jpg",
       "category": "PUZZLE"
     },
     {
       "title": "Mini Shooters",
-      "path": "duckmath-site/g4m3s/?title=mini-shooters",
+      "path": "./duckmath-site/g4m3s/?title=mini-shooters",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/mini-shooters.jpg",
       "category": "ACTION"
     },
     {
       "title": "Cool Game",
-      "path": "duckmath-site/g4m3s/?title=cool-game",
+      "path": "./duckmath-site/g4m3s/?title=cool-game",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/heck.png",
       "category": "PUZZLE"
     },
     {
       "title": "Digital Museum",
-      "path": "duckmath-site/g4m3s/?title=digital-museum",
+      "path": "./duckmath-site/g4m3s/?title=digital-museum",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/digital.webp",
       "category": "ARCADE"
     },
     {
       "title": "Hover Racer Pro",
-      "path": "duckmath-site/g4m3s/?title=hover-racer-pro",
+      "path": "./duckmath-site/g4m3s/?title=hover-racer-pro",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Hover-Racer-Pro.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Speedrun Parkour",
-      "path": "duckmath-site/g4m3s/?title=speedrun-parkour",
+      "path": "./duckmath-site/g4m3s/?title=speedrun-parkour",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Speedrun-Parkour.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Paw Clicker",
-      "path": "duckmath-site/g4m3s/?title=paw-clicker",
+      "path": "./duckmath-site/g4m3s/?title=paw-clicker",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Paw-Clicker.webp",
       "category": "SIMULATION"
     },
     {
       "title": "The Farmer",
-      "path": "duckmath-site/g4m3s/?title=the-farmer",
+      "path": "./duckmath-site/g4m3s/?title=the-farmer",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/The-Farmer.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Bubble Shooter Easy",
-      "path": "duckmath-site/g4m3s/?title=bubble-shooter-easy",
+      "path": "./duckmath-site/g4m3s/?title=bubble-shooter-easy",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/bubble-shooter-ez-512.webp",
       "category": "SIMULATION"
     },
     {
       "title": "Survival Island",
-      "path": "duckmath-site/g4m3s/?title=survival-island",
+      "path": "./duckmath-site/g4m3s/?title=survival-island",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Survival-Island.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Tank Arena",
-      "path": "duckmath-site/g4m3s/?title=tank-arena",
+      "path": "./duckmath-site/g4m3s/?title=tank-arena",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Tank-Arena-Online.jpg",
       "category": "ACTION"
     },
     {
       "title": "Slime Rush Td",
-      "path": "duckmath-site/g4m3s/?title=slime-rush-td",
+      "path": "./duckmath-site/g4m3s/?title=slime-rush-td",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/slime-rush-td.jpg",
       "category": "STRATEGY"
     },
     {
       "title": "Galactic Driver",
-      "path": "duckmath-site/g4m3s/?title=galactic-driver",
+      "path": "./duckmath-site/g4m3s/?title=galactic-driver",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Galactic-Driver.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Orb Farm",
-      "path": "duckmath-site/g4m3s/?title=orb-farm",
+      "path": "./duckmath-site/g4m3s/?title=orb-farm",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/orb-farm.jpg",
       "category": "STRATEGY"
     },
     {
       "title": "Dont Fall io",
-      "path": "duckmath-site/g4m3s/?title=dont-fall-io",
+      "path": "./duckmath-site/g4m3s/?title=dont-fall-io",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Dont-Fall-io-2.jpg",
       "category": "PLATFORMER"
     },
     {
       "title": "Cake Match Puzzle",
-      "path": "duckmath-site/g4m3s/?title=cake-match-puzzle",
+      "path": "./duckmath-site/g4m3s/?title=cake-match-puzzle",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/cake-match-puzzle.webp",
       "category": "PUZZLE"
     },
     {
       "title": "Powerslide Kart Simulator",
-      "path": "duckmath-site/g4m3s/?title=powerslide-kart-simulator",
+      "path": "./duckmath-site/g4m3s/?title=powerslide-kart-simulator",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Powerslide-Kart-Simulator.jpg",
       "category": "RACING"
     },
     {
       "title": "Head Basketball",
-      "path": "duckmath-site/g4m3s/?title=head-basketball",
+      "path": "./duckmath-site/g4m3s/?title=head-basketball",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Head-Basketball.jpg",
       "category": "SPORTS"
     },
     {
       "title": "Xx142 B2.exe",
-      "path": "duckmath-site/g4m3s/?title=xx142-b2.exe",
+      "path": "./duckmath-site/g4m3s/?title=xx142-b2.exe",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/xx142-b2.webp",
       "category": "PUZZLE"
     },
     {
       "title": "Paper Planets",
-      "path": "duckmath-site/g4m3s/?title=paper-planets",
+      "path": "./duckmath-site/g4m3s/?title=paper-planets",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/paper-planets.webp",
       "category": "STRATEGY"
     },
     {
       "title": "Riddle School",
-      "path": "duckmath-site/g4m3s/?title=riddle-school",
+      "path": "./duckmath-site/g4m3s/?title=riddle-school",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img3/riddle-school.webp",
       "category": "ARCADE"
     },
     {
       "title": "Mafia Getaway Cars",
-      "path": "duckmath-site/g4m3s/?title=mafia-getaway-cars",
+      "path": "./duckmath-site/g4m3s/?title=mafia-getaway-cars",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Mafia-Getaway-Cars.jpg",
       "category": "RACING"
     },
     {
       "title": "Cactus Mccoy 1",
-      "path": "duckmath-site/g4m3s/?title=cactus-mccoy-1",
+      "path": "./duckmath-site/g4m3s/?title=cactus-mccoy-1",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/cactus-mccoy-1.webp",
       "category": "PLATFORMER"
     },
     {
       "title": "Soul Essence Adventure",
-      "path": "duckmath-site/g4m3s/?title=soul-essence-adventure",
+      "path": "./duckmath-site/g4m3s/?title=soul-essence-adventure",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Soul-Essence-Adventure.jpg",
       "category": "ADVENTURE"
     },
     {
       "title": "Crazy Hill Climb",
-      "path": "duckmath-site/g4m3s/?title=crazy-hill-climb",
+      "path": "./duckmath-site/g4m3s/?title=crazy-hill-climb",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Crazy-Hill-Climb.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Tile Match",
-      "path": "duckmath-site/g4m3s/?title=tile-match",
+      "path": "./duckmath-site/g4m3s/?title=tile-match",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/tile-match.jpg",
       "category": "PUZZLE"
     },
     {
       "title": "The Farmer Craft",
-      "path": "duckmath-site/g4m3s/?title=the-farmer-craft",
+      "path": "./duckmath-site/g4m3s/?title=the-farmer-craft",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/The-Farmer-Craft.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Train Racing",
-      "path": "duckmath-site/g4m3s/?title=train-racing",
+      "path": "./duckmath-site/g4m3s/?title=train-racing",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Train-Racing-Game.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Pizza Party",
-      "path": "duckmath-site/g4m3s/?title=pizza-party",
+      "path": "./duckmath-site/g4m3s/?title=pizza-party",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/pizzaparty.webp",
       "category": "STRATEGY"
     },
     {
       "title": "Hook Wars",
-      "path": "duckmath-site/g4m3s/?title=hook-wars",
+      "path": "./duckmath-site/g4m3s/?title=hook-wars",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Hook-Wars.jpg",
       "category": "ADVENTURE"
     },
     {
       "title": "Survival Craft",
-      "path": "duckmath-site/g4m3s/?title=survival-craft",
+      "path": "./duckmath-site/g4m3s/?title=survival-craft",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Survival-Craft-Game.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Heist Escape",
-      "path": "duckmath-site/g4m3s/?title=heist-escape",
+      "path": "./duckmath-site/g4m3s/?title=heist-escape",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Heist-Escape.jpg",
       "category": "ADVENTURE"
     },
     {
       "title": "Veggie Survivors",
-      "path": "duckmath-site/g4m3s/?title=veggie-survivors",
+      "path": "./duckmath-site/g4m3s/?title=veggie-survivors",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/veggie-survivors-freezenova.webp",
       "category": "ADVENTURE"
     },
     {
       "title": "Storm City Mafia",
-      "path": "duckmath-site/g4m3s/?title=storm-city-mafia",
+      "path": "./duckmath-site/g4m3s/?title=storm-city-mafia",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Storm-City-Mafia.jpg",
       "category": "ACTION"
     },
     {
       "title": "Voxel World",
-      "path": "duckmath-site/g4m3s/?title=voxel-world",
+      "path": "./duckmath-site/g4m3s/?title=voxel-world",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/voxel-world.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Bookworm",
-      "path": "duckmath-site/g4m3s/?title=bookworm",
+      "path": "./duckmath-site/g4m3s/?title=bookworm",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/bookworm.webp",
       "category": "PUZZLE"
     },
     {
       "title": "Gold Miner",
-      "path": "duckmath-site/g4m3s/?title=gold-miner",
+      "path": "./duckmath-site/g4m3s/?title=gold-miner",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/gold-miner-512.webp",
       "category": "ARCADE"
     },
     {
       "title": "Hill Climb Cars",
-      "path": "duckmath-site/g4m3s/?title=hill-climb-cars",
+      "path": "./duckmath-site/g4m3s/?title=hill-climb-cars",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Hill-Climb-Cars.jpg",
       "category": "RACING"
     },
     {
       "title": "Cactus Mccoy 2",
-      "path": "duckmath-site/g4m3s/?title=cactus-mccoy-2",
+      "path": "./duckmath-site/g4m3s/?title=cactus-mccoy-2",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/cactus-mccoy-2-game.webp",
       "category": "ARCADE"
     },
     {
       "title": "Grand Prix Multiplication",
-      "path": "duckmath-site/g4m3s/?title=grand-prix-multiplication",
+      "path": "./duckmath-site/g4m3s/?title=grand-prix-multiplication",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/grandprix.webp",
       "category": "PUZZLE"
     },
     {
       "title": "Jewelanche",
-      "path": "duckmath-site/g4m3s/?title=jewelanche",
+      "path": "./duckmath-site/g4m3s/?title=jewelanche",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/jewelanche.jpg",
       "category": "PUZZLE"
     },
     {
       "title": "Tiny Castle",
-      "path": "duckmath-site/g4m3s/?title=tiny-castle",
+      "path": "./duckmath-site/g4m3s/?title=tiny-castle",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/tinycastle.webp",
       "category": "STRATEGY"
     },
     {
       "title": "Flappy Circle",
-      "path": "duckmath-site/g4m3s/?title=flappy-circle",
+      "path": "./duckmath-site/g4m3s/?title=flappy-circle",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/flappycircle.webp",
       "category": "SIMULATION"
     },
     {
       "title": "Library",
-      "path": "duckmath-site/g4m3s/?title=library",
+      "path": "./duckmath-site/g4m3s/?title=library",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img3/library.webp",
       "category": "ARCADE"
     },
     {
       "title": "Nova Billiard",
-      "path": "duckmath-site/g4m3s/?title=nova-billiard",
+      "path": "./duckmath-site/g4m3s/?title=nova-billiard",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Nova-Billiard-Game.jpg",
       "category": "STRATEGY"
     },
     {
       "title": "Money Movers",
-      "path": "duckmath-site/g4m3s/?title=money-movers",
+      "path": "./duckmath-site/g4m3s/?title=money-movers",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/moneymovers1.webp",
       "category": "PUZZLE"
     },
     {
       "title": "Siegius",
-      "path": "duckmath-site/g4m3s/?title=siegius",
+      "path": "./duckmath-site/g4m3s/?title=siegius",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/siegius-512.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Fantasy Tower Defense",
-      "path": "duckmath-site/g4m3s/?title=fantasy-tower-defense",
+      "path": "./duckmath-site/g4m3s/?title=fantasy-tower-defense",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Fantasy-Tower-Defense-2.jpg",
       "category": "STRATEGY"
     },
     {
       "title": "Math Experta",
-      "path": "duckmath-site/g4m3s/?title=math-experta",
+      "path": "./duckmath-site/g4m3s/?title=math-experta",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/math-experta-512-2.webp",
       "category": "ARCADE"
     },
     {
       "title": "Arena Of Heroes",
-      "path": "duckmath-site/g4m3s/?title=arena-of-heroes",
+      "path": "./duckmath-site/g4m3s/?title=arena-of-heroes",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/Arena-of-Heroes.webp",
       "category": "ACTION"
     },
     {
       "title": "Diver Down",
-      "path": "duckmath-site/g4m3s/?title=diver-down",
+      "path": "./duckmath-site/g4m3s/?title=diver-down",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img2/diver-down-512.webp",
       "category": "PUZZLE"
     },
     {
       "title": "Mahjong",
-      "path": "duckmath-site/g4m3s/?title=mahjong",
+      "path": "./duckmath-site/g4m3s/?title=mahjong",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Mahjong.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Marco",
-      "path": "duckmath-site/g4m3s/?title=marco",
+      "path": "./duckmath-site/g4m3s/?title=marco",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Marco-Online.jpg",
       "category": "ADVENTURE"
     },
     {
       "title": "Solitaire Adventure",
-      "path": "duckmath-site/g4m3s/?title=solitaire-adventure",
+      "path": "./duckmath-site/g4m3s/?title=solitaire-adventure",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Solitaire-Adventure-Tripeaks.jpg",
       "category": "STRATEGY"
     },
     {
       "title": "MaddoxCraft",
-      "path": "duckmath-site/g4m3s/?title=maddoxcraft",
+      "path": "./duckmath-site/g4m3s/?title=maddoxcraft",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img3/maddoxcraft.jpeg",
       "category": "ARCADE"
     },
     {
       "title": "E-Life Simulator",
-      "path": "duckmath-site/g4m3s/?title=e-life-simulator",
+      "path": "./duckmath-site/g4m3s/?title=e-life-simulator",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/life-simulator.jpg",
       "category": "STRATEGY"
     },
     {
       "title": "Rodeo Stampede",
-      "path": "duckmath-site/g4m3s/?title=rodeo-stampede",
+      "path": "./duckmath-site/g4m3s/?title=rodeo-stampede",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/rodeo-stampede.webp",
       "category": "STRATEGY"
     },
     {
       "title": "Sudoku",
-      "path": "duckmath-site/g4m3s/?title=sudoku",
+      "path": "./duckmath-site/g4m3s/?title=sudoku",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/Sudoku.jpg",
       "category": "ARCADE"
     },
     {
       "title": "Truck Loader 4",
-      "path": "duckmath-site/g4m3s/?title=truck-loader-4",
+      "path": "./duckmath-site/g4m3s/?title=truck-loader-4",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/truckloader4.webp",
       "category": "PUZZLE"
     },
     {
       "title": "Orion Sandbox",
-      "path": "duckmath-site/g4m3s/?title=orion-sandbox",
+      "path": "./duckmath-site/g4m3s/?title=orion-sandbox",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/orion-sandbox.jpg",
       "category": "STRATEGY"
     },
     {
       "title": "Global Guesser",
-      "path": "duckmath-site/g4m3s/?title=global-guesser",
+      "path": "./duckmath-site/g4m3s/?title=global-guesser",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img3/global-guesser.webp",
       "category": "ARCADE"
     },
     {
       "title": "Block Blast",
-      "path": "duckmath-site/g4m3s/?title=block-blast",
+      "path": "./duckmath-site/g4m3s/?title=block-blast",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/img/block-blast.jpg",
       "category": "PUZZLE"
     },
     {
       "title": "Duck Life 3",
-      "path": "duckmath-site/g4m3s/?title=duck-life-3",
+      "path": "./duckmath-site/g4m3s/?title=duck-life-3",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/dl3.webp",
       "category": "SPORTS"
     },
     {
       "title": "Duck Life 2",
-      "path": "duckmath-site/g4m3s/?title=duck-life-2",
+      "path": "./duckmath-site/g4m3s/?title=duck-life-2",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/dl2.webp",
       "category": "SPORTS"
     },
     {
       "title": "2048",
-      "path": "duckmath-site/g4m3s/?title=2048",
+      "path": "./duckmath-site/g4m3s/?title=2048",
       "image": "https://cdn.jsdelivr.net/gh/mathlesson/mathlesson.github.io/2048.webp",
       "category": "PUZZLE"
     }
