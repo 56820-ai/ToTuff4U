@@ -465,7 +465,7 @@
       const logos = {
         "slope": "../images/slope.png",
         "retro bowl": "../images/retrobowl.jpg",
-        "retro bowl time": "../images/retrobowl.jpg",
+        "retro bowl time": "../images/retrobowl.jpg",\n        "blocky combat swat time": "https://img.gamepost.com/cloud/v2-y8-thumbs-big-thumbnails-001/101159/big.gif",
         "gunspin": "../images/gunspin.png",
         "block blast": "../images/blockblast.png",
         "drift boss": "../images/driftboss.png",
@@ -563,7 +563,7 @@
 
       // Keep every submitted score as its own leaderboard record.
       // A player may appear multiple times when they submit multiple runs.
-      const timedGames = new Set(["minecraft", "retro bowl time"]);
+      const timedGames = new Set(["minecraft", "retro bowl time", "blocky combat swat time"]);
       const byGame = new Map();
       onlineScores.forEach(item => {
         const key = String(item.game_title || "Game").trim().toLowerCase();
