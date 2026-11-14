@@ -572,24 +572,6 @@
       "category": "ARCADE"
     },
     {
-      "title": "T Lanes",
-      "path": "g/one-button-collection/?tlanes",
-      "image": "g/one-button-collection/tlanes/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
-      "title": "Holes",
-      "path": "g/one-button-collection/?holes",
-      "image": "g/one-button-collection/holes/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
-      "title": "Flip O",
-      "path": "g/one-button-collection/?flipo",
-      "image": "g/one-button-collection/flipo/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
       "title": "Tower of Hanoi",
       "path": "g/one-button-collection/?thanoi",
       "image": "g/one-button-collection/thanoi/screenshot.gif",
@@ -605,18 +587,6 @@
       "title": "TT Fence",
       "path": "g/one-button-collection/?ttfence",
       "image": "g/one-button-collection/ttfence/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
-      "title": "C Tower",
-      "path": "g/one-button-collection/?ctower",
-      "image": "g/one-button-collection/ctower/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
-      "title": "Growth",
-      "path": "g/one-button-collection/?growth",
-      "image": "g/one-button-collection/growth/screenshot.gif",
       "category": "ARCADE"
     },
     {
@@ -656,12 +626,6 @@
       "category": "ARCADE"
     },
     {
-      "title": "Snaky",
-      "path": "g/one-button-collection/?snaky",
-      "image": "g/one-button-collection/snaky/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
       "title": "Wiper",
       "path": "g/one-button-collection/?wiper",
       "image": "g/one-button-collection/wiper/screenshot.gif",
@@ -683,12 +647,6 @@
       "title": "Number Line",
       "path": "g/one-button-collection/?numberline",
       "image": "g/one-button-collection/numberline/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
-      "title": "Line B",
-      "path": "g/one-button-collection/?lineb",
-      "image": "g/one-button-collection/lineb/screenshot.gif",
       "category": "ARCADE"
     },
     {
@@ -746,12 +704,6 @@
       "category": "ARCADE"
     },
     {
-      "title": "Sub Jump",
-      "path": "g/one-button-collection/?subjump",
-      "image": "g/one-button-collection/subjump/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
       "title": "Scaffold",
       "path": "g/one-button-collection/?scaffold",
       "image": "g/one-button-collection/scaffold/screenshot.gif",
@@ -773,12 +725,6 @@
       "title": "Parking",
       "path": "g/one-button-collection/?parking",
       "image": "g/one-button-collection/parking/screenshot.gif",
-      "category": "ARCADE"
-    },
-    {
-      "title": "Balance",
-      "path": "g/one-button-collection/?balance",
-      "image": "g/one-button-collection/balance/screenshot.gif",
       "category": "ARCADE"
     },
     {
