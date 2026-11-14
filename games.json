@@ -558,6 +558,12 @@
       "path": "g/duckdb2-blocky-combat-swat-main",
       "image": "images/blocky-combat-swat.svg",
       "category": "ACTION"
+    },
+    {
+      "title": "Block Blast",
+      "path": "g/blockblast",
+      "image": "images/blockblast.png",
+      "category": "PUZZLE"
     }
   ]
 }
