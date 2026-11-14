@@ -1,7 +1,7 @@
 import { chromium } from "playwright";
 import { readFile, writeFile, appendFile } from "node:fs/promises";
 
-const BASE = "http://127.0.0.1:4173";
+const BASE = "http://127.0.0.1:4173/ToTuff4U";
 const gamesData = JSON.parse(await readFile("games.json", "utf8"));
 const catalog = Array.isArray(gamesData.games) ? gamesData.games : [];
 const browser = await chromium.launch({
@@ -70,8 +70,19 @@ async function checkGame(game) {
   const frames = await page.locator("iframe").evaluateAll(els => els.map(f => f.getAttribute("src") || f.src).filter(Boolean)).catch(() => []);
   const canvases = await page.locator("canvas").count().catch(() => 0);
   const mainFrameUrl = page.url();
-  const missingPage = /(^|\n)\s*(404|page not found|file not found)\s*(\n|$)/i.test(body.slice(0, 900));
-  const hardFailure = !response || status >= 400 || missingPage || localFailures.length > 0 || !!navigationError;
+  const missingPage = /(^|\n)\s*(404|page not found|file not found|error response)\s*(\n|$)/i.test(body.slice(0, 900)) ||
+    /error response/i.test(title);
+  const criticalPageErrors = pageErrors.filter(message =>
+    /Invalid or unexpected token|Unexpected token|Unexpected number|missing \\) after argument list|Invalid regular expression|THREE is not defined|Identifier .* already declared|check is not defined|status 404/i.test(message)
+  );
+  const missingCoreAssets = localFailures.filter(item =>
+    /\\.(js|wasm|unityweb|data|json)(?:[?#]|$)/i.test(item.url) &&
+    !/(\\/js\\/(main|favicon|panic|gtag|auto-clicker|autoclicker)\\.js|\\/storage\\/js\\/cloak\\.js|save\\.dat|optiondata\\.dat|savedata\\.ini|service.?worker|\\/sw\\.js|\\/cdn-cgi\\/)/i.test(item.url)
+  );
+  const iframeHosts = frames.map(src => { try { return new URL(src, url).host; } catch { return ""; } }).filter(Boolean);
+  const failedGameFrames = externalFailures.filter(item => iframeHosts.some(host => item.url.includes(host)));
+  const hardFailure = !response || status >= 400 || missingPage || !!navigationError ||
+    criticalPageErrors.length > 0 || missingCoreAssets.length > 0 || failedGameFrames.length > 0;
   await page.close().catch(() => {});
   return {
     title: game.title,
@@ -82,6 +93,9 @@ async function checkGame(game) {
     hardFailure,
     navigationError,
     localFailures: localFailures.slice(0, 12),
+    missingCoreAssets: missingCoreAssets.slice(0, 12),
+    criticalPageErrors: criticalPageErrors.slice(0, 8),
+    failedGameFrames: failedGameFrames.slice(0, 8),
     externalFailures: externalFailures.slice(0, 8),
     pageErrors: pageErrors.slice(0, 8),
     iframeSources: frames.slice(0, 5),
@@ -266,7 +280,13 @@ try {
   duckmath.error = String(e.message || e).slice(0, 500);
 }
 
-const existing = new Set(catalog.map(g => String(g.title || "").trim().toLowerCase()));
+const failedTitles = new Set(results.filter(r => r.hardFailure).map(r => String(r.title || "").trim().toLowerCase()));
+const removedBrokenGames = gamesData.games.filter(g => failedTitles.has(String(g.title || "").trim().toLowerCase()));
+if (removedBrokenGames.length) {
+  gamesData.games = gamesData.games.filter(g => !failedTitles.has(String(g.title || "").trim().toLowerCase()));
+  await writeFile("games.json", JSON.stringify(gamesData, null, 2) + "\\n");
+}
+const existing = new Set(gamesData.games.map(g => String(g.title || "").trim().toLowerCase()));
 const uniqueAdditions = additions.filter((g, i, arr) => {
   const key = g.title.toLowerCase();
   if (existing.has(key)) return false;
@@ -283,7 +303,8 @@ const report = {
   catalogCount: catalog.length,
   catalogPassed: results.filter(r => !r.hardFailure).length,
   catalogFailed: results.filter(r => r.hardFailure),
-  catalogWarnings: results.filter(r => r.pageErrors.length || r.externalFailures.length),
+  catalogWarnings: results.filter(r => r.pageErrors.length || r.externalFailures.length || r.localFailures.length),
+  removedBrokenGames: removedBrokenGames.map(g => g.title),
   logoAudit,
   brokenLogos: logoAudit.filter(x => !x.ok),
   duckmath,
@@ -298,6 +319,7 @@ if (process.env.GITHUB_STEP_SUMMARY) {
     `- Arcade Atlas entries tested: ${report.catalogCount}`,
     `- Arcade Atlas pages passing hard checks: ${report.catalogPassed}`,
     `- Arcade Atlas hard failures: ${report.catalogFailed.length}`,
+    `- Broken Arcade Atlas games removed: ${removedBrokenGames.length}`,
     `- Catalog logos checked: ${logoAudit.length}`,
     `- Broken catalog logos: ${report.brokenLogos.length}`,
     `- DuckMath dynamic games found: ${duckmath.cachedApps}`,
@@ -308,6 +330,9 @@ if (process.env.GITHUB_STEP_SUMMARY) {
     `- New DuckMath games added to Arcade Atlas: ${uniqueAdditions.length}`,
     `- Leaderboard logo map loaded: ${uiAudit.leaderboard.logoCount || 0}`,
     `- Blocky Combat timer detected: ${!!uiAudit.blockyCombat.timer}`,
+    "",
+    "## Removed broken Arcade Atlas games",
+    ...report.removedBrokenGames.map(title => `- ${title}`),
     "",
     "## Broken catalog logos",
     ...report.brokenLogos.map(x => `- ${x.title}: ${x.reason || (x.width + "x" + x.height)} (${x.url})`),
@@ -326,6 +351,7 @@ console.log(JSON.stringify({
   catalogCount: report.catalogCount,
   catalogPassed: report.catalogPassed,
   catalogFailed: report.catalogFailed.length,
+  removedBrokenGames: report.removedBrokenGames.length,
   duckmathFound: duckmath.cachedApps,
   duckmathVerified: duckmath.verified.length,
   duckmathBroken: duckmath.broken.length,
