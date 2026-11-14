@@ -528,6 +528,20 @@
       "path": "g/ovo",
       "image": "images/ovo.jpg",
       "category": "PLATFORMER"
+    },
+    {
+      "title": "Pac-Man",
+      "path": "g/pacman",
+      "image": "./duckmath-site/assets/img/icons/pacman.webp",
+      "category": "ARCADE",
+      "source": "https://github.com/8tentaculos/jsPacman"
+    },
+    {
+      "title": "Doodle Jump",
+      "path": "g/doodle-jump",
+      "image": "./duckmath-site/assets/img/icons/doodle.webp",
+      "category": "ARCADE",
+      "source": "https://github.com/freemany/gamedoh"
     }
   ]
 }
