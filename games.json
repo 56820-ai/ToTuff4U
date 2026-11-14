@@ -650,6 +650,30 @@
       "path": "g/hideandsmash",
       "image": "images/hideandsmash.png",
       "category": "ACTION"
+    },
+    {
+      "title": "Color Clash",
+      "path": "g/color-clash",
+      "image": "images/color-clash.svg",
+      "category": "PUZZLE"
+    },
+    {
+      "title": "Whack-a-Mole",
+      "path": "g/whack-a-mole",
+      "image": "images/whack-a-mole.svg",
+      "category": "ARCADE"
+    },
+    {
+      "title": "Neon Racer",
+      "path": "g/neon-racer",
+      "image": "images/neon-racer.svg",
+      "category": "RACING"
+    },
+    {
+      "title": "Mario Kart 64",
+      "path": "g/mariakart64",
+      "image": "./duckmath-site/assets/img/icons/supermario64.webp",
+      "category": "RACING"
     }
   ]
 }
