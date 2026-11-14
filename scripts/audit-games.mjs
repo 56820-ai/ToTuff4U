@@ -137,8 +137,9 @@ try {
 // test each returned game's page wrapper before adding it to Arcade Atlas.
 const duckmath = { homeStatus: null, dynamicCards: 0, cachedApps: 0, checked: 0, verified: [], broken: [], excludedForAge: [], error: "" };
 let additions = [];
+const duckContext = await browser.newContext({ viewport: { width: 1365, height: 768 } });
 try {
-  const home = await browser.newPage({ viewport: { width: 1365, height: 768 } });
+  const home = await duckContext.newPage();
   home.on("dialog", d => d.accept().catch(() => {}));
   const r = await home.goto(BASE + "/duckmath-site/", { waitUntil: "domcontentloaded", timeout: 20000 });
   duckmath.homeStatus = r ? r.status() : null;
@@ -162,7 +163,7 @@ try {
     while (appCursor < apps.length) {
       const i = appCursor++;
       const app = apps[i];
-      const page = await browser.newPage({ viewport: { width: 1365, height: 768 } });
+      const page = await duckContext.newPage();
       const failures = [];
       page.on("dialog", d => d.accept().catch(() => {}));
       page.on("response", resp => {
@@ -220,7 +221,9 @@ try {
     const disabledTitles = [...new Set(duckmath.broken.map(x => String(x.title || "").trim()).filter(Boolean))];
     await writeFile("duckmath-site/disabled-games.json", JSON.stringify(disabledTitles, null, 2) + "\n");
   }
+  await duckContext.close();
 } catch (e) {
+  await duckContext.close().catch(() => {});
   duckmath.error = String(e.message || e).slice(0, 500);
 }
 
