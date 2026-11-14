@@ -552,6 +552,12 @@
       "title": "Duck Life 3",
       "path": "g/ducklife3",
       "image": "./duckmath-site/assets/img/icons/dl3.webp"
+    },
+    {
+      "title": "Blocky Combat SWAT",
+      "path": "g/duckdb2-blocky-combat-swat-main",
+      "image": "images/blocky-combat-swat.svg",
+      "category": "ACTION"
     }
   ]
 }
