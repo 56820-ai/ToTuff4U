@@ -64,7 +64,7 @@ Deno.serve(async (req: Request) => {
   const scoreText = typeof body.score === "string" ? body.score :
     Number.isSafeInteger(body.score) ? String(body.score) : "";
   const kind = body.kind === "session" ? "session" : body.kind === "score" ? "score" : "";
-  if (!playerName || !gameTitle || !kind || !/^[0-9]{1,100}$/.test(scoreText) ||
+  if (!playerName || !gameTitle || !kind || !/^[0-9]{1,500}$/.test(scoreText) ||
       (kind === "session" && BigInt(scoreText) < 5n)) {
     return json({ error: "Invalid score submission." }, 400);
   }
