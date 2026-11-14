@@ -358,9 +358,12 @@
                     else setStatus("DEATH / RUN END DETECTED · confirming (" + endScreenHits + "/2)");
                     endScreenHits = ended ? endScreenHits + 1 : 0;
 
-                    if ((textEnded || endScreenHits >= 2) && !handled) {
+                    // Wait for the same end-screen score to be read confidently twice.
+                    // Previously textEnded bypassed confirmation and submitted maxScore
+                    // while it was still zero on the first OCR pass.
+                    if ((textEnded || endScreenHits >= 2) && endScoreCandidateHits >= 2 && maxScore > 0 && !handled) {
                         handled = true;
-                        var score = maxScore || 0;
+                        var score = maxScore;
                         if (score > 0 && leaderboardReady && window.ArcadeScores) {
                             setStatus("game ended · submitting detected score " + score);
                             var playerName = window.ArcadeScores.getPlayerName("Enter your name for the Slope leaderboard (24 characters max):");
