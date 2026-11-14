@@ -64,9 +64,14 @@ Deno.serve(async (req: Request) => {
   const scoreText = typeof body.score === "string" ? body.score :
     Number.isSafeInteger(body.score) ? String(body.score) : "";
   const kind = body.kind === "session" ? "session" : body.kind === "score" ? "score" : "";
-  if (!playerName || !gameTitle || !kind || !/^[0-9]{1,500}$/.test(scoreText) ||
-      (kind === "session" && BigInt(scoreText) < 5n)) {
-    return json({ error: "Invalid score submission." }, 400);
+  if (!playerName) return json({ error: "A valid player name is required." }, 400);
+  if (!gameTitle) return json({ error: "A valid game title is required." }, 400);
+  if (!kind) return json({ error: "The submission type is missing or invalid." }, 400);
+  if (!/^[0-9]{1,500}$/.test(scoreText)) {
+    return json({ error: "The score must be a whole-number decimal string containing 1–500 digits." }, 400);
+  }
+  if (kind === "session" && BigInt(scoreText) < 5n) {
+    return json({ error: "Playtime submissions must be at least 5 seconds." }, 400);
   }
   if (kind === "score" && gameTitle.toLowerCase() === "slope" && BigInt(scoreText) > 1500n) {
     return json({ error: "Slope scores are limited to 1,500." }, 400);
