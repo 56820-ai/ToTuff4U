@@ -41,7 +41,7 @@ function slugFromGame(game) {
   catch { return String(game?.title || ""); }
 }
 function formatGameTitle(value) {
-  const slug = String(value || "").trim().toLowerCase().replace(/[\\s_]+/g, "-");
+  const slug = String(value || "").trim().toLowerCase().replace(/[\s_]+/g, "-");
   const special = {
     "snek-io": "Snek.io",
     "worldguessr": "WorldGuessr",
@@ -58,7 +58,7 @@ function formatGameTitle(value) {
   };
   if (special[slug]) return special[slug];
   const words = { fnf:"FNF", gta:"GTA", cs:"CS", csgo:"CSGO", uno:"UNO", ovo:"OvO", fps:"FPS", btd:"BTD", f1:"F1", bffs:"BFFs", moto:"Moto", x3m:"X3M", "2d":"2D", "3d":"3D", papas:"Papa's", duckcraft:"DuckCraft", eaglecraft:"EagleCraft", maddoxcraft:"MaddoxCraft", nba:"NBA", nfl:"NFL", io:"io" };
-  return slug.split("-").filter(Boolean).map(word => words[word] || (/^\\d+$/.test(word) ? word : word[0].toUpperCase() + word.slice(1))).join(" ");
+  return slug.split("-").filter(Boolean).map(word => words[word] || (/^\d+$/.test(word) ? word : word[0].toUpperCase() + word.slice(1))).join(" ");
 }
 function suitableForMiddleSchool(app) {
   const text = [app?.title, app?.categories, app?.description].flat().join(" ").toLowerCase();
@@ -344,7 +344,7 @@ const uniqueAdditions = additions.filter((game, index, array) => {
 });
 if (uniqueAdditions.length) gamesData.games.push(...uniqueAdditions);
 if (removedBrokenGames.length || removedUnsuitableDuckMath.length || removedDuplicateDuckMath.length || uniqueAdditions.length) {
-  await writeFile("games.json", JSON.stringify(gamesData, null, 2) + "\\n");
+  await writeFile("games.json", JSON.stringify(gamesData, null, 2) + "\n");
 }
 const report = {
   generatedAt: new Date().toISOString(),
