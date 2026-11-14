@@ -1,0 +1,35 @@
+name: Deploy Quack Lab DuckCraft
+on:
+  push:
+    paths:
+      - ".github/workflows/deploy-duckcraft-web.yml"
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download successful browser export
+        uses: actions/download-artifact@v4
+        with:
+          name: duckcraft-browser-build
+          run-id: 43516761247
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: /tmp/duckcraft-build
+      - name: Install browser build
+        run: |
+          mkdir -p g/duckcraft-quacklab
+          cp -a /tmp/duckcraft-build/. g/duckcraft-quacklab/
+          test -s g/duckcraft-quacklab/index.html
+          test -s g/duckcraft-quacklab/index.wasm
+          test -s g/duckcraft-quacklab/index.pck
+      - name: Commit game files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add g/duckcraft-quacklab
+          git commit -m "Deploy Quack Lab DuckCraft browser build" || echo "No changes to commit"
+          git push
