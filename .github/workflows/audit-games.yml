@@ -17,10 +17,14 @@ concurrency:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 jobs:
   browser-audit:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
     timeout-minutes: 30
     steps:
       - name: Check out Arcade Atlas
@@ -64,3 +68,15 @@ jobs:
           name: arcade-atlas-game-audit
           path: arcade-atlas-game-audit.json
           if-no-files-found: ignore
+      - name: Remove temporary audit report from site files
+        if: success()
+        run: rm -f arcade-atlas-game-audit.json
+      - name: Upload GitHub Pages artifact
+        if: success()
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - name: Deploy updated Arcade Atlas
+        if: success()
+        id: deployment
+        uses: actions/deploy-pages@v4
