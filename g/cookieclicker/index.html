@@ -207,41 +207,91 @@ var App=typeof App==='undefined'?0:App;
   var GAME = "Cookie Clicker";
   var NAME_KEY = "arcadeLeaderboardPlayerName";
   var RUN_KEY = "arcadeCookieClickerBestRun";
-  var checkTimer;
+  var checkTimer = null, checking = false, statusNode = null;
 
+  function status(message) {
+    if (!statusNode) {
+      statusNode = document.createElement("div");
+      statusNode.id = "arcade-cookie-leaderboard-status";
+      statusNode.style.cssText = "position:fixed;right:12px;bottom:12px;z-index:2147483647;max-width:340px;padding:8px 12px;border:1px solid #6bffd9;border-radius:8px;background:#101525;color:#fff;font:12px/1.4 sans-serif;box-shadow:0 3px 14px #0008;";
+      (document.body || document.documentElement).appendChild(statusNode);
+    }
+    statusNode.textContent = "Cookie Clicker leaderboard: " + message;
+    statusNode.style.display = "block";
+  }
   function savedName() {
     try { return (localStorage.getItem(NAME_KEY) || "").trim().slice(0, 24); } catch (e) { return ""; }
   }
   function askName() {
-    return window.ArcadeScores && window.ArcadeScores.getPlayerName
-      ? window.ArcadeScores.getPlayerName("Enter your name for the Cookie Clicker leaderboard (24 characters max):")
-      : "";
+    var entered = window.prompt("Enter your name for the Cookie Clicker leaderboard (24 characters max):", "");
+    if (entered === null || !entered.trim()) return "";
+    var name = entered.trim().slice(0, 24);
+    try { localStorage.setItem(NAME_KEY, name); } catch (e) {}
+    return name;
   }
   function scoreNow() {
     var value = window.Game && Number(window.Game.cookiesEarned);
     return Number.isFinite(value) && value >= 0 ? Math.floor(value) : null;
   }
-  async function checkHighScore() {
-    if (!window.ArcadeScores || !window.ArcadeScores.configured) return;
+  async function checkHighScore(reason) {
+    if (checking) return;
+    if (!window.Game || !window.Game.ready || !window.ArcadeScores || !window.ArcadeScores.configured) return;
     var score = scoreNow();
-    if (score === null) return;
+    if (score === null || score < 1) return;
     var previousRun = 0;
     try { previousRun = Number(localStorage.getItem(RUN_KEY)) || 0; } catch (e) {}
+    // Compare against this browser's last successfully submitted best, not the
+    // global leaderboard's first-place score. Otherwise ordinary imported saves
+    // below the current #1 score are silently discarded and never ask for a name.
     if (score <= previousRun) return;
-    var scores = await window.ArcadeScores.getScores();
-    var top = scores.filter(function (row) { return String(row.game_title).toLowerCase() === GAME.toLowerCase(); })
-      .reduce(function (best, row) { return Math.max(best, Number(row.score) || 0); }, 0);
-    if (score <= top) return;
-    var name = savedName() || askName();
-    if (!name) return;
-    var submitted = await window.ArcadeScores.submit(GAME, score, name);
-    if (submitted) {
-      try { localStorage.setItem(RUN_KEY, String(score)); } catch (e) {}
+    checking = true;
+    try {
+      status("new save score detected (" + score.toLocaleString() + " cookies earned) · preparing submission…");
+      var name = savedName() || askName();
+      if (!name) {
+        status("name entry cancelled · score not submitted");
+        return;
+      }
+      var submitted = await window.ArcadeScores.submit(GAME, score, name);
+      if (submitted) {
+        try { localStorage.setItem(RUN_KEY, String(score)); } catch (e) {}
+        status("submitted " + score.toLocaleString() + " cookies earned for " + name + " ✓");
+      } else {
+        status("submission failed · you can retry by reloading the save");
+      }
+    } catch (error) {
+      console.warn("Cookie Clicker leaderboard check failed:", error);
+      status("could not submit score · " + (error && error.message ? error.message : "unknown error"));
+    } finally {
+      checking = false;
     }
   }
+
+  function scheduleCheck(reason) {
+    window.setTimeout(function () { checkHighScore(reason); }, 1200);
+  }
   window.addEventListener("load", function () {
-    checkTimer = setInterval(checkHighScore, 5000);
-    setTimeout(checkHighScore, 1500);
+    checkTimer = setInterval(function () { checkHighScore("periodic"); }, 5000);
+    scheduleCheck("initial load");
+    // Cookie Clicker's save-import functions run after the game is initialized.
+    // Hook successful imports so the newly loaded cookiesEarned value is checked
+    // immediately rather than waiting for the next generic polling interval.
+    if (window.Game && typeof Game.ImportSaveCode === "function") {
+      var originalImportSaveCode = Game.ImportSaveCode;
+      Game.ImportSaveCode = function (save) {
+        var result = originalImportSaveCode.apply(this, arguments);
+        if (result) scheduleCheck("imported save");
+        return result;
+      };
+    }
+    if (window.Game && typeof Game.FileLoad === "function") {
+      var originalFileLoad = Game.FileLoad;
+      Game.FileLoad = function () {
+        var result = originalFileLoad.apply(this, arguments);
+        scheduleCheck("loaded save file");
+        return result;
+      };
+    }
   });
   window.addEventListener("beforeunload", function () { if (checkTimer) clearInterval(checkTimer); });
 })();
