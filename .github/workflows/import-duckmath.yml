@@ -4,8 +4,6 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths:
-      - ".github/workflows/import-duckmath.yml"
 
 permissions:
   contents: write
@@ -30,7 +28,7 @@ jobs:
           root = Path("duckmath-site")
           prefix = "/ToTuff4U/duckmath-site"
           path_pattern = re.compile(r'(?<![A-Za-z0-9:])/(assets|g4m3s|more|blog)(?=/)')
-          page_pattern = re.compile(r'(?<![A-Za-z0-9:])/(about|leaderboard|advertise|404|g404|loading)\\.html')
+          page_pattern = re.compile(r'(?<![A-Za-z0-9:])/(about|leaderboard|advertise|404|g404|loading)\.html')
           for file in root.rglob("*"):
               if not file.is_file() or file.suffix.lower() not in {".html", ".js", ".css", ".json", ".xml", ".txt"}:
                   continue
