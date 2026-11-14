@@ -231,22 +231,25 @@ var App=typeof App==='undefined'?0:App;
   }
   function scoreNow() {
     var value = window.Game && Number(window.Game.cookiesEarned);
-    return Number.isFinite(value) && value >= 0 ? Math.floor(value) : null;
+    // Cookie Clicker routinely exceeds JavaScript's safe-integer range. Convert
+    // the actual integer value to a decimal BigInt string before it is rounded
+    // or rejected by the shared leaderboard client.
+    return Number.isFinite(value) && Number.isInteger(value) && value >= 0
+      ? BigInt(value).toString() : null;
   }
   async function checkHighScore(reason) {
     if (checking) return;
     if (!window.Game || !window.Game.ready || !window.ArcadeScores || !window.ArcadeScores.configured) return;
     var score = scoreNow();
     if (score === null || score < 1) return;
-    var previousRun = 0;
-    try { previousRun = Number(localStorage.getItem(RUN_KEY)) || 0; } catch (e) {}
-    // Compare against this browser's last successfully submitted best, not the
-    // global leaderboard's first-place score. Otherwise ordinary imported saves
-    // below the current #1 score are silently discarded and never ask for a name.
-    if (score <= previousRun) return;
+    var previousRun = "0";
+    try { previousRun = localStorage.getItem(RUN_KEY) || "0"; } catch (e) {}
+    // Compare decimal strings as BigInts so quadrillion+ saves are not rounded.
+    // Compare against this browser's last successfully submitted best, not #1.
+    if (BigInt(score) <= BigInt(previousRun)) return;
     checking = true;
     try {
-      status("new save score detected (" + score.toLocaleString() + " cookies earned) · preparing submission…");
+      status("new save score detected (" + BigInt(score).toLocaleString() + " cookies earned) · preparing submission…");
       var name = savedName() || askName();
       if (!name) {
         status("name entry cancelled · score not submitted");
@@ -255,7 +258,7 @@ var App=typeof App==='undefined'?0:App;
       var submitted = await window.ArcadeScores.submit(GAME, score, name);
       if (submitted) {
         try { localStorage.setItem(RUN_KEY, String(score)); } catch (e) {}
-        status("submitted " + score.toLocaleString() + " cookies earned for " + name + " ✓");
+        status("submitted " + BigInt(score).toLocaleString() + " cookies earned for " + name + " ✓");
       } else {
         status("submission failed · you can retry by reloading the save");
       }
