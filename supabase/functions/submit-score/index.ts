@@ -61,12 +61,14 @@ Deno.serve(async (req: Request) => {
 
   const playerName = typeof body.player_name === "string" ? body.player_name.trim().slice(0, 24) : "";
   const gameTitle = typeof body.game_title === "string" ? body.game_title.trim().slice(0, 60) : "";
-  const score = Number(body.score);
+  const scoreText = typeof body.score === "string" ? body.score :
+    Number.isSafeInteger(body.score) ? String(body.score) : "";
   const kind = body.kind === "session" ? "session" : body.kind === "score" ? "score" : "";
-  if (!playerName || !gameTitle || !kind || !Number.isSafeInteger(score) || score < (kind === "session" ? 5 : 0)) {
+  if (!playerName || !gameTitle || !kind || !/^[0-9]{1,100}$/.test(scoreText) ||
+      (kind === "session" && BigInt(scoreText) < 5n)) {
     return json({ error: "Invalid score submission." }, 400);
   }
-  if (kind === "score" && gameTitle.toLowerCase() === "slope" && score > 1500) {
+  if (kind === "score" && gameTitle.toLowerCase() === "slope" && BigInt(scoreText) > 1500n) {
     return json({ error: "Slope scores are limited to 1,500." }, 400);
   }
 
@@ -77,7 +79,7 @@ Deno.serve(async (req: Request) => {
     });
     const { data: inserted, error: scoreError } = await supabase
       .from("scores")
-      .insert({ player_name: playerName, game_title: gameTitle, score })
+      .insert({ player_name: playerName, game_title: gameTitle, score: scoreText })
       .select("id")
       .single();
 
