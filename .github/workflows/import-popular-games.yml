@@ -1,0 +1,66 @@
+name: Import curated popular games
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/import-popular-games.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  import-games:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Arcade Atlas
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Build and import Pac-Man
+        shell: bash
+        run: |
+          set -euo pipefail
+          tmp="$(mktemp -d)"
+          git clone --depth 1 https://github.com/8tentaculos/jsPacman.git "$tmp/pacman"
+          cd "$tmp/pacman"
+          npm ci --ignore-scripts
+          npm run build
+          test -f dist/index.html
+          mkdir -p "$GITHUB_WORKSPACE/g/pacman"
+          rsync -a --delete dist/ "$GITHUB_WORKSPACE/g/pacman/"
+          cp LICENSE "$GITHUB_WORKSPACE/g/pacman/LICENSE"
+          cp README.md "$GITHUB_WORKSPACE/g/pacman/README-UPSTREAM.md"
+          printf '%s\n' "Source: https://github.com/8tentaculos/jsPacman" "License: MIT" "Built from commit: $(git rev-parse HEAD)" > "$GITHUB_WORKSPACE/g/pacman/ATTRIBUTION.txt"
+
+      - name: Import Doodle Jump
+        shell: bash
+        run: |
+          set -euo pipefail
+          tmp="$(mktemp -d)"
+          git clone --depth 1 https://github.com/freemany/gamedoh.git "$tmp/gamedoh"
+          mkdir -p "$GITHUB_WORKSPACE/g/doodle-jump"
+          rsync -a --delete "$tmp/gamedoh/games/doodle-jump/" "$GITHUB_WORKSPACE/g/doodle-jump/"
+          cp "$tmp/gamedoh/LICENSE" "$GITHUB_WORKSPACE/g/doodle-jump/LICENSE"
+          cp "$tmp/gamedoh/README.md" "$GITHUB_WORKSPACE/g/doodle-jump/README-UPSTREAM.md"
+          printf '%s\n' "Source: https://github.com/freemany/gamedoh/tree/main/games/doodle-jump" "License: MIT (upstream repository)" "The game uses the upstream gamedoh-engine CDN at jskidz.au." "Built from commit: $(git -C "$tmp/gamedoh" rev-parse HEAD)" > "$GITHUB_WORKSPACE/g/doodle-jump/ATTRIBUTION.txt"
+
+      - name: Verify imported game entry points
+        run: |
+          test -f g/pacman/index.html
+          test -f g/doodle-jump/index.html
+          test -f g/doodle-jump/main.js
+
+      - name: Commit imported games
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add g/pacman g/doodle-jump
+          git commit -m "Add Pac-Man and Doodle Jump"
+          git pull --rebase origin main
+          git push
