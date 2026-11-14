@@ -1,0 +1,3 @@
+Source: https://github.com/8tentaculos/jsPacman
+License: MIT
+Built from commit: 0f255fee87c68b513f0ec286498d56162e813ee2

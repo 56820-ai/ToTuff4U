@@ -1,0 +1,4 @@
+Source: https://github.com/freemany/gamedoh/tree/main/games/doodle-jump
+License: MIT (upstream repository)
+The game uses the upstream gamedoh-engine CDN at jskidz.au.
+Built from commit: ae2e6456470b549216e2346b38b90a6fb31d3f5a
