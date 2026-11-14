@@ -632,6 +632,30 @@
       "path": "g/neon-racer",
       "image": "images/neon-racer.svg",
       "category": "RACING"
+    },
+    {
+      "title": "Basketball Stars",
+      "path": "g/basketballstars",
+      "image": "g/basketballstars/assets/images/basketball-stars.png",
+      "category": "SPORTS"
+    },
+    {
+      "title": "Duck Life 4",
+      "path": "g/ducklife4",
+      "image": "g/ducklife4/splash.jpg",
+      "category": "SIMULATION"
+    },
+    {
+      "title": "Sandboxels",
+      "path": "g/sandboxels",
+      "image": "g/sandboxels/icons/icon.png",
+      "category": "SIMULATION"
+    },
+    {
+      "title": "Stack Bump 3D",
+      "path": "g/stack-bump-3d",
+      "image": "g/stack-bump-3d/thumbnail.jpg",
+      "category": "ARCADE"
     }
   ]
 }
