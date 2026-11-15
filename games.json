@@ -686,6 +686,24 @@
       "path": "g/sandboxels",
       "image": "g/sandboxels/icons/cover.png",
       "category": "SANDBOX"
+    },
+    {
+      "title": "Tank Trouble",
+      "path": "g/tanktrouble",
+      "image": "g/tanktrouble/icon-256.png",
+      "category": "ACTION"
+    },
+    {
+      "title": "Hide and Smash",
+      "path": "g/hideandsmash",
+      "image": "g/hideandsmash/assets/images/preload/logo.png",
+      "category": "ACTION"
+    },
+    {
+      "title": "Crazy Tunnel 3D",
+      "path": "g/crazytunnel3d",
+      "image": "g/crazytunnel3d/TemplateData/logo.png",
+      "category": "RACING"
     }
   ]
 }
