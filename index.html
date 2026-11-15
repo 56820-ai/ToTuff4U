@@ -1869,7 +1869,10 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         if (!game) { section.style.display = 'none'; return; }
         const today = getDailyDateKey();
         const state = getDailyPlayStreak();
-        const streak = state.lastDate === today || state.lastDate === getDailyDateKey(new Date(Date.now() - 86400000))
+        const yesterdayDate = new Date();
+        yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+        const yesterday = getDailyDateKey(yesterdayDate);
+        const streak = state.lastDate === today || state.lastDate === yesterday
             ? Math.max(0, Number(state.streak) || 0) : 0;
         const image = document.getElementById('daily-pick-image');
         image.src = game.image || makeGameIconFallback(game);
@@ -1891,7 +1894,9 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         const today = getDailyDateKey();
         const state = getDailyPlayStreak();
         if (state.lastDate !== today) {
-            const yesterday = getDailyDateKey(new Date(Date.now() - 86400000));
+            const yesterdayDate = new Date();
+            yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+            const yesterday = getDailyDateKey(yesterdayDate);
             const previous = Math.max(0, Number(state.streak) || 0);
             state.streak = state.lastDate === yesterday ? previous + 1 : 1;
             state.lastDate = today;
@@ -2478,7 +2483,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         .daily-pick-title{margin:0 0 5px;color:#fff;font-size:22px;font-weight:800}
         .daily-pick-description{margin:0 0 8px;color:#c5d2eb;font-size:13px}
         .daily-pick-streak{margin:0;color:#ffd98a;font-size:12px;font-weight:700}
-        .daily-pick-play{flex:0 0 auto;min-height:42px;padding:0 17px;border:0;border-radius:10px;background:linear-gradient(135deg,#ff6b9d,#7659e8);color:#fff;font:800 13px inherit;cursor:pointer}
+        .daily-pick-play{flex:0 0 auto;min-height:42px;padding:0 17px;border:0;border-radius:10px;background:linear-gradient(135deg,#ff6b9d,#7659e8);color:#fff;font:800 13px system-ui,sans-serif;cursor:pointer}
         .daily-pick-play:hover{filter:brightness(1.12);transform:translateY(-1px)}
         .daily-pick-play:focus-visible{outline:3px solid #70d9ff;outline-offset:3px}
         @media(max-width:620px){.daily-pick-card{align-items:flex-start;flex-wrap:wrap}.daily-pick-art{width:70px;height:70px;flex-basis:70px}.daily-pick-copy{flex:1 1 calc(100% - 90px)}.daily-pick-play{width:100%}}
