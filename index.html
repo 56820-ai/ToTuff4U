@@ -2231,6 +2231,8 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         <li>Added 2048 Cupcakes and Google Baseball; removed failed imports after browser testing.</li>
         <li>Added a Clear History control for the Recently Played row.</li>
         <li>Added keyboard shortcuts: press / or Ctrl+K to focus game search; Escape clears it.</li>
+        <li>Your selected game sort order is now remembered on this device.</li>
+        <li>Removed Stacktris after its game loader failed the browser audit.</li>
         <li>Updated Arcade Atlas browser-tab branding and created original artwork for new games.</li>
         <li>Added a Privacy Policy and linked it in the sidebar and footer.</li>
         <li>Added a What's New popup with a link to the full patch notes.</li>
@@ -2274,7 +2276,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 </style>
 <script>
 (function(){
-  const version="2026-11-15-4";
+  const version="2026-11-15-5";
   const overlay=document.getElementById("patchNotesOverlay");
   const reopen=document.getElementById("reopenPatchNotes");
   const close=()=>{overlay.classList.remove("visible");overlay.setAttribute("aria-hidden","true");localStorage.setItem("arcadeAtlasPatchNotesSeen",version);reopen.style.display="block";};
