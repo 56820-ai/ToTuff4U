@@ -3028,6 +3028,12 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         const importFile = document.getElementById('collection-import-file');
         if (importCollections && importFile) importCollections.addEventListener('click', () => importFile.click());
         if (importFile) importFile.addEventListener('change', importGameCollections);
+        window.addEventListener('storage', event => {
+            if (event.key !== GAME_COLLECTIONS_KEY && event.key !== null) return;
+            const hadCollectionFilter = !!activeGameCollectionId;
+            updateCollectionsSection();
+            if (hadCollectionFilter) searchGames();
+        });
         const collectionForm = document.getElementById('collection-form');
         if (collectionForm) collectionForm.addEventListener('submit', saveCollectionDialog);
         const closeCollection = document.getElementById('closeCollectionDialog');

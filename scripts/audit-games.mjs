@@ -332,7 +332,8 @@ try {
 }
 
 try {
-  const page = await browser.newPage({ viewport: { width: 1365, height: 900 } });
+  const collectionsContext = await browser.newContext({ viewport: { width: 1365, height: 900 } });
+  const page = await collectionsContext.newPage();
   const errors = [];
   page.on("pageerror", e => errors.push(String(e.message || e).slice(0, 220)));
   const response = await page.goto(BASE + "/", { waitUntil: "domcontentloaded", timeout: 16000 });
@@ -382,6 +383,18 @@ try {
   const importMergedAndSanitized = importState.length === 2 && importState[0].paths.length === 2 &&
     importState[0].paths.every(path => !/^https?:/i.test(path)) && importState[1].paths.length === 1;
 
+  const syncPage = await collectionsContext.newPage();
+  syncPage.on("pageerror", e => errors.push(String(e.message || e).slice(0, 220)));
+  await syncPage.goto(BASE + "/", { waitUntil: "domcontentloaded", timeout: 16000 });
+  await syncPage.waitForSelector("#collections-grid .collection-card", { timeout: 10000 });
+  await syncPage.evaluate(() => {
+    const overlay = document.getElementById("patchNotesOverlay");
+    if (overlay) { overlay.classList.remove("visible"); overlay.setAttribute("aria-hidden", "true"); }
+  });
+  const secondTabCollections = await syncPage.locator("#collections-grid .collection-card").count();
+  await syncPage.locator("#collections-grid .collection-card").filter({ hasText: "Arcade Night" }).locator(".collection-browse-button").last().click();
+  await syncPage.waitForFunction(() => document.getElementById("catalogResultsCount")?.textContent === "2 games in Arcade Night", undefined, { timeout: 4000 });
+
   await page.evaluate(() => { window.__collectionOpened = ""; window.open = url => { window.__collectionOpened = url; return null; }; });
   await page.locator('#collections-grid .collection-play-button').click();
   const randomLaunch = await page.evaluate(() => window.__collectionOpened || "");
@@ -398,17 +411,25 @@ try {
   await page.locator('#collection-name-input').fill("Arcade Favorites");
   await page.locator('#collection-form').evaluate(form => form.requestSubmit());
   await page.waitForFunction(() => JSON.parse(localStorage.getItem("arcadeAtlasCollectionsV1") || "[]").some(item => item.name === "Arcade Favorites"), undefined, { timeout: 4000 });
+  await syncPage.waitForFunction(() => document.querySelector("#collections-grid h3")?.textContent === "Arcade Favorites", undefined, { timeout: 4000 });
+  await syncPage.waitForFunction(() => document.getElementById("catalogResultsCount")?.textContent === "2 games in Arcade Favorites", undefined, { timeout: 4000 });
   await page.locator('#collections-grid button[aria-label="Delete Arcade Favorites"]').click();
   const customDeleteDialog = await page.locator('#collection-dialog').evaluate(dialog => dialog.open) &&
     (await page.locator('#collection-dialog-title').textContent()) === "Delete playlist?";
   await page.locator('#collection-form').evaluate(form => form.requestSubmit());
-  await page.waitForFunction(() => JSON.parse(localStorage.getItem("arcadeAtlasCollectionsV1") || "[]").length === 0, undefined, { timeout: 4000 });
-  const deleted = await page.locator('#collections-grid .collection-card').count() === 0;
+  await page.waitForFunction(() => !JSON.parse(localStorage.getItem("arcadeAtlasCollectionsV1") || "[]").some(item => item.name === "Arcade Favorites"), undefined, { timeout: 4000 });
+  await syncPage.waitForFunction(() => document.getElementById("clearCollectionFilter")?.style.display === "none", undefined, { timeout: 4000 });
+  await syncPage.waitForFunction(() => document.getElementById("catalogResultsCount")?.textContent === "100 games", undefined, { timeout: 4000 });
+  const deleted = await page.locator('#collections-grid .collection-card').count() === 1 &&
+    (await page.locator('#collections-grid h3').textContent()) === "Co-op Night";
+  const crossTabSynced = secondTabCollections === 2;
   const ok = response?.status() === 200 && created && storedPaths.length === 1 && backupValid && importMergedAndSanitized && allowedLaunches.includes(randomLaunch) &&
-    filteredTitle === "Slope" && filteredCards === 2 && customDeleteDialog && deleted && errors.length === 0;
-  uiAudit.collections = { status: response?.status() || null, created, storedPaths, backupValid, importMergedAndSanitized, randomLaunch, filteredTitle, filteredCards, customDeleteDialog, deleted, errors, ok };
+    filteredTitle === "Slope" && filteredCards === 2 && crossTabSynced && customDeleteDialog && deleted && errors.length === 0;
+  uiAudit.collections = { status: response?.status() || null, created, storedPaths, backupValid, importMergedAndSanitized, randomLaunch, filteredTitle, filteredCards, crossTabSynced, customDeleteDialog, deleted, errors, ok };
   await page.evaluate(() => localStorage.removeItem("arcadeAtlasCollectionsV1"));
+  await syncPage.close();
   await page.close();
+  await collectionsContext.close();
 } catch (e) {
   uiAudit.collections.error = String(e.message || e).slice(0, 300);
 }
