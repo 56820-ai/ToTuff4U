@@ -1,0 +1,7 @@
+2048 Cupcakes
+
+Source: https://github.com/0x0800/2048-CUPCAKES
+The upstream project identifies the game as an MIT-licensed cupcakes-themed version of 2048.
+Original 2048 source: https://github.com/gabrielecirulli/2048
+
+Please retain the accompanying LICENSE.txt when redistributing this game.

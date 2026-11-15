@@ -1307,7 +1307,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
                 </div>
 
                 <section id="recent-games-section" aria-label="Recently played games">
-                    <h2 class="section-title">RECENTLY PLAYED</h2>
+                    <div class="recent-heading"><h2 class="section-title">RECENTLY PLAYED</h2><button type="button" id="clearRecentGames" class="clear-recent-button">Clear history</button></div>
                     <div class="games-grid" id="recent-games-grid"></div>
                 </section>
 
@@ -2150,6 +2150,11 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         
         updateFavoritesSection();
         updateRecentSection();
+        const clearRecentButton = document.getElementById("clearRecentGames");
+        if (clearRecentButton) clearRecentButton.addEventListener("click", function () {
+            try { localStorage.removeItem("recentGames"); } catch (error) {}
+            updateRecentSection();
+        });
         
         function updateTime() {
             const timeElement = document.getElementById("time");
@@ -2207,10 +2212,13 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         <li>Improved player-name prompts for score and playtime submissions.</li>
       </ul>
       <h3>🛠️ Site updates</h3>
-      <ul><li>Added keyboard shortcuts: press / or Ctrl+K to jump to game search; Escape clears the search.</li><li>Added 2048 Cupcakes and Stack Bump 3D to the catalog.</li></ul>
+      
       <ul>
         <li>Added a Recently Played row that remembers your last eight games on this device.</li>
         <li>Added a Most Played sort that learns from launches on the current device.</li>
+        <li>Added 2048 Cupcakes, Stack Bump 3D, and Google Baseball to the catalog.</li>
+        <li>Added a Clear History control for the Recently Played row.</li>
+        <li>Added keyboard shortcuts: press / or Ctrl+K to focus game search; Escape clears it.</li>
         <li>Updated Arcade Atlas browser-tab branding and created original artwork for new games.</li>
         <li>Added a Privacy Policy and linked it in the sidebar and footer.</li>
         <li>Added a What's New popup with a link to the full patch notes.</li>
@@ -2243,7 +2251,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 @media(max-width:520px){.patch-notes-modal{padding:22px 18px}.patch-notes-content li{font-size:14px}.patch-notes-actions{align-items:flex-start;flex-direction:column}.patch-notes-actions button{width:100%}}
 
         .empty-games-message{grid-column:1/-1;padding:24px;border:1px dashed rgba(160,185,220,.25);border-radius:14px;color:#aebbd0;text-align:center;background:rgba(17,29,50,.55)}
-        .catalog-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 18px}
+        .catalog-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 18px}\n        .recent-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}\n        .recent-heading .section-title{margin-bottom:12px}\n        .clear-recent-button{border:1px solid rgba(160,185,220,.25);border-radius:9px;background:#111d32;color:#b8c9e4;padding:7px 11px;font:600 12px system-ui;cursor:pointer}\n        .clear-recent-button:hover{background:#1b2b49;color:#fff}\n        .clear-recent-button:focus-visible{outline:3px solid #70d9ff;outline-offset:2px}
         #categoryFilter,#sortFilter,.surprise-button{min-height:42px;border:1px solid rgba(160,185,220,.2);border-radius:11px;background:#111d32;color:#eaf1ff;padding:0 14px;font-family:inherit;font-size:13px;font-weight:600}
         #categoryFilter,#sortFilter{min-width:160px;cursor:pointer}
         .surprise-button{cursor:pointer;background:linear-gradient(135deg,#6848d8,#286acb);border-color:transparent;transition:transform .18s ease,filter .18s ease}
@@ -2254,7 +2262,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 </style>
 <script>
 (function(){
-  const version="2026-11-15-1";
+  const version="2026-11-15-2";
   const overlay=document.getElementById("patchNotesOverlay");
   const reopen=document.getElementById("reopenPatchNotes");
   const close=()=>{overlay.classList.remove("visible");overlay.setAttribute("aria-hidden","true");localStorage.setItem("arcadeAtlasPatchNotesSeen",version);reopen.style.display="block";};

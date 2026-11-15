@@ -19,7 +19,7 @@
   <meta name="format-detection" content="telephone=no" />
 <script src="../../js/timeTracker.js" defer></script>
 </head>
-<script src="../../js/main.js"></script>
+
 <body>
   <div class="container">
     <div class="heading">
@@ -121,7 +121,7 @@
       var t, js, fjs = d.getElementsByTagName(s)[0];
       if (d.getElementById(id)) return; js=d.createElement(s); js.id=id;
       js.src="https://platform.twitter.com/widgets.js"; fjs.parentNode.insertBefore(js, fjs);
-      return w\indow.twttr || (t = { _e: [], ready: function(f){ t._e.push(f) } });
+      return window.twttr || (t = { _e: [], ready: function(f){ t._e.push(f) } });
     }(document, "script", "twitter-wjs"));
   </script>
   <script type="text/javascript">

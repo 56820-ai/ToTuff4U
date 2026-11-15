@@ -662,6 +662,12 @@
       "path": "g/googlebaseball",
       "image": "images/google-baseball.svg",
       "category": "SPORTS"
+    },
+    {
+      "title": "2048 Cupcakes",
+      "path": "g/cupcake2048",
+      "image": "g/cupcake2048/meta/apple-touch-icon.png",
+      "category": "PUZZLE"
     }
   ]
 }
