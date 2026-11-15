@@ -243,7 +243,7 @@
     {
       "title": "Stacktris",
       "path": "g/stacktris",
-      "image": "images/stacktris.jpg",
+      "image": "g/stacktris-main/webapp/cover.jpg",
       "category": "PUZZLE"
     },
     {
@@ -634,12 +634,6 @@
       "category": "RACING"
     },
     {
-      "title": "Stacktris",
-      "path": "g/stacktris-main",
-      "image": "g/stacktris-main/webapp/cover.jpg",
-      "category": "PUZZLE"
-    },
-    {
       "title": "Paddle Clash",
       "path": "g/paddle-clash",
       "image": "images/paddle-clash.svg",
@@ -662,6 +656,12 @@
       "path": "g/asteroid-rush",
       "image": "images/asteroid-rush.svg",
       "category": "ARCADE"
+    },
+    {
+      "title": "Basketball Stars",
+      "path": "g/basketballstars",
+      "image": "duckmath-site/assets/img/icons/basketball-stars.webp",
+      "category": "SPORTS"
     }
   ]
 }
