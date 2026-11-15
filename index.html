@@ -1345,6 +1345,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
                 </section>
 
                 <h2 class="section-title">ALL GAMES</h2>
+                <div id="category-quick-filters" class="category-quick-filters" role="group" aria-label="Quick game categories"></div>
                 <div class="catalog-tools">
                     <label class="sr-only" for="categoryFilter">Filter games by category</label>
                     <select id="categoryFilter" onchange="searchGames()" aria-label="Filter games by category">
@@ -1943,6 +1944,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
     async function searchGames() {
         const query = document.getElementById('searchInput').value.toLowerCase().trim();
         const category = (document.getElementById('categoryFilter') || {}).value || '';
+        updateCategoryQuickFilters(category);
         const favoritesOnly = getFavoritesOnly();
         const allGamesGrid = document.getElementById('all-games-grid');
         const favoritesSection = document.getElementById('favorites-section');
@@ -1992,6 +1994,17 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         updateMostPlayedSection();
     }
 
+    function updateCategoryQuickFilters(activeCategory) {
+        const container = document.getElementById('category-quick-filters');
+        if (!container) return;
+        const selected = String(activeCategory || '').toUpperCase();
+        container.querySelectorAll('button[data-category]').forEach(button => {
+            const active = (button.dataset.category || '') === selected;
+            button.classList.toggle('active', active);
+            button.setAttribute('aria-pressed', String(active));
+        });
+    }
+
     function populateCategoryFilter(games) {
         const filter = document.getElementById('categoryFilter');
         if (!filter) return;
@@ -2003,6 +2016,33 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
             option.textContent = category.replace(/-/g, ' ');
             filter.appendChild(option);
         });
+
+        const container = document.getElementById('category-quick-filters');
+        if (container) {
+            const quickOrder = ['ACTION','ARCADE','SPORTS','PUZZLE','RACING','PLATFORMER','IO','SIMULATION','SANDBOX','IDLE','STRATEGY','ADVENTURE'];
+            const buttons = [{ value: '', label: 'All games' }].concat(
+                quickOrder.filter(category => categories.includes(category)).map(category => ({
+                    value: category,
+                    label: category.toLowerCase().replace(/\\b\\w/g, letter => letter.toUpperCase())
+                }))
+            );
+            container.innerHTML = '';
+            buttons.forEach(item => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'category-quick-filter';
+                button.dataset.category = item.value;
+                button.textContent = item.label;
+                button.setAttribute('aria-pressed', 'false');
+                button.addEventListener('click', () => {
+                    filter.value = item.value;
+                    updateCategoryQuickFilters(item.value);
+                    searchGames();
+                });
+                container.appendChild(button);
+            });
+        }
+        updateCategoryQuickFilters(filter.value || '');
     }
 
     function playRandomGame() {
@@ -2479,6 +2519,11 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 
         .empty-games-message{grid-column:1/-1;padding:24px;border:1px dashed rgba(160,185,220,.25);border-radius:14px;color:#aebbd0;text-align:center;background:rgba(17,29,50,.55)}
         .catalog-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 18px}
+        .category-quick-filters{display:flex;gap:8px;overflow-x:auto;flex-wrap:nowrap;padding:2px 0 10px;margin:0 0 8px;scrollbar-width:thin}
+        .category-quick-filter{flex:0 0 auto;min-height:34px;padding:0 13px;border:1px solid rgba(160,185,220,.22);border-radius:999px;background:#111d32;color:#c9d6ee;font:700 11px system-ui,sans-serif;cursor:pointer;transition:background .18s ease,border-color .18s ease,transform .18s ease}
+        .category-quick-filter:hover{transform:translateY(-1px);border-color:rgba(112,185,255,.65);color:#fff}
+        .category-quick-filter.active{background:linear-gradient(135deg,#477fe0,#7956d8);border-color:transparent;color:#fff}
+        .category-quick-filter:focus-visible{outline:3px solid #70d9ff;outline-offset:3px}
         .recent-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
         .daily-pick-card{display:flex;align-items:center;gap:18px;padding:18px;margin:0 0 24px;border:1px solid rgba(107,157,255,.35);border-radius:16px;background:linear-gradient(115deg,rgba(34,52,91,.94),rgba(33,25,69,.94));box-shadow:0 12px 28px rgba(0,0,0,.18)}
         .daily-pick-art{width:92px;height:92px;flex:0 0 92px;display:grid;place-items:center;border-radius:16px;background:rgba(4,10,24,.55);overflow:hidden}
@@ -2540,7 +2585,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 </style>
 <script>
 (function(){
-  const version="2026-11-15-11";
+  const version="2026-11-15-12";
   const overlay=document.getElementById("patchNotesOverlay");
   const reopen=document.getElementById("reopenPatchNotes");
   const close=()=>{overlay.classList.remove("visible");overlay.setAttribute("aria-hidden","true");localStorage.setItem("arcadeAtlasPatchNotesSeen",version);reopen.style.display="block";};
