@@ -229,7 +229,13 @@ try {
   const response = await page.goto(BASE + "/", { waitUntil: "domcontentloaded", timeout: 16000 });
   await page.waitForSelector("#favoritesOnlyToggle", { timeout: 12000 });
   await page.waitForSelector("#all-games-grid .game-card .favorite-star", { timeout: 12000 });
-  await page.locator("#dismissPatchNotes").click({ timeout: 1200 }).catch(() => {});
+  await page.evaluate(() => {
+    const overlay = document.getElementById("patchNotesOverlay");
+    if (overlay) {
+      overlay.classList.remove("visible");
+      overlay.setAttribute("aria-hidden", "true");
+    }
+  });
   const actionChip = page.locator('#category-quick-filters button[data-category="ACTION"]');
   await actionChip.click({ timeout: 4000 });
   await page.waitForFunction(() => document.getElementById("categoryFilter")?.value === "ACTION", undefined, { timeout: 4000 });
@@ -267,7 +273,13 @@ try {
   const emptyMessage = await page.locator("#all-games-grid .empty-games-message").textContent();
   await page.reload({ waitUntil: "domcontentloaded" });
   await page.waitForSelector("#favoritesOnlyToggle", { timeout: 10000 });
-  await page.locator("#dismissPatchNotes").click({ timeout: 1200 }).catch(() => {});
+  await page.evaluate(() => {
+    const overlay = document.getElementById("patchNotesOverlay");
+    if (overlay) {
+      overlay.classList.remove("visible");
+      overlay.setAttribute("aria-hidden", "true");
+    }
+  });
   await page.waitForFunction(() => document.getElementById("catalogResultsCount")?.textContent.startsWith("0 games in favorites"), undefined, { timeout: 10000 });
   const persistedFilter = await page.locator("#favoritesOnlyToggle").getAttribute("aria-pressed");
   await page.waitForFunction(() => {
