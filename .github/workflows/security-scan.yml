@@ -9,6 +9,10 @@ on:
       - "g/**"
       - ".github/workflows/security-scan.yml"
 
+concurrency:
+  group: arcade-atlas-security-scan
+  cancel-in-progress: true
+
 permissions:
   contents: read
   security-events: write
