@@ -1880,9 +1880,12 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         image.onerror = function() { this.onerror = null; this.src = makeGameIconFallback(game); };
         document.getElementById('daily-pick-title').textContent = game.title;
         document.getElementById('daily-pick-description').textContent = 'A fresh game is selected every day. Come back tomorrow for a new pick.';
-        document.getElementById('daily-pick-streak').textContent = streak
+        const streakText = state.lastDate === today
             ? '🔥 Daily launch streak: ' + streak + (streak === 1 ? ' day' : ' days')
-            : 'Start a streak by playing today’s pick.';
+            : state.lastDate === yesterday && streak
+                ? '🔥 ' + streak + (streak === 1 ? '-day streak' : '-day streak') + ' — play today to keep it going.'
+                : 'Start a streak by playing today’s pick.';
+        document.getElementById('daily-pick-streak').textContent = streakText;
         const query = document.getElementById('searchInput')?.value?.trim() || '';
         const category = document.getElementById('categoryFilter')?.value || '';
         section.style.display = query || category || getFavoritesOnly() ? 'none' : '';
