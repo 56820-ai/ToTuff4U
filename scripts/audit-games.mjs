@@ -357,14 +357,40 @@ try {
   await page.waitForFunction(() => JSON.parse(localStorage.getItem("arcadeAtlasCollectionsV1") || "[]").some(item => item.name === "Arcade Night" && item.paths.length === 1), undefined, { timeout: 4000 });
   const storedPaths = await page.evaluate(() => JSON.parse(localStorage.getItem("arcadeAtlasCollectionsV1") || "[]")[0]?.paths || []);
 
+  const downloadPromise = page.waitForEvent("download");
+  await page.locator("#exportCollectionsButton").click();
+  const backupDownload = await downloadPromise;
+  const backupPath = await backupDownload.path();
+  const backup = backupPath ? JSON.parse(await readFile(backupPath, "utf8")) : null;
+  const backupValid = /^arcade-atlas-playlists-\d{4}-\d{2}-\d{2}\.json$/.test(backupDownload.suggestedFilename()) &&
+    backup?.format === "arcade-atlas-playlists" && backup.version === 1 && backup.collections?.[0]?.paths?.length === 1;
+  const connectFourPath = await page.evaluate(() => cachedGames.find(game => game.title === "Connect Four").path);
+  await page.locator("#collection-import-file").setInputFiles({
+    name: "playlists.json",
+    mimeType: "application/json",
+    buffer: Buffer.from(JSON.stringify({
+      format: "arcade-atlas-playlists",
+      version: 1,
+      collections: [
+        { name: "Arcade Night", paths: [connectFourPath, "https://example.invalid/game"] },
+        { name: "Co-op Night", paths: [connectFourPath] }
+      ]
+    }))
+  });
+  await page.waitForFunction(() => JSON.parse(localStorage.getItem("arcadeAtlasCollectionsV1") || "[]").some(item => item.name === "Co-op Night"), undefined, { timeout: 4000 });
+  const importState = await page.evaluate(() => JSON.parse(localStorage.getItem("arcadeAtlasCollectionsV1") || "[]"));
+  const importMergedAndSanitized = importState.length === 2 && importState[0].paths.length === 2 &&
+    importState[0].paths.every(path => !/^https?:/i.test(path)) && importState[1].paths.length === 1;
+
   await page.evaluate(() => { window.__collectionOpened = ""; window.open = url => { window.__collectionOpened = url; return null; }; });
   await page.locator('#collections-grid .collection-play-button').click();
   const randomLaunch = await page.evaluate(() => window.__collectionOpened || "");
-  const expectedSlopeHref = await page.evaluate(() => buildGameHref(cachedGames.find(game => game.title === "Slope").path));
+  const allowedLaunches = await page.evaluate(() => ["Slope", "Connect Four"].map(title => buildGameHref(cachedGames.find(game => game.title === title).path)));
 
   await page.locator('#collections-grid .collection-browse-button').last().click();
-  await page.waitForFunction(() => document.getElementById("catalogResultsCount")?.textContent === "1 game in Arcade Night", undefined, { timeout: 4000 });
+  await page.waitForFunction(() => document.getElementById("catalogResultsCount")?.textContent === "2 games in Arcade Night", undefined, { timeout: 4000 });
   const filteredTitle = await page.locator('#all-games-grid .game-card-title').textContent();
+  const filteredCards = await page.locator('#all-games-grid .game-card').count();
   await page.locator('#clearCollectionFilter').click();
   await page.waitForFunction(() => document.getElementById("clearCollectionFilter")?.style.display === "none", undefined, { timeout: 4000 });
 
@@ -378,9 +404,9 @@ try {
   await page.locator('#collection-form').evaluate(form => form.requestSubmit());
   await page.waitForFunction(() => JSON.parse(localStorage.getItem("arcadeAtlasCollectionsV1") || "[]").length === 0, undefined, { timeout: 4000 });
   const deleted = await page.locator('#collections-grid .collection-card').count() === 0;
-  const ok = response?.status() === 200 && created && storedPaths.length === 1 && randomLaunch === expectedSlopeHref &&
-    filteredTitle === "Slope" && customDeleteDialog && deleted && errors.length === 0;
-  uiAudit.collections = { status: response?.status() || null, created, storedPaths, randomLaunch, expectedSlopeHref, filteredTitle, customDeleteDialog, deleted, errors, ok };
+  const ok = response?.status() === 200 && created && storedPaths.length === 1 && backupValid && importMergedAndSanitized && allowedLaunches.includes(randomLaunch) &&
+    filteredTitle === "Slope" && filteredCards === 2 && customDeleteDialog && deleted && errors.length === 0;
+  uiAudit.collections = { status: response?.status() || null, created, storedPaths, backupValid, importMergedAndSanitized, randomLaunch, filteredTitle, filteredCards, customDeleteDialog, deleted, errors, ok };
   await page.evaluate(() => localStorage.removeItem("arcadeAtlasCollectionsV1"));
   await page.close();
 } catch (e) {
