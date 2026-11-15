@@ -2132,7 +2132,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         const topCategory = Array.from(categoryWeights.entries()).sort((a, b) => b[1] - a[1])[0]?.[0] || '';
         const readableCategory = topCategory ? topCategory.toLowerCase().replace(/\b\w/g, letter => letter.toUpperCase()) : '';
         reason.textContent = preferenceBased && readableCategory
-            ? 'More games like your ' + readableCategory + ' favorites and 4+ star picks.'
+            ? 'More ' + readableCategory + ' games picked for you.'
             : preferenceBased ? 'Based on your game preferences.' : 'Based on games you return to on this device.';
         section.style.display = '';
         renderGames(recommendations, container);
