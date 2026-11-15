@@ -425,6 +425,7 @@
     /* Top-three podium */
     #score-list { list-style:none; display:flex; flex-direction:column; gap:2rem; }
     .podium-section { padding:1.25rem; border:1px solid rgba(107,255,217,.18); border-radius:20px; background:rgba(18,25,42,.72); }
+    .daily-streak-note { margin:-.75rem 0 1.25rem; text-align:center; color:#aab8cb; font:500 .8rem/1.45 system-ui,sans-serif; }
     .podium-game-title { text-align:center; font:700 1.35rem "Orbitron",sans-serif; margin:0 0 1.4rem; color:#e9faff; }
     .podium { display:flex; align-items:flex-end; justify-content:center; gap:clamp(.5rem,2vw,1.25rem); max-width:680px; margin:0 auto; min-height:245px; }
     .podium-place { flex:1; min-width:0; display:flex; flex-direction:column; align-items:center; text-align:center; gap:.45rem; }
@@ -563,6 +564,8 @@
       const heading = document.createElement("h2");
       heading.className = "podium-game-title";
       heading.textContent = gameTitle;
+      const description = gameTitle === "Daily Pick Streak" ? document.createElement("p") : null;
+      if (description) { description.className = "daily-streak-note"; description.textContent = "Player-submitted daily launches. Streaks are not independently verified."; }
       const podium = document.createElement("div");
       podium.className = "podium";
       const order = [
@@ -590,7 +593,8 @@
           const timed = timedGames.has(gameKey);
           const reaction = gameKey === "reaction test";
           const driftBoss = gameKey === "drift boss";
-          const displayScore = gameKey === "cookie clicker" ? formatCookieScore(item.score)
+          const displayScore = gameKey === "daily pick streak" ? seconds.toLocaleString() + (seconds === 1 ? " day" : " days")
+            : gameKey === "cookie clicker" ? formatCookieScore(item.score)
             : timed
             ? Math.floor(seconds / 86400) + "d " + Math.floor((seconds % 86400) / 3600) + "h " + Math.floor((seconds % 3600) / 60) + "m " + (seconds % 60) + "s"
             : reaction ? Math.max(0, 10000 - seconds).toLocaleString() + " ms"
@@ -614,7 +618,9 @@
         }
         podium.appendChild(card);
       });
-      section.append(heading, podium);
+      section.append(heading);
+      if (description) section.appendChild(description);
+      section.appendChild(podium);
       scoreList.appendChild(section);
     }
 
@@ -645,6 +651,7 @@
         ["blocky combat swat time", "Blocky Combat SWAT · Total Playtime"],
         ["breakout", "Breakout"],
         ["cookie clicker", "Cookie Clicker"],
+        ["daily pick streak", "Daily Pick Streak"],
         ["drift boss", "Drift Boss"],
         ["minecraft", "Minecraft"],
         ["reaction test", "Reaction Test"],
@@ -688,19 +695,22 @@
             ? compareCookieScores
             : (a,b) => Number(b.score) - Number(a.score));
         }
-        // Cookie Clicker ranks each player only once using their personal best.
-        // This prevents repeated runs by one person from occupying the whole podium.
-        if (key === "cookie clicker") {
+        // Cookie Clicker and Daily Pick Streak rank each player by their personal best.
+        // This prevents repeat submissions from occupying multiple podium places.
+        if (key === "cookie clicker" || key === "daily pick streak") {
           const bestByPlayer = new Map();
           players.forEach(item => {
             const playerKey = String(item.player_name || "").trim().toLocaleLowerCase();
             if (!playerKey) return;
             const previous = bestByPlayer.get(playerKey);
-            if (!previous || BigInt(String(item.score || "0")) > BigInt(String(previous.score || "0"))) {
+            const isBetter = key === "cookie clicker"
+              ? (!previous || BigInt(String(item.score || "0")) > BigInt(String(previous.score || "0")))
+              : (!previous || Number(item.score) > Number(previous.score));
+            if (isBetter) {
               bestByPlayer.set(playerKey, item);
             }
           });
-          players = [...bestByPlayer.values()].sort(compareCookieScores);
+          players = [...bestByPlayer.values()].sort(key === "cookie clicker" ? compareCookieScores : (a,b) => Number(b.score) - Number(a.score));
         }
         const knownTitle = supportedGames.find(([gameKey]) => gameKey === key);
         const title = key === "retro bowl time" ? "Retro Bowl · Total Playtime"

@@ -1166,6 +1166,12 @@ body {font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-se
 .game-card-image {width:78px;height:78px;border-radius:18px;border:1px solid rgba(255,255,255,.12);box-shadow:none}
 .game-card:hover .game-card-image {border-color:var(--accent-pink);box-shadow:none}
 .game-card-title {font-family:inherit;font-size:14px;background:none;color:#eaf1ff;-webkit-text-fill-color:initial}
+.game-card-badge{position:absolute;top:9px;left:9px;z-index:1;padding:4px 7px;border:1px solid rgba(126,194,255,.32);border-radius:999px;background:rgba(8,18,35,.92);color:#a9dcff;font:800 9px/1 system-ui,sans-serif;letter-spacing:.45px}
+.game-card-description{max-width:100%;margin:6px 0 0;color:#aebbd0;font:500 11px/1.4 system-ui,sans-serif;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.game-rating{display:flex;justify-content:center;gap:2px;margin:5px 0 0}
+.game-rating button{width:18px;height:20px;padding:0;border:0;background:transparent;color:#64748b;font-size:14px;line-height:1;cursor:pointer}
+.game-rating button.is-rated{color:#ffd477}
+.game-rating button:hover,.game-rating button:focus-visible{color:#ffe5a3;outline:1px solid #70d9ff;outline-offset:1px;border-radius:3px}
 #favorites-container {background:#111c30;border:1px solid rgba(160,185,220,.13);border-radius:16px;box-shadow:none}
 #favorites-container .game-card {min-width:155px}
 footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
@@ -1357,7 +1363,9 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
                         <option value="az">A to Z</option>
                         <option value="za">Z to A</option>
                         <option value="newest">Recently added</option>
-                    <option value="played">Most played (this device)</option></select>
+                        <option value="played">Most played (this device)</option>
+                        <option value="rated">Top rated by you</option>
+                    </select>
                     <button type="button" id="favoritesOnlyToggle" class="favorites-filter-button" aria-pressed="false">☆ Favorites only</button>
                     <button type="button" class="surprise-button" onclick="playRandomGame()">
                         <i class="fas fa-dice" aria-hidden="true"></i> Surprise me
@@ -1438,7 +1446,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
             <p>Some games offer leaderboards. If you choose to submit a score or playtime, the player name, game name, score, and/or playtime value you submit may be sent to our leaderboard database and displayed publicly on the site. Do not use your real name or include personal information in a player name.</p>
             <p>You can use the site without creating an Arcade Atlas account. The site does not ask you to provide an email address to use its game catalog or submit a leaderboard score.</p>
             <h2>Information stored in your browser</h2>
-            <p>The site may use browser local storage to remember preferences such as favorite games, recently played games, game launch counts, your player name, locally tracked playtime, and your Daily Pick launch streak. This information is stored in your browser and may remain there until you clear the site's data or your browser removes it. Clearing it may reset these preferences and locally stored totals. The Daily Pick streak records that you opened the featured game; it does not track game completion.</p>
+            <p>The site may use browser local storage to remember preferences such as favorite games, recently played games, game launch counts, personal game ratings, your player name, locally tracked playtime, and your Daily Pick launch streak. Ratings stay in this browser and are not shared. This information is stored in your browser and may remain there until you clear the site's data or your browser removes it. Clearing it may reset these preferences and locally stored totals. The Daily Pick streak records that you opened the featured game; it does not track game completion. If you submit a new personal-best streak, your chosen nickname and streak length appear publicly on the Daily Pick Streak leaderboard.</p>
             <h2>Leaderboards and database</h2>
             <p>Leaderboard submissions are processed by Supabase, our database service provider. Submitted leaderboard information is used to operate and display game rankings. Because leaderboard entries are public, information you submit there should be treated as public. Database and service-provider handling is also subject to <a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer">Supabase's Privacy Policy</a>.</p>
             <h2>Analytics and advertising</h2>
@@ -1571,6 +1579,33 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
     });
 
     let cachedGames = [];
+    let activeCatalogMode = '';
+    let catalogSearchSequence = 0;
+
+    function getGameSearchText(game) {
+        const tags = Array.isArray(game.tags) ? game.tags : [];
+        return [game.title, game.category, game.description, ...tags].filter(Boolean).join(' ').toLowerCase();
+    }
+
+    function hasMultiplayerTag(game) {
+        return Array.isArray(game.tags) && game.tags.some(tag => /multiplayer|co-op|two-player|2-player/i.test(String(tag)));
+    }
+
+    function getGameRatings() {
+        try {
+            const saved = JSON.parse(localStorage.getItem('arcadeAtlasGameRatings') || '{}');
+            return saved && typeof saved === 'object' && !Array.isArray(saved) ? saved : {};
+        } catch (error) { return {}; }
+    }
+
+    function saveGameRating(game, rating) {
+        const ratings = getGameRatings();
+        const key = normalizeGamePath(game.path);
+        if (ratings[key] === rating) delete ratings[key];
+        else ratings[key] = rating;
+        try { localStorage.setItem('arcadeAtlasGameRatings', JSON.stringify(ratings)); } catch (error) {}
+        searchGames();
+    }
 
     function getGamePlayCounts() {
         try { const value = JSON.parse(localStorage.getItem('gamePlayCounts') || '{}'); return value && typeof value === 'object' && !Array.isArray(value) ? value : {}; }
@@ -1601,7 +1636,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
     async function loadGames() {
         if (cachedGames.length) return cachedGames;
         try {
-            const response = await fetch('games.json?v=2026-11-15-nightwork2');
+            const response = await fetch('games.json?v=2026-11-15-arcade-atlas-io1');
             if (!response.ok) throw new Error('Could not load games.json: ' + response.status);
             const data = await response.json();
             cachedGames = Array.isArray(data.games) ? data.games : [];
@@ -1889,7 +1924,19 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         document.getElementById('daily-pick-streak').textContent = streakText;
         const query = document.getElementById('searchInput')?.value?.trim() || '';
         const category = document.getElementById('categoryFilter')?.value || '';
-        section.style.display = query || category || getFavoritesOnly() ? 'none' : '';
+        section.style.display = query || category || getFavoritesOnly() || activeCatalogMode ? 'none' : '';
+    }
+
+    function submitDailyStreakRecord(streak) {
+        if (!window.ArcadeScores || !window.ArcadeScores.configured || !Number.isSafeInteger(streak) || streak < 1) return;
+        let previousBest = 0;
+        try { previousBest = Number(localStorage.getItem('arcadeAtlasDailyStreakSubmittedBest')) || 0; } catch (error) {}
+        if (streak <= previousBest) return;
+        const playerName = window.ArcadeScores.getPlayerName('Choose a nickname for the public Daily Pick Streak leaderboard (24 characters max). Cancel to play without submitting.');
+        if (!playerName) return;
+        window.ArcadeScores.submit('Daily Pick Streak', streak, playerName).then(ok => {
+            if (ok) { try { localStorage.setItem('arcadeAtlasDailyStreakSubmittedBest', String(streak)); } catch (error) {} }
+        });
     }
 
     function launchDailyPick() {
@@ -1905,6 +1952,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
             state.streak = state.lastDate === yesterday ? previous + 1 : 1;
             state.lastDate = today;
             try { localStorage.setItem('arcadeAtlasDailyPlayStreak', JSON.stringify(state)); } catch (error) {}
+            submitDailyStreakRecord(state.streak);
         }
         updateDailyPickSection();
         recordRecentGame(game);
@@ -1925,7 +1973,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         container.innerHTML = '';
         const query = document.getElementById('searchInput')?.value?.trim() || '';
         const category = document.getElementById('categoryFilter')?.value || '';
-        const filteredView = query !== '' || !!category || getFavoritesOnly();
+        const filteredView = query !== '' || !!category || getFavoritesOnly() || !!activeCatalogMode;
         section.style.display = ranked.length && !filteredView ? '' : 'none';
         if (ranked.length) renderGames(ranked, container);
     }
@@ -1938,19 +1986,21 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         else if (sortMode === 'za') sorted.sort((a, b) => String(b.title || '').localeCompare(String(a.title || '')));
         else if (sortMode === 'newest') sorted.reverse();
         else if (sortMode === 'played') { const counts = getGamePlayCounts(); sorted.sort((a, b) => (Number(counts[normalizeGamePath(b.path)]) || 0) - (Number(counts[normalizeGamePath(a.path)]) || 0)); }
+        else if (sortMode === 'rated') { const ratings = getGameRatings(); sorted.sort((a, b) => (Number(ratings[normalizeGamePath(b.path)]) || 0) - (Number(ratings[normalizeGamePath(a.path)]) || 0) || String(a.title || '').localeCompare(String(b.title || ''))); }
         return sorted;
     }
 
     async function searchGames() {
+        const searchSequence = ++catalogSearchSequence;
         const query = document.getElementById('searchInput').value.toLowerCase().trim();
         const category = (document.getElementById('categoryFilter') || {}).value || '';
-        updateCategoryQuickFilters(category);
+        updateCategoryQuickFilters(category, activeCatalogMode);
         const favoritesOnly = getFavoritesOnly();
         const allGamesGrid = document.getElementById('all-games-grid');
         const favoritesSection = document.getElementById('favorites-section');
         const favoritesHeading = document.getElementById('favorites-heading');
         const recentSection = document.getElementById('recent-games-section');
-        const filteredView = query !== '' || !!category || favoritesOnly;
+        const filteredView = query !== '' || !!category || favoritesOnly || !!activeCatalogMode;
         const dailyPickSection = document.getElementById('daily-pick-section');
         if (dailyPickSection) dailyPickSection.style.display = filteredView ? 'none' : '';
 
@@ -1966,15 +2016,16 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 
         allGamesGrid.innerHTML = '';
         const allGames = await loadGames();
+        if (searchSequence !== catalogSearchSequence) return;
         const favoritePaths = favoritesOnly
             ? new Set(getFavorites().map(game => normalizeGamePath(game.path)))
             : null;
         const filteredGames = allGames.filter(game => {
-            const matchesQuery = String(game.title || '').toLowerCase().includes(query) ||
-                String(game.category || '').toLowerCase().includes(query);
+            const matchesQuery = getGameSearchText(game).includes(query);
             const matchesCategory = !category || String(game.category || '').toUpperCase() === category;
             const matchesFavorite = !favoritePaths || favoritePaths.has(normalizeGamePath(game.path));
-            return matchesQuery && matchesCategory && matchesFavorite;
+            const matchesMode = activeCatalogMode !== 'multiplayer' || hasMultiplayerTag(game);
+            return matchesQuery && matchesCategory && matchesFavorite && matchesMode;
         });
         const sortedGames = sortGameList(filteredGames);
         const count = document.getElementById('catalogResultsCount');
@@ -1994,12 +2045,17 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         updateMostPlayedSection();
     }
 
-    function updateCategoryQuickFilters(activeCategory) {
+    function updateCategoryQuickFilters(activeCategory, activeMode) {
         const container = document.getElementById('category-quick-filters');
         if (!container) return;
         const selected = String(activeCategory || '').toUpperCase();
         container.querySelectorAll('button[data-category]').forEach(button => {
             const active = (button.dataset.category || '') === selected;
+            button.classList.toggle('active', active);
+            button.setAttribute('aria-pressed', String(active));
+        });
+        container.querySelectorAll('button[data-mode]').forEach(button => {
+            const active = (button.dataset.mode || '') === String(activeMode || '');
             button.classList.toggle('active', active);
             button.setAttribute('aria-pressed', String(active));
         });
@@ -2026,23 +2082,26 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
                     label: category.toLowerCase().replace(/\b\w/g, letter => letter.toUpperCase())
                 }))
             );
+            buttons.push({ mode: 'multiplayer', label: 'Play together' });
             container.innerHTML = '';
             buttons.forEach(item => {
                 const button = document.createElement('button');
                 button.type = 'button';
                 button.className = 'category-quick-filter';
-                button.dataset.category = item.value;
+                if (item.mode) button.dataset.mode = item.mode;
+                else button.dataset.category = item.value;
                 button.textContent = item.label;
                 button.setAttribute('aria-pressed', 'false');
                 button.addEventListener('click', () => {
-                    filter.value = item.value;
-                    updateCategoryQuickFilters(item.value);
+                    if (item.mode) activeCatalogMode = activeCatalogMode === item.mode ? '' : item.mode;
+                    else filter.value = item.value;
+                    updateCategoryQuickFilters(filter.value, activeCatalogMode);
                     searchGames();
                 });
                 container.appendChild(button);
             });
         }
-        updateCategoryQuickFilters(filter.value || '');
+        updateCategoryQuickFilters(filter.value || '', activeCatalogMode);
     }
 
     function playRandomGame() {
@@ -2052,11 +2111,11 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
             ? new Set(getFavorites().map(game => normalizeGamePath(game.path)))
             : null;
         const eligible = cachedGames.filter(game => {
-            const matchesQuery = !query || String(game.title || '').toLowerCase().includes(query) ||
-                String(game.category || '').toLowerCase().includes(query);
+            const matchesQuery = !query || getGameSearchText(game).includes(query);
             const matchesCategory = !category || String(game.category || '').toUpperCase() === category;
             const matchesFavorite = !favoritePaths || favoritePaths.has(normalizeGamePath(game.path));
-            return matchesQuery && matchesCategory && matchesFavorite && game.path;
+            const matchesMode = activeCatalogMode !== 'multiplayer' || hasMultiplayerTag(game);
+            return matchesQuery && matchesCategory && matchesFavorite && matchesMode && game.path;
         });
         if (!eligible.length) {
             alert('No games match your current filters. Try another search, category, or favorite.');
@@ -2069,6 +2128,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 
     function renderGames(games, container) {
         const favorites = getFavorites();
+        const ratings = getGameRatings();
         games.forEach(game => {
             const isFavorite = favorites.some(fav => normalizeGamePath(fav.path) === normalizeGamePath(game.path));
             const gameCard = document.createElement('div');
@@ -2090,7 +2150,39 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
             title.className = 'game-card-title';
             title.textContent = game.title || 'Game';
             link.append(img, title);
+            if (game.description) {
+                const description = document.createElement('p');
+                description.className = 'game-card-description';
+                description.textContent = game.description;
+                link.appendChild(description);
+            }
+            if (game.external && hasMultiplayerTag(game)) {
+                const badge = document.createElement('span');
+                badge.className = 'game-card-badge';
+                badge.textContent = 'ONLINE ↗';
+                badge.title = 'Online multiplayer hosted on the game publisher’s website';
+                link.appendChild(badge);
+            }
             gameCard.appendChild(link);
+            const selectedRating = Number(ratings[normalizeGamePath(game.path)]) || 0;
+            const rating = document.createElement('div');
+            rating.className = 'game-rating';
+            rating.setAttribute('role', 'group');
+            rating.setAttribute('aria-label', 'Your rating for ' + (game.title || 'game') + ' on this device');
+            for (let value = 1; value <= 5; value++) {
+                const ratingButton = document.createElement('button');
+                ratingButton.type = 'button';
+                ratingButton.className = value <= selectedRating ? 'is-rated' : '';
+                ratingButton.textContent = '★';
+                ratingButton.setAttribute('aria-label', 'Rate ' + (game.title || 'game') + ' ' + value + ' out of 5 stars');
+                ratingButton.setAttribute('aria-pressed', String(value === selectedRating));
+                ratingButton.addEventListener('click', event => {
+                    event.stopPropagation();
+                    saveGameRating(game, value);
+                });
+                rating.appendChild(ratingButton);
+            }
+            gameCard.appendChild(rating);
             const starIcon = createFavoriteButton(isFavorite, game.title || 'Game');
             gameCard.appendChild(starIcon);
             container.appendChild(gameCard);
@@ -2481,6 +2573,10 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         <li>Added a Daily Pick that rotates every day and tracks your daily launch streak on this device.</li>
         <li>Added one-tap category chips for faster browsing across Action, Sports, Puzzle, Racing, and other categories.</li>
         <li>Added a Most Played sort that learns from launches on the current device.</li>
+        <li>Added a Play together filter for tagged couch co-op games.</li>
+        <li>Search now checks descriptions and tags; add your own one-to-five star ratings and sort by them.</li>
+        <li>Expanded descriptions for 24 popular catalog games.</li>
+        <li>New Daily Pick streak personal bests can be submitted to the shared leaderboard with a nickname you choose.</li>
         <li>Added 2048 Cupcakes and Google Baseball; removed failed imports after browser testing.</li>
         <li>Added a Clear History control for the Recently Played row.</li>
         <li>Added keyboard shortcuts: press / or Ctrl+K to focus game search; Escape clears it.</li>

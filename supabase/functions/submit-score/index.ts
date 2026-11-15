@@ -73,6 +73,9 @@ Deno.serve(async (req: Request) => {
   if (!/^[0-9]{1,500}$/.test(scoreText)) {
     return json({ error: "The score must be a whole-number decimal string containing 1–500 digits." }, 400);
   }
+  if (kind === "score" && gameTitle.toLowerCase() === "daily pick streak" && (BigInt(scoreText) < 1n || BigInt(scoreText) > 36500n)) {
+    return json({ error: "Daily Pick Streak must be between 1 and 36,500 days." }, 400);
+  }
   if (kind === "session" && BigInt(scoreText) < 5n) {
     return json({ error: "Playtime submissions must be at least 5 seconds." }, 400);
   }

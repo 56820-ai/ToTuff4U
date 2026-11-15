@@ -4,7 +4,8 @@
       "title": "Slope",
       "path": "g/slope",
       "image": "./duckmath-site/assets/img/icons/slope.webp",
-      "category": "RACING"
+      "category": "RACING",
+      "description": "Guide a rolling ball down a steep neon course and dodge gaps and obstacles."
     },
     {
       "title": "Gunspin",
@@ -16,7 +17,8 @@
       "title": "1v1.lol",
       "path": "g/1v1lol",
       "image": "./duckmath-site/assets/img/icons/1v1.webp",
-      "category": "ACTION"
+      "category": "ACTION",
+      "description": "Build ramps and walls, then practice quick one-on-one building and aim battles."
     },
     {
       "title": "Idle Breakout",
@@ -40,13 +42,23 @@
       "title": "Gun Mayhem",
       "path": "g/gunmayhem",
       "image": "images/gunmayhem.png",
-      "category": "ACTION"
+      "category": "ACTION",
+      "tags": [
+        "multiplayer",
+        "local multiplayer",
+        "platform fighter"
+      ]
     },
     {
       "title": "Gun Mayhem 2",
       "path": "g/gunmayhem2",
       "image": "images/gunmayhem2.png",
-      "category": "ACTION"
+      "category": "ACTION",
+      "tags": [
+        "multiplayer",
+        "local multiplayer",
+        "platform fighter"
+      ]
     },
     {
       "title": "Wall Smash",
@@ -58,7 +70,8 @@
       "title": "Drift Boss",
       "path": "g/driftboss",
       "image": "./duckmath-site/assets/img/icons/driftboss.webp",
-      "category": "RACING"
+      "category": "RACING",
+      "description": "Time each turn carefully to keep your car drifting along a narrow track."
     },
     {
       "title": "Jack Smith",
@@ -70,7 +83,8 @@
       "title": "Infinite Craft",
       "path": "g/infinitecraft",
       "image": "images/infinitecraft.png",
-      "category": "PUZZLE"
+      "category": "PUZZLE",
+      "description": "Combine simple elements to discover surprising new items and ideas."
     },
     {
       "title": "Lazy Jump 3D",
@@ -82,19 +96,30 @@
       "title": "House Of Hazards",
       "path": "g/houseofhazards",
       "image": "images/houseofhazards.png",
-      "category": "ACTION"
+      "category": "ACTION",
+      "tags": [
+        "multiplayer",
+        "local multiplayer",
+        "party"
+      ]
     },
     {
       "title": "Hole.io",
       "path": "g/holeio",
       "image": "./duckmath-site/assets/img/icons/hole.io.webp",
-      "category": "IO"
+      "category": "IO",
+      "description": "Move a growing hole around the city and swallow objects before time runs out."
     },
     {
       "title": "Volley Random",
       "path": "g/volleyrandom",
       "image": "images/volleyrandom.png",
-      "category": "SPORTS"
+      "category": "SPORTS",
+      "tags": [
+        "multiplayer",
+        "local multiplayer",
+        "sports"
+      ]
     },
     {
       "title": "Draw The Hill",
@@ -118,13 +143,15 @@
       "title": "Snow Rider 3D",
       "path": "g/snowrider3d",
       "image": "./duckmath-site/assets/img/icons/snowrider3d.webp",
-      "category": "RACING"
+      "category": "RACING",
+      "description": "Steer a sled downhill, dodge obstacles, and collect gifts along the way."
     },
     {
       "title": "Tetris",
       "path": "g/tetris",
       "image": "./duckmath-site/assets/img/icons/tetris.webp",
-      "category": "PUZZLE"
+      "category": "PUZZLE",
+      "description": "Fit falling shapes together to clear lines and keep the stack from reaching the top."
     },
     {
       "title": "Checkout Frenzy",
@@ -154,19 +181,34 @@
       "title": "Soccer Random",
       "path": "g/soccer-random",
       "image": "images/soccerrandom.png",
-      "category": "SPORTS"
+      "category": "SPORTS",
+      "tags": [
+        "multiplayer",
+        "local multiplayer",
+        "sports"
+      ]
     },
     {
       "title": "Rooftop Sniper",
       "path": "g/rooftopsnipers",
       "image": "./duckmath-site/assets/img/icons/rooftop.webp",
-      "category": "ACTION"
+      "category": "ACTION",
+      "tags": [
+        "multiplayer",
+        "local multiplayer",
+        "platform fighter"
+      ]
     },
     {
       "title": "Boxing Random",
       "path": "g/boxingrandom",
       "image": "images/boxingrandom.png",
-      "category": "SPORTS"
+      "category": "SPORTS",
+      "tags": [
+        "multiplayer",
+        "local multiplayer",
+        "sports"
+      ]
     },
     {
       "title": "Adventure Capitalist",
@@ -184,7 +226,8 @@
       "title": "Bloons TD5",
       "path": "g/btd5",
       "image": "./duckmath-site/assets/img/icons/bloons1.webp",
-      "category": "STRATEGY"
+      "category": "STRATEGY",
+      "description": "Place dart-throwing monkeys and other defenses to stop waves of balloons."
     },
     {
       "title": "Mr Mine",
@@ -202,7 +245,8 @@
       "title": "Run 3",
       "path": "g/run3",
       "image": "./duckmath-site/assets/img/icons/run3.webp",
-      "category": "ARCADE"
+      "category": "ARCADE",
+      "description": "Sprint and jump through tunnels that twist as you move across their walls."
     },
     {
       "title": "Spend Elon's Money",
@@ -214,13 +258,15 @@
       "title": "Plants V Zombies",
       "path": "g/pvz",
       "image": "./duckmath-site/assets/img/icons/pvz.webp",
-      "category": "STRATEGY"
+      "category": "STRATEGY",
+      "description": "Place plants with different abilities to defend your garden from silly zombies."
     },
     {
       "title": "Duck Life",
       "path": "g/ducklife",
       "image": "./duckmath-site/assets/img/icons/dl1.webp",
-      "category": "SIMULATION"
+      "category": "SIMULATION",
+      "description": "Train a duck in running, swimming, flying, and climbing before racing."
     },
     {
       "title": "Mine Sweeper",
@@ -250,7 +296,8 @@
       "title": "Drive Mad",
       "path": "g/drivemad",
       "image": "images/drivemad.png",
-      "category": "RACING"
+      "category": "RACING",
+      "description": "Balance your vehicle across tricky physics courses without flipping over."
     },
     {
       "title": "Papa's Games",
@@ -274,19 +321,26 @@
       "title": "Subway Surfers",
       "path": "g/subway-surfers",
       "image": "./duckmath-site/assets/img/icons/subway.webp",
-      "category": "ENDLESS RUNNER"
+      "category": "ENDLESS RUNNER",
+      "description": "Dash along train tracks, switch lanes, jump barriers, and collect coins."
     },
     {
       "title": "Basketball Random",
       "path": "g/basketball-random",
       "image": "images/basketball-random.png",
-      "category": "SPORTS"
+      "category": "SPORTS",
+      "tags": [
+        "multiplayer",
+        "local multiplayer",
+        "sports"
+      ]
     },
     {
       "title": "MotoX3M",
       "path": "g/motox3m",
       "image": "./duckmath-site/assets/img/icons/motox3m.webp",
-      "category": "RACING"
+      "category": "RACING",
+      "description": "Ride a stunt bike through obstacle courses, flips, and timed checkpoints."
     },
     {
       "title": "Cookie Clicker",
@@ -316,13 +370,15 @@
       "title": "Jetpack Joyride",
       "path": "g/jetpack-joyride",
       "image": "./duckmath-site/assets/img/icons/jetpackjoyride.webp",
-      "category": "ARCADE"
+      "category": "ARCADE",
+      "description": "Fly through a lab with a jetpack, avoid hazards, and grab coins."
     },
     {
       "title": "Geometry Dash",
       "path": "g/geodash",
       "image": "./duckmath-site/assets/img/icons/geometrydash.webp",
-      "category": "PLATFORMER"
+      "category": "PLATFORMER",
+      "description": "Jump and fly to the beat through obstacle courses that reward precise timing."
     },
     {
       "title": "Duck Life 1",
@@ -485,7 +541,8 @@
       "title": "Agar.io",
       "path": "g/agario",
       "image": "./duckmath-site/assets/img/icons/agar.webp",
-      "category": "IO"
+      "category": "IO",
+      "description": "Grow a cell by collecting pellets and try to outmaneuver larger opponents."
     },
     {
       "title": "Crossy Road",
@@ -503,7 +560,12 @@
       "title": "Fireboy & Watergirl",
       "path": "g/fireboywatergirlforsettemple",
       "image": "./duckmath-site/assets/img/icons/fireboy.webp",
-      "category": "PLATFORMER"
+      "category": "PLATFORMER",
+      "tags": [
+        "co-op",
+        "two-player",
+        "puzzle"
+      ]
     },
     {
       "title": "Rooftop Snipers 2",
@@ -515,14 +577,16 @@
       "title": "OvO",
       "path": "g/ovo",
       "image": "images/ovo.jpg",
-      "category": "PLATFORMER"
+      "category": "PLATFORMER",
+      "description": "Race through precise platforming levels using jumps, slides, and wall moves."
     },
     {
       "title": "Pac-Man",
       "path": "g/pacman",
       "image": "./duckmath-site/assets/img/icons/pacman.webp",
       "category": "ARCADE",
-      "source": "https://github.com/8tentaculos/jsPacman"
+      "source": "https://github.com/8tentaculos/jsPacman",
+      "description": "Clear each maze while avoiding ghosts and collecting power pellets."
     },
     {
       "title": "Doodle Jump",
@@ -553,13 +617,15 @@
       "title": "Block Blast",
       "path": "g/blockblast",
       "image": "images/blockblast.png",
-      "category": "PUZZLE"
+      "category": "PUZZLE",
+      "description": "Place block shapes on the board and clear full rows or columns to score."
     },
     {
       "title": "2048",
       "path": "g/2048",
       "image": "images/2048.png",
-      "category": "PUZZLE"
+      "category": "PUZZLE",
+      "description": "Slide numbered tiles together to combine them and reach the 2048 tile."
     },
     {
       "title": "Ace Gangster",
@@ -583,19 +649,22 @@
       "title": "Minecraft 1.12.2",
       "path": "g/mc",
       "image": "images/mc.png",
-      "category": "SANDBOX"
+      "category": "SANDBOX",
+      "description": "Explore a browser-hosted block world, gather materials, and build with friends or solo."
     },
     {
       "title": "Retro Bowl",
       "path": "g/retro-bowl",
       "image": "images/retrobowl.jpg",
-      "category": "SPORTS"
+      "category": "SPORTS",
+      "description": "Manage a retro-style football team and call plays on offense."
     },
     {
       "title": "Survev.io",
       "path": "g/survev",
       "image": "images/survev.png",
-      "category": "ACTION"
+      "category": "ACTION",
+      "description": "Search for equipment, stay inside the safe zone, and survive a top-down battle royale."
     },
     {
       "title": "Waterworks",
@@ -669,7 +738,12 @@
       "path": "g/connect-four",
       "image": "images/connect-four.svg",
       "category": "PUZZLE",
-      "source": "https://github.com/bryanbraun/connect-four"
+      "source": "https://github.com/bryanbraun/connect-four",
+      "tags": [
+        "multiplayer",
+        "local multiplayer",
+        "strategy"
+      ]
     }
   ]
 }

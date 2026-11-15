@@ -52,6 +52,9 @@ async function submitScore(request, env) {
   if (!/^[0-9]{1,500}$/.test(scoreText)) {
     return json({ error: "The score must be a whole-number decimal string containing 1–500 digits." }, 400);
   }
+  if (kind === "score" && gameTitle.toLowerCase() === "daily pick streak" && (BigInt(scoreText) < 1n || BigInt(scoreText) > 36500n)) {
+    return json({ error: "Daily Pick Streak must be between 1 and 36,500 days." }, 400);
+  }
   if (kind === "session" && BigInt(scoreText) < 5n) {
     return json({ error: "Playtime submissions must be at least 5 seconds." }, 400);
   }
@@ -155,6 +158,23 @@ export default {
               ) AS game_rank
             FROM timed_totals t
           ),
+          daily_best AS (
+            SELECT *,
+              ROW_NUMBER() OVER (
+                PARTITION BY player_key
+                ORDER BY length(normalized_score) DESC, normalized_score DESC, created_at DESC, id ASC
+              ) AS player_rank
+            FROM base
+            WHERE game_key = 'daily pick streak'
+          ),
+          daily_top AS (
+            SELECT *,
+              ROW_NUMBER() OVER (
+                ORDER BY length(normalized_score) DESC, normalized_score DESC, created_at DESC, player_key ASC
+              ) AS game_rank
+            FROM daily_best
+            WHERE player_rank = 1
+          ),
           normal_top AS (
             SELECT *,
               ROW_NUMBER() OVER (
@@ -162,7 +182,7 @@ export default {
                 ORDER BY length(normalized_score) DESC, normalized_score DESC, created_at DESC, id ASC
               ) AS game_rank
             FROM base
-            WHERE game_key NOT IN ('cookie clicker', 'minecraft', 'retro bowl time', 'blocky combat swat time')
+            WHERE game_key NOT IN ('cookie clicker', 'daily pick streak', 'minecraft', 'retro bowl time', 'blocky combat swat time')
               AND (game_key <> 'slope' OR CAST(score AS INTEGER) <= 1500)
           )
           SELECT id, player_name, game_title, score, created_at FROM normal_top WHERE game_rank <= 3
@@ -170,6 +190,8 @@ export default {
           SELECT id, player_name, game_title, score, created_at FROM cookie_top WHERE game_rank <= 3
           UNION ALL
           SELECT id, player_name, game_title, score, created_at FROM timed_top WHERE game_rank <= 3
+          UNION ALL
+          SELECT id, player_name, game_title, score, created_at FROM daily_top WHERE game_rank <= 3
         `).all();
         return json(result.results || []);
       } catch (error) {
