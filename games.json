@@ -634,28 +634,10 @@
       "category": "RACING"
     },
     {
-      "title": "Basketball Stars",
-      "path": "g/basketballstars",
-      "image": "duckmath-site/assets/img/icons/basketball-stars.webp",
-      "category": "SPORTS"
-    },
-    {
-      "title": "Duck Life 4",
-      "path": "g/ducklife4",
-      "image": "g/ducklife4/splash.jpg",
-      "category": "SIMULATION"
-    },
-    {
       "title": "Stacktris",
       "path": "g/stacktris-main",
       "image": "g/stacktris-main/webapp/cover.jpg",
       "category": "PUZZLE"
-    },
-    {
-      "title": "Crazy Tunnel 3D",
-      "path": "g/crazytunnel3d",
-      "image": "g/crazytunnel3d/TemplateData/logo.png",
-      "category": "RACING"
     },
     {
       "title": "Paddle Clash",
