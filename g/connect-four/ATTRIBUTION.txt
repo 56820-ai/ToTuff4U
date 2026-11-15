@@ -1,0 +1,7 @@
+Connect Four
+
+Original project: https://github.com/bryanbraun/connect-four
+Author: Bryan Braun
+License: MIT License (see LICENSE)
+
+This local Arcade Atlas copy retains the upstream source files and MIT copyright notice. The catalog icon and Arcade Atlas integration are original additions.

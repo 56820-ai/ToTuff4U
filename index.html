@@ -2400,6 +2400,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
       <h3>🎮 New games</h3>
       <ul>
         <li>Added four new keyboard-and-touch playable mini-games: Paddle Clash, Sky Hop, Gem Maze, and Asteroid Rush.</li>
+        <li>Added Connect Four, a local two-player classic with keyboard and accessible controls.</li>
         <li>Created matching original icons for the four new mini-games.</li>
         <li>Added Arcade 3D, with five browser-playable 3D modes.</li>
         <li>Added Nightmaze, an original Unity 6 WebGL horror game.</li>
@@ -2539,7 +2540,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 </style>
 <script>
 (function(){
-  const version="2026-11-15-10";
+  const version="2026-11-15-11";
   const overlay=document.getElementById("patchNotesOverlay");
   const reopen=document.getElementById("reopenPatchNotes");
   const close=()=>{overlay.classList.remove("visible");overlay.setAttribute("aria-hidden","true");localStorage.setItem("arcadeAtlasPatchNotesSeen",version);reopen.style.display="block";};
