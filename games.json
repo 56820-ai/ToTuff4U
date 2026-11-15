@@ -656,6 +656,13 @@
       "path": "g/cupcake2048",
       "image": "g/cupcake2048/meta/apple-touch-icon.png",
       "category": "PUZZLE"
+    },
+    {
+      "title": "Ancient Beast",
+      "path": "g/ancient-beast",
+      "image": "g/ancient-beast/assets/interface/AncientBeast.png",
+      "category": "STRATEGY",
+      "source": "https://github.com/FreezingMoon/AncientBeast"
     }
   ]
 }
