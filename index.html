@@ -2023,7 +2023,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
             const buttons = [{ value: '', label: 'All games' }].concat(
                 quickOrder.filter(category => categories.includes(category)).map(category => ({
                     value: category,
-                    label: category.toLowerCase().replace(/\\b\\w/g, letter => letter.toUpperCase())
+                    label: category.toLowerCase().replace(/\b\w/g, letter => letter.toUpperCase())
                 }))
             );
             container.innerHTML = '';
