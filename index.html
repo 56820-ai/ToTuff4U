@@ -1841,7 +1841,10 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
             .slice(0, 8)
             .map(item => item.game);
         container.innerHTML = '';
-        section.style.display = ranked.length ? '' : 'none';
+        const query = document.getElementById('searchInput')?.value?.trim() || '';
+        const category = document.getElementById('categoryFilter')?.value || '';
+        const filteredView = query !== '' || !!category || getFavoritesOnly();
+        section.style.display = ranked.length && !filteredView ? '' : 'none';
         if (ranked.length) renderGames(ranked, container);
     }
 
@@ -1903,6 +1906,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
                 : 'No games found. Try a different title or category.';
             allGamesGrid.appendChild(message);
         }
+        updateMostPlayedSection();
     }
 
     function populateCategoryFilter(games) {
@@ -2342,6 +2346,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
       
       <ul>
         <li>Added a persistent Favorites-only catalog filter and keyboard-accessible favorite buttons.</li>
+        <li>The Most Played shelf now hides while catalog filters are active.</li>
         <li>Ran the Chromium audit and removed six game imports with missing local resources or runtime errors.</li>
         <li>Added a Recently Played row that remembers your last eight games on this device.</li>
         <li>Added a Most Played shelf that ranks the games you launch most often on this device.</li>
@@ -2435,7 +2440,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 </style>
 <script>
 (function(){
-  const version="2026-11-15-8";
+  const version="2026-11-15-9";
   const overlay=document.getElementById("patchNotesOverlay");
   const reopen=document.getElementById("reopenPatchNotes");
   const close=()=>{overlay.classList.remove("visible");overlay.setAttribute("aria-hidden","true");localStorage.setItem("arcadeAtlasPatchNotesSeen",version);reopen.style.display="block";};

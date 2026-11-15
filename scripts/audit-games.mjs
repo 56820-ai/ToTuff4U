@@ -188,7 +188,7 @@ await Promise.all(Array.from({ length: workers }, async () => {
 }));
 
 // Check the two custom interfaces touched by this maintenance pass.
-const uiAudit = { leaderboard: {}, blockyCombat: {} };
+const uiAudit = { leaderboard: {}, blockyCombat: {}, catalog: {} };
 try {
   const page = await browser.newPage({ viewport: { width: 1365, height: 768 } });
   const errors = [];
@@ -220,6 +220,92 @@ try {
   await page.close();
 } catch (e) {
   uiAudit.blockyCombat.error = String(e.message || e).slice(0, 300);
+}
+
+try {
+  const page = await browser.newPage({ viewport: { width: 1365, height: 768 } });
+  const errors = [];
+  page.on("pageerror", e => errors.push(String(e.message || e).slice(0, 220)));
+  const response = await page.goto(BASE + "/", { waitUntil: "domcontentloaded", timeout: 16000 });
+  await page.waitForSelector("#favoritesOnlyToggle", { timeout: 12000 });
+  await page.waitForSelector("#all-games-grid .game-card .favorite-star", { timeout: 12000 });
+  await page.locator("#dismissPatchNotes").click({ timeout: 1200 }).catch(() => {});
+  const star = page.locator("#all-games-grid .game-card .favorite-star").first();
+  const favoriteButton = await star.evaluate(el => ({
+    tag: el.tagName.toLowerCase(),
+    pressed: el.getAttribute("aria-pressed"),
+    label: el.getAttribute("aria-label") || ""
+  }));
+  const firstHref = await page.locator("#all-games-grid .game-card a").first().getAttribute("href");
+  await page.evaluate(href => {
+    const key = normalizeGamePath(href);
+    localStorage.setItem("gamePlayCounts", JSON.stringify({ [key]: 4 }));
+    updateMostPlayedSection();
+  }, firstHref);
+  const mostPlayedBefore = await page.locator("#most-played-section").evaluate(el => getComputedStyle(el).display !== "none");
+  await star.focus();
+  await page.keyboard.press("Space");
+  await page.waitForFunction(() => document.querySelector("#all-games-grid .favorite-star")?.getAttribute("aria-pressed") === "true", undefined, { timeout: 4000 });
+  await page.locator("#favoritesOnlyToggle").click();
+  await page.waitForFunction(() => document.getElementById("catalogResultsCount")?.textContent.includes("1 game in favorites"), undefined, { timeout: 4000 });
+  const filteredCards = await page.locator("#all-games-grid .game-card").count();
+  await page.waitForFunction(() => {
+    const section = document.getElementById("most-played-section");
+    return section && getComputedStyle(section).display === "none";
+  }, undefined, { timeout: 4000 });
+  const mostPlayedHidden = await page.locator("#most-played-section").evaluate(el => getComputedStyle(el).display === "none");
+  await page.locator("#all-games-grid .favorite-star").first().focus();
+  await page.keyboard.press("Space");
+  await page.waitForFunction(() => document.getElementById("catalogResultsCount")?.textContent.startsWith("0 games in favorites"), undefined, { timeout: 4000 });
+  const emptyMessage = await page.locator("#all-games-grid .empty-games-message").textContent();
+  await page.reload({ waitUntil: "domcontentloaded" });
+  await page.waitForSelector("#favoritesOnlyToggle", { timeout: 10000 });
+  await page.locator("#dismissPatchNotes").click({ timeout: 1200 }).catch(() => {});
+  await page.waitForFunction(() => document.getElementById("catalogResultsCount")?.textContent.startsWith("0 games in favorites"), undefined, { timeout: 10000 });
+  const persistedFilter = await page.locator("#favoritesOnlyToggle").getAttribute("aria-pressed");
+  await page.waitForFunction(() => {
+    const section = document.getElementById("most-played-section");
+    return section && getComputedStyle(section).display === "none";
+  }, undefined, { timeout: 4000 });
+  const mostPlayedHiddenAfterReload = await page.locator("#most-played-section").evaluate(el => getComputedStyle(el).display === "none");
+  await page.locator("#favoritesOnlyToggle").click();
+  await page.waitForFunction(() => {
+    const section = document.getElementById("most-played-section");
+    return section && getComputedStyle(section).display !== "none";
+  }, undefined, { timeout: 4000 });
+  const mostPlayedVisibleAfterClear = await page.locator("#most-played-section").evaluate(el => getComputedStyle(el).display !== "none");
+  await page.evaluate(() => {
+    localStorage.removeItem("favoriteGames");
+    localStorage.removeItem("arcadeAtlasFavoritesOnly");
+    localStorage.removeItem("gamePlayCounts");
+  });
+  const ok = response?.status() === 200 &&
+    favoriteButton.tag === "button" &&
+    favoriteButton.pressed === "false" &&
+    !!favoriteButton.label &&
+    mostPlayedBefore &&
+    filteredCards === 1 &&
+    mostPlayedHidden &&
+    String(emptyMessage || "").includes("Star a game") &&
+    persistedFilter === "true" &&
+    mostPlayedHiddenAfterReload &&
+    mostPlayedVisibleAfterClear;
+  uiAudit.catalog = {
+    status: response?.status() || null,
+    favoriteButton,
+    mostPlayedBefore,
+    filteredCards,
+    mostPlayedHidden,
+    emptyMessage,
+    persistedFilter,
+    mostPlayedHiddenAfterReload,
+    mostPlayedVisibleAfterClear,
+    errors,
+    ok
+  };
+  await page.close();
+} catch (e) {
+  uiAudit.catalog.error = String(e.message || e).slice(0, 300);
 }
 
 // DuckMath is backed by its own live catalog service. Verify its app list and
@@ -304,6 +390,7 @@ if (process.env.GITHUB_STEP_SUMMARY) {
     `- New DuckMath games added to Arcade Atlas: ${uniqueAdditions.length}`,
     `- Leaderboard logo map loaded: ${uiAudit.leaderboard.logoCount || 0}`,
     `- Blocky Combat timer detected: ${!!uiAudit.blockyCombat.timer}`,
+    `- Favorites-only catalog UI smoke test passed: ${!!uiAudit.catalog.ok}`,
     "",
     "## Removed broken Arcade Atlas games",
     ...report.removedBrokenGames.map(title => `- ${title}`),
@@ -330,5 +417,6 @@ console.log(JSON.stringify({
   duckmathVerified: duckmath.verified.length,
   duckmathBroken: duckmath.broken.length,
   added: uniqueAdditions.length,
-  duckmathError: duckmath.error
+  duckmathError: duckmath.error,
+  catalogUiOk: !!uiAudit.catalog.ok
 }, null, 2));
