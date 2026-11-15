@@ -1328,6 +1328,35 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
                     </div>
                 </div>
 
+                <section id="collections-section" class="collections-section" aria-label="Your game collections">
+                    <div class="recent-heading collections-heading">
+                        <div><h2 class="section-title">MY COLLECTIONS</h2><p class="collections-intro">Build your own playlists from the Arcade Atlas game catalog.</p></div>
+                        <button type="button" id="createCollectionButton" class="collection-create-button">＋ New playlist</button>
+                    </div>
+                    <div id="collections-grid" class="collections-grid"></div>
+                </section>
+
+                <dialog id="collection-dialog" class="collection-dialog" aria-labelledby="collection-dialog-title">
+                    <form id="collection-form" class="collection-dialog-form">
+                        <div class="collection-dialog-heading">
+                            <div><p class="daily-pick-kicker">YOUR ARCADE, YOUR WAY</p><h2 id="collection-dialog-title">Game playlists</h2></div>
+                            <button type="button" id="closeCollectionDialog" class="collection-dialog-close" aria-label="Close playlist editor">×</button>
+                        </div>
+                        <p id="collection-dialog-game" class="collection-dialog-game"></p>
+                        <fieldset id="collection-options-fieldset" class="collection-options-fieldset">
+                            <legend>Choose playlists for this game</legend>
+                            <div id="collection-options"></div>
+                        </fieldset>
+                        <label id="collection-name-label" class="collection-name-label" for="collection-name-input">Create a playlist or enter a new name</label>
+                        <input id="collection-name-input" name="collectionName" maxlength="28" autocomplete="off" placeholder="e.g. Play with friends">
+                        <p id="collection-dialog-status" class="collection-dialog-status" role="status" aria-live="polite"></p>
+                        <div class="collection-dialog-actions">
+                            <button type="button" id="cancelCollectionDialog" class="collection-cancel-button">Cancel</button>
+                            <button type="submit" class="collection-save-button">Save playlist</button>
+                        </div>
+                    </form>
+                </dialog>
+
                 <section id="recent-games-section" aria-label="Recently played games">
                     <div class="recent-heading"><h2 class="section-title">RECENTLY PLAYED</h2><button type="button" id="clearRecentGames" class="clear-recent-button">Clear history</button></div>
                     <div class="games-grid" id="recent-games-grid"></div>
@@ -1369,7 +1398,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
                     <p id="quest-announcement" class="sr-only" aria-live="polite"></p>
                 </section>
 
-                <h2 class="section-title">ALL GAMES</h2>
+                <h2 id="all-games-heading" class="section-title">ALL GAMES</h2>
                 <div id="category-quick-filters" class="category-quick-filters" role="group" aria-label="Quick game categories"></div>
                 <div class="catalog-tools">
                     <label class="sr-only" for="categoryFilter">Filter games by category</label>
@@ -1386,6 +1415,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
                         <option value="rated">Top rated by you</option>
                     </select>
                     <button type="button" id="favoritesOnlyToggle" class="favorites-filter-button" aria-pressed="false">☆ Favorites only</button>
+                    <button type="button" id="clearCollectionFilter" class="collection-clear-filter" style="display:none">Clear playlist filter</button>
                     <button type="button" class="surprise-button" onclick="playRandomGame()">
                         <i class="fas fa-dice" aria-hidden="true"></i> Surprise me
                     </button>
@@ -1465,7 +1495,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
             <p>Some games offer leaderboards. If you choose to submit a score or playtime, the player name, game name, score, and/or playtime value you submit may be sent to our leaderboard database and displayed publicly on the site. Do not use your real name or include personal information in a player name.</p>
             <p>You can use the site without creating an Arcade Atlas account. The site does not ask you to provide an email address to use its game catalog or submit a leaderboard score.</p>
             <h2>Information stored in your browser</h2>
-            <p>The site may use browser local storage to remember preferences such as favorite games, recently played games, game launch counts, personal game ratings, your player name, locally tracked playtime, your Daily Pick launch streak, and Arcade Quests progress (XP and unlocked badges). The Play More Like This shelf uses your favorites, ratings, and repeat launches to suggest games on this device. Arcade Quests records which games you launch on this device so it can track daily goals and lifetime badge milestones, including distinct multiplayer titles; it does not verify that a game was completed. These preferences, recommendations, and quest records stay on this device and are not sent to Arcade Atlas. They may remain in your browser until you clear the site's data or your browser removes them. Clearing site data may reset these preferences and locally stored totals. The Daily Pick streak records that you opened the featured game; it does not track game completion. If you submit a new personal-best streak, your chosen nickname and streak length appear publicly on the Daily Pick Streak leaderboard.</p>
+            <p>The site may use browser local storage to remember preferences such as favorite games, custom game playlist names and membership, recently played games, game launch counts, personal game ratings, your player name, locally tracked playtime, your Daily Pick launch streak, and Arcade Quests progress (XP and unlocked badges). Playlists store game paths from this catalog so you can filter the catalog to your saved games. The Play More Like This shelf uses your favorites, ratings, and repeat launches to suggest games on this device. Arcade Quests records which games you launch on this device so it can track daily goals and lifetime badge milestones, including distinct multiplayer titles; it does not verify that a game was completed. These preferences, playlists, recommendations, and quest records stay on this device and are not sent to Arcade Atlas. They may remain in your browser until you clear the site's data or your browser removes them. Clearing site data may reset these preferences and locally stored totals. The Daily Pick streak records that you opened the featured game; it does not track game completion. If you submit a new personal-best streak, your chosen nickname and streak length appear publicly on the Daily Pick Streak leaderboard.</p>
             <h2>Leaderboards and database</h2>
             <p>Leaderboard submissions are processed by Supabase, our database service provider. Submitted leaderboard information is used to operate and display game rankings. Because leaderboard entries are public, information you submit there should be treated as public. Database and service-provider handling is also subject to <a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer">Supabase's Privacy Policy</a>.</p>
             <h2>Analytics and advertising</h2>
@@ -1600,6 +1630,14 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
     let cachedGames = [];
     let activeCatalogMode = '';
     let catalogSearchSequence = 0;
+    let activeGameCollectionId = '';
+    let collectionDialogGame = null;
+    let collectionDialogRenameId = '';
+    let collectionDialogDeleteId = '';
+
+    const GAME_COLLECTIONS_KEY = 'arcadeAtlasCollectionsV1';
+    const MAX_GAME_COLLECTIONS = 12;
+    const MAX_GAMES_PER_COLLECTION = 100;
 
     function getGameSearchText(game) {
         const tags = Array.isArray(game.tags) ? game.tags : [];
@@ -1608,6 +1646,251 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 
     function hasMultiplayerTag(game) {
         return Array.isArray(game.tags) && game.tags.some(tag => /multiplayer|co-op|two-player|2-player/i.test(String(tag)));
+    }
+
+    function getGameCollections() {
+        try {
+            const saved = JSON.parse(localStorage.getItem(GAME_COLLECTIONS_KEY) || '[]');
+            if (!Array.isArray(saved)) return [];
+            const ids = new Set();
+            const names = new Set();
+            const knownPaths = new Set(cachedGames.map(game => normalizeGamePath(game.path)));
+            return saved.filter(item => item && typeof item === 'object' && typeof item.id === 'string' && typeof item.name === 'string')
+                .map(item => ({
+                    id: item.id.slice(0, 80),
+                    name: item.name.trim().slice(0, 28),
+                    paths: Array.isArray(item.paths) ? item.paths.filter(path => typeof path === 'string').slice(0, MAX_GAMES_PER_COLLECTION) : []
+                }))
+                .filter(item => {
+                    const id = item.id;
+                    const name = item.name.toLowerCase();
+                    if (!id || item.name.length < 1 || ids.has(id) || names.has(name)) return false;
+                    ids.add(id); names.add(name);
+                    item.paths = Array.from(new Set(item.paths.map(normalizeGamePath))).filter(path => knownPaths.has(path));
+                    return true;
+                })
+                .slice(0, MAX_GAME_COLLECTIONS);
+        } catch (error) { return []; }
+    }
+
+    function saveGameCollections(collections) {
+        try { localStorage.setItem(GAME_COLLECTIONS_KEY, JSON.stringify(collections)); return true; }
+        catch (error) { return false; }
+    }
+
+    function createCollectionId() {
+        return 'collection-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 9);
+    }
+
+    function updateCollectionsSection() {
+        const section = document.getElementById('collections-section');
+        const grid = document.getElementById('collections-grid');
+        const createButton = document.getElementById('createCollectionButton');
+        if (!section || !grid) return;
+        const collections = getGameCollections();
+        grid.replaceChildren();
+        if (!collections.length) {
+            const empty = document.createElement('p');
+            empty.className = 'collections-empty';
+            empty.textContent = 'Create a playlist to group games for your next mood, challenge, or game night.';
+            grid.appendChild(empty);
+        }
+        collections.forEach(collection => {
+            const card = document.createElement('article');
+            card.className = 'collection-card' + (activeGameCollectionId === collection.id ? ' active' : '');
+            const heading = document.createElement('div'); heading.className = 'collection-card-heading';
+            const title = document.createElement('h3'); title.textContent = collection.name;
+            const count = document.createElement('span'); count.className = 'collection-count';
+            count.textContent = collection.paths.length + (collection.paths.length === 1 ? ' game' : ' games');
+            heading.append(title, count);
+            const sample = document.createElement('p'); sample.className = 'collection-card-preview';
+            const titles = collection.paths.map(path => cachedGames.find(game => normalizeGamePath(game.path) === path)?.title).filter(Boolean);
+            sample.textContent = titles.length ? titles.slice(0, 3).join(' · ') + (titles.length > 3 ? ' · +' + (titles.length - 3) + ' more' : '') : 'No games yet. Add games from the catalog.';
+            const actions = document.createElement('div'); actions.className = 'collection-card-actions';
+            const playRandom = document.createElement('button'); playRandom.type = 'button'; playRandom.className = 'collection-browse-button collection-play-button';
+            playRandom.textContent = 'Play random'; playRandom.disabled = !collection.paths.length;
+            playRandom.setAttribute('aria-label', 'Play a random game from ' + collection.name);
+            playRandom.addEventListener('click', () => playRandomFromCollection(collection.id));
+            const browse = document.createElement('button'); browse.type = 'button'; browse.className = 'collection-browse-button';
+            browse.textContent = activeGameCollectionId === collection.id ? 'Showing games' : 'Browse games';
+            browse.setAttribute('aria-pressed', String(activeGameCollectionId === collection.id));
+            browse.addEventListener('click', () => showGameCollection(collection.id));
+            const rename = document.createElement('button'); rename.type = 'button'; rename.className = 'collection-manage-button'; rename.textContent = 'Rename';
+            rename.setAttribute('aria-label', 'Rename ' + collection.name); rename.addEventListener('click', () => openCollectionDialog({ renameId: collection.id }));
+            const remove = document.createElement('button'); remove.type = 'button'; remove.className = 'collection-manage-button'; remove.textContent = 'Delete';
+            remove.setAttribute('aria-label', 'Delete ' + collection.name); remove.addEventListener('click', () => deleteGameCollection(collection.id));
+            actions.append(playRandom, browse, rename, remove); card.append(heading, sample, actions); grid.appendChild(card);
+        });
+        if (createButton) createButton.disabled = collections.length >= MAX_GAME_COLLECTIONS;
+        updateCollectionFilterControl(collections);
+        refreshCollectionButtons(collections);
+    }
+
+    function refreshCollectionButtons(collections = getGameCollections()) {
+        document.querySelectorAll('.collection-add-button[data-game-path]').forEach(button => {
+            const path = normalizeGamePath(button.dataset.gamePath);
+            const game = cachedGames.find(item => normalizeGamePath(item.path) === path);
+            const included = collections.some(collection => collection.paths.includes(path));
+            button.classList.toggle('has-collection', included);
+            button.setAttribute('aria-label', (included ? 'Edit playlists for ' : 'Add ') + (game?.title || 'game') + ' to playlists');
+            button.title = included ? 'Edit playlists' : 'Add to playlist';
+            const icon = button.querySelector('i');
+            if (icon) icon.className = included ? 'fas fa-folder-open' : 'fas fa-folder-plus';
+        });
+    }
+
+    function updateCollectionFilterControl(collections) {
+        const clearButton = document.getElementById('clearCollectionFilter');
+        if (!clearButton) return;
+        const active = collections.find(collection => collection.id === activeGameCollectionId);
+        if (!active) activeGameCollectionId = '';
+        clearButton.style.display = active ? '' : 'none';
+        clearButton.textContent = active ? 'Playlist: ' + active.name + ' ×' : 'Clear playlist filter';
+        clearButton.setAttribute('aria-label', active ? 'Clear playlist filter for ' + active.name : 'Clear playlist filter');
+    }
+
+    function showGameCollection(id) {
+        const collection = getGameCollections().find(item => item.id === id);
+        if (!collection) return;
+        activeGameCollectionId = collection.id;
+        const search = document.getElementById('searchInput'); if (search) search.value = '';
+        const category = document.getElementById('categoryFilter'); if (category) category.value = '';
+        activeCatalogMode = '';
+        try { localStorage.setItem('arcadeAtlasFavoritesOnly', 'false'); } catch (error) {}
+        updateFavoritesFilterButton();
+        updateCollectionsSection();
+        searchGames();
+        document.getElementById('all-games-heading')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function playRandomFromCollection(id) {
+        const collection = getGameCollections().find(item => item.id === id);
+        if (!collection || !collection.paths.length) return;
+        const game = cachedGames.filter(item => collection.paths.includes(normalizeGamePath(item.path)) && item.path);
+        if (!game.length) return;
+        const selected = game[Math.floor(Math.random() * game.length)];
+        recordRecentGame(selected);
+        window.open(buildGameHref(selected.path), '_blank', 'noopener,noreferrer');
+    }
+
+    function clearGameCollectionFilter() {
+        activeGameCollectionId = '';
+        updateCollectionsSection();
+        searchGames();
+    }
+
+    function openCollectionDialog(options = {}) {
+        const dialog = document.getElementById('collection-dialog');
+        const list = document.getElementById('collection-options');
+        const fieldset = document.getElementById('collection-options-fieldset');
+        const nameInput = document.getElementById('collection-name-input');
+        const title = document.getElementById('collection-dialog-title');
+        const gameLine = document.getElementById('collection-dialog-game');
+        const status = document.getElementById('collection-dialog-status');
+        if (!dialog || !list || !nameInput) return;
+        collectionDialogGame = options.game || null;
+        collectionDialogRenameId = options.renameId || '';
+        collectionDialogDeleteId = options.deleteId || '';
+        const collections = getGameCollections();
+        const editing = collections.find(collection => collection.id === collectionDialogRenameId);
+        const deleting = collections.find(collection => collection.id === collectionDialogDeleteId);
+        title.textContent = deleting ? 'Delete playlist?' : editing ? 'Rename playlist' : collectionDialogGame ? 'Add game to playlists' : 'Create a playlist';
+        gameLine.textContent = deleting ? 'Delete “' + deleting.name + '”? The games will stay in your catalog.' : collectionDialogGame ? 'Choose playlists for ' + collectionDialogGame.title + '.' : 'Group games into a playlist you can browse anytime.';
+        fieldset.hidden = !collectionDialogGame || !!deleting;
+        list.replaceChildren();
+        if (collectionDialogGame) {
+            if (!collections.length) {
+                const empty = document.createElement('p'); empty.className = 'collection-options-empty';
+                empty.textContent = 'Create a playlist below to save this game for later.'; list.appendChild(empty);
+            }
+            collections.forEach(collection => {
+                const label = document.createElement('label'); label.className = 'collection-option';
+                const checkbox = document.createElement('input'); checkbox.type = 'checkbox'; checkbox.value = collection.id; checkbox.dataset.collectionId = collection.id;
+                checkbox.checked = collection.paths.includes(normalizeGamePath(collectionDialogGame.path));
+                const text = document.createElement('span'); text.textContent = collection.name;
+                label.append(checkbox, text); list.appendChild(label);
+            });
+        }
+        nameInput.value = editing ? editing.name : '';
+        nameInput.disabled = false;
+        document.getElementById('collection-name-label').hidden = !!deleting;
+        nameInput.hidden = !!deleting;
+        document.getElementById('collection-name-label').textContent = editing ? 'Playlist name' : 'Create a playlist or enter a new name';
+        nameInput.placeholder = collections.length >= MAX_GAME_COLLECTIONS && !editing ? 'Playlist limit reached' : 'e.g. Play with friends';
+        const saveButton = document.querySelector('#collection-form .collection-save-button');
+        saveButton.textContent = deleting ? 'Delete playlist' : editing ? 'Save name' : 'Save playlist';
+        saveButton.classList.toggle('collection-delete-confirm', !!deleting);
+        status.textContent = collections.length >= MAX_GAME_COLLECTIONS && !editing && !deleting ? 'You can save up to ' + MAX_GAME_COLLECTIONS + ' playlists.' : '';
+        if (typeof dialog.showModal === 'function') dialog.showModal();
+        else dialog.setAttribute('open', '');
+        if (deleting) saveButton.focus(); else nameInput.focus();
+    }
+
+    function closeCollectionDialog() {
+        const dialog = document.getElementById('collection-dialog');
+        if (dialog?.open && typeof dialog.close === 'function') dialog.close();
+        else dialog?.removeAttribute('open');
+        collectionDialogGame = null;
+        collectionDialogRenameId = '';
+        collectionDialogDeleteId = '';
+    }
+
+    function saveCollectionDialog(event) {
+        event.preventDefault();
+        const collections = getGameCollections();
+        const input = document.getElementById('collection-name-input');
+        const status = document.getElementById('collection-dialog-status');
+        const name = input.value.trim();
+        const editing = collections.find(collection => collection.id === collectionDialogRenameId);
+        const deleting = collections.find(collection => collection.id === collectionDialogDeleteId);
+        if (deleting) {
+            const remaining = collections.filter(collection => collection.id !== deleting.id);
+            if (!saveGameCollections(remaining)) { status.textContent = 'Could not update playlists in this browser.'; return; }
+            if (activeGameCollectionId === deleting.id) activeGameCollectionId = '';
+            closeCollectionDialog(); updateCollectionsSection(); searchGames(); return;
+        }
+        if (!editing && !collectionDialogGame && !name) { status.textContent = 'Enter a playlist name to continue.'; input.focus(); return; }
+        if ((editing || name) && (name.length < 1 || name.length > 28)) { status.textContent = 'Playlist names must be 1 to 28 characters.'; input.focus(); return; }
+        if (editing && collections.some(collection => collection.id !== editing.id && collection.name.toLowerCase() === name.toLowerCase())) { status.textContent = 'You already have a playlist with that name.'; input.focus(); return; }
+        if (editing) {
+            editing.name = name;
+        } else {
+            if (name && collections.some(collection => collection.name.toLowerCase() === name.toLowerCase())) { status.textContent = 'You already have a playlist with that name.'; input.focus(); return; }
+            if (name && collections.length >= MAX_GAME_COLLECTIONS) { status.textContent = 'You can save up to ' + MAX_GAME_COLLECTIONS + ' playlists.'; return; }
+            if (collectionDialogGame) {
+                const path = normalizeGamePath(collectionDialogGame.path);
+                document.querySelectorAll('#collection-options input[data-collection-id]').forEach(checkbox => {
+                    const collection = collections.find(item => item.id === checkbox.dataset.collectionId);
+                    if (!collection) return;
+                    collection.paths = checkbox.checked
+                        ? Array.from(new Set([...collection.paths, path])).slice(0, MAX_GAMES_PER_COLLECTION)
+                        : collection.paths.filter(item => item !== path);
+                });
+            }
+            if (name) collections.push({ id: createCollectionId(), name, paths: collectionDialogGame ? [normalizeGamePath(collectionDialogGame.path)] : [] });
+        }
+        if (!saveGameCollections(collections)) { status.textContent = 'Could not save playlists in this browser. Try freeing some site storage.'; return; }
+        closeCollectionDialog();
+        updateCollectionsSection();
+        if (activeGameCollectionId) searchGames();
+    }
+
+    function createCollectionButton(game, collections = getGameCollections()) {
+        const button = document.createElement('button');
+        const included = collections.some(collection => collection.paths.includes(normalizeGamePath(game.path)));
+        button.type = 'button'; button.className = 'collection-add-button' + (included ? ' has-collection' : '');
+        button.dataset.gamePath = normalizeGamePath(game.path);
+        button.setAttribute('aria-label', (included ? 'Edit playlists for ' : 'Add ') + (game.title || 'game') + ' to playlists');
+        button.title = included ? 'Edit playlists' : 'Add to playlist'; button.setAttribute('aria-haspopup', 'dialog');
+        const icon = document.createElement('i'); icon.className = included ? 'fas fa-folder-open' : 'fas fa-folder-plus'; icon.setAttribute('aria-hidden', 'true');
+        button.appendChild(icon);
+        button.addEventListener('click', event => { event.preventDefault(); event.stopPropagation(); openCollectionDialog({ game }); });
+        return button;
+    }
+
+    function deleteGameCollection(id) {
+        if (!getGameCollections().some(item => item.id === id)) return;
+        openCollectionDialog({ deleteId: id });
     }
 
     function getGameRatings() {
@@ -1901,6 +2184,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 
     function updateFavoritesSection() {
         const favorites = getFavorites();
+        const collections = getGameCollections();
         const favoritesContainer = document.getElementById('favorites-container');
         favoritesContainer.innerHTML = '';
 
@@ -1932,7 +2216,8 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
             title.textContent = game.title || 'Game';
             link.append(img, title);
             const star = createFavoriteButton(true, game.title || 'Game');
-            gameCard.append(link, star);
+            const collectionButton = createCollectionButton(game, collections);
+            gameCard.append(link, collectionButton, star);
             favoritesContainer.appendChild(gameCard);
         });
     }
@@ -2081,7 +2366,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         container.innerHTML = '';
         const query = document.getElementById('searchInput')?.value?.trim() || '';
         const category = document.getElementById('categoryFilter')?.value || '';
-        const filteredView = query !== '' || !!category || getFavoritesOnly() || !!activeCatalogMode;
+        const filteredView = query !== '' || !!category || getFavoritesOnly() || !!activeCatalogMode || !!activeGameCollectionId;
         section.style.display = ranked.length && !filteredView ? '' : 'none';
         if (ranked.length) renderGames(ranked, container);
     }
@@ -2160,7 +2445,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         const favoritesSection = document.getElementById('favorites-section');
         const favoritesHeading = document.getElementById('favorites-heading');
         const recentSection = document.getElementById('recent-games-section');
-        const filteredView = query !== '' || !!category || favoritesOnly || !!activeCatalogMode;
+        const filteredView = query !== '' || !!category || favoritesOnly || !!activeCatalogMode || !!activeGameCollectionId;
         const dailyPickSection = document.getElementById('daily-pick-section');
         if (dailyPickSection) dailyPickSection.style.display = filteredView ? 'none' : '';
 
@@ -2180,16 +2465,21 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         const favoritePaths = favoritesOnly
             ? new Set(getFavorites().map(game => normalizeGamePath(game.path)))
             : null;
+        const activeCollection = getGameCollections().find(collection => collection.id === activeGameCollectionId);
+        const collectionPaths = activeCollection ? new Set(activeCollection.paths) : null;
+        if (activeGameCollectionId && !activeCollection) activeGameCollectionId = '';
         const filteredGames = allGames.filter(game => {
             const matchesQuery = getGameSearchText(game).includes(query);
             const matchesCategory = !category || String(game.category || '').toUpperCase() === category;
             const matchesFavorite = !favoritePaths || favoritePaths.has(normalizeGamePath(game.path));
             const matchesMode = activeCatalogMode !== 'multiplayer' || hasMultiplayerTag(game);
-            return matchesQuery && matchesCategory && matchesFavorite && matchesMode;
+            const matchesCollection = !collectionPaths || collectionPaths.has(normalizeGamePath(game.path));
+            return matchesQuery && matchesCategory && matchesFavorite && matchesMode && matchesCollection;
         });
         const sortedGames = sortGameList(filteredGames);
         const count = document.getElementById('catalogResultsCount');
-        if (count) count.textContent = sortedGames.length + (sortedGames.length === 1 ? ' game' : ' games') + (favoritesOnly ? ' in favorites' : '');
+        if (count) count.textContent = sortedGames.length + (sortedGames.length === 1 ? ' game' : ' games') + (favoritesOnly ? ' in favorites' : '') + (activeCollection ? ' in ' + activeCollection.name : '');
+        updateCollectionFilterControl(getGameCollections());
 
         if (sortedGames.length) {
             renderGames(sortedGames, allGamesGrid);
@@ -2197,7 +2487,9 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
             const message = document.createElement('p');
             message.className = 'empty-games-message';
             message.setAttribute('role', 'status');
-            message.textContent = favoritesOnly
+            message.textContent = activeCollection
+                ? 'No games in this playlist match these filters.'
+                : favoritesOnly
                 ? 'No favorite games match these filters yet. Star a game to add it here.'
                 : 'No games found. Try a different title or category.';
             allGamesGrid.appendChild(message);
@@ -2270,12 +2562,15 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         const favoritePaths = getFavoritesOnly()
             ? new Set(getFavorites().map(game => normalizeGamePath(game.path)))
             : null;
+        const activeCollection = getGameCollections().find(collection => collection.id === activeGameCollectionId);
+        const collectionPaths = activeCollection ? new Set(activeCollection.paths) : null;
         const eligible = cachedGames.filter(game => {
             const matchesQuery = !query || getGameSearchText(game).includes(query);
             const matchesCategory = !category || String(game.category || '').toUpperCase() === category;
             const matchesFavorite = !favoritePaths || favoritePaths.has(normalizeGamePath(game.path));
             const matchesMode = activeCatalogMode !== 'multiplayer' || hasMultiplayerTag(game);
-            return matchesQuery && matchesCategory && matchesFavorite && matchesMode && game.path;
+            const matchesCollection = !collectionPaths || collectionPaths.has(normalizeGamePath(game.path));
+            return matchesQuery && matchesCategory && matchesFavorite && matchesMode && matchesCollection && game.path;
         });
         if (!eligible.length) {
             alert('No games match your current filters. Try another search, category, or favorite.');
@@ -2289,6 +2584,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
     function renderGames(games, container) {
         const favorites = getFavorites();
         const ratings = getGameRatings();
+        const collections = getGameCollections();
         games.forEach(game => {
             const isFavorite = favorites.some(fav => normalizeGamePath(fav.path) === normalizeGamePath(game.path));
             const gameCard = document.createElement('div');
@@ -2343,6 +2639,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
                 rating.appendChild(ratingButton);
             }
             gameCard.appendChild(rating);
+            gameCard.appendChild(createCollectionButton(game, collections));
             const starIcon = createFavoriteButton(isFavorite, game.title || 'Game');
             gameCard.appendChild(starIcon);
             container.appendChild(gameCard);
@@ -2658,7 +2955,20 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         updateMostPlayedSection();
         updateRecommendationsSection();
         updateArcadeQuests();
+        updateCollectionsSection();
         updateDailyPickSection();
+        const createCollection = document.getElementById('createCollectionButton');
+        if (createCollection) createCollection.addEventListener('click', () => openCollectionDialog());
+        const collectionForm = document.getElementById('collection-form');
+        if (collectionForm) collectionForm.addEventListener('submit', saveCollectionDialog);
+        const closeCollection = document.getElementById('closeCollectionDialog');
+        const cancelCollection = document.getElementById('cancelCollectionDialog');
+        if (closeCollection) closeCollection.addEventListener('click', closeCollectionDialog);
+        if (cancelCollection) cancelCollection.addEventListener('click', closeCollectionDialog);
+        const collectionDialog = document.getElementById('collection-dialog');
+        if (collectionDialog) collectionDialog.addEventListener('click', event => { if (event.target === collectionDialog) closeCollectionDialog(); });
+        const clearCollectionFilterButton = document.getElementById('clearCollectionFilter');
+        if (clearCollectionFilterButton) clearCollectionFilterButton.addEventListener('click', clearGameCollectionFilter);
         const dailyPickButton = document.getElementById('daily-pick-play');
         if (dailyPickButton) dailyPickButton.addEventListener('click', launchDailyPick);
         const clearRecentButton = document.getElementById("clearRecentGames");
@@ -2691,6 +3001,11 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
     <h2 id="patchNotesTitle">Arcade Atlas Update</h2>
     <p class="patch-notes-date">November 15, 2026 · Latest updates</p>
     <div class="patch-notes-content">
+      <h3>🗂️ Make it yours</h3>
+      <ul>
+        <li>Create up to 12 custom playlists, add games from any game card, and rename or delete playlists whenever you like.</li>
+        <li>Browse a playlist to filter the catalog, then combine it with search and category filters. Playlist names and game selections stay in this browser.</li>
+      </ul>
       <h3>🏅 New ways to play</h3>
       <ul>
         <li>Arcade Quests adds on-device XP, a daily explorer goal, and four badges, including Party Starter for trying three different multiplayer games.</li>
@@ -2859,10 +3174,57 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
             #categoryFilter, #sortFilter, .surprise-button, .favorites-filter-button { flex: 1; min-width: 0; }
             .catalog-results-count { width: 100%; margin-left: 0; text-align: center; }
         }
+        .collection-add-button{appearance:none;position:absolute;top:8px;left:8px;z-index:10;display:grid;place-items:center;width:38px;height:38px;padding:0;border:1px solid rgba(255,255,255,.22);border-radius:50%;background:rgba(5,10,20,.72);color:#dbe9ff;font-size:15px;cursor:pointer;touch-action:manipulation;transition:transform .18s ease,color .18s ease,border-color .18s ease}
+        .collection-add-button:hover,.collection-add-button:focus-visible{transform:scale(1.08);color:#9ee5d0;border-color:#70d9ff}
+        .collection-add-button:focus-visible{outline:3px solid #70d9ff;outline-offset:2px}
+        .collection-add-button.has-collection{color:#9ee5d0;border-color:rgba(98,216,203,.55)}
+        .game-card-badge{left:53px}
+        .collections-section{margin:0 0 24px;padding:18px;border:1px solid rgba(160,185,220,.14);border-radius:16px;background:linear-gradient(130deg,rgba(17,29,50,.82),rgba(23,31,55,.76))}
+        .collections-heading{align-items:center;margin-bottom:13px}
+        .collections-heading .section-title{margin:0 0 4px}
+        .collections-intro{margin:0;color:#9eb0ca;font-size:12px}
+        .collection-create-button,.collection-browse-button,.collection-manage-button,.collection-cancel-button,.collection-save-button{min-height:40px;padding:0 13px;border:1px solid rgba(160,185,220,.22);border-radius:10px;background:#111d32;color:#eaf1ff;font:700 12px system-ui,sans-serif;cursor:pointer;touch-action:manipulation}
+        .collection-create-button,.collection-save-button,.collection-browse-button{background:linear-gradient(135deg,#477fe0,#7956d8);border-color:transparent;color:#fff}
+        .collection-save-button.collection-delete-confirm{background:linear-gradient(135deg,#b6425e,#8c2e4a);border-color:rgba(255,155,175,.35)}
+        .collection-create-button:disabled{opacity:.5;cursor:not-allowed}
+        .collection-create-button:focus-visible,.collection-browse-button:focus-visible,.collection-manage-button:focus-visible,.collection-cancel-button:focus-visible,.collection-save-button:focus-visible{outline:3px solid #70d9ff;outline-offset:2px}
+        .collections-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(225px,1fr));gap:10px}
+        .collections-empty{grid-column:1/-1;margin:0;padding:14px;border:1px dashed rgba(160,185,220,.2);border-radius:11px;color:#aebbd0;font-size:12px}
+        .collection-card{min-width:0;padding:13px;border:1px solid rgba(160,185,220,.15);border-radius:12px;background:rgba(5,12,27,.4)}
+        .collection-card.active{border-color:rgba(98,216,203,.5);box-shadow:0 0 0 1px rgba(98,216,203,.15)}
+        .collection-card-heading{display:flex;align-items:center;justify-content:space-between;gap:8px}
+        .collection-card-heading h3{overflow:hidden;margin:0;color:#f0f5ff;font-size:14px;text-overflow:ellipsis;white-space:nowrap}
+        .collection-count{flex:0 0 auto;color:#9ee5d0;font-size:11px;font-weight:700}
+        .collection-card-preview{min-height:31px;margin:7px 0 11px;color:#9eb0ca;font-size:11px;line-height:1.45}
+        .collection-options-empty{margin:4px;color:#9eb0ca;font-size:12px}
+        .collection-card-actions{display:flex;flex-wrap:wrap;gap:6px}
+        .collection-card-actions button{min-height:36px;padding:0 10px;font-size:11px}
+        .collection-clear-filter{min-height:42px;padding:0 12px;border:1px solid rgba(98,216,203,.35);border-radius:10px;background:rgba(30,105,97,.22);color:#a9f1de;font:700 12px system-ui,sans-serif;cursor:pointer}
+        .collection-clear-filter:focus-visible{outline:3px solid #70d9ff;outline-offset:2px}
+        .collection-dialog{width:min(480px,calc(100% - 28px));max-height:min(80vh,700px);padding:0;overflow:auto;border:1px solid rgba(126,194,255,.3);border-radius:18px;background:#101a2c;color:#edf4ff;box-shadow:0 24px 80px rgba(0,0,0,.6)}
+        .collection-dialog::backdrop{background:rgba(2,6,15,.78);backdrop-filter:blur(4px)}
+        .collection-dialog-form{padding:20px}
+        .collection-dialog-heading{display:flex;justify-content:space-between;align-items:center;gap:14px}
+        .collection-dialog-heading h2{margin:0;font-size:20px}
+        .collection-dialog-heading .daily-pick-kicker{margin:0 0 5px}
+        .collection-dialog-close{width:40px;height:40px;border:1px solid rgba(160,185,220,.22);border-radius:50%;background:#18253b;color:#eaf1ff;font-size:24px;cursor:pointer}
+        .collection-dialog-game{margin:12px 0;color:#b9c7de;font-size:13px}
+        .collection-options-fieldset{margin:0 0 14px;padding:10px;border:1px solid rgba(160,185,220,.18);border-radius:11px}
+        .collection-options-fieldset legend{padding:0 5px;color:#dbe9ff;font-size:12px;font-weight:700}
+        #collection-options{display:grid;gap:2px;max-height:180px;overflow:auto}
+        .collection-option{display:flex;align-items:center;gap:9px;min-height:40px;padding:5px 7px;border-radius:8px;color:#eaf1ff;font-size:13px;cursor:pointer}
+        .collection-option:hover{background:rgba(112,185,255,.1)}
+        .collection-option input{width:18px;height:18px;accent-color:#68d6c1}
+        .collection-name-label{display:block;margin-bottom:6px;color:#dbe9ff;font-size:12px;font-weight:700}
+        #collection-name-input{width:100%;min-height:42px;padding:0 12px;border:1px solid rgba(160,185,220,.25);border-radius:9px;background:#091326;color:#f0f5ff;font:14px system-ui,sans-serif}
+        #collection-name-input:focus-visible{outline:3px solid #70d9ff;outline-offset:2px}
+        .collection-dialog-status{min-height:18px;margin:6px 0 10px;color:#ffcb99;font-size:12px}
+        .collection-dialog-actions{display:flex;justify-content:flex-end;gap:8px}
+        @media(max-width:620px){.collections-section{padding:14px}.collections-heading{align-items:flex-start;flex-direction:column}.collection-create-button{width:100%}.collections-grid{grid-template-columns:1fr}.collection-dialog-form{padding:16px}.collection-dialog-actions>*{flex:1}}
 </style>
 <script>
 (function(){
-  const version="2026-11-15-14";
+  const version="2026-11-15-15";
   const overlay=document.getElementById("patchNotesOverlay");
   const reopen=document.getElementById("reopenPatchNotes");
   const close=()=>{overlay.classList.remove("visible");overlay.setAttribute("aria-hidden","true");localStorage.setItem("arcadeAtlasPatchNotesSeen",version);reopen.style.display="block";};

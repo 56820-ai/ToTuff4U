@@ -188,7 +188,7 @@ await Promise.all(Array.from({ length: workers }, async () => {
 }));
 
 // Check the two custom interfaces touched by this maintenance pass.
-const uiAudit = { leaderboard: {}, blockyCombat: {}, catalog: {}, dailyPick: {}, connectFour: {} };
+const uiAudit = { leaderboard: {}, blockyCombat: {}, catalog: {}, collections: {}, dailyPick: {}, connectFour: {} };
 try {
   const page = await browser.newPage({ viewport: { width: 1365, height: 768 } });
   const errors = [];
@@ -329,6 +329,62 @@ try {
   await page.close();
 } catch (e) {
   uiAudit.catalog.error = String(e.message || e).slice(0, 300);
+}
+
+try {
+  const page = await browser.newPage({ viewport: { width: 1365, height: 900 } });
+  const errors = [];
+  page.on("pageerror", e => errors.push(String(e.message || e).slice(0, 220)));
+  const response = await page.goto(BASE + "/", { waitUntil: "domcontentloaded", timeout: 16000 });
+  await page.waitForSelector("#createCollectionButton", { timeout: 12000 });
+  await page.evaluate(() => {
+    const overlay = document.getElementById("patchNotesOverlay");
+    if (overlay) { overlay.classList.remove("visible"); overlay.setAttribute("aria-hidden", "true"); }
+    localStorage.removeItem("arcadeAtlasCollectionsV1");
+  });
+  await page.reload({ waitUntil: "domcontentloaded" });
+  await page.waitForSelector("#createCollectionButton", { timeout: 10000 });
+  await page.locator("#createCollectionButton").click();
+  await page.locator("#collection-name-input").fill("Arcade Night");
+  await page.locator("#collection-form").evaluate(form => form.requestSubmit());
+  await page.waitForFunction(() => JSON.parse(localStorage.getItem("arcadeAtlasCollectionsV1") || "[]").some(item => item.name === "Arcade Night"), undefined, { timeout: 4000 });
+  const created = await page.locator("#collections-grid .collection-card").count() === 1;
+
+  const slopeAdd = page.locator('#all-games-grid .game-card').filter({ has: page.getByText("Slope", { exact: true }) }).first().locator('.collection-add-button');
+  await slopeAdd.click();
+  await page.locator('#collection-options input[data-collection-id]').check();
+  await page.locator('#collection-form').evaluate(form => form.requestSubmit());
+  await page.waitForFunction(() => JSON.parse(localStorage.getItem("arcadeAtlasCollectionsV1") || "[]").some(item => item.name === "Arcade Night" && item.paths.length === 1), undefined, { timeout: 4000 });
+  const storedPaths = await page.evaluate(() => JSON.parse(localStorage.getItem("arcadeAtlasCollectionsV1") || "[]")[0]?.paths || []);
+
+  await page.evaluate(() => { window.__collectionOpened = ""; window.open = url => { window.__collectionOpened = url; return null; }; });
+  await page.locator('#collections-grid .collection-play-button').click();
+  const randomLaunch = await page.evaluate(() => window.__collectionOpened || "");
+  const expectedSlopeHref = await page.evaluate(() => buildGameHref(cachedGames.find(game => game.title === "Slope").path));
+
+  await page.locator('#collections-grid .collection-browse-button').last().click();
+  await page.waitForFunction(() => document.getElementById("catalogResultsCount")?.textContent === "1 game in Arcade Night", undefined, { timeout: 4000 });
+  const filteredTitle = await page.locator('#all-games-grid .game-card-title').textContent();
+  await page.locator('#clearCollectionFilter').click();
+  await page.waitForFunction(() => document.getElementById("clearCollectionFilter")?.style.display === "none", undefined, { timeout: 4000 });
+
+  await page.locator('#collections-grid button[aria-label="Rename Arcade Night"]').click();
+  await page.locator('#collection-name-input').fill("Arcade Favorites");
+  await page.locator('#collection-form').evaluate(form => form.requestSubmit());
+  await page.waitForFunction(() => JSON.parse(localStorage.getItem("arcadeAtlasCollectionsV1") || "[]").some(item => item.name === "Arcade Favorites"), undefined, { timeout: 4000 });
+  await page.locator('#collections-grid button[aria-label="Delete Arcade Favorites"]').click();
+  const customDeleteDialog = await page.locator('#collection-dialog').evaluate(dialog => dialog.open) &&
+    (await page.locator('#collection-dialog-title').textContent()) === "Delete playlist?";
+  await page.locator('#collection-form').evaluate(form => form.requestSubmit());
+  await page.waitForFunction(() => JSON.parse(localStorage.getItem("arcadeAtlasCollectionsV1") || "[]").length === 0, undefined, { timeout: 4000 });
+  const deleted = await page.locator('#collections-grid .collection-card').count() === 0;
+  const ok = response?.status() === 200 && created && storedPaths.length === 1 && randomLaunch === expectedSlopeHref &&
+    filteredTitle === "Slope" && customDeleteDialog && deleted && errors.length === 0;
+  uiAudit.collections = { status: response?.status() || null, created, storedPaths, randomLaunch, expectedSlopeHref, filteredTitle, customDeleteDialog, deleted, errors, ok };
+  await page.evaluate(() => localStorage.removeItem("arcadeAtlasCollectionsV1"));
+  await page.close();
+} catch (e) {
+  uiAudit.collections.error = String(e.message || e).slice(0, 300);
 }
 
 try {
@@ -488,6 +544,7 @@ if (process.env.GITHUB_STEP_SUMMARY) {
     `- Blocky Combat timer detected: ${!!uiAudit.blockyCombat.timer}`,
     `- Favorites-only catalog UI smoke test passed: ${!!uiAudit.catalog.ok}`,
     `- Quick category filter UI smoke test passed: ${!!uiAudit.catalog.quickFiltersOk}`,
+    `- Custom playlist create, filter, rename, delete, and random-play test passed: ${!!uiAudit.collections.ok}`,
     `- Daily Pick rotation and streak test passed: ${!!uiAudit.dailyPick.ok}`,
     `- Connect Four two-player board smoke test passed: ${!!uiAudit.connectFour.ok}`,
     "",
@@ -518,6 +575,7 @@ console.log(JSON.stringify({
   added: uniqueAdditions.length,
   duckmathError: duckmath.error,
   catalogUiOk: !!uiAudit.catalog.ok,
+  collectionsUiOk: !!uiAudit.collections.ok,
   dailyPickOk: !!uiAudit.dailyPick.ok,
   connectFourOk: !!uiAudit.connectFour.ok
 }, null, 2));
