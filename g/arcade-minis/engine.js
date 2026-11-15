@@ -12,7 +12,7 @@ function rect(x,y,a,b,c){ctx.fillStyle=c;ctx.fillRect(x,y,a,b);}
 function circle(x,y,r,c){ctx.fillStyle=c;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();}
 function bg(){rect(0,0,w,h,"#091329");}
 function finish(msg){over=true;statusEl.textContent=msg+" — press R or tap Restart";document.getElementById("restart").hidden=false;}
-function reset(){score=0;over=false;started=true;last=0;statusEl.textContent="";document.getElementById("restart").hidden=true;init();}
+function reset(){setScore(0);over=false;started=true;last=0;keys={};statusEl.textContent="";document.getElementById("restart").hidden=true;init();}
 document.getElementById("restart").onclick=reset;
 addEventListener("keydown",e=>{keys[e.key.toLowerCase()]=true;if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"," "].includes(e.key))e.preventDefault();if(e.key.toLowerCase()==="r"&&over)reset();});
 addEventListener("keyup",e=>keys[e.key.toLowerCase()]=false);
