@@ -1323,7 +1323,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
                         <option value="az">A to Z</option>
                         <option value="za">Z to A</option>
                         <option value="newest">Recently added</option>
-                    </select>
+                    <option value="played">Most played (this device)</option></select>
                     <button type="button" class="surprise-button" onclick="playRandomGame()">
                         <i class="fas fa-dice"></i> Surprise me
                     </button>
@@ -1536,9 +1536,14 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 
     let cachedGames = [];
 
+    function getGamePlayCounts() {
+        try { const value = JSON.parse(localStorage.getItem('gamePlayCounts') || '{}'); return value && typeof value === 'object' && !Array.isArray(value) ? value : {}; }
+        catch (error) { return {}; }
+    }
+
     async function loadGames() {
         try {
-            const response = await fetch('games.json?v=2026-11-14-popular1');
+            const response = await fetch('games.json?v=2026-11-14-nightbatch');
             if (!response.ok) throw new Error('Could not load games.json: ' + response.status);
             const data = await response.json();
             cachedGames = Array.isArray(data.games) ? data.games : [];
@@ -1726,6 +1731,10 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
             const current = getRecentGames().filter(item => normalizeGamePath(item.path) !== normalizeGamePath(game.path));
             current.unshift({ path: game.path, title: game.title || 'Game', image: game.image || '', category: game.category || 'ARCADE' });
             localStorage.setItem('recentGames', JSON.stringify(current.slice(0, 8)));
+            const counts = getGamePlayCounts();
+            const key = normalizeGamePath(game.path);
+            counts[key] = Math.min(999999, (Number(counts[key]) || 0) + 1);
+            localStorage.setItem('gamePlayCounts', JSON.stringify(counts));
             updateRecentSection();
         } catch (error) {
             console.warn('Could not save recent game:', error);
@@ -1778,6 +1787,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         if (sortMode === 'az') filteredGames.sort((a, b) => String(a.title || '').localeCompare(String(b.title || '')));
         else if (sortMode === 'za') filteredGames.sort((a, b) => String(b.title || '').localeCompare(String(a.title || '')));
         else if (sortMode === 'newest') filteredGames.reverse();
+        else if (sortMode === 'played') { const counts = getGamePlayCounts(); filteredGames.sort((a, b) => (Number(counts[normalizeGamePath(b.path)]) || 0) - (Number(counts[normalizeGamePath(a.path)]) || 0)); }
         if (filteredGames.length) {
             renderGames(filteredGames, allGamesGrid);
         } else {
@@ -2224,7 +2234,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 </style>
 <script>
 (function(){
-  const version="2026-11-14-2";
+  const version="2026-11-14-3";
   const overlay=document.getElementById("patchNotesOverlay");
   const reopen=document.getElementById("reopenPatchNotes");
   const close=()=>{overlay.classList.remove("visible");overlay.setAttribute("aria-hidden","true");localStorage.setItem("arcadeAtlasPatchNotesSeen",version);reopen.style.display="block";};
