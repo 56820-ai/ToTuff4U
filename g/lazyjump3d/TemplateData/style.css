@@ -81,7 +81,7 @@ body {
 #unity-logo {
     width: 143px;
     height: 143px;
-    background: url('logo.png') no-repeat center
+    background: url('logoOLD.png') no-repeat center
 }
 
 #unity-progress-bar-empty {
@@ -110,7 +110,7 @@ body {
     float: left;
     width: 204px;
     height: 38px;
-    background: url('logo.png') no-repeat center
+    background: url('logoOLD.png') no-repeat center
 }
 
 #unity-build-title {

@@ -19,7 +19,7 @@
   var isMinecraft = /\/g\/mc\/1\.12\.2$/.test(path);
   var isRetroBowl = /\/g\/retro-bowl$/.test(path);
   var isBlockyCombat = /\/g\/duckdb2-blocky-combat-swat-main$/.test(path);
-  var miniGameTitles = { "neon-racer": "Neon Racer Time", "basketballstars": "Basketball Stars Time", "cupcake2048": "2048 Cupcakes Time", "stack-bump-3d": "Stack Bump 3D Time", "stacktris-main": "Stacktris Time", "googlebaseball": "Google Baseball Time", "rb-college": "Retro Bowl College Time", "snake": "Snake Time", "crazytunnel3d": "Crazy Tunnel 3D Time", "sky-hop": "Sky Hop Time", "asteroid-rush": "Asteroid Rush Time", "gem-maze": "Gem Maze Time", "color-clash": "Color Clash Time", "paddle-clash": "Paddle Clash Time", "whack-a-mole": "Whack-a-Mole Time" };
+  var miniGameTitles = { "neon-racer": "Neon Racer Time", "basketballstars": "Basketball Stars Time", "cupcake2048": "2048 Cupcakes Time", "stack-bump-3d": "Stack Bump 3D Time", "stacktris-main": "Stacktris Time", "googlebaseball": "Google Baseball Time", "rb-college": "Retro Bowl College Time", "lazyjump3d": "Lazy Jump 3D Time", "snake": "Snake Time", "crazytunnel3d": "Crazy Tunnel 3D Time", "sky-hop": "Sky Hop Time", "asteroid-rush": "Asteroid Rush Time", "gem-maze": "Gem Maze Time", "color-clash": "Color Clash Time", "paddle-clash": "Paddle Clash Time", "whack-a-mole": "Whack-a-Mole Time" };
   var miniGameTitle = miniGameTitles[path.split("/").pop()] || "";
   if (!isMinecraft && !isRetroBowl && !isBlockyCombat && !miniGameTitle) return;
   var gameTitle = isRetroBowl ? "Retro Bowl Time" : isBlockyCombat ? "Blocky Combat SWAT Time" : miniGameTitle || "Minecraft";

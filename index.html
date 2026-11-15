@@ -1757,6 +1757,17 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         renderGames(recent, container);
     }
 
+    function sortGameList(games) {
+        const sorted = games.slice();
+        const sortMode = document.getElementById('sortFilter')?.value || 'featured';
+        try { localStorage.setItem('arcadeAtlasSortMode', sortMode); } catch (error) {}
+        if (sortMode === 'az') sorted.sort((a, b) => String(a.title || '').localeCompare(String(b.title || '')));
+        else if (sortMode === 'za') sorted.sort((a, b) => String(b.title || '').localeCompare(String(a.title || '')));
+        else if (sortMode === 'newest') sorted.reverse();
+        else if (sortMode === 'played') { const counts = getGamePlayCounts(); sorted.sort((a, b) => (Number(counts[normalizeGamePath(b.path)]) || 0) - (Number(counts[normalizeGamePath(a.path)]) || 0)); }
+        return sorted;
+    }
+
     async function searchGames() {
         const query = document.getElementById('searchInput').value.toLowerCase().trim();
         const category = (document.getElementById('categoryFilter') || {}).value || '';
@@ -1783,13 +1794,9 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
             const matchesCategory = !category || String(game.category || '').toUpperCase() === category;
             return matchesQuery && matchesCategory;
         });
-        const sortMode = document.getElementById('sortFilter')?.value || 'featured';
-        if (sortMode === 'az') filteredGames.sort((a, b) => String(a.title || '').localeCompare(String(b.title || '')));
-        else if (sortMode === 'za') filteredGames.sort((a, b) => String(b.title || '').localeCompare(String(a.title || '')));
-        else if (sortMode === 'newest') filteredGames.reverse();
-        else if (sortMode === 'played') { const counts = getGamePlayCounts(); filteredGames.sort((a, b) => (Number(counts[normalizeGamePath(b.path)]) || 0) - (Number(counts[normalizeGamePath(a.path)]) || 0)); }
-        if (filteredGames.length) {
-            renderGames(filteredGames, allGamesGrid);
+        const sortedGames = sortGameList(filteredGames);
+        if (sortedGames.length) {
+            renderGames(sortedGames, allGamesGrid);
         } else {
             allGamesGrid.innerHTML = '<p class="empty-games-message" role="status">No games found. Try a different title or category.</p>';
         }
@@ -2146,7 +2153,12 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         populateCategoryFilter(allGames);
         
         const allGamesGrid = document.getElementById("all-games-grid");
-        renderGames(allGames, allGamesGrid);
+        const sortFilter = document.getElementById("sortFilter");
+        try {
+            const savedSort = localStorage.getItem("arcadeAtlasSortMode");
+            if (savedSort && sortFilter && Array.from(sortFilter.options).some(option => option.value === savedSort)) sortFilter.value = savedSort;
+        } catch (error) {}
+        renderGames(sortGameList(allGames), allGamesGrid);
         
         updateFavoritesSection();
         updateRecentSection();
@@ -2216,7 +2228,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
       <ul>
         <li>Added a Recently Played row that remembers your last eight games on this device.</li>
         <li>Added a Most Played sort that learns from launches on the current device.</li>
-        <li>Added 2048 Cupcakes and Google Baseball to the catalog; repaired Retro Bowl College's startup.</li>
+        <li>Added 2048 Cupcakes and Google Baseball; removed failed imports after browser testing.</li>
         <li>Added a Clear History control for the Recently Played row.</li>
         <li>Added keyboard shortcuts: press / or Ctrl+K to focus game search; Escape clears it.</li>
         <li>Updated Arcade Atlas browser-tab branding and created original artwork for new games.</li>
@@ -2262,7 +2274,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 </style>
 <script>
 (function(){
-  const version="2026-11-15-3";
+  const version="2026-11-15-4";
   const overlay=document.getElementById("patchNotesOverlay");
   const reopen=document.getElementById("reopenPatchNotes");
   const close=()=>{overlay.classList.remove("visible");overlay.setAttribute("aria-hidden","true");localStorage.setItem("arcadeAtlasPatchNotesSeen",version);reopen.style.display="block";};
