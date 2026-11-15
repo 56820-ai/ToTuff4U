@@ -664,42 +664,6 @@
       "category": "SPORTS"
     },
     {
-      "title": "Paper.io 2",
-      "path": "g/paperio2",
-      "image": "g/paperio2/images/logo.png",
-      "category": "IO"
-    },
-    {
-      "title": "Duck Life 4",
-      "path": "g/ducklife4",
-      "image": "g/ducklife4/splash.jpg",
-      "category": "SIMULATION"
-    },
-    {
-      "title": "Doge Miner",
-      "path": "g/dogeminer",
-      "image": "g/dogeminer/favicon.ico",
-      "category": "IDLE"
-    },
-    {
-      "title": "Sandboxels",
-      "path": "g/sandboxels",
-      "image": "g/sandboxels/icons/cover.png",
-      "category": "SANDBOX"
-    },
-    {
-      "title": "Tank Trouble",
-      "path": "g/tanktrouble",
-      "image": "g/tanktrouble/icon-256.png",
-      "category": "ACTION"
-    },
-    {
-      "title": "Hide and Smash",
-      "path": "g/hideandsmash",
-      "image": "g/hideandsmash/assets/images/preload/logo.png",
-      "category": "ACTION"
-    },
-    {
       "title": "Crazy Tunnel 3D",
       "path": "g/crazytunnel3d",
       "image": "g/crazytunnel3d/TemplateData/logo.png",
