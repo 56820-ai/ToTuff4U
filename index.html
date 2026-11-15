@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta charset="UTF-8">
 <script async src="https://www.googletagmanager.com/gtm.js?id=GTM-KHTBG5BX"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -1337,6 +1338,11 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
                     <div class="games-grid" id="most-played-grid"></div>
                 </section>
 
+                <section id="recommended-section" aria-label="Recommended games" style="display:none">
+                    <div class="recent-heading"><div><h2 class="section-title">PLAY MORE LIKE THIS</h2><p id="recommendation-reason" class="recommendation-reason"></p></div></div>
+                    <div class="games-grid" id="recommended-grid"></div>
+                </section>
+
                 <section id="daily-pick-section" aria-label="Daily game pick" style="display:none">
                     <div class="daily-pick-card">
                         <div class="daily-pick-art"><img id="daily-pick-image" alt="" loading="lazy"></div>
@@ -1348,6 +1354,19 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
                         </div>
                         <button type="button" class="daily-pick-play" id="daily-pick-play">Play today's pick</button>
                     </div>
+                </section>
+
+                <section id="arcade-quests" class="arcade-quests" aria-labelledby="arcade-quests-title">
+                    <div class="quest-heading">
+                        <div><p class="daily-pick-kicker">PLAY • COLLECT • LEVEL UP</p><h2 id="arcade-quests-title">ARCADE QUESTS</h2></div>
+                        <div class="quest-xp"><strong id="quest-xp-total">0</strong><span>XP</span></div>
+                    </div>
+                    <div class="quest-daily" aria-live="polite">
+                        <div class="quest-progress-copy"><strong>Daily explorer</strong><span id="quest-daily-copy">Try 3 different games today to earn up to 55 XP.</span></div>
+                        <div class="quest-progress-track" role="progressbar" aria-label="Daily explorer progress" aria-valuemin="0" aria-valuemax="3" aria-valuenow="0"><span id="quest-progress-bar"></span></div>
+                    </div>
+                    <div id="quest-badges" class="quest-badges" aria-label="Game collection badges"></div>
+                    <p id="quest-announcement" class="sr-only" aria-live="polite"></p>
                 </section>
 
                 <h2 class="section-title">ALL GAMES</h2>
@@ -1446,7 +1465,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
             <p>Some games offer leaderboards. If you choose to submit a score or playtime, the player name, game name, score, and/or playtime value you submit may be sent to our leaderboard database and displayed publicly on the site. Do not use your real name or include personal information in a player name.</p>
             <p>You can use the site without creating an Arcade Atlas account. The site does not ask you to provide an email address to use its game catalog or submit a leaderboard score.</p>
             <h2>Information stored in your browser</h2>
-            <p>The site may use browser local storage to remember preferences such as favorite games, recently played games, game launch counts, personal game ratings, your player name, locally tracked playtime, and your Daily Pick launch streak. Ratings stay in this browser and are not shared. This information is stored in your browser and may remain there until you clear the site's data or your browser removes it. Clearing it may reset these preferences and locally stored totals. The Daily Pick streak records that you opened the featured game; it does not track game completion. If you submit a new personal-best streak, your chosen nickname and streak length appear publicly on the Daily Pick Streak leaderboard.</p>
+            <p>The site may use browser local storage to remember preferences such as favorite games, recently played games, game launch counts, personal game ratings, your player name, locally tracked playtime, your Daily Pick launch streak, and Arcade Quests progress (XP and unlocked badges). The Play More Like This shelf uses your favorites, ratings, and repeat launches to suggest games on this device. Arcade Quests records which games you launch on this device so it can track daily goals and lifetime badge milestones, including distinct multiplayer titles; it does not verify that a game was completed. These preferences, recommendations, and quest records stay on this device and are not sent to Arcade Atlas. They may remain in your browser until you clear the site's data or your browser removes them. Clearing site data may reset these preferences and locally stored totals. The Daily Pick streak records that you opened the featured game; it does not track game completion. If you submit a new personal-best streak, your chosen nickname and streak length appear publicly on the Daily Pick Streak leaderboard.</p>
             <h2>Leaderboards and database</h2>
             <p>Leaderboard submissions are processed by Supabase, our database service provider. Submitted leaderboard information is used to operate and display game rankings. Because leaderboard entries are public, information you submit there should be treated as public. Database and service-provider handling is also subject to <a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer">Supabase's Privacy Policy</a>.</p>
             <h2>Analytics and advertising</h2>
@@ -1604,12 +1623,98 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         if (ratings[key] === rating) delete ratings[key];
         else ratings[key] = rating;
         try { localStorage.setItem('arcadeAtlasGameRatings', JSON.stringify(ratings)); } catch (error) {}
+        updateRecommendationsSection();
         searchGames();
     }
 
     function getGamePlayCounts() {
         try { const value = JSON.parse(localStorage.getItem('gamePlayCounts') || '{}'); return value && typeof value === 'object' && !Array.isArray(value) ? value : {}; }
         catch (error) { return {}; }
+    }
+
+    const ARCADE_QUESTS_KEY = 'arcadeAtlasQuestProgressV1';
+    const ARCADE_BADGES = [
+        { id: 'curious', games: 5, label: 'Curious Player', icon: '✦', reward: 15 },
+        { id: 'arcade-regular', games: 20, label: 'Arcade Regular', icon: '⚡', reward: 35 },
+        { id: 'game-collector', games: 50, label: 'Game Collector', icon: '🏆', reward: 75 },
+        { id: 'party-starter', games: 3, collection: 'multiplayer', label: 'Party Starter', icon: '🎮', reward: 25 }
+    ];
+
+    function getArcadeQuestProgress() {
+        try {
+            const saved = JSON.parse(localStorage.getItem(ARCADE_QUESTS_KEY) || '{}');
+            if (!saved || typeof saved !== 'object' || Array.isArray(saved)) return { date: '', today: [], lifetime: [], multiplayer: [], xp: 0, unlocked: [] };
+            return {
+                date: typeof saved.date === 'string' ? saved.date : '',
+                today: Array.isArray(saved.today) ? saved.today.filter(value => typeof value === 'string').slice(0, 100) : [],
+                lifetime: Array.isArray(saved.lifetime) ? saved.lifetime.filter(value => typeof value === 'string').slice(0, 1000) : [],
+                multiplayer: Array.isArray(saved.multiplayer) ? saved.multiplayer.filter(value => typeof value === 'string').slice(0, 100) : [],
+                xp: Math.max(0, Math.min(100000000, Math.floor(Number(saved.xp) || 0))),
+                unlocked: Array.isArray(saved.unlocked) ? saved.unlocked.filter(value => typeof value === 'string') : []
+            };
+        } catch (error) { return { date: '', today: [], lifetime: [], multiplayer: [], xp: 0, unlocked: [] }; }
+    }
+
+    function saveArcadeQuestProgress(progress) {
+        try { localStorage.setItem(ARCADE_QUESTS_KEY, JSON.stringify(progress)); return true; }
+        catch (error) { return false; }
+    }
+
+    function recordArcadeQuestLaunch(game) {
+        if (!game || !game.path) return;
+        const progress = getArcadeQuestProgress();
+        const today = getDailyDateKey();
+        if (progress.date !== today) { progress.date = today; progress.today = []; }
+        const key = normalizeGamePath(game.path);
+        let announcement = '';
+        if (!progress.today.includes(key)) {
+            progress.today.push(key);
+            if (progress.today.length <= 3) progress.xp += 10;
+            if (progress.today.length === 3) {
+                progress.xp += 25;
+                announcement = 'Daily Explorer complete! You earned 25 bonus XP.';
+            }
+        }
+        if (!progress.lifetime.includes(key)) progress.lifetime.push(key);
+        if (hasMultiplayerTag(game) && !progress.multiplayer.includes(key)) progress.multiplayer.push(key);
+        for (const badge of ARCADE_BADGES) {
+            const collection = progress[badge.collection || 'lifetime'];
+            if (collection.length >= badge.games && !progress.unlocked.includes(badge.id)) {
+                progress.unlocked.push(badge.id);
+                progress.xp += badge.reward;
+                announcement = (announcement ? announcement + ' ' : '') + badge.label + ' badge unlocked! +' + badge.reward + ' XP.';
+            }
+        }
+        if (saveArcadeQuestProgress(progress)) updateArcadeQuests(announcement);
+    }
+
+    function updateArcadeQuests(announcement) {
+        const section = document.getElementById('arcade-quests');
+        if (!section) return;
+        const progress = getArcadeQuestProgress();
+        const today = getDailyDateKey();
+        const todayCount = progress.date === today ? Math.min(3, new Set(progress.today).size) : 0;
+        document.getElementById('quest-xp-total').textContent = progress.xp.toLocaleString();
+        document.getElementById('quest-daily-copy').textContent = todayCount >= 3
+            ? 'Daily Explorer complete! Come back tomorrow for a new quest.'
+            : 'Try ' + (3 - todayCount) + ' more different ' + ((3 - todayCount) === 1 ? 'game' : 'games') + ' today. +' + ((3 - todayCount) * 10 + 25) + ' XP available.';
+        const progressBar = document.getElementById('quest-progress-bar');
+        progressBar.style.width = (todayCount / 3 * 100) + '%';
+        progressBar.parentElement.setAttribute('aria-valuenow', String(todayCount));
+        const badges = document.getElementById('quest-badges');
+        badges.replaceChildren();
+        ARCADE_BADGES.forEach(badge => {
+            const collection = progress[badge.collection || 'lifetime'];
+            const unlocked = collection.length >= badge.games;
+            const card = document.createElement('div');
+            card.className = 'quest-badge' + (unlocked ? ' unlocked' : '');
+            const icon = document.createElement('span'); icon.className = 'quest-badge-icon'; icon.setAttribute('aria-hidden', 'true'); icon.textContent = unlocked ? badge.icon : '🔒';
+            const copy = document.createElement('span'); copy.className = 'quest-badge-copy';
+            const name = document.createElement('strong'); name.textContent = badge.label;
+            const detail = document.createElement('small'); detail.textContent = unlocked ? 'Unlocked · +' + badge.reward + ' XP' : collection.length + ' / ' + badge.games + ' ' + (badge.collection === 'multiplayer' ? 'multiplayer games' : 'unique games');
+            copy.append(name, detail); card.append(icon, copy); badges.appendChild(card);
+        });
+        document.getElementById('quest-announcement').textContent = announcement || '';
     }
 
     function getFavoritesOnly() {
@@ -1790,6 +1895,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 
         saveFavorites(favorites);
         updateFavoritesSection();
+        updateRecommendationsSection();
         if (getFavoritesOnly()) searchGames();
     }
 
@@ -1855,8 +1961,10 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
             const key = normalizeGamePath(game.path);
             counts[key] = Math.min(999999, (Number(counts[key]) || 0) + 1);
             localStorage.setItem('gamePlayCounts', JSON.stringify(counts));
+            recordArcadeQuestLaunch(game);
             updateRecentSection();
             updateMostPlayedSection();
+            updateRecommendationsSection();
         } catch (error) {
             console.warn('Could not save recent game:', error);
         }
@@ -1976,6 +2084,58 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         const filteredView = query !== '' || !!category || getFavoritesOnly() || !!activeCatalogMode;
         section.style.display = ranked.length && !filteredView ? '' : 'none';
         if (ranked.length) renderGames(ranked, container);
+    }
+
+    function updateRecommendationsSection() {
+        const section = document.getElementById('recommended-section');
+        const container = document.getElementById('recommended-grid');
+        const reason = document.getElementById('recommendation-reason');
+        if (!section || !container || !reason || !cachedGames.length) return;
+        const favoritePaths = new Set(getFavorites().map(game => normalizeGamePath(game.path)));
+        const ratings = getGameRatings();
+        const counts = getGamePlayCounts();
+        let seeds = cachedGames.filter(game => favoritePaths.has(normalizeGamePath(game.path)) || Number(ratings[normalizeGamePath(game.path)]) >= 4);
+        const preferenceBased = seeds.length > 0;
+        if (!seeds.length) {
+            seeds = cachedGames
+                .filter(game => (Number(counts[normalizeGamePath(game.path)]) || 0) >= 2)
+                .sort((a, b) => (Number(counts[normalizeGamePath(b.path)]) || 0) - (Number(counts[normalizeGamePath(a.path)]) || 0))
+                .slice(0, 5);
+        }
+        const categoryWeights = new Map();
+        const tagWeights = new Map();
+        seeds.forEach(game => {
+            const category = String(game.category || '').toUpperCase();
+            if (category) categoryWeights.set(category, (categoryWeights.get(category) || 0) + 1);
+            (Array.isArray(game.tags) ? game.tags : []).forEach(tag => {
+                const normalized = String(tag).trim().toLowerCase();
+                if (normalized) tagWeights.set(normalized, (tagWeights.get(normalized) || 0) + 1);
+            });
+        });
+        const seedPaths = new Set(seeds.map(game => normalizeGamePath(game.path)));
+        const recommendations = cachedGames
+            .filter(game => game && game.path && !seedPaths.has(normalizeGamePath(game.path)) && Number(ratings[normalizeGamePath(game.path)]) !== 1 && Number(ratings[normalizeGamePath(game.path)]) !== 2)
+            .map(game => {
+                const category = String(game.category || '').toUpperCase();
+                let score = (categoryWeights.get(category) || 0) * 4;
+                (Array.isArray(game.tags) ? game.tags : []).forEach(tag => { score += (tagWeights.get(String(tag).trim().toLowerCase()) || 0) * 2; });
+                const plays = Number(counts[normalizeGamePath(game.path)]) || 0;
+                score -= Math.min(1, Math.log2(plays + 1) * 0.2);
+                return { game, score };
+            })
+            .filter(item => item.score > 0)
+            .sort((a, b) => b.score - a.score || String(a.game.title || '').localeCompare(String(b.game.title || '')))
+            .slice(0, 6)
+            .map(item => item.game);
+        container.innerHTML = '';
+        if (!recommendations.length) { section.style.display = 'none'; return; }
+        const topCategory = Array.from(categoryWeights.entries()).sort((a, b) => b[1] - a[1])[0]?.[0] || '';
+        const readableCategory = topCategory ? topCategory.toLowerCase().replace(/\b\w/g, letter => letter.toUpperCase()) : '';
+        reason.textContent = preferenceBased && readableCategory
+            ? 'More games like your ' + readableCategory + ' favorites and 4+ star picks.'
+            : preferenceBased ? 'Based on your game preferences.' : 'Based on games you return to on this device.';
+        section.style.display = '';
+        renderGames(recommendations, container);
     }
 
     function sortGameList(games) {
@@ -2496,6 +2656,8 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         updateFavoritesSection();
         updateRecentSection();
         updateMostPlayedSection();
+        updateRecommendationsSection();
+        updateArcadeQuests();
         updateDailyPickSection();
         const dailyPickButton = document.getElementById('daily-pick-play');
         if (dailyPickButton) dailyPickButton.addEventListener('click', launchDailyPick);
@@ -2529,22 +2691,21 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
     <h2 id="patchNotesTitle">Arcade Atlas Update</h2>
     <p class="patch-notes-date">November 15, 2026 · Latest updates</p>
     <div class="patch-notes-content">
+      <h3>🏅 New ways to play</h3>
+      <ul>
+        <li>Arcade Quests rewards trying different games with on-device XP, a daily explorer goal, and collection badges, including a multiplayer badge.</li>
+        <li>Play More Like This recommends local games using your favorites, four-star ratings, and repeat plays.</li>
+        <li>Quest progress stays on this device; launches count toward goals, not game completion.</li>
+      </ul>
       <h3>🎮 New games</h3>
       <ul>
         <li>Added four new keyboard-and-touch playable mini-games: Paddle Clash, Sky Hop, Gem Maze, and Asteroid Rush.</li>
         <li>Added Connect Four, a local two-player classic with keyboard and accessible controls.</li>
         <li>Created matching original icons for the four new mini-games.</li>
         <li>Added Arcade 3D, with five browser-playable 3D modes.</li>
-        <li>Added Nightmaze, an original Unity 6 WebGL horror game.</li>
-        <li>Added Cube Libre, a browser-based WebGL 2 3D survival game.</li>
-        <li>Added The Clash of Civilizations, a Unity WebGL real-time strategy demo.</li>
-        <li>Added Quake III Arena (Q3JS), a WebAssembly browser shooter with live multiplayer servers.</li>
-        <li>Added Gothic Whip, a Godot action-platformer with a boss fight.</li>
-        <li>Added Hollowmere, a farming and creature-collecting RPG.</li>
         <li>Added Ancient Beast, an online tactical creature-battler (early alpha).</li>
-        <li>Added Age of War (Unity Remake), an unfinished but playable Unity WebGL remake.</li>
-        <li>Also added Hextris, A Dark Room, Untrusted, HexGL, Bitburner, and BananaBread.</li>
-        <li>Imported games are stored in Arcade Atlas with upstream attribution retained in their game folders.</li>
+        <li>Removed off-site launch cards that did not have playable game builds hosted in Arcade Atlas.</li>
+        <li>Catalog game cards now launch local game builds; upstream attribution remains with imported projects.</li>
       </ul>
       <h3>🏆 Leaderboards</h3>
       <ul>
@@ -2621,6 +2782,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         .category-quick-filter.active{background:linear-gradient(135deg,#477fe0,#7956d8);border-color:transparent;color:#fff}
         .category-quick-filter:focus-visible{outline:3px solid #70d9ff;outline-offset:3px}
         .recent-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+        .recommendation-reason{margin:-7px 0 12px;color:#9eb0ca;font-size:12px}
         .daily-pick-card{display:flex;align-items:center;gap:18px;padding:18px;margin:0 0 24px;border:1px solid rgba(107,157,255,.35);border-radius:16px;background:linear-gradient(115deg,rgba(34,52,91,.94),rgba(33,25,69,.94));box-shadow:0 12px 28px rgba(0,0,0,.18)}
         .daily-pick-art{width:92px;height:92px;flex:0 0 92px;display:grid;place-items:center;border-radius:16px;background:rgba(4,10,24,.55);overflow:hidden}
         .daily-pick-art img{width:100%;height:100%;object-fit:contain;padding:8px}
@@ -2632,6 +2794,24 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         .daily-pick-play{flex:0 0 auto;min-height:42px;padding:0 17px;border:0;border-radius:10px;background:linear-gradient(135deg,#ff6b9d,#7659e8);color:#fff;font:800 13px system-ui,sans-serif;cursor:pointer}
         .daily-pick-play:hover{filter:brightness(1.12);transform:translateY(-1px)}
         .daily-pick-play:focus-visible{outline:3px solid #70d9ff;outline-offset:3px}
+        .arcade-quests{margin:0 0 28px;padding:20px;border:1px solid rgba(112,185,255,.22);border-radius:16px;background:linear-gradient(125deg,rgba(17,29,50,.94),rgba(32,25,65,.88));box-shadow:0 12px 28px rgba(0,0,0,.16)}
+        .quest-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:17px}
+        .quest-heading h2{margin:0;color:#fff;font-size:20px;letter-spacing:.04em}
+        .quest-heading .daily-pick-kicker{margin-bottom:4px}
+        .quest-xp{display:flex;align-items:baseline;gap:6px;padding:7px 12px;border:1px solid rgba(255,217,138,.28);border-radius:999px;background:rgba(255,199,84,.1);color:#ffda8d}
+        .quest-xp strong{font-size:21px;font-variant-numeric:tabular-nums}.quest-xp span{font-size:11px;font-weight:900;letter-spacing:.1em}
+        .quest-daily{padding:14px 15px;border:1px solid rgba(160,185,220,.14);border-radius:12px;background:rgba(5,12,27,.34)}
+        .quest-progress-copy{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:11px;color:#f0f5ff;font-size:13px}
+        .quest-progress-copy strong{font-size:14px}.quest-progress-copy span{color:#b9c7de;text-align:right}
+        .quest-progress-track{height:9px;overflow:hidden;border-radius:999px;background:rgba(160,185,220,.17)}
+        .quest-progress-track span{display:block;width:0;height:100%;border-radius:inherit;background:linear-gradient(90deg,#62d8cb,#70a7ff,#b47aff);transition:width .3s ease}
+        .quest-badges{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}
+        .quest-badge{display:flex;align-items:center;gap:10px;min-width:0;padding:11px;border:1px solid rgba(160,185,220,.13);border-radius:11px;background:rgba(7,15,31,.35);color:#8393ae}
+        .quest-badge.unlocked{border-color:rgba(255,217,138,.28);color:#ffdc91;background:rgba(255,199,84,.07)}
+        .quest-badge-icon{flex:0 0 auto;font-size:20px}.quest-badge-copy{display:flex;min-width:0;flex-direction:column;gap:3px}
+        .quest-badge-copy strong{overflow:hidden;color:#eaf1ff;font-size:12px;text-overflow:ellipsis;white-space:nowrap}
+        .quest-badge-copy small{color:#9eb0ca;font-size:10px}
+        @media(max-width:620px){.arcade-quests{padding:15px}.quest-progress-copy{align-items:flex-start;flex-direction:column;gap:4px}.quest-progress-copy span{text-align:left}.quest-badges{grid-template-columns:1fr}.quest-badge{padding:9px 11px}}
         @media(max-width:620px){.daily-pick-card{align-items:flex-start;flex-wrap:wrap}.daily-pick-art{width:70px;height:70px;flex-basis:70px}.daily-pick-copy{flex:1 1 calc(100% - 90px)}.daily-pick-play{width:100%}}
         .recent-heading .section-title{margin-bottom:12px}
         .clear-recent-button{border:1px solid rgba(160,185,220,.25);border-radius:9px;background:#111d32;color:#b8c9e4;padding:7px 11px;font:600 12px system-ui;cursor:pointer}
@@ -2681,7 +2861,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 </style>
 <script>
 (function(){
-  const version="2026-11-15-13";
+  const version="2026-11-15-14";
   const overlay=document.getElementById("patchNotesOverlay");
   const reopen=document.getElementById("reopenPatchNotes");
   const close=()=>{overlay.classList.remove("visible");overlay.setAttribute("aria-hidden","true");localStorage.setItem("arcadeAtlasPatchNotesSeen",version);reopen.style.display="block";};
