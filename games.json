@@ -181,12 +181,6 @@
       "category": "SIMULATION"
     },
     {
-      "title": "Retro Bowl College",
-      "path": "g/rb-college",
-      "image": "./duckmath-site/assets/img/icons/retrobowlcollege.webp",
-      "category": "SPORTS"
-    },
-    {
       "title": "Bloons TD5",
       "path": "g/btd5",
       "image": "./duckmath-site/assets/img/icons/bloons1.webp",
