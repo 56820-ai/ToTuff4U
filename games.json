@@ -664,13 +664,6 @@
       "category": "PUZZLE"
     },
     {
-      "title": "Ancient Beast",
-      "path": "g/ancient-beast",
-      "image": "g/ancient-beast/assets/interface/AncientBeast.png",
-      "category": "STRATEGY",
-      "source": "https://github.com/FreezingMoon/AncientBeast"
-    },
-    {
       "title": "Connect Four",
       "path": "g/connect-four",
       "image": "images/connect-four.svg",
