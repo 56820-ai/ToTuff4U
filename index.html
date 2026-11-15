@@ -1277,7 +1277,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
                 
                 <div class="search-container">
                     <div class="search-wrapper">
-                        <input type="text" id="searchInput" onkeyup="searchGames()" placeholder="Search for titles...">
+                        <input type="text" id="searchInput" onkeyup="searchGames()" placeholder="Search games... (press /)" aria-label="Search games">
                         <i class="fas fa-search search-icon"></i>
                     </div>
                 </div>
@@ -1543,7 +1543,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 
     async function loadGames() {
         try {
-            const response = await fetch('games.json?v=2026-11-14-nightbatch2');
+            const response = await fetch('games.json?v=2026-11-15-nightwork2');
             if (!response.ok) throw new Error('Could not load games.json: ' + response.status);
             const data = await response.json();
             cachedGames = Array.isArray(data.games) ? data.games : [];
@@ -1858,6 +1858,24 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         });
     }
 
+
+    // Keyboard shortcuts: / or Ctrl+K focuses search; Escape clears it.
+    document.addEventListener('keydown', function(e) {
+        const search = document.getElementById('searchInput');
+        if (!search) return;
+        const active = document.activeElement;
+        const typing = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable || active.tagName === 'SELECT');
+        if ((e.key === '/' && !typing) || ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k')) {
+            e.preventDefault();
+            search.focus();
+            search.select();
+        } else if (e.key === 'Escape' && active === search && search.value) {
+            search.value = '';
+            searchGames();
+            search.blur();
+        }
+    });
+
     function displayTotalTimeSpent() {
         const totalKey = "totalTimeSpent";
         let totalTimeSpent = Number.parseInt(localStorage.getItem(totalKey)) || 0;
@@ -2155,7 +2173,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
     <button class="patch-notes-close" id="closePatchNotes" aria-label="Close patch notes">&times;</button>
     <div class="patch-notes-kicker">WHAT'S NEW</div>
     <h2 id="patchNotesTitle">Arcade Atlas Update</h2>
-    <p class="patch-notes-date">November 14, 2026 · Latest updates</p>
+    <p class="patch-notes-date">November 15, 2026 · Latest updates</p>
     <div class="patch-notes-content">
       <h3>🎮 New games</h3>
       <ul>
@@ -2189,6 +2207,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         <li>Improved player-name prompts for score and playtime submissions.</li>
       </ul>
       <h3>🛠️ Site updates</h3>
+      <ul><li>Added keyboard shortcuts: press / or Ctrl+K to jump to game search; Escape clears the search.</li><li>Added 2048 Cupcakes and Stack Bump 3D to the catalog.</li></ul>
       <ul>
         <li>Added a Recently Played row that remembers your last eight games on this device.</li>
         <li>Added a Most Played sort that learns from launches on the current device.</li>
@@ -2235,7 +2254,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 </style>
 <script>
 (function(){
-  const version="2026-11-14-4";
+  const version="2026-11-15-1";
   const overlay=document.getElementById("patchNotesOverlay");
   const reopen=document.getElementById("reopenPatchNotes");
   const close=()=>{overlay.classList.remove("visible");overlay.setAttribute("aria-hidden","true");localStorage.setItem("arcadeAtlasPatchNotesSeen",version);reopen.style.display="block";};
