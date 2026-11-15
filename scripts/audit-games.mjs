@@ -230,6 +230,13 @@ try {
   await page.waitForSelector("#favoritesOnlyToggle", { timeout: 12000 });
   await page.waitForSelector("#all-games-grid .game-card .favorite-star", { timeout: 12000 });
   await page.locator("#dismissPatchNotes").click({ timeout: 1200 }).catch(() => {});
+  const actionChip = page.locator('#category-quick-filters button[data-category="ACTION"]');
+  await actionChip.click({ timeout: 4000 });
+  await page.waitForFunction(() => document.getElementById("categoryFilter")?.value === "ACTION", undefined, { timeout: 4000 });
+  const quickFilterActive = await actionChip.getAttribute("aria-pressed") === "true";
+  await page.locator('#category-quick-filters button[data-category=""]').click({ timeout: 4000 });
+  await page.waitForFunction(() => document.getElementById("categoryFilter")?.value === "", undefined, { timeout: 4000 });
+  const quickFilterCleared = await page.locator('#category-quick-filters button[data-category=""]').getAttribute("aria-pressed") === "true";
   const star = page.locator("#all-games-grid .game-card .favorite-star").first();
   const favoriteButton = await star.evaluate(el => ({
     tag: el.tagName.toLowerCase(),
@@ -289,7 +296,8 @@ try {
     String(emptyMessage || "").includes("Star a game") &&
     persistedFilter === "true" &&
     mostPlayedHiddenAfterReload &&
-    mostPlayedVisibleAfterClear;
+    mostPlayedVisibleAfterClear &&
+    quickFilterActive && quickFilterCleared;
   uiAudit.catalog = {
     status: response?.status() || null,
     favoriteButton,
@@ -300,6 +308,9 @@ try {
     persistedFilter,
     mostPlayedHiddenAfterReload,
     mostPlayedVisibleAfterClear,
+    quickFilterActive,
+    quickFilterCleared,
+    quickFiltersOk: quickFilterActive && quickFilterCleared,
     errors,
     ok
   };
@@ -464,6 +475,7 @@ if (process.env.GITHUB_STEP_SUMMARY) {
     `- Leaderboard logo map loaded: ${uiAudit.leaderboard.logoCount || 0}`,
     `- Blocky Combat timer detected: ${!!uiAudit.blockyCombat.timer}`,
     `- Favorites-only catalog UI smoke test passed: ${!!uiAudit.catalog.ok}`,
+    `- Quick category filter UI smoke test passed: ${!!uiAudit.catalog.quickFiltersOk}`,
     `- Daily Pick rotation and streak test passed: ${!!uiAudit.dailyPick.ok}`,
     `- Connect Four two-player board smoke test passed: ${!!uiAudit.connectFour.ok}`,
     "",
