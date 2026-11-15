@@ -423,9 +423,17 @@ try {
   const deleted = await page.locator('#collections-grid .collection-card').count() === 1 &&
     (await page.locator('#collections-grid h3').textContent()) === "Co-op Night";
   const crossTabSynced = secondTabCollections === 2;
+  const tooManyCollections = Array.from({ length: 20 }, (_, index) => ({ name: "Imported " + index, paths: [connectFourPath] }));
+  await page.locator("#collection-import-file").setInputFiles({
+    name: "many-playlists.json",
+    mimeType: "application/json",
+    buffer: Buffer.from(JSON.stringify({ format: "arcade-atlas-playlists", version: 1, collections: tooManyCollections }))
+  });
+  await page.waitForFunction(() => JSON.parse(localStorage.getItem("arcadeAtlasCollectionsV1") || "[]").length === 12, undefined, { timeout: 4000 });
+  const importLimitRespected = await page.evaluate(() => JSON.parse(localStorage.getItem("arcadeAtlasCollectionsV1") || "[]").length === MAX_GAME_COLLECTIONS);
   const ok = response?.status() === 200 && created && storedPaths.length === 1 && backupValid && importMergedAndSanitized && allowedLaunches.includes(randomLaunch) &&
-    filteredTitle === "Slope" && filteredCards === 2 && crossTabSynced && customDeleteDialog && deleted && errors.length === 0;
-  uiAudit.collections = { status: response?.status() || null, created, storedPaths, backupValid, importMergedAndSanitized, randomLaunch, filteredTitle, filteredCards, crossTabSynced, customDeleteDialog, deleted, errors, ok };
+    filteredTitle === "Slope" && filteredCards === 2 && crossTabSynced && customDeleteDialog && deleted && importLimitRespected && errors.length === 0;
+  uiAudit.collections = { status: response?.status() || null, created, storedPaths, backupValid, importMergedAndSanitized, randomLaunch, filteredTitle, filteredCards, crossTabSynced, customDeleteDialog, deleted, importLimitRespected, errors, ok };
   await page.evaluate(() => localStorage.removeItem("arcadeAtlasCollectionsV1"));
   await syncPage.close();
   await page.close();
