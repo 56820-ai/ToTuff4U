@@ -235,12 +235,6 @@
       "category": "ACTION"
     },
     {
-      "title": "Stacktris",
-      "path": "g/stacktris",
-      "image": "g/stacktris-main/webapp/cover.jpg",
-      "category": "PUZZLE"
-    },
-    {
       "title": "Black Jack",
       "path": "g/blackjack",
       "image": "images/blackjack.png",
