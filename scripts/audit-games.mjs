@@ -201,7 +201,9 @@ try {
     logoCount: typeof catalogLogos !== "undefined" ? catalogLogos.size : 0,
     blockyLogo: typeof getGameLogo === "function" ? getGameLogo("Blocky Combat SWAT Time") : ""
   })).catch(() => ({ hasScoreList: false, hasLogoFunction: false, logoCount: 0, blockyLogo: "" }));
-  uiAudit.leaderboard = { status: response?.status() || null, ...state, errors };
+  const dailyStreakIconResponse = await page.request.get(BASE + "/images/daily-pick-streak.svg").catch(() => null);
+  const dailyStreakLogo = await page.evaluate(() => typeof getGameLogo === "function" ? getGameLogo("Daily Pick Streak") : "");
+  uiAudit.leaderboard = { status: response?.status() || null, ...state, dailyStreakLogo, dailyStreakIconStatus: dailyStreakIconResponse?.status() || null, errors };
   await page.close();
 } catch (e) {
   uiAudit.leaderboard.error = String(e.message || e).slice(0, 300);
@@ -316,6 +318,32 @@ try {
   const shareLinkCopied = await page.locator("#shareCatalogButton").textContent().then(text => String(text || "").includes("copied"));
   const copiedShareUrl = await page.evaluate(async () => await navigator.clipboard.readText().catch(() => ""));
   const shareUrlValid = (() => { try { const url = new URL(copiedShareUrl); return url.searchParams.get("q") === "slope" && url.searchParams.get("category") === "ARCADE" && url.searchParams.get("sort") === "az" && url.searchParams.get("mode") === "multiplayer" && !url.searchParams.has("favorites") && !url.searchParams.has("collection"); } catch { return false; } })();
+  await page.goto(BASE + "/", { waitUntil: "domcontentloaded", timeout: 16000 });
+  await page.waitForSelector("#all-games-grid .game-card", { timeout: 10000 });
+  const syncPage = await page.context().newPage();
+  await syncPage.goto(BASE + "/", { waitUntil: "domcontentloaded", timeout: 16000 });
+  await syncPage.waitForSelector("#all-games-grid .game-card", { timeout: 10000 });
+  await syncPage.evaluate(() => { const overlay = document.getElementById("patchNotesOverlay"); if (overlay) { overlay.classList.remove("visible"); overlay.setAttribute("aria-hidden", "true"); } });
+  const syncedGame = await syncPage.locator("#all-games-grid .game-card").first().evaluate(card => ({
+    path: normalizeGamePath(card.querySelector("a")?.getAttribute("href") || ""),
+    title: card.querySelector(".game-card-title")?.textContent || "",
+    image: card.querySelector(".game-card-image")?.getAttribute("src") || "",
+    category: "ARCADE"
+  }));
+  await syncPage.evaluate(game => {
+    localStorage.setItem("favoriteGames", JSON.stringify([game]));
+    localStorage.setItem("arcadeAtlasGameRatings", JSON.stringify({ [game.path]: 5 }));
+  }, syncedGame);
+  const syncedCard = page.locator("#all-games-grid .game-card").filter({ has: page.getByText(syncedGame.title, { exact: true }) }).first();
+  await page.waitForFunction(title => {
+    const cards = [...document.querySelectorAll("#all-games-grid .game-card")];
+    const card = cards.find(item => item.querySelector(".game-card-title")?.textContent === title);
+    return card?.querySelector(".favorite-star")?.getAttribute("aria-pressed") === "true" && card?.querySelector('.game-rating button[aria-pressed="true"]')?.getAttribute("aria-label")?.includes("5 out of 5");
+  }, syncedGame.title, { timeout: 6000 });
+  const crossTabPreferencesSynced = await syncedCard.locator(".favorite-star").getAttribute("aria-pressed") === "true" &&
+    await syncedCard.locator('.game-rating button[aria-pressed="true"]').getAttribute("aria-label").then(label => String(label || "").includes("5 out of 5"));
+  await syncPage.evaluate(() => { localStorage.removeItem("favoriteGames"); localStorage.removeItem("arcadeAtlasGameRatings"); });
+  await syncPage.close();
   const ok = response?.status() === 200 &&
     favoriteButton.tag === "button" &&
     favoriteButton.pressed === "false" &&
@@ -327,7 +355,7 @@ try {
     persistedFilter === "true" &&
     mostPlayedHiddenAfterReload &&
     mostPlayedVisibleAfterClear &&
-    quickFilterActive && quickFilterCleared && sharedFiltersLoaded && shareLinkCopied && shareUrlValid && dailyStreakLinkWorks;
+    quickFilterActive && quickFilterCleared && sharedFiltersLoaded && shareLinkCopied && shareUrlValid && dailyStreakLinkWorks && crossTabPreferencesSynced;
   uiAudit.catalog = {
     status: response?.status() || null,
     favoriteButton,
@@ -342,6 +370,7 @@ try {
     shareLinkCopied,
     shareUrlValid,
     dailyStreakLinkWorks,
+    crossTabPreferencesSynced,
     quickFilterActive,
     quickFilterCleared,
     quickFiltersOk: quickFilterActive && quickFilterCleared,
@@ -623,8 +652,9 @@ if (process.env.GITHUB_STEP_SUMMARY) {
     `- DuckMath titles excluded for middle-school suitability: ${duckmath.excludedForAge.length}`,
     `- New DuckMath games added to Arcade Atlas: ${uniqueAdditions.length}`,
     `- Leaderboard logo map loaded: ${uiAudit.leaderboard.logoCount || 0}`,
+    `- Daily Pick streak icon loaded: ${uiAudit.leaderboard.dailyStreakLogo === "../images/daily-pick-streak.svg" && uiAudit.leaderboard.dailyStreakIconStatus === 200}`,
     `- Blocky Combat timer detected: ${!!uiAudit.blockyCombat.timer}`,
-    `- Favorites-only catalog UI smoke test passed: ${!!uiAudit.catalog.ok}`,
+    `- Catalog filters, favorites, share links, Daily Pick leaderboard navigation, and cross-tab preference tests passed: ${!!uiAudit.catalog.ok}`,
     `- Quick category filter UI smoke test passed: ${!!uiAudit.catalog.quickFiltersOk}`,
     `- Custom playlist create, backup, restore, filter persistence, random play, cross-tab sync, rename, delete, and import-limit tests passed: ${!!uiAudit.collections.ok}`,
     `- Daily Pick rotation and streak test passed: ${!!uiAudit.dailyPick.ok}`,
@@ -661,3 +691,14 @@ console.log(JSON.stringify({
   dailyPickOk: !!uiAudit.dailyPick.ok,
   connectFourOk: !!uiAudit.connectFour.ok
 }, null, 2));
+const failedUiChecks = [
+  ["leaderboard", uiAudit.leaderboard.status === 200 && uiAudit.leaderboard.dailyStreakLogo === "../images/daily-pick-streak.svg" && uiAudit.leaderboard.dailyStreakIconStatus === 200],
+  ["catalog and cross-tab preferences", !!uiAudit.catalog.ok],
+  ["playlists", !!uiAudit.collections.ok],
+  ["Daily Pick", !!uiAudit.dailyPick.ok],
+  ["Connect Four", !!uiAudit.connectFour.ok]
+].filter(([, passed]) => !passed).map(([name]) => name);
+if (failedUiChecks.length) {
+  console.error("Arcade Atlas UI audit failed:", failedUiChecks.join(", "));
+  process.exitCode = 1;
+}

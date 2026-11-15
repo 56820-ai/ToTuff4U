@@ -2378,6 +2378,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
             updateRecentSection();
             updateMostPlayedSection();
             updateRecommendationsSection();
+            if (document.getElementById('sortFilter')?.value === 'played') searchGames();
         } catch (error) {
             console.warn('Could not save recent game:', error);
         }
@@ -3113,10 +3114,40 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         if (importCollections && importFile) importCollections.addEventListener('click', () => importFile.click());
         if (importFile) importFile.addEventListener('change', importGameCollections);
         window.addEventListener('storage', event => {
-            if (event.key !== GAME_COLLECTIONS_KEY && event.key !== null) return;
-            const hadCollectionFilter = !!activeGameCollectionId;
-            updateCollectionsSection();
-            if (hadCollectionFilter) searchGames();
+            const key = event.key;
+            const cleared = key === null;
+            let refreshCatalog = cleared;
+            if (cleared || key === GAME_COLLECTIONS_KEY) {
+                const hadCollectionFilter = !!activeGameCollectionId;
+                updateCollectionsSection();
+                refreshCatalog = refreshCatalog || hadCollectionFilter;
+            }
+            if (cleared || key === 'favoriteGames' || key === 'arcadeAtlasFavoritesOnly') {
+                updateFavoritesFilterButton();
+                updateFavoritesSection();
+                updateRecommendationsSection();
+                refreshCatalog = true;
+            }
+            if (cleared || key === 'arcadeAtlasGameRatings') {
+                updateRecommendationsSection();
+                refreshCatalog = true;
+            }
+            if (cleared || key === 'gamePlayCounts' || key === 'recentGames') {
+                updateRecentSection();
+                updateMostPlayedSection();
+                updateRecommendationsSection();
+                if (cleared || document.getElementById('sortFilter')?.value === 'played') refreshCatalog = true;
+            }
+            if (cleared || key === 'arcadeAtlasDailyPlayStreak') updateDailyPickSection();
+            if (cleared || key === ARCADE_QUESTS_KEY) updateArcadeQuests();
+            if (key === 'arcadeAtlasSortMode' && event.newValue) {
+                const sort = document.getElementById('sortFilter');
+                if (sort && Array.from(sort.options).some(option => option.value === event.newValue)) {
+                    sort.value = event.newValue;
+                    refreshCatalog = true;
+                }
+            }
+            if (refreshCatalog) searchGames();
         });
         const collectionForm = document.getElementById('collection-form');
         if (collectionForm) collectionForm.addEventListener('submit', saveCollectionDialog);
@@ -3396,7 +3427,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 </style>
 <script>
 (function(){
-  const version="2026-11-15-19";
+  const version="2026-11-15-20";
   const overlay=document.getElementById("patchNotesOverlay");
   const reopen=document.getElementById("reopenPatchNotes");
   const close=()=>{overlay.classList.remove("visible");overlay.setAttribute("aria-hidden","true");localStorage.setItem("arcadeAtlasPatchNotesSeen",version);reopen.style.display="block";};
