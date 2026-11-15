@@ -649,20 +649,35 @@
 }
 
         .favorite-star {
+            appearance: none;
             position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 18px;
-            cursor: pointer;
+            top: 8px;
+            right: 8px;
             z-index: 10;
+            display: grid;
+            place-items: center;
+            width: 38px;
+            height: 38px;
+            padding: 0;
+            border: 1px solid rgba(255,255,255,.22);
+            border-radius: 50%;
+            background: rgba(5,10,20,.62);
             color: white;
+            font-size: 18px;
+            line-height: 1;
+            cursor: pointer;
+            touch-action: manipulation;
             filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.5));
-            transition: all 0.3s ease;
+            transition: transform .2s ease, color .2s ease, background .2s ease, filter .2s ease;
         }
-
+        .favorite-star i { pointer-events: none; }
         .favorite-star:hover {
-            transform: scale(1.2);
+            transform: scale(1.12);
             filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.7));
+        }
+        .favorite-star:focus-visible {
+            outline: 3px solid #70d9ff;
+            outline-offset: 3px;
         }
 
         .favorite-star.active {
@@ -1329,9 +1344,11 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
                         <option value="za">Z to A</option>
                         <option value="newest">Recently added</option>
                     <option value="played">Most played (this device)</option></select>
+                    <button type="button" id="favoritesOnlyToggle" class="favorites-filter-button" aria-pressed="false">☆ Favorites only</button>
                     <button type="button" class="surprise-button" onclick="playRandomGame()">
-                        <i class="fas fa-dice"></i> Surprise me
+                        <i class="fas fa-dice" aria-hidden="true"></i> Surprise me
                     </button>
+                    <span id="catalogResultsCount" class="catalog-results-count" role="status" aria-live="polite"></span>
                 </div>
                 <div class="games-grid" id="all-games-grid">
                 </div>
@@ -1546,7 +1563,29 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         catch (error) { return {}; }
     }
 
+    function getFavoritesOnly() {
+        try { return localStorage.getItem('arcadeAtlasFavoritesOnly') === 'true'; }
+        catch (error) { return false; }
+    }
+
+    function updateFavoritesFilterButton() {
+        const button = document.getElementById('favoritesOnlyToggle');
+        if (!button) return;
+        const active = getFavoritesOnly();
+        button.setAttribute('aria-pressed', String(active));
+        button.textContent = active ? '★ Showing favorites' : '☆ Favorites only';
+        button.title = active ? 'Show the full game catalog' : 'Show only games you have starred';
+    }
+
+    function toggleFavoritesOnly() {
+        const enabled = !getFavoritesOnly();
+        try { localStorage.setItem('arcadeAtlasFavoritesOnly', String(enabled)); } catch (error) {}
+        updateFavoritesFilterButton();
+        searchGames();
+    }
+
     async function loadGames() {
+        if (cachedGames.length) return cachedGames;
         try {
             const response = await fetch('games.json?v=2026-11-15-nightwork2');
             if (!response.ok) throw new Error('Could not load games.json: ' + response.status);
@@ -1643,18 +1682,40 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         localStorage.setItem('favoriteGames', JSON.stringify(favorites));
     }
 
-    function toggleFavorite(event) {
-        event.stopPropagation();
-        event.preventDefault();
+    function createFavoriteButton(isFavorite, gameTitle) {
+        const title = String(gameTitle || 'Game');
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'favorite-star' + (isFavorite ? ' active' : '');
+        button.setAttribute('aria-pressed', String(!!isFavorite));
+        button.setAttribute('aria-label', isFavorite ? 'Remove ' + title + ' from favorites' : 'Add ' + title + ' to favorites');
+        button.title = isFavorite ? 'Remove from favorites' : 'Add to favorites';
+        const icon = document.createElement('i');
+        icon.className = (isFavorite ? 'fas' : 'far') + ' fa-star';
+        icon.setAttribute('aria-hidden', 'true');
+        button.appendChild(icon);
+        button.addEventListener('click', toggleFavorite);
+        return button;
+    }
 
-        const gameCard = event.target.closest('.game-card');
+    function toggleFavorite(event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const starButton = event.currentTarget || event.target;
+        const gameCard = starButton.closest('.game-card');
+        if (!gameCard) return;
         const gameLink = gameCard.querySelector('a');
+        if (!gameLink) return;
         const gamePath = normalizeGamePath(gameLink.getAttribute('href'));
-        const gameTitle = gameLink.querySelector('.game-card-title').textContent;
-        const gameImage = gameLink.querySelector('.game-card-image').getAttribute('src');
+        const titleNode = gameLink.querySelector('.game-card-title');
+        const imageNode = gameLink.querySelector('.game-card-image');
+        const gameTitle = titleNode ? titleNode.textContent : 'Game';
+        const gameImage = imageNode ? imageNode.getAttribute('src') : '';
         const catalogGame = cachedGames.find(game => normalizeGamePath(game.path) === gamePath);
         const favorites = getFavorites();
         const index = favorites.findIndex(game => normalizeGamePath(game.path) === gamePath);
+        const icon = starButton.querySelector('i');
 
         if (index === -1) {
             favorites.push({
@@ -1663,17 +1724,24 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
                 image: catalogGame ? catalogGame.image : gameImage,
                 category: catalogGame ? catalogGame.category : 'ARCADE'
             });
-            event.target.classList.remove('far');
-            event.target.classList.add('fas', 'active', 'star-animation');
-            setTimeout(() => event.target.classList.remove('star-animation'), 500);
+            starButton.classList.add('active', 'star-animation');
+            starButton.setAttribute('aria-pressed', 'true');
+            starButton.setAttribute('aria-label', 'Remove ' + gameTitle + ' from favorites');
+            starButton.title = 'Remove from favorites';
+            if (icon) icon.className = 'fas fa-star';
+            setTimeout(() => starButton.classList.remove('star-animation'), 500);
         } else {
             favorites.splice(index, 1);
-            event.target.classList.remove('fas', 'active');
-            event.target.classList.add('far');
+            starButton.classList.remove('active', 'star-animation');
+            starButton.setAttribute('aria-pressed', 'false');
+            starButton.setAttribute('aria-label', 'Add ' + gameTitle + ' to favorites');
+            starButton.title = 'Add to favorites';
+            if (icon) icon.className = 'far fa-star';
         }
 
         saveFavorites(favorites);
         updateFavoritesSection();
+        if (getFavoritesOnly()) searchGames();
     }
 
     function updateFavoritesSection() {
@@ -1708,9 +1776,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
             title.className = 'game-card-title';
             title.textContent = game.title || 'Game';
             link.append(img, title);
-            const star = document.createElement('i');
-            star.className = 'fas fa-star favorite-star active';
-            star.addEventListener('click', toggleFavorite);
+            const star = createFavoriteButton(true, game.title || 'Game');
             gameCard.append(link, star);
             favoritesContainer.appendChild(gameCard);
         });
@@ -1793,12 +1859,14 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
     async function searchGames() {
         const query = document.getElementById('searchInput').value.toLowerCase().trim();
         const category = (document.getElementById('categoryFilter') || {}).value || '';
+        const favoritesOnly = getFavoritesOnly();
         const allGamesGrid = document.getElementById('all-games-grid');
         const favoritesSection = document.getElementById('favorites-section');
         const favoritesHeading = document.getElementById('favorites-heading');
         const recentSection = document.getElementById('recent-games-section');
+        const filteredView = query !== '' || !!category || favoritesOnly;
 
-        if (query === '' && !category) {
+        if (!filteredView) {
             favoritesSection.style.display = 'block';
             favoritesHeading.style.display = 'block';
             if (recentSection) recentSection.style.display = 'block';
@@ -1810,17 +1878,30 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 
         allGamesGrid.innerHTML = '';
         const allGames = await loadGames();
+        const favoritePaths = favoritesOnly
+            ? new Set(getFavorites().map(game => normalizeGamePath(game.path)))
+            : null;
         const filteredGames = allGames.filter(game => {
             const matchesQuery = String(game.title || '').toLowerCase().includes(query) ||
                 String(game.category || '').toLowerCase().includes(query);
             const matchesCategory = !category || String(game.category || '').toUpperCase() === category;
-            return matchesQuery && matchesCategory;
+            const matchesFavorite = !favoritePaths || favoritePaths.has(normalizeGamePath(game.path));
+            return matchesQuery && matchesCategory && matchesFavorite;
         });
         const sortedGames = sortGameList(filteredGames);
+        const count = document.getElementById('catalogResultsCount');
+        if (count) count.textContent = sortedGames.length + (sortedGames.length === 1 ? ' game' : ' games') + (favoritesOnly ? ' in favorites' : '');
+
         if (sortedGames.length) {
             renderGames(sortedGames, allGamesGrid);
         } else {
-            allGamesGrid.innerHTML = '<p class="empty-games-message" role="status">No games found. Try a different title or category.</p>';
+            const message = document.createElement('p');
+            message.className = 'empty-games-message';
+            message.setAttribute('role', 'status');
+            message.textContent = favoritesOnly
+                ? 'No favorite games match these filters yet. Star a game to add it here.'
+                : 'No games found. Try a different title or category.';
+            allGamesGrid.appendChild(message);
         }
     }
 
@@ -1840,14 +1921,18 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
     function playRandomGame() {
         const query = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
         const category = document.getElementById('categoryFilter')?.value || '';
+        const favoritePaths = getFavoritesOnly()
+            ? new Set(getFavorites().map(game => normalizeGamePath(game.path)))
+            : null;
         const eligible = cachedGames.filter(game => {
             const matchesQuery = !query || String(game.title || '').toLowerCase().includes(query) ||
                 String(game.category || '').toLowerCase().includes(query);
             const matchesCategory = !category || String(game.category || '').toUpperCase() === category;
-            return matchesQuery && matchesCategory && game.path;
+            const matchesFavorite = !favoritePaths || favoritePaths.has(normalizeGamePath(game.path));
+            return matchesQuery && matchesCategory && matchesFavorite && game.path;
         });
         if (!eligible.length) {
-            alert('No games match those filters. Try another search or category.');
+            alert('No games match your current filters. Try another search, category, or favorite.');
             return;
         }
         const game = eligible[Math.floor(Math.random() * eligible.length)];
@@ -1879,9 +1964,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
             title.textContent = game.title || 'Game';
             link.append(img, title);
             gameCard.appendChild(link);
-            const starIcon = document.createElement('i');
-            starIcon.className = (isFavorite ? 'fas' : 'far') + ' fa-star favorite-star ' + (isFavorite ? 'active' : '');
-            starIcon.addEventListener('click', toggleFavorite);
+            const starIcon = createFavoriteButton(isFavorite, game.title || 'Game');
             gameCard.appendChild(starIcon);
             container.appendChild(gameCard);
         });
@@ -2180,8 +2263,17 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
             const savedSort = localStorage.getItem("arcadeAtlasSortMode");
             if (savedSort && sortFilter && Array.from(sortFilter.options).some(option => option.value === savedSort)) sortFilter.value = savedSort;
         } catch (error) {}
-        renderGames(sortGameList(allGames), allGamesGrid);
-        
+        updateFavoritesFilterButton();
+        const favoritesToggle = document.getElementById('favoritesOnlyToggle');
+        if (favoritesToggle) favoritesToggle.addEventListener('click', toggleFavoritesOnly);
+        if (getFavoritesOnly()) {
+            await searchGames();
+        } else {
+            renderGames(sortGameList(allGames), allGamesGrid);
+            const count = document.getElementById('catalogResultsCount');
+            if (count) count.textContent = allGames.length + ' games';
+        }
+
         updateFavoritesSection();
         updateRecentSection();
         updateMostPlayedSection();
@@ -2217,7 +2309,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
     <div class="patch-notes-content">
       <h3>🎮 New games</h3>
       <ul>
-        <li>Added Basketball Stars and four new keyboard-and-touch playable mini-games: Paddle Clash, Sky Hop, Gem Maze, and Asteroid Rush.</li>
+        <li>Added four new keyboard-and-touch playable mini-games: Paddle Clash, Sky Hop, Gem Maze, and Asteroid Rush.</li>
         <li>Created matching original icons for the four new mini-games.</li>
         <li>Added Arcade 3D, with five browser-playable 3D modes.</li>
         <li>Added Nightmaze, an original Unity 6 WebGL horror game.</li>
@@ -2249,6 +2341,8 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
       <h3>🛠️ Site updates</h3>
       
       <ul>
+        <li>Added a persistent Favorites-only catalog filter and keyboard-accessible favorite buttons.</li>
+        <li>Ran the Chromium audit and removed six game imports with missing local resources or runtime errors.</li>
         <li>Added a Recently Played row that remembers your last eight games on this device.</li>
         <li>Added a Most Played shelf that ranks the games you launch most often on this device.</li>
         <li>Added Basketball Stars, Paper.io 2, Duck Life 4, Doge Miner, Sandboxels, Tank Trouble, Hide and Smash, and Crazy Tunnel 3D.</li>
@@ -2304,10 +2398,44 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         .surprise-button:focus-visible,#categoryFilter:focus-visible{outline:3px solid #70d9ff;outline-offset:2px}
         .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
         @media(max-width:560px){.catalog-tools{gap:8px}#categoryFilter,#sortFilter,.surprise-button{flex:1;min-width:0}}
+
+        .favorites-filter-button {
+            min-height: 42px;
+            border: 1px solid rgba(160,185,220,.22);
+            border-radius: 11px;
+            background: #111d32;
+            color: #eaf1ff;
+            padding: 0 14px;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background .18s ease, border-color .18s ease, color .18s ease;
+        }
+        .favorites-filter-button[aria-pressed="true"] {
+            border-color: rgba(255,215,0,.58);
+            background: rgba(110,80,18,.32);
+            color: #ffe38a;
+        }
+        .favorites-filter-button:focus-visible {
+            outline: 3px solid #70d9ff;
+            outline-offset: 2px;
+        }
+        .catalog-results-count {
+            margin-left: auto;
+            color: #8fa3c1;
+            font: 12px system-ui, sans-serif;
+            font-variant-numeric: tabular-nums;
+        }
+        @media(max-width:560px) {
+            .catalog-tools { gap: 8px; }
+            #categoryFilter, #sortFilter, .surprise-button, .favorites-filter-button { flex: 1; min-width: 0; }
+            .catalog-results-count { width: 100%; margin-left: 0; text-align: center; }
+        }
 </style>
 <script>
 (function(){
-  const version="2026-11-15-7";
+  const version="2026-11-15-8";
   const overlay=document.getElementById("patchNotesOverlay");
   const reopen=document.getElementById("reopenPatchNotes");
   const close=()=>{overlay.classList.remove("visible");overlay.setAttribute("aria-hidden","true");localStorage.setItem("arcadeAtlasPatchNotesSeen",version);reopen.style.display="block";};

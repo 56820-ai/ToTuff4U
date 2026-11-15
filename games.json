@@ -656,18 +656,6 @@
       "path": "g/cupcake2048",
       "image": "g/cupcake2048/meta/apple-touch-icon.png",
       "category": "PUZZLE"
-    },
-    {
-      "title": "Basketball Stars",
-      "path": "g/basketballstars",
-      "image": "g/basketballstars/assets/images/basketball-stars.png",
-      "category": "SPORTS"
-    },
-    {
-      "title": "Crazy Tunnel 3D",
-      "path": "g/crazytunnel3d",
-      "image": "g/crazytunnel3d/TemplateData/logo.png",
-      "category": "RACING"
     }
   ]
 }
