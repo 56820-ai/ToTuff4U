@@ -674,6 +674,12 @@
       "path": "g/stack-bump-3d",
       "image": "g/stack-bump-3d/thumbnail.jpg",
       "category": "ARCADE"
+    },
+    {
+      "title": "Google Baseball",
+      "path": "g/googlebaseball",
+      "image": "images/google-baseball.svg",
+      "category": "SPORTS"
     }
   ]
 }
