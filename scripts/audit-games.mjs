@@ -188,7 +188,7 @@ await Promise.all(Array.from({ length: workers }, async () => {
 }));
 
 // Check the two custom interfaces touched by this maintenance pass.
-const uiAudit = { leaderboard: {}, blockyCombat: {}, catalog: {} };
+const uiAudit = { leaderboard: {}, blockyCombat: {}, catalog: {}, dailyPick: {} };
 try {
   const page = await browser.newPage({ viewport: { width: 1365, height: 768 } });
   const errors = [];
@@ -308,6 +308,54 @@ try {
   uiAudit.catalog.error = String(e.message || e).slice(0, 300);
 }
 
+try {
+  const page = await browser.newPage({ viewport: { width: 1365, height: 768 } });
+  const errors = [];
+  page.on("pageerror", e => errors.push(String(e.message || e).slice(0, 220)));
+  const response = await page.goto(BASE + "/", { waitUntil: "domcontentloaded", timeout: 16000 });
+  await page.waitForSelector("#daily-pick-play", { timeout: 12000 });
+  await page.waitForSelector("#daily-pick-title", { timeout: 12000 });
+  const titleBefore = await page.locator("#daily-pick-title").textContent();
+  const expectedHref = await page.evaluate(() => buildGameHref(getDailyPickGame(cachedGames).path));
+  await page.evaluate(() => {
+    window.open = url => { window.__dailyPickOpened = url; return null; };
+  });
+  await page.locator("#daily-pick-play").click();
+  const firstState = await page.evaluate(() => ({
+    state: JSON.parse(localStorage.getItem("arcadeAtlasDailyPlayStreak") || "{}"),
+    opened: window.__dailyPickOpened || ""
+  }));
+  await page.locator("#daily-pick-play").click();
+  const secondState = await page.evaluate(() => JSON.parse(localStorage.getItem("arcadeAtlasDailyPlayStreak") || "{}"));
+  const today = await page.evaluate(() => getDailyDateKey());
+  await page.reload({ waitUntil: "domcontentloaded" });
+  await page.waitForSelector("#daily-pick-title", { timeout: 10000 });
+  const titleAfterReload = await page.locator("#daily-pick-title").textContent();
+  const streakLabel = await page.locator("#daily-pick-streak").textContent();
+  const ok = response?.status() === 200 &&
+    !!titleBefore && titleBefore === titleAfterReload &&
+    firstState.state.lastDate === today &&
+    Number(firstState.state.streak) === 1 &&
+    Number(secondState.streak) === 1 &&
+    firstState.opened === expectedHref &&
+    String(streakLabel || "").includes("1 day") &&
+    errors.length === 0;
+  uiAudit.dailyPick = {
+    status: response?.status() || null,
+    title: titleBefore,
+    stableAfterReload: titleBefore === titleAfterReload,
+    firstState: firstState.state,
+    secondLaunchDidNotInflateStreak: Number(secondState.streak) === 1,
+    openedExpectedGame: firstState.opened === expectedHref,
+    streakLabel,
+    errors,
+    ok
+  };
+  await page.close();
+} catch (e) {
+  uiAudit.dailyPick.error = String(e.message || e).slice(0, 300);
+}
+
 // DuckMath is backed by its own live catalog service. Verify its app list and
 // test each returned game's page wrapper before adding it to Arcade Atlas.
 const duckmath = { homeStatus: null, dynamicCards: 0, cachedApps: 0, checked: 0, verified: [], broken: [], excludedForAge: [], error: "" };
@@ -391,6 +439,7 @@ if (process.env.GITHUB_STEP_SUMMARY) {
     `- Leaderboard logo map loaded: ${uiAudit.leaderboard.logoCount || 0}`,
     `- Blocky Combat timer detected: ${!!uiAudit.blockyCombat.timer}`,
     `- Favorites-only catalog UI smoke test passed: ${!!uiAudit.catalog.ok}`,
+    `- Daily Pick rotation and streak test passed: ${!!uiAudit.dailyPick.ok}`,
     "",
     "## Removed broken Arcade Atlas games",
     ...report.removedBrokenGames.map(title => `- ${title}`),
@@ -418,5 +467,6 @@ console.log(JSON.stringify({
   duckmathBroken: duckmath.broken.length,
   added: uniqueAdditions.length,
   duckmathError: duckmath.error,
-  catalogUiOk: !!uiAudit.catalog.ok
+  catalogUiOk: !!uiAudit.catalog.ok,
+  dailyPickOk: !!uiAudit.dailyPick.ok
 }, null, 2));
