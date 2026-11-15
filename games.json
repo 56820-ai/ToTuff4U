@@ -431,13 +431,6 @@
       "source": "https://github.com/doublespeakgames/adarkroom"
     },
     {
-      "title": "Untrusted",
-      "path": "https://untrustedgame.com/",
-      "image": "https://raw.githubusercontent.com/AlexNisnevich/untrusted/master/images/static.gif",
-      "category": "PUZZLE",
-      "source": "https://github.com/AlexNisnevich/untrusted"
-    },
-    {
       "title": "HexGL",
       "path": "g/hexgl",
       "image": "https://raw.githubusercontent.com/BKcore/HexGL/master/icon_256.png",
@@ -445,67 +438,11 @@
       "source": "https://github.com/BKcore/HexGL"
     },
     {
-      "title": "Bitburner",
-      "path": "https://bitburner-official.github.io/",
-      "image": "https://raw.githubusercontent.com/bitburner-official/bitburner-src/dev/assets/favicon.ico",
-      "category": "IDLE",
-      "source": "https://github.com/bitburner-official/bitburner-src"
-    },
-    {
-      "title": "BananaBread",
-      "path": "https://kripken.github.io/BananaBread/cube2/bb.html",
-      "image": "https://opengraph.githubassets.com/1/kripken/BananaBread",
-      "category": "ACTION",
-      "source": "https://github.com/kripken/BananaBread"
-    },
-    {
       "title": "Arcade 3D",
       "path": "g/arcade-3d",
       "image": "https://opengraph.githubassets.com/1/webgl-games/arcade-3d",
       "category": "ACTION",
       "source": "https://github.com/webgl-games/arcade-3d"
-    },
-    {
-      "title": "Nightmaze",
-      "path": "https://masterchiefproject.github.io/Nightmaze/",
-      "image": "https://opengraph.githubassets.com/1/MasterChiefProject/Nightmaze",
-      "category": "HORROR",
-      "source": "https://github.com/MasterChiefProject/Nightmaze"
-    },
-    {
-      "title": "Cube Libre",
-      "path": "https://flyingfathead.github.io/cube-libre/",
-      "image": "https://raw.githubusercontent.com/FlyingFathead/cube-libre/main/docs/assets/cube-libre-logo.png",
-      "category": "ARCADE",
-      "source": "https://github.com/FlyingFathead/cube-libre"
-    },
-    {
-      "title": "The Clash of Civilizations",
-      "path": "https://umut3rc.github.io/The-Clash-Of-Civilizations/",
-      "image": "https://opengraph.githubassets.com/1/umut3RC/The-Clash-Of-Civilizations",
-      "category": "STRATEGY",
-      "source": "https://github.com/umut3RC/The-Clash-Of-Civilizations"
-    },
-    {
-      "title": "Gothic Whip",
-      "path": "https://askjackb.github.io/gothic-whip-game/",
-      "image": "https://raw.githubusercontent.com/askjackb/gothic-whip-game/main/screenshot_action.png",
-      "category": "ACTION",
-      "source": "https://github.com/askjackb/gothic-whip-game"
-    },
-    {
-      "title": "Hollowmere",
-      "path": "https://hollowmere.tretu.de/",
-      "image": "https://raw.githubusercontent.com/robintrepte/hollowmere.tretu.de/main/store/steam/header_capsule_920x430.png",
-      "category": "SIMULATION",
-      "source": "https://github.com/robintrepte/hollowmere.tretu.de"
-    },
-    {
-      "title": "Age of War (Unity Remake)",
-      "path": "https://thommynator.github.io/AgeOfWarGame/",
-      "image": "https://raw.githubusercontent.com/Thommynator/AgeOfWarGame/main/TemplateData/favicon.ico",
-      "category": "STRATEGY",
-      "source": "https://github.com/Thommynator/AgeOfWarGame"
     },
     {
       "title": "Duck Life 5",
