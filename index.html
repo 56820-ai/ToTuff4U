@@ -1543,7 +1543,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 
     async function loadGames() {
         try {
-            const response = await fetch('games.json?v=2026-11-14-nightbatch');
+            const response = await fetch('games.json?v=2026-11-14-nightbatch2');
             if (!response.ok) throw new Error('Could not load games.json: ' + response.status);
             const data = await response.json();
             cachedGames = Array.isArray(data.games) ? data.games : [];
@@ -2159,8 +2159,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
     <div class="patch-notes-content">
       <h3>🎮 New games</h3>
       <ul>
-        <li>Added Basketball Stars, Duck Life 4, Stacktris, and Crazy Tunnel 3D from the complete game folders already in the repository.</li>
-        <li>Added Paddle Clash, Sky Hop, Gem Maze, and Asteroid Rush as lightweight, keyboard-and-touch playable Arcade Atlas mini-games.</li>
+        <li>Added Basketball Stars and four new keyboard-and-touch playable mini-games: Paddle Clash, Sky Hop, Gem Maze, and Asteroid Rush.</li>
         <li>Created matching original icons for the four new mini-games.</li>
         <li>Added Arcade 3D, with five browser-playable 3D modes.</li>
         <li>Added Nightmaze, an original Unity 6 WebGL horror game.</li>
@@ -2183,7 +2182,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
       <ul>
         <li>Redesigned game leaderboards with a top-three podium: second place on the left, first in the center, and third on the right.</li>
         <li>Fixed Reaction Test rankings so faster times appear higher.</li>
-        <li>Stacktris: improved OCR resolution, score reading, and swipe-animation handling.</li>
+        <li>Stacktris: improved OCR resolution, score reading, swipe-animation handling, and persistent playtime tracking.</li>
         <li>Slope: improved score recognition and made death detection faster.</li>
         <li>Block Blast: added OCR score submission with game-over checks and confetti filtering.</li>
         <li>Retro Bowl: added total playtime tracking and leaderboard display.</li>
@@ -2236,7 +2235,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 </style>
 <script>
 (function(){
-  const version="2026-11-14-3";
+  const version="2026-11-14-4";
   const overlay=document.getElementById("patchNotesOverlay");
   const reopen=document.getElementById("reopenPatchNotes");
   const close=()=>{overlay.classList.remove("visible");overlay.setAttribute("aria-hidden","true");localStorage.setItem("arcadeAtlasPatchNotesSeen",version);reopen.style.display="block";};
