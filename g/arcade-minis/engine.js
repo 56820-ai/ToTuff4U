@@ -16,9 +16,39 @@ function reset(){score=0;over=false;started=true;last=0;statusEl.textContent="";
 document.getElementById("restart").onclick=reset;
 addEventListener("keydown",e=>{keys[e.key.toLowerCase()]=true;if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"," "].includes(e.key))e.preventDefault();if(e.key.toLowerCase()==="r"&&over)reset();});
 addEventListener("keyup",e=>keys[e.key.toLowerCase()]=false);
-canvas.addEventListener("pointerdown",e=>{const r=canvas.getBoundingClientRect();touchX=e.clientX-r.left;if(mode==="asteroids"){state.x=clamp(touchX,20,w-20);state.bullets.push({x:state.x,y:state.y-20});}else if(mode==="hopper"&&e.clientY-r.top<r.height*.65){keys[" "]=true;}else if(mode==="maze"){const cell=Math.min((w-30)/10,(h-90)/10),ox=(w-cell*10)/2,oy=(h-cell*10)/2,tx=Math.floor((touchX-ox)/cell),ty=Math.floor((e.clientY-r.top-oy)/cell);if(tx>state.x)keys.arrowright=true;else if(tx<state.x)keys.arrowleft=true;else if(ty>state.y)keys.arrowdown=true;else if(ty<state.y)keys.arrowup=true;}else keys[touchX<r.width/2?"arrowleft":"arrowright"]=true;});
+canvas.addEventListener("pointerdown",e=>{const r=canvas.getBoundingClientRect();touchX=e.clientX-r.left;if(mode==="paddle"){state.p1=clamp(e.clientY-r.top,45,h-45);return;}if(mode==="asteroids"){state.x=clamp(touchX,20,w-20);state.bullets.push({x:state.x,y:state.y-20});}else if(mode==="hopper"&&e.clientY-r.top<r.height*.65){keys[" "]=true;}else if(mode==="maze"){const cell=Math.min((w-30)/10,(h-90)/10),ox=(w-cell*10)/2,oy=(h-cell*10)/2,tx=Math.floor((touchX-ox)/cell),ty=Math.floor((e.clientY-r.top-oy)/cell);if(tx>state.x)keys.arrowright=true;else if(tx<state.x)keys.arrowleft=true;else if(ty>state.y)keys.arrowdown=true;else if(ty<state.y)keys.arrowup=true;}else keys[touchX<r.width/2?"arrowleft":"arrowright"]=true;});
 addEventListener("pointerup",()=>{keys.arrowleft=false;keys.arrowright=false;});
 let state={};
+function drawPaddle(dt){
+ const s=state;
+ if(keys.arrowup||keys.w)s.p1-=340*dt;
+ if(keys.arrowdown||keys.s)s.p1+=340*dt;
+ s.p1=clamp(s.p1,48,h-48);
+ s.p2+=clamp(s.y-s.p2,-260*dt,260*dt);
+ s.x+=s.vx*dt;s.y+=s.vy*dt;
+ if(s.y<14){s.y=14;s.vy=Math.abs(s.vy);}else if(s.y>h-14){s.y=h-14;s.vy=-Math.abs(s.vy);}
+ if(s.vx<0&&s.x<66&&Math.abs(s.y-s.p1)<57){s.x=66;s.vx=Math.abs(s.vx)*1.035;s.vy+=clamp((s.y-s.p1)*3,-170,170);}
+ if(s.vx>0&&s.x>w-66&&Math.abs(s.y-s.p2)<57){s.x=w-66;s.vx=-Math.abs(s.vx)*1.02;s.vy+=clamp((s.y-s.p2)*2,-100,100);}
+ if(s.x<0){finish("Missed! Score: "+score);return;}
+ if(s.x>w){setScore(score+1);s.x=w/2;s.y=h/2;s.vx=-270;s.vy=rand(-170,170);}
+ rect(28,s.p1-48,13,96,"#48e3ff");rect(w-41,s.p2-48,13,96,"#a78bfa");
+ circle(s.x,s.y,11,"#ffd447");
+ text("Move: ↑ ↓ / W S · Keep the ball in play",w/2,30,15,"#b7d8e8","center");
+}
+function drawWhack(dt){
+ const s=state;s.time-=dt;
+ if(s.time<=0){s.time=0;finish("Time's up! Score: "+score);return;}
+ const size=Math.min(105,(w-90)/3,(h-150)/3),gap=12,sx=(w-(size*3+gap*2))/2,sy=85;
+ text("WHACK THE MOLE",w/2,42,25,"#fff","center");
+ for(let i=0;i<9;i++){
+  const x=sx+(i%3)*(size+gap),y=sy+Math.floor(i/3)*(size+gap);
+  ctx.fillStyle="#173c34";ctx.beginPath();ctx.ellipse(x+size/2,y+size*.72,size*.43,size*.22,0,0,Math.PI*2);ctx.fill();
+  rect(x+4,y+size*.56,size-8,size*.26,"#3c2418");
+  if(i===s.target){circle(x+size/2,y+size*.48,size*.31,"#b8794e");circle(x+size*.39,y+size*.43,4,"#fff");circle(x+size*.61,y+size*.43,4,"#fff");circle(x+size*.39,y+size*.43,2,"#172033");circle(x+size*.61,y+size*.43,2,"#172033");ctx.strokeStyle="#6b392a";ctx.lineWidth=3;ctx.beginPath();ctx.arc(x+size/2,y+size*.55,size*.12,.15,Math.PI-.15);ctx.stroke();}
+ }
+ text("Time: "+Math.ceil(s.time)+"s",w/2,h-22,18,"#ffd447","center");
+}
+
 function init(){
  if(mode==="racer")state={lane:1,ob:[],tick:0,road:0};
  if(mode==="hopper")state={x:w/2,y:h-46,vy:0,plats:[],camera:0,ground:h-28,grounded:true,prevY:h-46};
@@ -41,7 +71,7 @@ function drawRacer(dt){
  if(keys.arrowleft||keys.a){s.lane=Math.max(0,s.lane-1);keys.arrowleft=keys.a=false;}if(keys.arrowright||keys.d){s.lane=Math.min(2,s.lane+1);keys.arrowright=keys.d=false;}
  const px=left+s.lane*laneW+laneW/2,py=h-86;rect(px-19,py,38,62,"#44d7ff");rect(px-12,py+8,24,15,"#e8fbff");
  if(s.ob.some(o=>o.lane===s.lane&&o.y+46>py+8&&o.y<py+55)){finish("Crash! Score: "+score);return;}
- setScore(score+dt*10);
+ s.scoreTick=(s.scoreTick||0)+dt;if(s.scoreTick>=.1){s.scoreTick-=.1;setScore(score+1);}
  text("← → / A D to switch lanes",w/2,30,15,"#b7d8e8","center");
 }
 function drawHopper(dt){
