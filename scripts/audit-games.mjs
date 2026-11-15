@@ -298,6 +298,16 @@ try {
     localStorage.removeItem("arcadeAtlasFavoritesOnly");
     localStorage.removeItem("gamePlayCounts");
   });
+  await page.context().grantPermissions(["clipboard-read", "clipboard-write"]).catch(() => {});
+  await page.goto(BASE + "/?q=slope&category=ARCADE&sort=az&mode=multiplayer", { waitUntil: "domcontentloaded", timeout: 16000 });
+  await page.evaluate(() => { const overlay = document.getElementById("patchNotesOverlay"); if (overlay) { overlay.classList.remove("visible"); overlay.setAttribute("aria-hidden", "true"); } });
+  await page.waitForFunction(() => document.getElementById("searchInput")?.value === "slope" && document.getElementById("categoryFilter")?.value === "ARCADE", undefined, { timeout: 10000 });
+  const sharedFiltersLoaded = await page.locator("#sortFilter").inputValue() === "az" &&
+    await page.locator('#category-quick-filters button[data-mode="multiplayer"]').getAttribute("aria-pressed") === "true";
+  await page.locator("#shareCatalogButton").click();
+  const shareLinkCopied = await page.locator("#shareCatalogButton").textContent().then(text => String(text || "").includes("copied"));
+  const copiedShareUrl = await page.evaluate(async () => await navigator.clipboard.readText().catch(() => ""));
+  const shareUrlValid = (() => { try { const url = new URL(copiedShareUrl); return url.searchParams.get("q") === "slope" && url.searchParams.get("category") === "ARCADE" && url.searchParams.get("sort") === "az" && url.searchParams.get("mode") === "multiplayer" && !url.searchParams.has("favorites") && !url.searchParams.has("collection"); } catch { return false; } })();
   const ok = response?.status() === 200 &&
     favoriteButton.tag === "button" &&
     favoriteButton.pressed === "false" &&
@@ -309,7 +319,7 @@ try {
     persistedFilter === "true" &&
     mostPlayedHiddenAfterReload &&
     mostPlayedVisibleAfterClear &&
-    quickFilterActive && quickFilterCleared;
+    quickFilterActive && quickFilterCleared && sharedFiltersLoaded && shareLinkCopied && shareUrlValid;
   uiAudit.catalog = {
     status: response?.status() || null,
     favoriteButton,
@@ -320,6 +330,9 @@ try {
     persistedFilter,
     mostPlayedHiddenAfterReload,
     mostPlayedVisibleAfterClear,
+    sharedFiltersLoaded,
+    shareLinkCopied,
+    shareUrlValid,
     quickFilterActive,
     quickFilterCleared,
     quickFiltersOk: quickFilterActive && quickFilterCleared,

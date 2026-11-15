@@ -1422,6 +1422,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
                     </select>
                     <button type="button" id="favoritesOnlyToggle" class="favorites-filter-button" aria-pressed="false">☆ Favorites only</button>
                     <button type="button" id="clearCollectionFilter" class="collection-clear-filter" style="display:none">Clear playlist filter</button>
+                    <button type="button" id="shareCatalogButton" class="share-catalog-button" aria-label="Copy a link to these catalog filters">↗ Share results</button>
                     <button type="button" class="surprise-button" onclick="playRandomGame()">
                         <i class="fas fa-dice" aria-hidden="true"></i> Surprise me
                     </button>
@@ -1637,6 +1638,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
     let activeCatalogMode = '';
     let catalogSearchSequence = 0;
     let activeGameCollectionId = '';
+    let catalogShareStatusTimer = 0;
     let collectionDialogGame = null;
     let collectionDialogRenameId = '';
     let collectionDialogDeleteId = '';
@@ -1651,6 +1653,56 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
             if (activeGameCollectionId) sessionStorage.setItem(GAME_COLLECTION_FILTER_KEY, activeGameCollectionId);
             else sessionStorage.removeItem(GAME_COLLECTION_FILTER_KEY);
         } catch (error) {}
+    }
+
+    function syncCatalogUrl() {
+        try {
+            const url = new URL(window.location.href);
+            const search = document.getElementById('searchInput')?.value?.trim() || '';
+            const category = document.getElementById('categoryFilter')?.value || '';
+            const sort = document.getElementById('sortFilter')?.value || 'featured';
+            search ? url.searchParams.set('q', search) : url.searchParams.delete('q');
+            category ? url.searchParams.set('category', category) : url.searchParams.delete('category');
+            sort !== 'featured' ? url.searchParams.set('sort', sort) : url.searchParams.delete('sort');
+            activeCatalogMode === 'multiplayer' ? url.searchParams.set('mode', 'multiplayer') : url.searchParams.delete('mode');
+            window.history.replaceState({}, '', url.pathname + (url.searchParams.size ? '?' + url.searchParams.toString() : '') + url.hash);
+        } catch (error) { console.warn('Could not update the catalog link:', error); }
+    }
+
+    async function shareCatalogFilters() {
+        const button = document.getElementById('shareCatalogButton');
+        if (!button) return;
+        syncCatalogUrl();
+        const url = new URL(window.location.href);
+        // Favorites and playlists are device-local, so never imply they work in a shared link.
+        const omittedLocalFilters = getFavoritesOnly() || !!activeGameCollectionId;
+        url.searchParams.delete('favorites');
+        url.searchParams.delete('collection');
+        const link = url.toString();
+        try {
+            if (navigator.clipboard?.writeText && window.isSecureContext) {
+                await navigator.clipboard.writeText(link);
+            } else {
+                const field = document.createElement('textarea');
+                field.value = link;
+                field.setAttribute('readonly', '');
+                field.style.position = 'fixed'; field.style.opacity = '0';
+                document.body.appendChild(field); field.select();
+                const copied = document.execCommand('copy');
+                field.remove();
+                if (!copied) throw new Error('Clipboard unavailable');
+            }
+            button.textContent = omittedLocalFilters ? '✓ Link copied · local filters omitted' : '✓ Link copied';
+            button.setAttribute('aria-label', omittedLocalFilters ? 'Catalog link copied; device-only favorites or playlists are not included' : 'Catalog link copied to clipboard');
+        } catch (error) {
+            button.textContent = 'Select URL to share';
+            button.setAttribute('aria-label', 'Could not copy automatically; select the address bar URL to share');
+        }
+        clearTimeout(catalogShareStatusTimer);
+        catalogShareStatusTimer = setTimeout(() => {
+            button.textContent = '↗ Share results';
+            button.setAttribute('aria-label', 'Copy a link to these catalog filters');
+        }, 2200);
     }
 
     function getGameSearchText(game) {
@@ -2512,6 +2564,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         const searchSequence = ++catalogSearchSequence;
         const query = document.getElementById('searchInput').value.toLowerCase().trim();
         const category = (document.getElementById('categoryFilter') || {}).value || '';
+        syncCatalogUrl();
         updateCategoryQuickFilters(category, activeCatalogMode);
         const favoritesOnly = getFavoritesOnly();
         const allGamesGrid = document.getElementById('all-games-grid');
@@ -3016,10 +3069,24 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
             const savedSort = localStorage.getItem("arcadeAtlasSortMode");
             if (savedSort && sortFilter && Array.from(sortFilter.options).some(option => option.value === savedSort)) sortFilter.value = savedSort;
         } catch (error) {}
+        try {
+            const params = new URLSearchParams(window.location.search);
+            const searchInput = document.getElementById('searchInput');
+            const categoryFilter = document.getElementById('categoryFilter');
+            const sharedSearch = params.get('q');
+            const sharedCategory = String(params.get('category') || '').toUpperCase();
+            const sharedSort = params.get('sort');
+            if (sharedSearch !== null && searchInput) searchInput.value = sharedSearch.slice(0, 100);
+            if (categoryFilter && Array.from(categoryFilter.options).some(option => option.value === sharedCategory)) categoryFilter.value = sharedCategory;
+            if (sortFilter && Array.from(sortFilter.options).some(option => option.value === sharedSort)) sortFilter.value = sharedSort;
+            if (params.get('mode') === 'multiplayer') activeCatalogMode = 'multiplayer';
+        } catch (error) {}
+        const shareCatalogButton = document.getElementById('shareCatalogButton');
+        if (shareCatalogButton) shareCatalogButton.addEventListener('click', shareCatalogFilters);
         updateFavoritesFilterButton();
         const favoritesToggle = document.getElementById('favoritesOnlyToggle');
         if (favoritesToggle) favoritesToggle.addEventListener('click', toggleFavoritesOnly);
-        if (getFavoritesOnly() || activeGameCollectionId) {
+        if (getFavoritesOnly() || activeGameCollectionId || new URLSearchParams(window.location.search).has('q') || new URLSearchParams(window.location.search).has('category') || new URLSearchParams(window.location.search).has('mode')) {
             await searchGames();
         } else {
             renderGames(sortGameList(allGames), allGamesGrid);
@@ -3225,12 +3292,15 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         .clear-recent-button:hover{background:#1b2b49;color:#fff}
         .clear-recent-button:focus-visible{outline:3px solid #70d9ff;outline-offset:2px}
         #categoryFilter,#sortFilter,.surprise-button{min-height:42px;border:1px solid rgba(160,185,220,.2);border-radius:11px;background:#111d32;color:#eaf1ff;padding:0 14px;font-family:inherit;font-size:13px;font-weight:600}
+        .share-catalog-button{min-height:42px;border:1px solid rgba(112,217,255,.28);border-radius:11px;background:rgba(17,29,50,.92);color:#c8edff;padding:0 13px;font:700 12px system-ui,sans-serif;cursor:pointer;transition:background .18s ease,border-color .18s ease}
+        .share-catalog-button:hover{background:#17334b;border-color:rgba(112,217,255,.7);color:#fff}
+        .share-catalog-button:focus-visible{outline:3px solid #70d9ff;outline-offset:2px}
         #categoryFilter,#sortFilter{min-width:160px;cursor:pointer}
         .surprise-button{cursor:pointer;background:linear-gradient(135deg,#6848d8,#286acb);border-color:transparent;transition:transform .18s ease,filter .18s ease}
         .surprise-button:hover{transform:translateY(-2px);filter:brightness(1.12)}
         .surprise-button:focus-visible,#categoryFilter:focus-visible{outline:3px solid #70d9ff;outline-offset:2px}
         .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-        @media(max-width:560px){.catalog-tools{gap:8px}#categoryFilter,#sortFilter,.surprise-button{flex:1;min-width:0}}
+        @media(max-width:560px){.catalog-tools{gap:8px}#categoryFilter,#sortFilter,.surprise-button,.share-catalog-button{flex:1;min-width:0}}
 
         .favorites-filter-button {
             min-height: 42px;
@@ -3317,7 +3387,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 </style>
 <script>
 (function(){
-  const version="2026-11-15-17";
+  const version="2026-11-15-18";
   const overlay=document.getElementById("patchNotesOverlay");
   const reopen=document.getElementById("reopenPatchNotes");
   const close=()=>{overlay.classList.remove("visible");overlay.setAttribute("aria-hidden","true");localStorage.setItem("arcadeAtlasPatchNotesSeen",version);reopen.style.display="block";};
