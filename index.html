@@ -1501,7 +1501,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
             <p>Some games offer leaderboards. If you choose to submit a score or playtime, the player name, game name, score, and/or playtime value you submit may be sent to our leaderboard database and displayed publicly on the site. Do not use your real name or include personal information in a player name.</p>
             <p>You can use the site without creating an Arcade Atlas account. The site does not ask you to provide an email address to use its game catalog or submit a leaderboard score.</p>
             <h2>Information stored in your browser</h2>
-            <p>The site may use browser local storage to remember preferences such as favorite games, custom game playlist names and membership, recently played games, game launch counts, personal game ratings, your player name, locally tracked playtime, your Daily Pick launch streak, and Arcade Quests progress (XP and unlocked badges). Playlists store game paths from this catalog so you can filter the catalog to your saved games. You can export your playlists to a JSON backup file or import a backup; imports only keep games that are already in this catalog. Arcade Atlas does not upload playlist data. The Play More Like This shelf uses your favorites, ratings, and repeat launches to suggest games on this device. Arcade Quests records which games you launch on this device so it can track daily goals and lifetime badge milestones, including distinct multiplayer titles; it does not verify that a game was completed. These preferences, playlists, recommendations, and quest records stay on this device and are not sent to Arcade Atlas. They may remain in your browser until you clear the site's data or your browser removes them. Clearing site data may reset these preferences and locally stored totals. The Daily Pick streak records that you opened the featured game; it does not track game completion. If you submit a new personal-best streak, your chosen nickname and streak length appear publicly on the Daily Pick Streak leaderboard.</p>
+            <p>The site may use browser local storage to remember preferences such as favorite games, custom game playlist names and membership, recently played games, game launch counts, personal game ratings, your player name, locally tracked playtime, your Daily Pick launch streak, and Arcade Quests progress (XP and unlocked badges). Playlists store game paths from this catalog so you can filter the catalog to your saved games. The currently selected playlist filter may be remembered in this tab's session so it stays selected if you refresh. You can export your playlists to a JSON backup file or import a backup; imports only keep games that are already in this catalog. Arcade Atlas does not upload playlist data. The Play More Like This shelf uses your favorites, ratings, and repeat launches to suggest games on this device. Arcade Quests records which games you launch on this device so it can track daily goals and lifetime badge milestones, including distinct multiplayer titles; it does not verify that a game was completed. These preferences, playlists, recommendations, and quest records stay on this device and are not sent to Arcade Atlas. They may remain in your browser until you clear the site's data or your browser removes them. Clearing site data may reset these preferences and locally stored totals. The Daily Pick streak records that you opened the featured game; it does not track game completion. If you submit a new personal-best streak, your chosen nickname and streak length appear publicly on the Daily Pick Streak leaderboard.</p>
             <h2>Leaderboards and database</h2>
             <p>Leaderboard submissions are processed by Supabase, our database service provider. Submitted leaderboard information is used to operate and display game rankings. Because leaderboard entries are public, information you submit there should be treated as public. Database and service-provider handling is also subject to <a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer">Supabase's Privacy Policy</a>.</p>
             <h2>Analytics and advertising</h2>
@@ -1642,8 +1642,16 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
     let collectionDialogDeleteId = '';
 
     const GAME_COLLECTIONS_KEY = 'arcadeAtlasCollectionsV1';
+    const GAME_COLLECTION_FILTER_KEY = 'arcadeAtlasActiveCollectionV1';
     const MAX_GAME_COLLECTIONS = 12;
     const MAX_GAMES_PER_COLLECTION = 100;
+
+    function persistActiveGameCollection() {
+        try {
+            if (activeGameCollectionId) sessionStorage.setItem(GAME_COLLECTION_FILTER_KEY, activeGameCollectionId);
+            else sessionStorage.removeItem(GAME_COLLECTION_FILTER_KEY);
+        } catch (error) {}
+    }
 
     function getGameSearchText(game) {
         const tags = Array.isArray(game.tags) ? game.tags : [];
@@ -1806,7 +1814,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         const clearButton = document.getElementById('clearCollectionFilter');
         if (!clearButton) return;
         const active = collections.find(collection => collection.id === activeGameCollectionId);
-        if (!active) activeGameCollectionId = '';
+        if (!active) { activeGameCollectionId = ''; persistActiveGameCollection(); }
         clearButton.style.display = active ? '' : 'none';
         clearButton.textContent = active ? 'Playlist: ' + active.name + ' ×' : 'Clear playlist filter';
         clearButton.setAttribute('aria-label', active ? 'Clear playlist filter for ' + active.name : 'Clear playlist filter');
@@ -1816,6 +1824,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         const collection = getGameCollections().find(item => item.id === id);
         if (!collection) return;
         activeGameCollectionId = collection.id;
+        persistActiveGameCollection();
         const search = document.getElementById('searchInput'); if (search) search.value = '';
         const category = document.getElementById('categoryFilter'); if (category) category.value = '';
         activeCatalogMode = '';
@@ -1838,6 +1847,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 
     function clearGameCollectionFilter() {
         activeGameCollectionId = '';
+        persistActiveGameCollection();
         updateCollectionsSection();
         searchGames();
     }
@@ -2530,7 +2540,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
             : null;
         const activeCollection = getGameCollections().find(collection => collection.id === activeGameCollectionId);
         const collectionPaths = activeCollection ? new Set(activeCollection.paths) : null;
-        if (activeGameCollectionId && !activeCollection) activeGameCollectionId = '';
+        if (activeGameCollectionId && !activeCollection) { activeGameCollectionId = ''; persistActiveGameCollection(); }
         const filteredGames = allGames.filter(game => {
             const matchesQuery = getGameSearchText(game).includes(query);
             const matchesCategory = !category || String(game.category || '').toUpperCase() === category;
@@ -2994,6 +3004,10 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         }
         
         const allGames = await loadGames();
+        try {
+            const savedCollectionId = sessionStorage.getItem(GAME_COLLECTION_FILTER_KEY) || '';
+            if (savedCollectionId && getGameCollections().some(collection => collection.id === savedCollectionId)) activeGameCollectionId = savedCollectionId;
+        } catch (error) {}
         populateCategoryFilter(allGames);
         
         const allGamesGrid = document.getElementById("all-games-grid");
@@ -3005,7 +3019,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         updateFavoritesFilterButton();
         const favoritesToggle = document.getElementById('favoritesOnlyToggle');
         if (favoritesToggle) favoritesToggle.addEventListener('click', toggleFavoritesOnly);
-        if (getFavoritesOnly()) {
+        if (getFavoritesOnly() || activeGameCollectionId) {
             await searchGames();
         } else {
             renderGames(sortGameList(allGames), allGamesGrid);
@@ -3081,6 +3095,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         <li>Create up to 12 custom playlists, add games from any game card, and rename or delete playlists whenever you like.</li>
         <li>Browse a playlist to filter the catalog, then combine it with search and category filters. Playlist names and game selections stay in this browser.</li>
         <li>Export playlist backups and import them on another device. Imports only use games already in the catalog.</li>
+        <li>Your active playlist filter now stays selected when you refresh this tab.</li>
       </ul>
       <h3>🏅 New ways to play</h3>
       <ul>
@@ -3302,7 +3317,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 </style>
 <script>
 (function(){
-  const version="2026-11-15-16";
+  const version="2026-11-15-17";
   const overlay=document.getElementById("patchNotesOverlay");
   const reopen=document.getElementById("reopenPatchNotes");
   const close=()=>{overlay.classList.remove("visible");overlay.setAttribute("aria-hidden","true");localStorage.setItem("arcadeAtlasPatchNotesSeen",version);reopen.style.display="block";};

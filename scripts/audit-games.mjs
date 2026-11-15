@@ -357,6 +357,11 @@ try {
   await page.locator('#collection-form').evaluate(form => form.requestSubmit());
   await page.waitForFunction(() => JSON.parse(localStorage.getItem("arcadeAtlasCollectionsV1") || "[]").some(item => item.name === "Arcade Night" && item.paths.length === 1), undefined, { timeout: 4000 });
   const storedPaths = await page.evaluate(() => JSON.parse(localStorage.getItem("arcadeAtlasCollectionsV1") || "[]")[0]?.paths || []);
+  await page.locator('#collections-grid .collection-browse-button').last().click();
+  await page.waitForFunction(() => document.getElementById("catalogResultsCount")?.textContent === "1 game in Arcade Night", undefined, { timeout: 4000 });
+  await page.reload({ waitUntil: "domcontentloaded" });
+  await page.waitForFunction(() => document.getElementById("catalogResultsCount")?.textContent === "1 game in Arcade Night", undefined, { timeout: 10000 });
+  const filterPersistedAfterReload = await page.locator("#clearCollectionFilter").isVisible();
 
   const downloadPromise = page.waitForEvent("download");
   await page.locator("#exportCollectionsButton").click();
@@ -432,8 +437,8 @@ try {
   await page.waitForFunction(() => JSON.parse(localStorage.getItem("arcadeAtlasCollectionsV1") || "[]").length === 12, undefined, { timeout: 4000 });
   const importLimitRespected = await page.evaluate(() => JSON.parse(localStorage.getItem("arcadeAtlasCollectionsV1") || "[]").length === MAX_GAME_COLLECTIONS);
   const ok = response?.status() === 200 && created && storedPaths.length === 1 && backupValid && importMergedAndSanitized && allowedLaunches.includes(randomLaunch) &&
-    filteredTitle === "Slope" && filteredCards === 2 && crossTabSynced && customDeleteDialog && deleted && importLimitRespected && errors.length === 0;
-  uiAudit.collections = { status: response?.status() || null, created, storedPaths, backupValid, importMergedAndSanitized, randomLaunch, filteredTitle, filteredCards, crossTabSynced, customDeleteDialog, deleted, importLimitRespected, errors, ok };
+    filterPersistedAfterReload && filteredTitle === "Slope" && filteredCards === 2 && crossTabSynced && customDeleteDialog && deleted && importLimitRespected && errors.length === 0;
+  uiAudit.collections = { status: response?.status() || null, created, storedPaths, filterPersistedAfterReload, backupValid, importMergedAndSanitized, randomLaunch, filteredTitle, filteredCards, crossTabSynced, customDeleteDialog, deleted, importLimitRespected, errors, ok };
   await page.evaluate(() => localStorage.removeItem("arcadeAtlasCollectionsV1"));
   await syncPage.close();
   await page.close();
@@ -599,7 +604,7 @@ if (process.env.GITHUB_STEP_SUMMARY) {
     `- Blocky Combat timer detected: ${!!uiAudit.blockyCombat.timer}`,
     `- Favorites-only catalog UI smoke test passed: ${!!uiAudit.catalog.ok}`,
     `- Quick category filter UI smoke test passed: ${!!uiAudit.catalog.quickFiltersOk}`,
-    `- Custom playlist create, filter, rename, delete, and random-play test passed: ${!!uiAudit.collections.ok}`,
+    `- Custom playlist create, backup, restore, filter persistence, random play, cross-tab sync, rename, delete, and import-limit tests passed: ${!!uiAudit.collections.ok}`,
     `- Daily Pick rotation and streak test passed: ${!!uiAudit.dailyPick.ok}`,
     `- Connect Four two-player board smoke test passed: ${!!uiAudit.connectFour.ok}`,
     "",
