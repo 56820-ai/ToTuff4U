@@ -188,7 +188,7 @@ await Promise.all(Array.from({ length: workers }, async () => {
 }));
 
 // Check the two custom interfaces touched by this maintenance pass.
-const uiAudit = { leaderboard: {}, blockyCombat: {}, catalog: {}, dailyPick: {} };
+const uiAudit = { leaderboard: {}, blockyCombat: {}, catalog: {}, dailyPick: {}, connectFour: {} };
 try {
   const page = await browser.newPage({ viewport: { width: 1365, height: 768 } });
   const errors = [];
@@ -356,6 +356,31 @@ try {
   uiAudit.dailyPick.error = String(e.message || e).slice(0, 300);
 }
 
+try {
+  const page = await browser.newPage({ viewport: { width: 1200, height: 850 } });
+  const errors = [];
+  page.on("pageerror", e => errors.push(String(e.message || e).slice(0, 220)));
+  const response = await page.goto(BASE + "/g/connect-four/", { waitUntil: "domcontentloaded", timeout: 16000 });
+  await page.waitForSelector("#board button", { timeout: 10000 });
+  const buttonCount = await page.locator("#board button").count();
+  await page.locator("#board button").first().click();
+  const state = await page.evaluate(() => ({
+    bottomLeftDisc: Game.board[5][0],
+    nextPlayer: Game.currentPlayer,
+    renderedDisc: document.querySelector("#board tr:nth-child(6) td:nth-child(1) button")?.className || ""
+  }));
+  const ok = response?.status() === 200 &&
+    buttonCount === 42 &&
+    state.bottomLeftDisc === "black" &&
+    state.nextPlayer === "red" &&
+    state.renderedDisc.includes("black") &&
+    errors.length === 0;
+  uiAudit.connectFour = { status: response?.status() || null, buttonCount, ...state, errors, ok };
+  await page.close();
+} catch (e) {
+  uiAudit.connectFour.error = String(e.message || e).slice(0, 300);
+}
+
 // DuckMath is backed by its own live catalog service. Verify its app list and
 // test each returned game's page wrapper before adding it to Arcade Atlas.
 const duckmath = { homeStatus: null, dynamicCards: 0, cachedApps: 0, checked: 0, verified: [], broken: [], excludedForAge: [], error: "" };
@@ -440,6 +465,7 @@ if (process.env.GITHUB_STEP_SUMMARY) {
     `- Blocky Combat timer detected: ${!!uiAudit.blockyCombat.timer}`,
     `- Favorites-only catalog UI smoke test passed: ${!!uiAudit.catalog.ok}`,
     `- Daily Pick rotation and streak test passed: ${!!uiAudit.dailyPick.ok}`,
+    `- Connect Four two-player board smoke test passed: ${!!uiAudit.connectFour.ok}`,
     "",
     "## Removed broken Arcade Atlas games",
     ...report.removedBrokenGames.map(title => `- ${title}`),
@@ -468,5 +494,6 @@ console.log(JSON.stringify({
   added: uniqueAdditions.length,
   duckmathError: duckmath.error,
   catalogUiOk: !!uiAudit.catalog.ok,
-  dailyPickOk: !!uiAudit.dailyPick.ok
+  dailyPickOk: !!uiAudit.dailyPick.ok,
+  connectFourOk: !!uiAudit.connectFour.ok
 }, null, 2));
