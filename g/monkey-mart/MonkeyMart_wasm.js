@@ -11075,47 +11075,10 @@ function _sysconf(name) {
 }
 
 function _system(command) {
-    if (ENVIRONMENT_IS_NODE) {
-        if (!command) return 1;
-        var cmdstr = UTF8ToString(command);
-        if (!cmdstr.length) return 0;
-        var cp = require("child_process");
-        var ret = cp.spawnSync(cmdstr, [], {
-            shell: true,
-            stdio: "inherit"
-        });
-        var _W_EXITCODE = function(ret, sig) {
-            return ret << 8 | sig
-        };
-        if (ret.status === null) {
-            var signalToNumber = function(sig) {
-                switch (sig) {
-                    case "SIGHUP":
-                        return 1;
-                    case "SIGINT":
-                        return 2;
-                    case "SIGQUIT":
-                        return 3;
-                    case "SIGFPE":
-                        return 8;
-                    case "SIGKILL":
-                        return 9;
-                    case "SIGALRM":
-                        return 14;
-                    case "SIGTERM":
-                        return 15
-                }
-                return 2
-            };
-            return _W_EXITCODE(0, signalToNumber(ret.signal))
-        }
-        return _W_EXITCODE(ret.status, 0)
-    }
     if (!command) return 0;
     setErrNo(6);
-    return -1
+    return -1;
 }
-
 function _time(ptr) {
     var ret = Date.now() / 1e3 | 0;
     if (ptr) {
