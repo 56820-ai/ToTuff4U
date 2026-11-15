@@ -658,24 +658,6 @@
       "category": "ARCADE"
     },
     {
-      "title": "Basketball Stars",
-      "path": "g/basketballstars",
-      "image": "duckmath-site/assets/img/icons/basketball-stars.webp",
-      "category": "SPORTS"
-    },
-    {
-      "title": "2048 Cupcakes",
-      "path": "g/cupcake2048",
-      "image": "g/cupcake2048/meta/apple-touch-icon.png",
-      "category": "PUZZLE"
-    },
-    {
-      "title": "Stack Bump 3D",
-      "path": "g/stack-bump-3d",
-      "image": "g/stack-bump-3d/thumbnail.jpg",
-      "category": "ARCADE"
-    },
-    {
       "title": "Google Baseball",
       "path": "g/googlebaseball",
       "image": "images/google-baseball.svg",
