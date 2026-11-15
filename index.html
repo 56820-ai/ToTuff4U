@@ -1387,7 +1387,10 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
                             <p class="daily-pick-description" id="daily-pick-description">A new game is picked every day.</p>
                             <p class="daily-pick-streak" id="daily-pick-streak">Start a streak by playing today's pick.</p>
                         </div>
-                        <button type="button" class="daily-pick-play" id="daily-pick-play">Play today's pick</button>
+                        <div class="daily-pick-actions">
+                            <a href="#leaderboard" id="daily-pick-leaderboard-link" class="daily-pick-leaderboard-link">🏆 Streak leaderboard</a>
+                            <button type="button" class="daily-pick-play" id="daily-pick-play">Play today's pick</button>
+                        </div>
                     </div>
                 </section>
 
@@ -3176,13 +3179,14 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         <li>Added Connect Four, a local two-player classic with keyboard and accessible controls.</li>
         <li>Created matching original icons for the four new mini-games.</li>
         <li>Added Arcade 3D, with five browser-playable 3D modes.</li>
-        <li>Added Ancient Beast, an online tactical creature-battler (early alpha).</li>
+        <li>Ancient Beast was removed after its required local files failed the browser audit.</li>
         <li>Removed off-site launch cards that did not have playable game builds hosted in Arcade Atlas.</li>
         <li>Catalog game cards now launch local game builds; upstream attribution remains with imported projects.</li>
       </ul>
       <h3>🏆 Leaderboards</h3>
       <ul>
         <li>Shared Arcade Atlas leaderboard support was not added for the new upstream games because they do not expose a compatible score-submission interface to this site.</li>
+        <li>The Daily Pick card now links straight to its shared streak podium, with original calendar-and-flame artwork.</li>
       </ul>
       <h3>🏆 Leaderboard improvements</h3>
       <ul>
@@ -3202,8 +3206,9 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         <li>Ran the Chromium audit and removed six game imports with missing local resources or runtime errors.</li>
         <li>Added a Recently Played row that remembers your last eight games on this device.</li>
         <li>Added a Most Played shelf that ranks the games you launch most often on this device.</li>
-        <li>Added Ancient Beast, an AGPL-3.0 licensed tactical strategy game with bot practice and online lobbies (early alpha).</li>
-        <li>Added a Daily Pick that rotates every day and tracks your daily launch streak on this device.</li>
+        <li>Removed Ancient Beast after its required local game files failed the browser audit.</li>
+        <li>Added a Daily Pick that rotates every day and tracks your daily launch streak on this device, plus a direct link to its shared leaderboard.</li>
+        <li>Copy shareable catalog links with the current search, category, sort, and Play Together filters selected.</li>
         <li>Added one-tap category chips for faster browsing across Action, Sports, Puzzle, Racing, and other categories.</li>
         <li>Added a Most Played sort that learns from launches on the current device.</li>
         <li>Added a Play together filter for tagged couch co-op games.</li>
@@ -3264,6 +3269,10 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         .daily-pick-title{margin:0 0 5px;color:#fff;font-size:22px;font-weight:800}
         .daily-pick-description{margin:0 0 8px;color:#c5d2eb;font-size:13px}
         .daily-pick-streak{margin:0;color:#ffd98a;font-size:12px;font-weight:700}
+        .daily-pick-actions{display:flex;flex:0 0 auto;align-items:center;gap:10px}
+        .daily-pick-leaderboard-link{min-height:42px;display:inline-flex;align-items:center;justify-content:center;padding:0 13px;border:1px solid rgba(255,217,138,.35);border-radius:10px;background:rgba(5,12,27,.28);color:#ffe2a2;font:700 12px system-ui,sans-serif;text-decoration:none;white-space:nowrap}
+        .daily-pick-leaderboard-link:hover{background:rgba(255,217,138,.12);border-color:rgba(255,217,138,.7);color:#fff}
+        .daily-pick-leaderboard-link:focus-visible{outline:3px solid #70d9ff;outline-offset:3px}
         .daily-pick-play{flex:0 0 auto;min-height:42px;padding:0 17px;border:0;border-radius:10px;background:linear-gradient(135deg,#ff6b9d,#7659e8);color:#fff;font:800 13px system-ui,sans-serif;cursor:pointer}
         .daily-pick-play:hover{filter:brightness(1.12);transform:translateY(-1px)}
         .daily-pick-play:focus-visible{outline:3px solid #70d9ff;outline-offset:3px}
@@ -3286,7 +3295,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         .quest-badge-copy small{color:#9eb0ca;font-size:10px}
         @media(max-width:820px){.quest-badges{grid-template-columns:repeat(2,minmax(0,1fr))}}
         @media(max-width:620px){.arcade-quests{padding:15px}.quest-progress-copy{align-items:flex-start;flex-direction:column;gap:4px}.quest-progress-copy span{text-align:left}.quest-badges{grid-template-columns:1fr}.quest-badge{padding:9px 11px}}
-        @media(max-width:620px){.daily-pick-card{align-items:flex-start;flex-wrap:wrap}.daily-pick-art{width:70px;height:70px;flex-basis:70px}.daily-pick-copy{flex:1 1 calc(100% - 90px)}.daily-pick-play{width:100%}}
+        @media(max-width:620px){.daily-pick-card{align-items:flex-start;flex-wrap:wrap}.daily-pick-art{width:70px;height:70px;flex-basis:70px}.daily-pick-copy{flex:1 1 calc(100% - 90px)}.daily-pick-actions{width:100%;flex-direction:column-reverse;align-items:stretch}.daily-pick-play{width:100%}}
         .recent-heading .section-title{margin-bottom:12px}
         .clear-recent-button{border:1px solid rgba(160,185,220,.25);border-radius:9px;background:#111d32;color:#b8c9e4;padding:7px 11px;font:600 12px system-ui;cursor:pointer}
         .clear-recent-button:hover{background:#1b2b49;color:#fff}
@@ -3387,7 +3396,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 </style>
 <script>
 (function(){
-  const version="2026-11-15-18";
+  const version="2026-11-15-19";
   const overlay=document.getElementById("patchNotesOverlay");
   const reopen=document.getElementById("reopenPatchNotes");
   const close=()=>{overlay.classList.remove("visible");overlay.setAttribute("aria-hidden","true");localStorage.setItem("arcadeAtlasPatchNotesSeen",version);reopen.style.display="block";};

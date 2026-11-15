@@ -236,6 +236,14 @@ try {
       overlay.setAttribute("aria-hidden", "true");
     }
   });
+  await page.waitForFunction(() => { const section = document.getElementById("daily-pick-section"); return section && getComputedStyle(section).display !== "none"; }, undefined, { timeout: 10000 });
+  const dailyStreakLink = page.locator("#daily-pick-leaderboard-link");
+  const dailyStreakLinkVisible = await dailyStreakLink.isVisible();
+  await dailyStreakLink.click();
+  await page.waitForFunction(() => document.getElementById("leaderboard-content")?.classList.contains("active"), undefined, { timeout: 4000 });
+  const dailyStreakLinkWorks = dailyStreakLinkVisible && await page.locator("#leaderboard-frame").count() === 1;
+  await page.locator('.nav-item[data-page="home"]').click();
+  await page.waitForFunction(() => document.getElementById("home-content")?.classList.contains("active"), undefined, { timeout: 4000 });
   const actionChip = page.locator('#category-quick-filters button[data-category="ACTION"]');
   await actionChip.click({ timeout: 4000 });
   await page.waitForFunction(() => document.getElementById("categoryFilter")?.value === "ACTION", undefined, { timeout: 4000 });
@@ -319,7 +327,7 @@ try {
     persistedFilter === "true" &&
     mostPlayedHiddenAfterReload &&
     mostPlayedVisibleAfterClear &&
-    quickFilterActive && quickFilterCleared && sharedFiltersLoaded && shareLinkCopied && shareUrlValid;
+    quickFilterActive && quickFilterCleared && sharedFiltersLoaded && shareLinkCopied && shareUrlValid && dailyStreakLinkWorks;
   uiAudit.catalog = {
     status: response?.status() || null,
     favoriteButton,
@@ -333,6 +341,7 @@ try {
     sharedFiltersLoaded,
     shareLinkCopied,
     shareUrlValid,
+    dailyStreakLinkWorks,
     quickFilterActive,
     quickFilterCleared,
     quickFiltersOk: quickFilterActive && quickFilterCleared,
