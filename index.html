@@ -1311,6 +1311,11 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
                     <div class="games-grid" id="recent-games-grid"></div>
                 </section>
 
+                <section id="most-played-section" aria-label="Most played on this device" style="display:none">
+                    <div class="recent-heading"><h2 class="section-title">MOST PLAYED ON THIS DEVICE</h2></div>
+                    <div class="games-grid" id="most-played-grid"></div>
+                </section>
+
                 <h2 class="section-title">ALL GAMES</h2>
                 <div class="catalog-tools">
                     <label class="sr-only" for="categoryFilter">Filter games by category</label>
@@ -1736,6 +1741,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
             counts[key] = Math.min(999999, (Number(counts[key]) || 0) + 1);
             localStorage.setItem('gamePlayCounts', JSON.stringify(counts));
             updateRecentSection();
+            updateMostPlayedSection();
         } catch (error) {
             console.warn('Could not save recent game:', error);
         }
@@ -1755,6 +1761,22 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
             return;
         }
         renderGames(recent, container);
+    }
+
+    function updateMostPlayedSection() {
+        const section = document.getElementById('most-played-section');
+        const container = document.getElementById('most-played-grid');
+        if (!section || !container) return;
+        const counts = getGamePlayCounts();
+        const ranked = cachedGames
+            .map(game => ({ game, plays: Number(counts[normalizeGamePath(game.path)]) || 0 }))
+            .filter(item => item.plays > 0)
+            .sort((a, b) => b.plays - a.plays || String(a.game.title || '').localeCompare(String(b.game.title || '')))
+            .slice(0, 8)
+            .map(item => item.game);
+        container.innerHTML = '';
+        section.style.display = ranked.length ? '' : 'none';
+        if (ranked.length) renderGames(ranked, container);
     }
 
     function sortGameList(games) {
@@ -2162,6 +2184,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         
         updateFavoritesSection();
         updateRecentSection();
+        updateMostPlayedSection();
         const clearRecentButton = document.getElementById("clearRecentGames");
         if (clearRecentButton) clearRecentButton.addEventListener("click", function () {
             try { localStorage.removeItem("recentGames"); } catch (error) {}
@@ -2227,6 +2250,8 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
       
       <ul>
         <li>Added a Recently Played row that remembers your last eight games on this device.</li>
+        <li>Added a Most Played shelf that ranks the games you launch most often on this device.</li>
+        <li>Added Basketball Stars, Paper.io 2, Duck Life 4, Doge Miner, and Sandboxels to the playable catalog.</li>
         <li>Added a Most Played sort that learns from launches on the current device.</li>
         <li>Added 2048 Cupcakes and Google Baseball; removed failed imports after browser testing.</li>
         <li>Added a Clear History control for the Recently Played row.</li>
@@ -2277,7 +2302,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 </style>
 <script>
 (function(){
-  const version="2026-11-15-6";
+  const version="2026-11-15-7";
   const overlay=document.getElementById("patchNotesOverlay");
   const reopen=document.getElementById("reopenPatchNotes");
   const close=()=>{overlay.classList.remove("visible");overlay.setAttribute("aria-hidden","true");localStorage.setItem("arcadeAtlasPatchNotesSeen",version);reopen.style.display="block";};
