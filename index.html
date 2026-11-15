@@ -2479,6 +2479,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         <li>Added a Most Played shelf that ranks the games you launch most often on this device.</li>
         <li>Added Ancient Beast, an AGPL-3.0 licensed tactical strategy game with bot practice and online lobbies (early alpha).</li>
         <li>Added a Daily Pick that rotates every day and tracks your daily launch streak on this device.</li>
+        <li>Added one-tap category chips for faster browsing across Action, Sports, Puzzle, Racing, and other categories.</li>
         <li>Added a Most Played sort that learns from launches on the current device.</li>
         <li>Added 2048 Cupcakes and Google Baseball; removed failed imports after browser testing.</li>
         <li>Added a Clear History control for the Recently Played row.</li>
@@ -2585,7 +2586,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 </style>
 <script>
 (function(){
-  const version="2026-11-15-12";
+  const version="2026-11-15-13";
   const overlay=document.getElementById("patchNotesOverlay");
   const reopen=document.getElementById("reopenPatchNotes");
   const close=()=>{overlay.classList.remove("visible");overlay.setAttribute("aria-hidden","true");localStorage.setItem("arcadeAtlasPatchNotesSeen",version);reopen.style.display="block";};
