@@ -19,3 +19,19 @@ CREATE TABLE IF NOT EXISTS score_ip_records (
   ip_hash TEXT NOT NULL,
   created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
 );
+
+
+-- Materialized leaderboard: one row per podium position per game.
+-- GET /scores reads only these rows, never the complete score history.
+CREATE TABLE IF NOT EXISTS leaderboard_top_scores (
+  game_key TEXT NOT NULL,
+  rank INTEGER NOT NULL CHECK(rank BETWEEN 1 AND 3),
+  id INTEGER NOT NULL,
+  player_name TEXT NOT NULL,
+  game_title TEXT NOT NULL,
+  score TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  PRIMARY KEY(game_key, rank)
+);
+CREATE INDEX IF NOT EXISTS idx_leaderboard_top_scores_game_rank
+  ON leaderboard_top_scores(game_key, rank);
