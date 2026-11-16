@@ -1,0 +1,13 @@
+name = "arcade-atlas-api"
+main = "src/index.js"
+compatibility_date = "2026-11-14"
+compatibility_flags = ["nodejs_compat"]
+
+[[hyperdrive]]
+binding = "HYPERDRIVE"
+id = "382728cc92dd4f3388cb822dee82998a"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "arcade-atlas"
+database_id = "03b97ad0-ffc9-49fb-bb36-39e5e76843b5"
