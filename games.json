@@ -815,6 +815,38 @@
         "track",
         "arcade"
       ]
+    },
+    {
+      "title": "Word Hunt",
+      "path": "g/word-hunt",
+      "image": "images/word-hunt.svg",
+      "category": "PUZZLE",
+      "description": "Crack the hidden five-letter word in six guesses using letter clues and color hints.",
+      "source": "https://github.com/JeffreyHamilton6399/arcadia/tree/main/games/wordle",
+      "tags": [
+        "word",
+        "logic",
+        "vocabulary",
+        "daily",
+        "puzzle",
+        "single player"
+      ]
+    },
+    {
+      "title": "15 Puzzle",
+      "path": "g/15-puzzle",
+      "image": "images/15-puzzle.svg",
+      "category": "PUZZLE",
+      "description": "Slide numbered tiles into order, plan each move, and beat your best time.",
+      "source": "https://github.com/JeffreyHamilton6399/arcadia/tree/main/games/sliding-puzzle",
+      "tags": [
+        "sliding puzzle",
+        "numbers",
+        "logic",
+        "brain teaser",
+        "single player",
+        "touch"
+      ]
     }
   ]
 }

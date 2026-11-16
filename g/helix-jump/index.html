@@ -98,7 +98,7 @@ cv.addEventListener('touchmove',function(e){e.preventDefault();if(dx!==undefined
 cv.addEventListener('touchend',function(){dx=undefined;});
 document.getElementById('start').onclick=reset;
 document.getElementById('again').onclick=reset;
-reset();running=false;
+reset();running=false;stEl.classList.remove('hide');
 loop();
 })();
 </script>
