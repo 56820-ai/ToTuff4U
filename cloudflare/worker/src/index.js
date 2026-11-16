@@ -1,5 +1,6 @@
+import { Client } from "pg";
+
 const ALLOWED_ORIGIN = "https://56820-ai.github.io";
-const NEON_FUNCTION_URL = "https://br-flat-grass-bdhxbnam-arcadeapi.compute.c-8.us-east-2.aws.neon.tech";
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -30,21 +31,73 @@ async function hashIp(ip, secret) {
   return Array.from(new Uint8Array(signature), byte => byte.toString(16).padStart(2, "0")).join("");
 }
 
-async function callNeon(path, env, init = {}) {
-  if (!env.NEON_API_KEY) return json({ error: "Neon API authentication is not configured." }, 503);
+async function withDatabase(env, callback) {
+  if (!env.HYPERDRIVE?.connectionString) throw new Error("Neon Hyperdrive binding is missing.");
+  const client = new Client({ connectionString: env.HYPERDRIVE.connectionString });
+  await client.connect();
   try {
-    const response = await fetch(NEON_FUNCTION_URL + path, {
-      ...init,
-      headers: {
-        "Authorization": `Bearer ${env.NEON_API_KEY}`,
-        ...(init.headers || {})
+    return await callback(client);
+  } finally {
+    await client.end();
+  }
+}
+
+async function submitScore(request, env) {
+  if (!env.IP_HASH_SECRET || env.IP_HASH_SECRET.length < 32) {
+    return json({ error: "Score submission is not configured on the server." }, 503);
+  }
+  const ip = getClientIp(request);
+  if (!ip) return json({ error: "The server could not determine your network address." }, 503);
+
+  let body;
+  try { body = await request.json(); }
+  catch { return json({ error: "Invalid JSON request." }, 400); }
+
+  const playerName = typeof body.player_name === "string" ? body.player_name.trim().slice(0, 24) : "";
+  const gameTitle = typeof body.game_title === "string" ? body.game_title.trim().slice(0, 60) : "";
+  const scoreText = typeof body.score === "string" ? body.score.trim() :
+    Number.isSafeInteger(body.score) && body.score >= 0 ? String(body.score) : "";
+  const kind = body.kind === "session" ? "session" : body.kind === "score" ? "score" : "";
+
+  if (!playerName) return json({ error: "A valid player name is required." }, 400);
+  if (!gameTitle) return json({ error: "A valid game title is required." }, 400);
+  if (!kind) return json({ error: "The submission type is missing or invalid." }, 400);
+  if (!/^[0-9]{1,500}$/.test(scoreText)) {
+    return json({ error: "The score must be a whole-number decimal string containing 1–500 digits." }, 400);
+  }
+  if (kind === "score" && gameTitle.toLowerCase() === "daily pick streak" && (BigInt(scoreText) < 1n || BigInt(scoreText) > 36500n)) {
+    return json({ error: "Daily Pick Streak must be between 1 and 36,500 days." }, 400);
+  }
+  if (kind === "session" && BigInt(scoreText) < 5n) {
+    return json({ error: "Playtime submissions must be at least 5 seconds." }, 400);
+  }
+  if (kind === "score" && gameTitle.toLowerCase() === "slope" && BigInt(scoreText) > 1500n) {
+    return json({ error: "Slope scores are limited to 1,500." }, 400);
+  }
+
+  const ipHash = await hashIp(ip, env.IP_HASH_SECRET);
+  try {
+    await withDatabase(env, async (client) => {
+      await client.query("BEGIN");
+      try {
+        const inserted = await client.query(
+          "INSERT INTO scores (player_name, game_title, score) VALUES ($1, $2, $3) RETURNING id",
+          [playerName, gameTitle, scoreText]
+        );
+        await client.query(
+          "INSERT INTO score_ip_records (score_id, ip_hash) VALUES ($1, $2)",
+          [inserted.rows[0].id, ipHash]
+        );
+        await client.query("COMMIT");
+      } catch (error) {
+        await client.query("ROLLBACK").catch(() => {});
+        throw error;
       }
     });
-    const data = await response.json();
-    return json(data, response.status);
+    return json({ success: true });
   } catch (error) {
-    console.error("Neon API request failed:", error);
-    return json({ error: "The score database could not be reached." }, 502);
+    console.error("Score submission failed:", error);
+    return json({ error: "The score could not be saved securely." }, 500);
   }
 }
 
@@ -69,48 +122,22 @@ export default {
     if (origin && origin !== ALLOWED_ORIGIN) return json({ error: "Origin not allowed." }, 403);
 
     if (request.method === "GET" && url.pathname === "/scores") {
-      return callNeon("/scores", env);
+      try {
+        const rows = await withDatabase(env, async (client) => {
+          const result = await client.query(
+            "SELECT id, player_name, game_title, score, created_at FROM leaderboard_top_scores ORDER BY game_key ASC, rank ASC"
+          );
+          return result.rows;
+        });
+        return json(rows);
+      } catch (error) {
+        console.error("Leaderboard read failed:", error);
+        return json({ error: "The leaderboard could not be loaded." }, 500);
+      }
     }
 
     if (request.method === "POST" && url.pathname === "/submit-score") {
-      if (!env.IP_HASH_SECRET || env.IP_HASH_SECRET.length < 32) {
-        return json({ error: "Score submission is not configured on the server." }, 503);
-      }
-      const ip = getClientIp(request);
-      if (!ip) return json({ error: "The server could not determine your network address." }, 503);
-
-      let body;
-      try { body = await request.json(); }
-      catch { return json({ error: "Invalid JSON request." }, 400); }
-
-      const playerName = typeof body.player_name === "string" ? body.player_name.trim().slice(0, 24) : "";
-      const gameTitle = typeof body.game_title === "string" ? body.game_title.trim().slice(0, 60) : "";
-      const scoreText = typeof body.score === "string" ? body.score.trim() :
-        Number.isSafeInteger(body.score) && body.score >= 0 ? String(body.score) : "";
-      const kind = body.kind === "session" ? "session" : body.kind === "score" ? "score" : "";
-
-      if (!playerName) return json({ error: "A valid player name is required." }, 400);
-      if (!gameTitle) return json({ error: "A valid game title is required." }, 400);
-      if (!kind) return json({ error: "The submission type is missing or invalid." }, 400);
-      if (!/^[0-9]{1,500}$/.test(scoreText)) {
-        return json({ error: "The score must be a whole-number decimal string containing 1–500 digits." }, 400);
-      }
-      if (kind === "score" && gameTitle.toLowerCase() === "daily pick streak" && (BigInt(scoreText) < 1n || BigInt(scoreText) > 36500n)) {
-        return json({ error: "Daily Pick Streak must be between 1 and 36,500 days." }, 400);
-      }
-      if (kind === "session" && BigInt(scoreText) < 5n) {
-        return json({ error: "Playtime submissions must be at least 5 seconds." }, 400);
-      }
-      if (kind === "score" && gameTitle.toLowerCase() === "slope" && BigInt(scoreText) > 1500n) {
-        return json({ error: "Slope scores are limited to 1,500." }, 400);
-      }
-
-      const ipHash = await hashIp(ip, env.IP_HASH_SECRET);
-      return callNeon("/submit-score", env, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "x-arcade-ip-hash": ipHash },
-        body: JSON.stringify({ player_name: playerName, game_title: gameTitle, score: scoreText, kind })
-      });
+      return submitScore(request, env);
     }
     return json({ error: "Not found." }, 404);
   }
