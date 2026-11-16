@@ -224,8 +224,10 @@ try {
   uiAudit.blockyCombat.error = String(e.message || e).slice(0, 300);
 }
 
+let catalogContext;
 try {
-  const page = await browser.newPage({ viewport: { width: 1365, height: 768 } });
+  catalogContext = await browser.newContext({ viewport: { width: 1365, height: 768 } });
+  const page = await catalogContext.newPage();
   const errors = [];
   page.on("pageerror", e => errors.push(String(e.message || e).slice(0, 220)));
   const response = await page.goto(BASE + "/", { waitUntil: "domcontentloaded", timeout: 16000 });
@@ -325,7 +327,7 @@ try {
   const shareUrlValid = (() => { try { const url = new URL(copiedShareUrl); return url.searchParams.get("q") === "slope" && url.searchParams.get("category") === "ARCADE" && url.searchParams.get("sort") === "az" && url.searchParams.get("mode") === "multiplayer" && !url.searchParams.has("favorites") && !url.searchParams.has("collection"); } catch { return false; } })();
   await page.goto(BASE + "/", { waitUntil: "domcontentloaded", timeout: 16000 });
   await page.waitForSelector("#all-games-grid .game-card", { timeout: 10000 });
-  const syncPage = await page.context().newPage();
+  const syncPage = await catalogContext.newPage();
   await syncPage.goto(BASE + "/", { waitUntil: "domcontentloaded", timeout: 16000 });
   await syncPage.waitForSelector("#all-games-grid .game-card", { timeout: 10000 });
   await syncPage.evaluate(() => { const overlay = document.getElementById("patchNotesOverlay"); if (overlay) { overlay.classList.remove("visible"); overlay.setAttribute("aria-hidden", "true"); } });
@@ -361,7 +363,7 @@ try {
     mostPlayedHiddenAfterReload &&
     mostPlayedVisibleAfterClear &&
     quickFilterActive && quickFilterCleared && sharedFiltersLoaded && shareLinkCopied && shareUrlValid && dailyStreakLinkWorks && crossTabPreferencesSynced &&
-    newGamesShelfVisible && newGamesShelfCount === 8 && newestShelfTitle === "Polygon Racer" && newGamesShelfHiddenByFilter && newGamesShelfRestored;
+    newGamesShelfVisible && newGamesShelfCount === 8 && newestShelfTitle === cachedGames[cachedGames.length - 1]?.title && newGamesShelfHiddenByFilter && newGamesShelfRestored;
   uiAudit.catalog = {
     status: response?.status() || null,
     favoriteButton,
@@ -389,7 +391,9 @@ try {
     ok
   };
   await page.close();
+  await catalogContext.close();
 } catch (e) {
+  await catalogContext?.close().catch(() => {});
   uiAudit.catalog.error = String(e.message || e).slice(0, 300);
 }
 
@@ -407,6 +411,10 @@ try {
   });
   await page.reload({ waitUntil: "domcontentloaded" });
   await page.waitForSelector("#createCollectionButton", { timeout: 10000 });
+  await page.evaluate(() => {
+    const overlay = document.getElementById("patchNotesOverlay");
+    if (overlay) { overlay.classList.remove("visible"); overlay.setAttribute("aria-hidden", "true"); }
+  });
   await page.locator("#createCollectionButton").click();
   await page.locator("#collection-name-input").fill("Arcade Night");
   await page.locator("#collection-form").evaluate(form => form.requestSubmit());
@@ -516,6 +524,10 @@ try {
   const response = await page.goto(BASE + "/", { waitUntil: "domcontentloaded", timeout: 16000 });
   await page.waitForSelector("#daily-pick-play", { timeout: 12000 });
   await page.waitForSelector("#daily-pick-title", { timeout: 12000 });
+  await page.evaluate(() => {
+    const overlay = document.getElementById("patchNotesOverlay");
+    if (overlay) { overlay.classList.remove("visible"); overlay.setAttribute("aria-hidden", "true"); }
+  });
   const titleBefore = await page.locator("#daily-pick-title").textContent();
   const expectedHref = await page.evaluate(() => buildGameHref(getDailyPickGame(cachedGames).path));
   await page.evaluate(() => {
@@ -593,14 +605,16 @@ try {
   await canvas.waitFor({ state: "visible", timeout: 12000 });
   const box = await canvas.boundingBox();
   if (!box) throw new Error("Chess canvas has no visible bounds");
-  const scale = box.width / 1080;
-  // The start overlay's Play control is centered at logical game coordinate (540, 1510).
-  await page.mouse.click(box.x + 540 * scale, box.y + 1510 * scale);
-  await page.waitForFunction(() => document.getElementById("status")?.textContent.includes("White to move"), undefined, { timeout: 6000 });
+  const scaleX = box.width / 1080;
+  const scaleY = box.height / 1920;
+  // Start button is centered at logical game coordinate (541, 1510).
+  await page.mouse.click(box.x + 541 * scaleX, box.y + 1510 * scaleY);
+  await page.waitForFunction(() => document.getElementById("status")?.textContent === "White to move — You", undefined, { timeout: 6000 });
   // White pawn: e2 -> e4. Board origin (60, 448), square size 120.
-  await page.mouse.click(box.x + 600 * scale, box.y + 1228 * scale);
-  await page.mouse.click(box.x + 600 * scale, box.y + 988 * scale);
-  await page.waitForFunction(() => document.getElementById("status")?.textContent.includes("White to move — You"), undefined, { timeout: 8000 });
+  await page.mouse.click(box.x + 600 * scaleX, box.y + 1228 * scaleY);
+  await page.mouse.click(box.x + 600 * scaleX, box.y + 988 * scaleY);
+  await page.waitForFunction(() => document.getElementById("status")?.textContent === "Black to move — CPU", undefined, { timeout: 4000 });
+  await page.waitForFunction(() => document.getElementById("status")?.textContent === "White to move — You", undefined, { timeout: 8000 });
   const status = await page.locator("#status").textContent();
   const ok = response?.status() === 200 && status?.includes("White to move — You") && errors.length === 0;
   uiAudit.chess = { status: response?.status() || null, canvasVisible: true, openingMove: "e2-e4", computerReplied: !!status?.includes("White to move — You"), errors, ok };
@@ -693,8 +707,12 @@ await runArcadeSmokeTest("simon", "/g/simon/", "#startBtn", async page => {
   const pads = await page.locator(".pad").count();
   await page.locator("#startBtn").click();
   await page.waitForFunction(() => document.getElementById("round")?.textContent === "1", undefined, { timeout: 5000 });
-  await page.waitForFunction(() => document.getElementById("status")?.textContent.includes("Your turn"), undefined, { timeout: 8000 });
-  return { pads, round: await page.locator("#round").textContent(), status: await page.locator("#status").textContent(), ok: pads === 4 };
+  await page.waitForFunction(() => {
+    const pads = [...document.querySelectorAll(".pad")];
+    return pads.length === 4 && pads.every(pad => !pad.classList.contains("disabled"));
+  }, undefined, { timeout: 8000 });
+  const status = await page.locator("#status").textContent();
+  return { pads, round: await page.locator("#round").textContent(), status, inputEnabled: await page.locator(".pad:not(.disabled)").count() === 4, ok: pads === 4 && status.includes("Your turn") };
 });
 await runArcadeSmokeTest("aimTrainer", "/g/aim-trainer/", "#arena", async page => {
   await page.locator("#startBtn").click();
@@ -719,6 +737,21 @@ await runArcadeSmokeTest("slither", "/g/slither/", "#c", async page => {
   const started = await page.locator("#st").evaluate(el => el.classList.contains("hide"));
   const score = await page.locator("#sc").textContent();
   return { canvasCount: await page.locator("canvas").count(), started, score, touchSteering: true, ok: started && score === "10" };
+});
+await runArcadeSmokeTest("wordHunt", "/g/word-hunt/", "#grid .tile", async page => {
+  const tiles = await page.locator("#grid .tile").count();
+  await page.locator('#keyboard .key[data-key="a"]').click();
+  const enteredLetter = await page.locator('#grid .tile[data-row="0"][data-col="0"]').textContent();
+  return { tiles, enteredLetter, keyboardKeys: await page.locator("#keyboard .key").count(), ok: tiles === 30 && enteredLetter === "A" };
+});
+await runArcadeSmokeTest("fifteenPuzzle", "/g/15-puzzle/", "#board .tile", async page => {
+  const tiles = await page.locator("#board .tile").count();
+  const movable = page.locator("#board .tile.movable").first();
+  await movable.click();
+  await page.waitForFunction(() => document.getElementById("moves")?.textContent === "1", undefined, { timeout: 3000 });
+  const movesAfterTap = await page.locator("#moves").textContent();
+  await page.locator("#restart").click();
+  return { tiles, movesAfterTap, resetMoves: await page.locator("#moves").textContent(), ok: tiles === 15 && movesAfterTap === "1" && await page.locator("#moves").textContent() === "0" };
 });
 await runArcadeSmokeTest("polygonRacer", "/g/polygon-racer/", "#c", async page => {
   await page.locator("#start").click();
