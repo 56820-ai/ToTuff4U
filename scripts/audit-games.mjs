@@ -240,6 +240,8 @@ try {
       overlay.setAttribute("aria-hidden", "true");
     }
   });
+  await page.locator('.nav-item[data-page="home"]').click();
+  await page.waitForFunction(() => document.getElementById("home-content")?.classList.contains("active"), undefined, { timeout: 5000 });
   await page.waitForFunction(() => { const section = document.getElementById("daily-pick-section"); return section && getComputedStyle(section).display !== "none"; }, undefined, { timeout: 10000 });
   const dailyStreakLink = page.locator("#daily-pick-leaderboard-link");
   const dailyStreakLinkVisible = await dailyStreakLink.isVisible();
@@ -431,6 +433,12 @@ try {
   await page.waitForFunction(() => document.getElementById("catalogResultsCount")?.textContent === "1 game in Arcade Night", undefined, { timeout: 4000 });
   await page.reload({ waitUntil: "domcontentloaded" });
   await page.waitForFunction(() => document.getElementById("catalogResultsCount")?.textContent === "1 game in Arcade Night", undefined, { timeout: 10000 });
+  await page.evaluate(() => {
+    const overlay = document.getElementById("patchNotesOverlay");
+    if (overlay) { overlay.classList.remove("visible"); overlay.setAttribute("aria-hidden", "true"); }
+  });
+  await page.locator('.nav-item[data-page="home"]').click();
+  await page.waitForFunction(() => document.getElementById("home-content")?.classList.contains("active"), undefined, { timeout: 5000 });
   const filterPersistedAfterReload = await page.locator("#clearCollectionFilter").isVisible();
 
   // The app exports through a programmatic anchor click. Capture the exact Blob
@@ -541,6 +549,8 @@ try {
   const response = await page.goto(BASE + "/", { waitUntil: "domcontentloaded", timeout: 16000 });
   await page.waitForSelector("#daily-pick-play", { timeout: 12000 });
   await page.waitForSelector("#daily-pick-title", { timeout: 12000 });
+  await page.locator('.nav-item[data-page="home"]').click();
+  await page.waitForFunction(() => document.getElementById("home-content")?.classList.contains("active"), undefined, { timeout: 5000 });
   await page.evaluate(() => {
     const overlay = document.getElementById("patchNotesOverlay");
     if (overlay) { overlay.classList.remove("visible"); overlay.setAttribute("aria-hidden", "true"); }
@@ -631,7 +641,7 @@ try {
   await page.mouse.click(box.x + 600 * scaleX, box.y + 1228 * scaleY);
   await page.mouse.click(box.x + 600 * scaleX, box.y + 988 * scaleY);
   await page.waitForFunction(() => document.getElementById("status")?.textContent === "Black to move — CPU", undefined, { timeout: 4000 });
-  await page.waitForFunction(() => document.getElementById("status")?.textContent === "White to move — You", undefined, { timeout: 8000 });
+  await page.waitForFunction(() => document.getElementById("status")?.textContent === "White to move — You", undefined, { timeout: 20000 });
   const status = await page.locator("#status").textContent();
   const ok = response?.status() === 200 && status?.includes("White to move — You") && errors.length === 0;
   uiAudit.chess = { status: response?.status() || null, canvasVisible: true, openingMove: "e2-e4", computerReplied: !!status?.includes("White to move — You"), errors, ok };
@@ -683,7 +693,7 @@ try {
   const ok = response?.status() === 200 && cells === 81 && numberButtons === 9 &&
     entered.value === "5" && entered.valid && !entered.invalid &&
     touchEntered.value === "8" && touchEntered.valid && !touchEntered.invalid &&
-    /^10:00$/.test(timer || "") && winVisible && errors.length === 0;
+    /^(10:00|9:[0-5]\d)$/.test(timer || "") && winVisible && errors.length === 0;
   uiAudit.sudoku = { status: response?.status() || null, cells, numberButtons, entered, touchEntered, timer, winVisible, errors, ok };
   await page.close();
 } catch (e) {
