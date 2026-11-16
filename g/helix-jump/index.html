@@ -69,7 +69,7 @@ function upd(){
   var shift=ball.y-CY;
   if(Math.abs(shift)>2){ball.y-=shift;rings.forEach(function(r){r.y-=shift;});}
 }
-function die(){dead=true;running=false;if(score>best){best=score;localStorage.setItem('arcadiaHelixBest',best);}bsEl.textContent=best;gosEl.textContent='Score: '+score;goEl.classList.remove('hide');}
+function die(){dead=true;running=false;if(score>best){best=score;localStorage.setItem('arcadeAtlasHelixBest',best);}bsEl.textContent=best;gosEl.textContent='Score: '+score;goEl.classList.remove('hide');}
 function draw(){
   ctx.clearRect(0,0,W,H);ctx.fillStyle='#0A0A12';ctx.fillRect(0,0,W,H);
   // center pole
