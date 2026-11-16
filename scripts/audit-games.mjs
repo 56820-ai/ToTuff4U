@@ -615,10 +615,34 @@ try {
     invalid: cell.classList.contains("invalid")
   }));
   const timer = await page.locator("#timer").textContent();
+  // Also verify touch-style number-pad input on the next editable cell.
+  await page.locator('#board .cell[data-r="0"][data-c="1"]').click();
+  await page.locator("#numPad .num").nth(7).click();
+  const touchEntered = await page.locator('#board .cell[data-r="0"][data-c="1"]').evaluate(cell => ({
+    value: cell.textContent.trim(),
+    valid: cell.classList.contains("valid"),
+    invalid: cell.classList.contains("invalid")
+  }));
+  const solution = [
+    [5,8,9,4,6,7,3,1,2],[2,1,4,9,3,5,6,7,8],[3,6,7,2,1,8,4,5,9],
+    [7,5,6,1,4,2,9,8,3],[9,4,8,6,5,3,1,2,7],[1,3,2,8,7,9,5,6,4],
+    [8,7,1,3,9,6,2,4,5],[4,9,5,7,2,1,8,3,6],[6,2,3,5,8,4,7,9,1]
+  ];
+  await page.evaluate(answer => {
+    for (let r = 0; r < 9; r++) for (let c = 0; c < 9; c++) {
+      const cell = document.querySelector(`#board .cell[data-r="${r}"][data-c="${c}"]`);
+      if (!cell.classList.contains("given")) {
+        cell.click();
+        window.dispatchEvent(new KeyboardEvent("keydown", { key: String(answer[r][c]), bubbles: true }));
+      }
+    }
+  }, solution);
+  const winVisible = await page.locator("#winMessage").evaluate(el => getComputedStyle(el).display !== "none");
   const ok = response?.status() === 200 && cells === 81 && numberButtons === 9 &&
     entered.value === "5" && entered.valid && !entered.invalid &&
-    /^10:00$/.test(timer || "") && errors.length === 0;
-  uiAudit.sudoku = { status: response?.status() || null, cells, numberButtons, entered, timer, errors, ok };
+    touchEntered.value === "8" && touchEntered.valid && !touchEntered.invalid &&
+    /^10:00$/.test(timer || "") && winVisible && errors.length === 0;
+  uiAudit.sudoku = { status: response?.status() || null, cells, numberButtons, entered, touchEntered, timer, winVisible, errors, ok };
   await page.close();
 } catch (e) {
   uiAudit.sudoku.error = String(e.message || e).slice(0, 300);
