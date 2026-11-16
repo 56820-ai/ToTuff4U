@@ -3,9 +3,7 @@
 <head>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8390067368864065" crossorigin="anonymous"></script>
   <meta charset="UTF-8" />
-  <title>Vortex</title>
-  <script src="/static/uv/uv.bundle.js" defer></script>
-  <script src="/static/uv/uv.config.js" defer></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1"><title>Arcade Atlas Chat</title>
   <style>
     #fullscreen-btn {
       position: fixed;
@@ -43,22 +41,12 @@
 
 <button id="fullscreen-btn">Fullscreen</button>
 
-<script>
-  window.addEventListener('DOMContentLoaded', () => {
-    window.location.href = "/static/embed.html#https://vortexos.net/";
-  });
-
-  document.getElementById('fullscreen-btn').addEventListener('click', () => {
-    const docEl = document.documentElement;
-    if (docEl.requestFullscreen) {
-      docEl.requestFullscreen();
-    } else if (docEl.webkitRequestFullscreen) { // Safari
-      docEl.webkitRequestFullscreen();
-    } else if (docEl.msRequestFullscreen) { // IE11
-      docEl.msRequestFullscreen();
-    }
-  });
-</script>
+<main style="max-width:900px;margin:48px auto;padding:32px;color:#f4f5ff;font:16px/1.6 system-ui,sans-serif;background:#15172a;border:1px solid #343858;border-radius:18px">
+<h1 style="margin-top:0">Vortex Chat</h1>
+<p>Vortex is an external chat service. Choose below when you want to open it. Arcade Atlas no longer automatically redirects this page or wraps the service in an iframe.</p>
+<a href="https://vortexos.net/" rel="noopener noreferrer" style="display:inline-block;padding:12px 20px;border-radius:10px;background:#7167ff;color:white;text-decoration:none;font-weight:700">Open Vortex</a>
+</main>
+<script>document.getElementById('fullscreen-btn')?.addEventListener('click',()=>{const el=document.documentElement;if(el.requestFullscreen)el.requestFullscreen();else if(el.webkitRequestFullscreen)el.webkitRequestFullscreen();});</script>
 
 </body>
 </html>
