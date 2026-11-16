@@ -14,11 +14,11 @@
   "use strict";
 
   const config = window.ARCADE_ATLAS_SCORE_CONFIG || {};
-  const configured = /^https:\/\/[a-z0-9-]+(?:\.[a-z0-9-]+)+$/i.test(config.workerUrl || "");
+  const configured = /^https:\/\/[a-z0-9-]+(?:\.[a-z0-9-]+)+$/i.test(config.apiUrl || "");
 
   async function request(path, options) {
     if (!configured) throw new Error("The shared score database has not been configured yet.");
-    const response = await fetch(config.workerUrl.replace(/\/$/, "") + path, {
+    const response = await fetch(config.apiUrl.replace(/\/$/, "") + path, {
       ...options,
       headers: {
         "Content-Type": "application/json",
@@ -42,7 +42,7 @@
 
   async function submitThroughServer(gameTitle, score, playerName, kind, keepalive) {
     if (!configured) throw new Error("The shared score database has not been configured yet.");
-    const endpoint = config.workerUrl.replace(/\/$/, "") + "/submit-score";
+    const endpoint = config.apiUrl.replace(/\/$/, "") + "/submit-score";
     const response = await fetch(endpoint, {
       method: "POST",
       keepalive: !!keepalive,
