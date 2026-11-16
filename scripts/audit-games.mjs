@@ -188,7 +188,7 @@ await Promise.all(Array.from({ length: workers }, async () => {
 }));
 
 // Check the two custom interfaces touched by this maintenance pass.
-const uiAudit = { leaderboard: {}, blockyCombat: {}, catalog: {}, collections: {}, dailyPick: {}, connectFour: {} };
+const uiAudit = { leaderboard: {}, blockyCombat: {}, catalog: {}, collections: {}, dailyPick: {}, connectFour: {}, chess: {} };
 try {
   const page = await browser.newPage({ viewport: { width: 1365, height: 768 } });
   const errors = [];
@@ -571,6 +571,33 @@ try {
   uiAudit.connectFour.error = String(e.message || e).slice(0, 300);
 }
 
+// Exercise Chess beyond a simple HTTP load: start a match, make e2-e4,
+// and confirm the computer responds and hands the turn back to the player.
+try {
+  const page = await browser.newPage({ viewport: { width: 1365, height: 768 } });
+  const errors = [];
+  page.on("pageerror", e => errors.push(String(e.message || e).slice(0, 220)));
+  const response = await page.goto(BASE + "/g/chess/", { waitUntil: "domcontentloaded", timeout: 16000 });
+  const canvas = page.locator("#game canvas");
+  await canvas.waitFor({ state: "visible", timeout: 12000 });
+  const box = await canvas.boundingBox();
+  if (!box) throw new Error("Chess canvas has no visible bounds");
+  const scale = box.width / 1080;
+  // The start overlay's Play control is centered at logical game coordinate (540, 1510).
+  await page.mouse.click(box.x + 540 * scale, box.y + 1510 * scale);
+  await page.waitForFunction(() => document.getElementById("status")?.textContent.includes("White to move"), undefined, { timeout: 6000 });
+  // White pawn: e2 -> e4. Board origin (60, 448), square size 120.
+  await page.mouse.click(box.x + 600 * scale, box.y + 1228 * scale);
+  await page.mouse.click(box.x + 600 * scale, box.y + 988 * scale);
+  await page.waitForFunction(() => document.getElementById("status")?.textContent.includes("White to move — You"), undefined, { timeout: 8000 });
+  const status = await page.locator("#status").textContent();
+  const ok = response?.status() === 200 && status?.includes("White to move — You") && errors.length === 0;
+  uiAudit.chess = { status: response?.status() || null, canvasVisible: true, openingMove: "e2-e4", computerReplied: !!status?.includes("White to move — You"), errors, ok };
+  await page.close();
+} catch (e) {
+  uiAudit.chess.error = String(e.message || e).slice(0, 300);
+}
+
 // DuckMath is backed by its own live catalog service. Verify its app list and
 // test each returned game's page wrapper before adding it to Arcade Atlas.
 const duckmath = { homeStatus: null, dynamicCards: 0, cachedApps: 0, checked: 0, verified: [], broken: [], excludedForAge: [], error: "" };
@@ -654,6 +681,7 @@ if (process.env.GITHUB_STEP_SUMMARY) {
     `- Leaderboard logo map loaded: ${uiAudit.leaderboard.logoCount || 0}`,
     `- Daily Pick streak icon loaded: ${uiAudit.leaderboard.dailyStreakLogo === "../images/daily-pick-streak.svg" && uiAudit.leaderboard.dailyStreakIconStatus === 200}`,
     `- Blocky Combat timer detected: ${!!uiAudit.blockyCombat.timer}`,
+    `- Chess vs Computer opening-move and AI-reply test passed: ${!!uiAudit.chess.ok}`,
     `- Catalog filters, favorites, share links, Daily Pick leaderboard navigation, and cross-tab preference tests passed: ${!!uiAudit.catalog.ok}`,
     `- Quick category filter UI smoke test passed: ${!!uiAudit.catalog.quickFiltersOk}`,
     `- Custom playlist create, backup, restore, filter persistence, random play, cross-tab sync, rename, delete, and import-limit tests passed: ${!!uiAudit.collections.ok}`,
