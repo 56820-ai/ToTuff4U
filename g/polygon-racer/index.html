@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=yes">
+<title>Polygon Racer | Arcade Atlas</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{font-family:Inter,system-ui,sans-serif;background:#0A0A12;color:#ECECF5;overflow:hidden;display:flex;align-items:center;justify-content:center}
+  #wrap{position:relative;width:100%;max-width:900px;aspect-ratio:16/10;margin:auto}
+  canvas{width:100%;height:100%;display:block;background:#0A0A12;border-radius:14px;border:1px solid rgba(255,255,255,.08)}
+  .hud{position:absolute;top:12px;left:14px;display:flex;gap:8px;pointer-events:none}
+  .hud .s{background:rgba(10,10,18,.7);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:6px 12px;font-weight:700;font-size:13px;font-variant-numeric:tabular-nums;backdrop-filter:blur(6px)}
+  .hud .s span{color:#9a9ab5;font-weight:500;font-size:10px;text-transform:uppercase;letter-spacing:.08em;margin-right:6px}
+  .ov{position:absolute;inset:0;display:grid;place-items:center;background:rgba(10,10,18,.82);backdrop-filter:blur(4px);border-radius:14px;text-align:center}
+  .ov.hide{display:none}
+  .ov h2{font-family:Syne,sans-serif;font-size:28px;margin-bottom:6px}
+  .ov p{color:#9a9ab5;margin-bottom:6px;font-size:13px}
+  .btn{padding:12px 22px;border-radius:11px;background:linear-gradient(90deg,#7C3AED,#9333ea);color:#fff;font-weight:600;border:none;cursor:pointer;font-size:15px}
+  .btn:hover{filter:brightness(1.1)}
+  .ctrls{position:absolute;bottom:10px;left:0;right:0;display:none;justify-content:center;gap:8px;padding:0 14px;pointer-events:none}
+  .ctrls button{width:60px;height:56px;border-radius:12px;background:rgba(124,58,237,.3);border:1px solid rgba(124,58,237,.5);color:#fff;font-size:20px;pointer-events:auto}
+  @media(pointer:coarse){.ctrls{display:flex}}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <canvas id="c" width="900" height="562"></canvas>
+  <div class="hud">
+    <div class="s"><span>Lap</span><b id="lap">1/3</b></div>
+    <div class="s"><span>Time</span><b id="tm">0:00.0</b></div>
+    <div class="s"><span>Best</span><b id="bs">—</b></div>
+  </div>
+  <div class="ctrls"><button id="bl">&lt;</button><button id="bu">^</button><button id="bd">v</button><button id="br">&gt;</button></div>
+  <div class="ov" id="st"><div><h2>Polygon Racer</h2><p>Top-down arcade racer. Complete 3 laps as fast as you can.</p><p style="margin-bottom:14px;font-size:12px">Arrow keys / WASD · Up=accel · Down=brake · Left/Right=steer</p><button class="btn" id="start">Start race</button></div></div>
+  <div class="ov hide" id="go"><div><h2 style="color:#22D3EE">Finished</h2><p id="gos"></p><button class="btn" id="again" style="margin-top:8px">Race again</button></div></div>
+</div>
+<script>
+(function(){
+var cv=document.getElementById('c'),ctx=cv.getContext('2d'),W=900,H=562;
+var lapEl=document.getElementById('lap'),tmEl=document.getElementById('tm'),bsEl=document.getElementById('bs'),stEl=document.getElementById('st'),goEl=document.getElementById('go'),gosEl=document.getElementById('gos');
+var best=+localStorage.getItem('arcadeAtlasPolygonRacerBest')||0;bsEl.textContent=best?(best/1000).toFixed(1)+'s':'—';
+// track defined as a loop of waypoints (an oval-ish blob)
+var cx=W/2,cy=H/2,rx=320,ry=210;
+function trackPoint(a){return {x:cx+Math.cos(a)*rx,y:cy+Math.sin(a)*ry};}
+var car,t,speed,ang,lap,running,done,t0,ti,prevA;
+function reset(){
+  var p=trackPoint(0);car={x:p.x,y:p.y};ang=0;t=0;speed=0;lap=0;running=true;done=false;t0=Date.now();prevA=0;
+  stEl.classList.add('hide');goEl.classList.add('hide');
+  if(ti)clearInterval(ti);ti=setInterval(function(){t=Date.now()-t0;tmEl.textContent=(t/1000).toFixed(1)+'s';},100);
+}
+var keys={};
+function upd(){
+  if(!running)return;
+  // input
+  var acc=0,brk=0,steer=0;
+  if(keys.up)acc=1;if(keys.down)brk=1;if(keys.left)steer=-1;if(keys.right)steer=1;
+  if(acc)speed+=0.18;if(brk)speed-=0.22;
+  speed*=0.97;speed=Math.max(-4,Math.min(7,speed));
+  ang+=steer*0.045*(speed/5||0.4)*(speed>=0?1:-1);
+  car.x+=Math.cos(ang)*speed;car.y+=Math.sin(ang)*speed;
+  // off-track slow
+  var dx=car.x-cx,dy=car.y-cy;var d=Math.sqrt((dx/rx)**2+(dy/ry)**2);
+  if(d>1.05)speed*=0.92;
+  // lap detection: crossing start line (a=0) going forward
+  var a=Math.atan2(car.y-cy,car.x-cx);
+  if(prevA>2.5 && a<-2.5 && speed>0.5){lap++;lapEl.textContent=Math.min(lap+1,3)+'/3';if(lap>=3)finish();}
+  prevA=a;
+}
+function finish(){
+  running=false;if(ti)clearInterval(ti);
+  var time=Date.now()-t0;
+  if(best===0||time<best){best=time;localStorage.setItem('arcadiaPolyBest',best);}
+  bsEl.textContent=(best/1000).toFixed(1)+'s';
+  gosEl.textContent='Time: '+(time/1000).toFixed(1)+'s'+(time<=best?' — New best!':'');
+  goEl.classList.remove('hide');
+}
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#0A0A12';ctx.fillRect(0,0,W,H);
+  // grass glow
+  var g=ctx.createRadialGradient(cx,cy,50,cx,cy,400);g.addColorStop(0,'rgba(124,58,237,.08)');g.addColorStop(1,'transparent');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  // track: outer + inner fill
+  ctx.save();
+  ctx.lineWidth=70;ctx.strokeStyle='#1c1c33';ctx.beginPath();
+  ctx.ellipse(cx,cy,rx,ry,0,0,7);ctx.stroke();
+  // track edges
+  ctx.lineWidth=3;ctx.strokeStyle='#7C3AED';ctx.beginPath();ctx.ellipse(cx,cy,rx+33,ry+33,0,0,7);ctx.stroke();
+  ctx.strokeStyle='#22D3EE';ctx.beginPath();ctx.ellipse(cx,cy,rx-33,ry-33,0,0,7);ctx.stroke();
+  // start line
+  var sp=trackPoint(0);ctx.save();ctx.translate(sp.x,sp.y);ctx.rotate(Math.PI/2);
+  ctx.fillStyle='#7C3AED';for(var i=0;i<7;i++){ctx.fillRect(-35+i*10,0,5,10);ctx.fillRect(-35+i*10+5,10,5,10);}
+  ctx.restore();
+  ctx.restore();
+  // car
+  ctx.save();ctx.translate(car.x,car.y);ctx.rotate(ang);
+  ctx.fillStyle='#22D3EE';ctx.shadowColor='#22D3EE';ctx.shadowBlur=14;ctx.fillRect(-12,-7,24,14);
+  ctx.shadowBlur=0;ctx.fillStyle='#0A0A12';ctx.fillRect(6,-5,6,10);
+  ctx.restore();
+}
+function loop(){if(running)upd();draw();requestAnimationFrame(loop);}
+window.addEventListener('keydown',function(e){var k=e.key.toLowerCase();if(k==='arrowup'||k==='w')keys.up=true;if(k==='arrowdown'||k==='s')keys.down=true;if(k==='arrowleft'||k==='a')keys.left=true;if(k==='arrowright'||k==='d')keys.right=true;});
+window.addEventListener('keyup',function(e){var k=e.key.toLowerCase();if(k==='arrowup'||k==='w')keys.up=false;if(k==='arrowdown'||k==='s')keys.down=false;if(k==='arrowleft'||k==='a')keys.left=false;if(k==='arrowright'||k==='d')keys.right=false;});
+function bind(id,k){var b=document.getElementById(id);b.addEventListener('touchstart',function(e){e.preventDefault();keys[k]=true;});b.addEventListener('touchend',function(e){e.preventDefault();keys[k]=false;});}
+bind('bl','left');bind('br','right');bind('bu','up');bind('bd','down');
+document.getElementById('start').onclick=reset;
+document.getElementById('again').onclick=reset;
+// initial car position
+var p=trackPoint(0);car={x:p.x,y:p.y};ang=0;
+loop();
+})();
+</script>
+</body>
+</html>
