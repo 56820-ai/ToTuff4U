@@ -246,13 +246,18 @@ try {
   const dailyStreakLinkWorks = dailyStreakLinkVisible && await page.locator("#leaderboard-frame").count() === 1;
   await page.locator('.nav-item[data-page="home"]').click();
   await page.waitForFunction(() => document.getElementById("home-content")?.classList.contains("active"), undefined, { timeout: 4000 });
+  const newGamesShelfVisible = await page.locator("#new-games-section").isVisible();
+  const newGamesShelfCount = await page.locator("#new-games-grid .game-card").count();
+  const newestShelfTitle = await page.locator("#new-games-grid .game-card .game-card-title").first().textContent();
   const actionChip = page.locator('#category-quick-filters button[data-category="ACTION"]');
   await actionChip.click({ timeout: 4000 });
   await page.waitForFunction(() => document.getElementById("categoryFilter")?.value === "ACTION", undefined, { timeout: 4000 });
   const quickFilterActive = await actionChip.getAttribute("aria-pressed") === "true";
+  const newGamesShelfHiddenByFilter = !(await page.locator("#new-games-section").isVisible());
   await page.locator('#category-quick-filters button[data-category=""]').click({ timeout: 4000 });
   await page.waitForFunction(() => document.getElementById("categoryFilter")?.value === "", undefined, { timeout: 4000 });
   const quickFilterCleared = await page.locator('#category-quick-filters button[data-category=""]').getAttribute("aria-pressed") === "true";
+  const newGamesShelfRestored = await page.locator("#new-games-section").isVisible();
   const star = page.locator("#all-games-grid .game-card .favorite-star").first();
   const favoriteButton = await star.evaluate(el => ({
     tag: el.tagName.toLowerCase(),
@@ -355,7 +360,8 @@ try {
     persistedFilter === "true" &&
     mostPlayedHiddenAfterReload &&
     mostPlayedVisibleAfterClear &&
-    quickFilterActive && quickFilterCleared && sharedFiltersLoaded && shareLinkCopied && shareUrlValid && dailyStreakLinkWorks && crossTabPreferencesSynced;
+    quickFilterActive && quickFilterCleared && sharedFiltersLoaded && shareLinkCopied && shareUrlValid && dailyStreakLinkWorks && crossTabPreferencesSynced &&
+    newGamesShelfVisible && newGamesShelfCount === 8 && newestShelfTitle === "Sudoku" && newGamesShelfHiddenByFilter && newGamesShelfRestored;
   uiAudit.catalog = {
     status: response?.status() || null,
     favoriteButton,
@@ -374,6 +380,11 @@ try {
     quickFilterActive,
     quickFilterCleared,
     quickFiltersOk: quickFilterActive && quickFilterCleared,
+    newGamesShelfVisible,
+    newGamesShelfCount,
+    newestShelfTitle,
+    newGamesShelfHiddenByFilter,
+    newGamesShelfRestored,
     errors,
     ok
   };
@@ -735,6 +746,7 @@ if (process.env.GITHUB_STEP_SUMMARY) {
     `- Sudoku grid, keyboard entry, and valid-cell test passed: ${!!uiAudit.sudoku.ok}`,
     `- Catalog filters, favorites, share links, Daily Pick leaderboard navigation, and cross-tab preference tests passed: ${!!uiAudit.catalog.ok}`,
     `- Quick category filter UI smoke test passed: ${!!uiAudit.catalog.quickFiltersOk}`,
+    `- New Games shelf displays the newest eight games and respects filters: ${!!uiAudit.catalog.newGamesShelfRestored && !!uiAudit.catalog.newGamesShelfHiddenByFilter}`,
     `- Custom playlist create, backup, restore, filter persistence, random play, cross-tab sync, rename, delete, and import-limit tests passed: ${!!uiAudit.collections.ok}`,
     `- Daily Pick rotation and streak test passed: ${!!uiAudit.dailyPick.ok}`,
     `- Connect Four two-player board smoke test passed: ${!!uiAudit.connectFour.ok}`,
