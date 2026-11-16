@@ -151,7 +151,7 @@
   var ovFinal = document.getElementById("ovFinal");
   var startBtn = document.getElementById("startBtn");
 
-  var STORAGE_KEY = "arcadiaStackBest";
+  var STORAGE_KEY = "arcadeAtlasStackBest";
   var best = 0;
   try { best = parseInt(localStorage.getItem(STORAGE_KEY) || "0", 10) || 0; } catch(e) {}
   bestEl.textContent = "Best " + best;
