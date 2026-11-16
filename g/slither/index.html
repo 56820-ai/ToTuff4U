@@ -111,7 +111,7 @@ window.addEventListener('keydown',function(e){if(e.key==='ArrowLeft')mouse.x-=30
 window.addEventListener('keyup',function(e){if(e.key===' ')boost=false;});
 document.getElementById('start').onclick=reset;
 document.getElementById('again').onclick=reset;
-reset();running=false;
+reset();running=false;stEl.classList.remove('hide');
 loop();
 })();
 </script>
