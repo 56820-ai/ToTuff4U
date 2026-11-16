@@ -1,0 +1,4 @@
+Original game: Word Hunt, adapted from the self-contained word guessing game in Jeffrey Hamilton's Arcadia project.
+Source: https://github.com/JeffreyHamilton6399/arcadia/tree/main/games/wordle
+License: MIT. The full license is included in this folder.
+Adaptations: Updated the title and Arcade Atlas branding.
