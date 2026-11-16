@@ -702,6 +702,119 @@
         "numbers",
         "single player"
       ]
+    },
+    {
+      "title": "Pong",
+      "path": "g/pong",
+      "image": "images/pong.svg",
+      "category": "ARCADE",
+      "description": "Control your paddle and outscore the computer in this fast classic rally.",
+      "source": "https://github.com/JeffreyHamilton6399/arcadia/tree/main/games/pong",
+      "tags": [
+        "classic",
+        "paddle",
+        "arcade",
+        "vs computer"
+      ]
+    },
+    {
+      "title": "Tic-Tac-Toe",
+      "path": "g/tic-tac-toe",
+      "image": "images/tic-tac-toe.svg",
+      "category": "STRATEGY",
+      "description": "Try to get three in a row against a computer opponent that plans its moves.",
+      "source": "https://github.com/JeffreyHamilton6399/arcadia/tree/main/games/tictactoe",
+      "tags": [
+        "strategy",
+        "board",
+        "classic",
+        "vs computer"
+      ]
+    },
+    {
+      "title": "Simon",
+      "path": "g/simon",
+      "image": "images/simon.svg",
+      "category": "PUZZLE",
+      "description": "Repeat the growing sequence of lights and sounds, and beat your best round.",
+      "source": "https://github.com/JeffreyHamilton6399/arcadia/tree/main/games/simon",
+      "tags": [
+        "memory",
+        "sequence",
+        "puzzle",
+        "reflex"
+      ]
+    },
+    {
+      "title": "Aim Trainer",
+      "path": "g/aim-trainer",
+      "image": "images/aim-trainer.svg",
+      "category": "ACTION",
+      "description": "Hit targets before time runs out. Track your hits, accuracy, and average reaction time.",
+      "source": "https://github.com/JeffreyHamilton6399/arcadia/tree/main/games/aimtrainer",
+      "tags": [
+        "aim",
+        "reflex",
+        "shooter",
+        "practice"
+      ]
+    },
+    {
+      "title": "Stack",
+      "path": "g/stack",
+      "image": "images/stack.svg",
+      "category": "ARCADE",
+      "description": "Drop moving blocks, line them up, and build the tallest tower you can.",
+      "source": "https://github.com/JeffreyHamilton6399/arcadia/tree/main/games/stack",
+      "tags": [
+        "arcade",
+        "timing",
+        "tower",
+        "skill"
+      ]
+    },
+    {
+      "title": "Helix Jump",
+      "path": "g/helix-jump",
+      "image": "images/helix-jump.svg",
+      "category": "ARCADE",
+      "description": "Rotate the spiral tower and guide the bouncing ball through safe gaps.",
+      "source": "https://github.com/JeffreyHamilton6399/arcadia/tree/main/games/helix",
+      "tags": [
+        "arcade",
+        "reflex",
+        "platformer",
+        "touch"
+      ]
+    },
+    {
+      "title": "Slither",
+      "path": "g/slither",
+      "image": "images/slither.svg",
+      "category": "IO",
+      "description": "Grow your snake by collecting glowing orbs while dodging six computer-controlled rivals.",
+      "source": "https://github.com/JeffreyHamilton6399/arcadia/tree/main/games/slither",
+      "tags": [
+        "io",
+        "snake",
+        "arena",
+        "bots",
+        "single player"
+      ]
+    },
+    {
+      "title": "Polygon Racer",
+      "path": "g/polygon-racer",
+      "image": "images/polygon-racer.svg",
+      "category": "RACING",
+      "description": "Race around a glowing polygon track in a three-lap time trial with keyboard or touch controls.",
+      "source": "https://github.com/JeffreyHamilton6399/arcadia/tree/main/games/polytrack",
+      "tags": [
+        "racing",
+        "time trial",
+        "track",
+        "arcade"
+      ]
     }
   ]
 }
