@@ -363,7 +363,7 @@ try {
     mostPlayedHiddenAfterReload &&
     mostPlayedVisibleAfterClear &&
     quickFilterActive && quickFilterCleared && sharedFiltersLoaded && shareLinkCopied && shareUrlValid && dailyStreakLinkWorks && crossTabPreferencesSynced &&
-    newGamesShelfVisible && newGamesShelfCount === 8 && newestShelfTitle === cachedGames[cachedGames.length - 1]?.title && newGamesShelfHiddenByFilter && newGamesShelfRestored;
+    newGamesShelfVisible && newGamesShelfCount === 8 && newestShelfTitle === gamesData.games[gamesData.games.length - 1]?.title && newGamesShelfHiddenByFilter && newGamesShelfRestored;
   uiAudit.catalog = {
     status: response?.status() || null,
     favoriteButton,
