@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5">
+<title>Stack | Arcade Atlas</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    height: 100%;
+    background: #0A0A12;
+    color: #E6E6F0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+  }
+  #wrap {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    z-index: 5;
+    text-align: center;
+    padding: 12px 14px 0;
+    pointer-events: none;
+  }
+  h1 {
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #E6E6F0;
+  }
+  .subtitle {
+    font-size: 11px;
+    color: #8a8aa8;
+    margin-top: 4px;
+    letter-spacing: 1px;
+  }
+  #hud {
+    position: absolute;
+    top: 60px; left: 0; right: 0;
+    text-align: center;
+    z-index: 5;
+    pointer-events: none;
+  }
+  #score {
+    font-size: 56px;
+    font-weight: 900;
+    color: #22D3EE;
+    text-shadow: 0 0 18px rgba(34,211,238,0.45);
+    line-height: 1;
+  }
+  #best {
+    font-size: 12px;
+    color: #8a8aa8;
+    margin-top: 4px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  canvas {
+    flex: 1;
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  #overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(10,10,18,0.85);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+    text-align: center;
+    padding: 20px;
+  }
+  #overlay.hidden { display: none; }
+  #overlay h2 {
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 6px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  #overlay .final {
+    font-size: 14px;
+    color: #8a8aa8;
+    margin-bottom: 4px;
+    letter-spacing: 1px;
+  }
+  #overlay .final b { color: #22D3EE; font-size: 24px; }
+  #overlay .hint {
+    font-size: 12px;
+    color: #555570;
+    margin: 18px 0 22px;
+    max-width: 280px;
+    line-height: 1.5;
+  }
+  #overlay button {
+    background: #22D3EE;
+    color: #0A0A12;
+    border: none;
+    padding: 14px 32px;
+    font-size: 15px;
+    font-weight: 800;
+    border-radius: 8px;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+  #overlay button:active { transform: scale(0.96); }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <header>
+    <h1>Stack</h1>
+    <div class="subtitle">Tap / click / space to drop. Align to grow.</div>
+  </header>
+  <div id="hud">
+    <div id="score">0</div>
+    <div id="best">Best 0</div>
+  </div>
+  <canvas id="game"></canvas>
+  <div id="overlay">
+    <h2 id="ovTitle">Stack</h2>
+    <div class="final" id="ovFinal">Tap / click / space to drop blocks.<br>Trim overhangs to grow taller.</div>
+    <div class="hint">The moving block alternates direction each layer.<br>Speed rises with height. Miss the stack completely and the game ends.</div>
+    <button id="startBtn">Start</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var canvas = document.getElementById("game");
+  var ctx = canvas.getContext("2d");
+  var scoreEl = document.getElementById("score");
+  var bestEl = document.getElementById("best");
+  var overlay = document.getElementById("overlay");
+  var ovTitle = document.getElementById("ovTitle");
+  var ovFinal = document.getElementById("ovFinal");
+  var startBtn = document.getElementById("startBtn");
+
+  var STORAGE_KEY = "arcadiaStackBest";
+  var best = 0;
+  try { best = parseInt(localStorage.getItem(STORAGE_KEY) || "0", 10) || 0; } catch(e) {}
+  bestEl.textContent = "Best " + best;
+
+  // Game state
+  var DPR = Math.max(1, Math.min(window.devicePixelRatio || 1, 2));
+  var W = 0, H = 0;
+  var BLOCK_HEIGHT = 32;
+  var COLOR_A = "#7C3AED";
+  var COLOR_B = "#22D3EE";
+  var INITIAL_WIDTH = 120;
+  var BASE_SPEED = 130; // px per second
+  var SPEED_PER_LEVEL = 4; // px/s per level
+  var MAX_SPEED = 520;
+
+  var stack = []; // each: {x, width, color}
+  var mover = null; // {x, width, dir, speed, color, y}
+  var cameraY = 0; // virtual camera offset (we keep stack centered)
+  var score = 0;
+  var running = false;
+  var gameOver = false;
+  var lastTime = 0;
+
+  function resize() {
+    DPR = Math.max(1, Math.min(window.devicePixelRatio || 1, 2));
+    W = canvas.clientWidth;
+    H = canvas.clientHeight;
+    canvas.width = Math.floor(W * DPR);
+    canvas.height = Math.floor(H * DPR);
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  }
+  window.addEventListener("resize", function(){
+    var wasRunning = running;
+    resize();
+    // re-centering handled in draw via cameraY
+  });
+
+  function colorForLevel(level) {
+    return level % 2 === 0 ? COLOR_A : COLOR_B;
+  }
+
+  function reset() {
+    stack = [];
+    score = 0;
+    cameraY = 0;
+    gameOver = false;
+    // First block centered
+    var baseY = H * 0.7; // virtual y of top of base block
+    stack.push({ x: W/2 - INITIAL_WIDTH/2, width: INITIAL_WIDTH, color: colorForLevel(0), y: baseY });
+    // Spawn first mover above
+    spawnMover();
+    scoreEl.textContent = "0";
+    running = true;
+    lastTime = performance.now();
+  }
+
+  function spawnMover() {
+    var top = stack[stack.length - 1];
+    var level = stack.length; // index of new block
+    var dir = (level % 2 === 0) ? 1 : -1; // alternate direction
+    var start = dir > 0 ? -top.width : W;
+    mover = {
+      x: start,
+      width: top.width,
+      dir: dir,
+      speed: Math.min(MAX_SPEED, BASE_SPEED + SPEED_PER_LEVEL * level),
+      color: colorForLevel(level),
+      y: top.y - BLOCK_HEIGHT
+    };
+  }
+
+  function dropBlock() {
+    if (!running || !mover) return;
+    var top = stack[stack.length - 1];
+    var leftM = mover.x;
+    var rightM = mover.x + mover.width;
+    var leftT = top.x;
+    var rightT = top.x + top.width;
+    var overlapLeft = Math.max(leftM, leftT);
+    var overlapRight = Math.min(rightM, rightT);
+    var overlap = overlapRight - overlapLeft;
+
+    if (overlap <= 0) {
+      // Total miss - game over
+      // Let the block fall off visually
+      gameOver = true;
+      running = false;
+      // Save best
+      if (score > best) {
+        best = score;
+        try { localStorage.setItem(STORAGE_KEY, String(best)); } catch(e) {}
+        bestEl.textContent = "Best " + best;
+      }
+      // Animate falling then show overlay
+      var fallBlock = { x: mover.x, width: mover.width, color: mover.color, y: mover.y, vy: 0 };
+      mover = null;
+      var fallStart = performance.now();
+      function fallAnim(t) {
+        var dt = (t - fallStart) / 1000;
+        fallBlock.vy += 900 * 0.016;
+        fallBlock.y += fallBlock.vy * 0.016;
+        drawAll(fallBlock);
+        if (fallBlock.y < H + 100) {
+          requestAnimationFrame(fallAnim);
+        } else {
+          showOverlay(true);
+        }
+      }
+      requestAnimationFrame(fallAnim);
+      return;
+    }
+
+    // New block is the overlap; trim the rest
+    var newX = overlapLeft;
+    var newWidth = overlap;
+    // Compute the overhang pieces for visual falling
+    var overhangPieces = [];
+    if (leftM < leftT) {
+      // Left overhang
+      overhangPieces.push({ x: leftM, width: (overlapLeft - leftM), color: mover.color, y: mover.y, vy: 0 });
+    }
+    if (rightM > rightT) {
+      overhangPieces.push({ x: overlapRight, width: (rightM - overlapRight), color: mover.color, y: mover.y, vy: 0 });
+    }
+    var newBlock = { x: newX, width: newWidth, color: mover.color, y: mover.y };
+    stack.push(newBlock);
+    score++;
+    scoreEl.textContent = String(score);
+
+    // Move camera so stack stays centered: target top block ~ 65% of viewport
+    var desiredTopY = H * 0.65;
+    var targetCamera = cameraY + (newBlock.y - desiredTopY);
+    // Animate camera over next frames (we just set, draw loop will lerp)
+    cameraTarget = targetCamera;
+
+    // Set the falling pieces (will animate in update loop)
+    fallingPieces = overhangPieces;
+
+    spawnMover();
+  }
+
+  var cameraTarget = 0;
+  var fallingPieces = [];
+
+  function update(dt) {
+    if (mover) {
+      mover.x += mover.dir * mover.speed * dt;
+      // Bounce off the edges of the screen
+      if (mover.x + mover.width > W && mover.dir > 0) {
+        mover.x = W - mover.width;
+        mover.dir = -1;
+      } else if (mover.x < 0 && mover.dir < 0) {
+        mover.x = 0;
+        mover.dir = 1;
+      }
+    }
+    // Smooth camera
+    if (Math.abs(cameraY - cameraTarget) > 0.5) {
+      cameraY += (cameraTarget - cameraY) * Math.min(1, dt * 6);
+    } else {
+      cameraY = cameraTarget;
+    }
+    // Falling pieces
+    for (var i = fallingPieces.length - 1; i >= 0; i--) {
+      var p = fallingPieces[i];
+      p.vy += 1500 * dt;
+      p.y += p.vy * dt;
+      if (p.y > H + 200) fallingPieces.splice(i, 1);
+    }
+  }
+
+  function drawAll(extraFall) {
+    ctx.clearRect(0, 0, W, H);
+    // Background subtle gradient
+    var grad = ctx.createLinearGradient(0, 0, 0, H);
+    grad.addColorStop(0, "#0A0A12");
+    grad.addColorStop(1, "#10101e");
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+
+    // Draw all stacked blocks (from bottom up), translated by cameraY
+    ctx.save();
+    ctx.translate(0, -cameraY);
+    for (var i = 0; i < stack.length; i++) {
+      drawBlock(stack[i]);
+    }
+    if (mover) drawBlock(mover);
+    for (var j = 0; j < fallingPieces.length; j++) drawBlock(fallingPieces[j]);
+    if (extraFall) drawBlock(extraFall);
+    ctx.restore();
+  }
+
+  function drawBlock(b) {
+    var x = b.x, y = b.y, w = b.width, h = BLOCK_HEIGHT;
+    // Main face
+    ctx.fillStyle = b.color;
+    ctx.fillRect(x, y, w, h);
+    // Top highlight (lighter strip)
+    ctx.fillStyle = "rgba(255,255,255,0.18)";
+    ctx.fillRect(x, y, w, 3);
+    // Left/right side shading for 3D effect
+    ctx.fillStyle = "rgba(0,0,0,0.25)";
+    ctx.fillRect(x, y + h - 4, w, 4);
+    // Subtle border
+    ctx.strokeStyle = "rgba(0,0,0,0.35)";
+    ctx.lineWidth = 1;
+    ctx.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
+  }
+
+  function loop(t) {
+    if (!running && !gameOver && fallingPieces.length === 0) {
+      // idle (e.g. before start) - still render once
+    }
+    var dt = Math.min(0.05, (t - lastTime) / 1000);
+    lastTime = t;
+    if (running || fallingPieces.length > 0) update(dt);
+    drawAll(null);
+    if (running || fallingPieces.length > 0 || gameOver) {
+      requestAnimationFrame(loop);
+    } else {
+      // keep drawing static frame
+      requestAnimationFrame(loop);
+    }
+  }
+
+  function showOverlay(isGameOver) {
+    overlay.classList.remove("hidden");
+    if (isGameOver) {
+      ovTitle.textContent = "Game Over";
+      ovFinal.innerHTML = "You stacked <b>" + score + "</b><br>Best " + best;
+      startBtn.textContent = "Play Again";
+    } else {
+      ovTitle.textContent = "Stack";
+      ovFinal.innerHTML = "Tap / click / space to drop blocks.<br>Trim overhangs to grow taller.";
+      startBtn.textContent = "Start";
+    }
+  }
+
+  function startGame() {
+    overlay.classList.add("hidden");
+    fallingPieces = [];
+    resize();
+    reset();
+    if (!loopRunning) {
+      loopRunning = true;
+      requestAnimationFrame(loop);
+    }
+  }
+
+  var loopRunning = false;
+
+  // Input handlers
+  function onDrop(e) {
+    if (e) e.preventDefault();
+    if (!running) return;
+    dropBlock();
+  }
+  canvas.addEventListener("pointerdown", onDrop);
+  window.addEventListener("keydown", function(e){
+    if (e.code === "Space" || e.key === " " || e.key === "Enter") {
+      e.preventDefault();
+      if (!running && overlay.classList.contains("hidden") === false) {
+        // start
+        startGame();
+      } else {
+        onDrop();
+      }
+    }
+  });
+  startBtn.addEventListener("click", startGame);
+
+  // Init
+  resize();
+  // Draw an idle preview
+  drawAll(null);
+  // Start a minimal render loop so preview shows
+  if (!loopRunning) {
+    loopRunning = true;
+    lastTime = performance.now();
+    requestAnimationFrame(loop);
+  }
+  showOverlay(false);
+})();
+</script>
+</body>
+</html>
