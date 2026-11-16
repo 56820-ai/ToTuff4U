@@ -113,3 +113,59 @@ body.body {
   align-items: center;
   justify-content: center;
 }
+
+
+/* Keep the original leaderboard styling while using the page's single
+   document scrollbar (no nested scrolling areas or transformed overflow). */
+html {
+  min-height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+body.body {
+  min-height: 100vh;
+  height: auto;
+  overflow-y: visible !important;
+  overflow-x: hidden !important;
+}
+
+.main {
+  height: auto;
+  max-height: none;
+  overflow: visible !important;
+  box-sizing: border-box;
+}
+
+.score-card {
+  box-sizing: border-box;
+  width: min(65%, 900px);
+  margin: 35px auto;
+  transform: none;
+}
+
+@media (max-width: 720px) {
+  .main {
+    width: 94%;
+    margin: 7rem auto 2rem;
+  }
+
+  .leaderboard-title {
+    font-size: clamp(3rem, 13vw, 5rem);
+  }
+
+  .score-card {
+    width: 100%;
+    padding: 14px;
+    margin: 22px auto;
+  }
+
+  .card-text {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .submit-score {
+    font-size: clamp(1.6rem, 7vw, 2.5rem);
+  }
+}
