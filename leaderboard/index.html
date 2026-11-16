@@ -402,10 +402,9 @@
       }
     }
   
-    /* The parent page resizes this iframe to the full leaderboard height,
-       so scrolling belongs to the parent document, not this embedded page. */
-    html { height: auto; min-height: 100%; overflow-x: hidden; overflow-y: hidden !important; }
-    body { height: auto; min-height: 100vh; overflow-x: hidden; overflow-y: hidden !important; }
+    /* Standalone leaderboard page: keep normal document scrolling enabled. */
+    html { height: auto; min-height: 100%; overflow-x: hidden; overflow-y: auto; }
+    body { height: auto; min-height: 100vh; overflow-x: hidden; overflow-y: auto; }
     .leaderboard-container { width: min(100%, 1000px); min-width: 0; padding: clamp(0.75rem, 4vw, 2.5rem); }
     .leaderboard { height: auto !important; max-height: none !important; overflow: visible !important; }
     #score-list { min-width: 0; }
@@ -734,31 +733,7 @@
     }
     renderLeaderboard();
     // Report the rendered document height so the main page owns scrolling.
-    (function enableParentPageScrolling() {
-      let lastHeight = 0;
-      function reportHeight() {
-        const height = Math.max(
-          document.documentElement.scrollHeight,
-          document.body ? document.body.scrollHeight : 0,
-          document.documentElement.offsetHeight,
-          document.body ? document.body.offsetHeight : 0
-        );
-        if (Math.abs(height - lastHeight) > 2) {
-          lastHeight = height;
-          window.parent.postMessage({ type: "arcade-atlas-leaderboard-height", height }, window.location.origin);
-        }
-      }
-      window.addEventListener("load", reportHeight);
-      if (window.ResizeObserver) {
-        const observer = new ResizeObserver(reportHeight);
-        observer.observe(document.documentElement);
-        if (document.body) observer.observe(document.body);
-      }
-      setTimeout(reportHeight, 100);
-      setTimeout(reportHeight, 500);
-      setTimeout(reportHeight, 1200);
-      window.addEventListener("resize", reportHeight);
-    })();
+
 
   </script>
 
