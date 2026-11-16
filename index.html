@@ -1394,6 +1394,13 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
                     </div>
                 </section>
 
+                <section id="new-games-section" aria-label="Recently added games" style="display:none">
+                    <div class="recent-heading">
+                        <div><h2 class="section-title">NEW IN THE ARCADE</h2><p class="collections-intro">Fresh games added to Arcade Atlas.</p></div>
+                    </div>
+                    <div class="games-grid" id="new-games-grid"></div>
+                </section>
+
                 <section id="arcade-quests" class="arcade-quests" aria-labelledby="arcade-quests-title">
                     <div class="quest-heading">
                         <div><p class="daily-pick-kicker">PLAY • COLLECT • LEVEL UP</p><h2 id="arcade-quests-title">ARCADE QUESTS</h2></div>
@@ -2500,6 +2507,19 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         if (ranked.length) renderGames(ranked, container);
     }
 
+    function updateNewGamesSection() {
+        const section = document.getElementById('new-games-section');
+        const container = document.getElementById('new-games-grid');
+        if (!section || !container) return;
+        const query = document.getElementById('searchInput')?.value?.trim() || '';
+        const category = document.getElementById('categoryFilter')?.value || '';
+        const filteredView = query !== '' || !!category || getFavoritesOnly() || !!activeCatalogMode || !!activeGameCollectionId;
+        const newest = cachedGames.slice(-8).reverse();
+        container.innerHTML = '';
+        section.style.display = newest.length && !filteredView ? '' : 'none';
+        if (newest.length && !filteredView) renderGames(newest, container);
+    }
+
     function updateRecommendationsSection() {
         const section = document.getElementById('recommended-section');
         const container = document.getElementById('recommended-grid');
@@ -2578,6 +2598,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         const filteredView = query !== '' || !!category || favoritesOnly || !!activeCatalogMode || !!activeGameCollectionId;
         const dailyPickSection = document.getElementById('daily-pick-section');
         if (dailyPickSection) dailyPickSection.style.display = filteredView ? 'none' : '';
+        updateNewGamesSection();
 
         if (!filteredView) {
             favoritesSection.style.display = 'block';
@@ -3105,6 +3126,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         updateArcadeQuests();
         updateCollectionsSection();
         updateDailyPickSection();
+        updateNewGamesSection();
         const createCollection = document.getElementById('createCollectionButton');
         if (createCollection) createCollection.addEventListener('click', () => openCollectionDialog());
         const exportCollections = document.getElementById('exportCollectionsButton');
