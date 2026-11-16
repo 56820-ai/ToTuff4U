@@ -71,7 +71,7 @@ function upd(){
 function finish(){
   running=false;if(ti)clearInterval(ti);
   var time=Date.now()-t0;
-  if(best===0||time<best){best=time;localStorage.setItem('arcadiaPolyBest',best);}
+  if(best===0||time<best){best=time;localStorage.setItem('arcadeAtlasPolygonRacerBest',best);}
   bsEl.textContent=(best/1000).toFixed(1)+'s';
   gosEl.textContent='Time: '+(time/1000).toFixed(1)+'s'+(time<=best?' — New best!':'');
   goEl.classList.remove('hide');
