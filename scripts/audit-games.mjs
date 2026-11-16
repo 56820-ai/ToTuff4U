@@ -463,7 +463,7 @@ try {
     json: window.__arcadeBackupBlob ? await window.__arcadeBackupBlob.text() : ""
   }));
   const backup = exportedBackup.json ? JSON.parse(exportedBackup.json) : null;
-  const backupValid = /^arcade-atlas-playlists-\\d{4}-\\d{2}-\\d{2}\\.json$/.test(exportedBackup.filename) &&
+  const backupValid = /^arcade-atlas-playlists-\d{4}-\d{2}-\d{2}\.json$/.test(exportedBackup.filename) &&
     backup?.format === "arcade-atlas-playlists" && backup.version === 1 && backup.collections?.[0]?.paths?.length === 1;
   const connectFourPath = await page.evaluate(() => cachedGames.find(game => game.title === "Connect Four").path);
   await page.locator("#collection-import-file").setInputFiles({
