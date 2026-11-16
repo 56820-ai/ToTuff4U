@@ -83,7 +83,7 @@ function upd(){
 function moveSnake(s,spd){var h=s.segs[0];var nx=h.x+Math.cos(s.ang)*spd,ny=h.y+Math.sin(s.ang)*spd;if(nx<0)nx=WORLD;if(nx>WORLD)nx=0;if(ny<0)ny=WORLD;if(ny>WORLD)ny=0;s.segs.unshift({x:nx,y:ny});s.segs.pop();}
 function grow(s){var t=s.segs[s.segs.length-1];s.segs.push({x:t.x,y:t.y});s.segs.push({x:t.x,y:t.y});}
 function dropOrbs(s){for(var i=0;i<s.segs.length;i+=2)orbs.push({x:s.segs[i].x,y:s.segs[i].y,r:5,c:'#22D3EE'});}
-function die(){running=false;snake.alive=false;if(score>best){best=score;localStorage.setItem('arcadiaSlitherBest',best);}bsEl.textContent=best;gosEl.textContent='Length: '+score;goEl.classList.remove('hide');}
+function die(){running=false;snake.alive=false;if(score>best){best=score;localStorage.setItem('arcadeAtlasSlitherBest',best);}bsEl.textContent=best;gosEl.textContent='Length: '+score;goEl.classList.remove('hide');}
 function draw(){
   ctx.clearRect(0,0,W,H);ctx.fillStyle='#0A0A12';ctx.fillRect(0,0,W,H);
   var head=snake.segs[0];var camx=head.x-W/2,camy=head.y-H/2;
