@@ -681,7 +681,7 @@
       "image": "images/chess.svg",
       "category": "STRATEGY",
       "description": "Play classic chess against a computer opponent. Tap a piece to see legal moves, then choose your destination.",
-      "source": "https://github.com/sausi-7/games",
+      "source": "https://github.com/sausi-7/games/tree/main/games/board/chess",
       "tags": [
         "strategy",
         "board",
@@ -695,7 +695,7 @@
       "image": "images/sudoku.svg",
       "category": "PUZZLE",
       "description": "Fill the 9×9 grid so every row, column, and 3×3 box contains the numbers 1–9. Includes a timer and keyboard or touch input.",
-      "source": "https://github.com/sausi-7/games",
+      "source": "https://github.com/sausi-7/games/tree/main/games/puzzle/sudoku",
       "tags": [
         "puzzle",
         "logic",
