@@ -688,6 +688,20 @@
         "chess",
         "single player"
       ]
+    },
+    {
+      "title": "Sudoku",
+      "path": "g/sudoku",
+      "image": "images/sudoku.svg",
+      "category": "PUZZLE",
+      "description": "Fill the 9×9 grid so every row, column, and 3×3 box contains the numbers 1–9. Includes a timer and keyboard or touch input.",
+      "source": "https://github.com/sausi-7/games",
+      "tags": [
+        "puzzle",
+        "logic",
+        "numbers",
+        "single player"
+      ]
     }
   ]
 }
