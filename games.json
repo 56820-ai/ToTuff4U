@@ -674,6 +674,20 @@
         "local multiplayer",
         "strategy"
       ]
+    },
+    {
+      "title": "Chess",
+      "path": "g/chess",
+      "image": "images/chess.svg",
+      "category": "STRATEGY",
+      "description": "Play classic chess against a computer opponent. Tap a piece to see legal moves, then choose your destination.",
+      "source": "https://github.com/sausi-7/games",
+      "tags": [
+        "strategy",
+        "board",
+        "chess",
+        "single player"
+      ]
     }
   ]
 }
