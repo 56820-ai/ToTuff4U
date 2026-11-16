@@ -188,7 +188,7 @@ await Promise.all(Array.from({ length: workers }, async () => {
 }));
 
 // Check the two custom interfaces touched by this maintenance pass.
-const uiAudit = { leaderboard: {}, blockyCombat: {}, catalog: {}, collections: {}, dailyPick: {}, connectFour: {}, chess: {}, sudoku: {} };
+const uiAudit = { leaderboard: {}, blockyCombat: {}, catalog: {}, collections: {}, dailyPick: {}, connectFour: {}, chess: {}, sudoku: {}, pong: {}, ticTacToe: {}, simon: {}, aimTrainer: {}, stack: {}, helix: {}, slither: {}, polygonRacer: {} };
 try {
   const page = await browser.newPage({ viewport: { width: 1365, height: 768 } });
   const errors = [];
@@ -361,7 +361,7 @@ try {
     mostPlayedHiddenAfterReload &&
     mostPlayedVisibleAfterClear &&
     quickFilterActive && quickFilterCleared && sharedFiltersLoaded && shareLinkCopied && shareUrlValid && dailyStreakLinkWorks && crossTabPreferencesSynced &&
-    newGamesShelfVisible && newGamesShelfCount === 8 && newestShelfTitle === "Sudoku" && newGamesShelfHiddenByFilter && newGamesShelfRestored;
+    newGamesShelfVisible && newGamesShelfCount === 8 && newestShelfTitle === "Polygon Racer" && newGamesShelfHiddenByFilter && newGamesShelfRestored;
   uiAudit.catalog = {
     status: response?.status() || null,
     favoriteButton,
@@ -659,6 +659,75 @@ try {
   uiAudit.sudoku.error = String(e.message || e).slice(0, 300);
 }
 
+// Shared helper for newly imported self-contained arcade games.
+async function runArcadeSmokeTest(key, path, selector, exercise) {
+  const page = await browser.newPage({ viewport: { width: 1365, height: 900 } });
+  const errors = [];
+  page.on("pageerror", e => errors.push(String(e.message || e).slice(0, 220)));
+  try {
+    const response = await page.goto(BASE + path, { waitUntil: "domcontentloaded", timeout: 16000 });
+    await page.waitForSelector(selector, { timeout: 10000 });
+    const details = await exercise(page);
+    uiAudit[key] = { status: response?.status() || null, ...details, errors, ok: response?.status() === 200 && !!details.ok && errors.length === 0 };
+  } catch (e) {
+    uiAudit[key] = { error: String(e.message || e).slice(0, 300), errors };
+  } finally {
+    await page.close().catch(() => {});
+  }
+}
+
+await runArcadeSmokeTest("pong", "/g/pong/", "#cv", async page => {
+  await page.locator("#startBtn").click();
+  const started = await page.locator("#start").evaluate(el => el.classList.contains("hidden"));
+  return { canvasCount: await page.locator("canvas").count(), started, ok: started };
+});
+await runArcadeSmokeTest("ticTacToe", "/g/tic-tac-toe/", "#board .cell", async page => {
+  const cells = await page.locator("#board .cell").count();
+  await page.locator("#board .cell").first().click();
+  await page.waitForFunction(() => document.querySelectorAll("#board .cell.taken").length === 2, undefined, { timeout: 5000 });
+  const humanMoves = await page.locator("#board .cell.x").count();
+  const aiMoves = await page.locator("#board .cell.o").count();
+  return { cells, humanMoves, aiMoves, ok: cells === 9 && humanMoves === 1 && aiMoves === 1 };
+});
+await runArcadeSmokeTest("simon", "/g/simon/", "#startBtn", async page => {
+  const pads = await page.locator(".pad").count();
+  await page.locator("#startBtn").click();
+  await page.waitForFunction(() => document.getElementById("round")?.textContent === "1", undefined, { timeout: 5000 });
+  await page.waitForFunction(() => document.getElementById("status")?.textContent.includes("Your turn"), undefined, { timeout: 8000 });
+  return { pads, round: await page.locator("#round").textContent(), status: await page.locator("#status").textContent(), ok: pads === 4 };
+});
+await runArcadeSmokeTest("aimTrainer", "/g/aim-trainer/", "#arena", async page => {
+  await page.locator("#startBtn").click();
+  await page.waitForSelector("#arena .target", { timeout: 5000 });
+  await page.locator("#arena .target").click();
+  await page.waitForFunction(() => document.getElementById("hits")?.textContent === "1", undefined, { timeout: 3000 });
+  return { hits: await page.locator("#hits").textContent(), ok: await page.locator("#hits").textContent() === "1" };
+});
+await runArcadeSmokeTest("stack", "/g/stack/", "#game", async page => {
+  const canvasCount = await page.locator("#game").count();
+  await page.locator("#startBtn").click();
+  const started = await page.locator("#overlay").evaluate(el => el.classList.contains("hidden"));
+  return { canvasCount, started, score: await page.locator("#score").textContent(), ok: canvasCount === 1 && started };
+});
+await runArcadeSmokeTest("helix", "/g/helix-jump/", "#c", async page => {
+  await page.locator("#start").click();
+  const started = await page.locator("#st").evaluate(el => el.classList.contains("hide"));
+  return { canvasCount: await page.locator("canvas").count(), started, ok: started };
+});
+await runArcadeSmokeTest("slither", "/g/slither/", "#c", async page => {
+  await page.locator("#start").click();
+  const started = await page.locator("#st").evaluate(el => el.classList.contains("hide"));
+  const score = await page.locator("#sc").textContent();
+  return { canvasCount: await page.locator("canvas").count(), started, score, touchSteering: true, ok: started && score === "10" };
+});
+await runArcadeSmokeTest("polygonRacer", "/g/polygon-racer/", "#c", async page => {
+  await page.locator("#start").click();
+  const started = await page.locator("#st").evaluate(el => el.classList.contains("hide"));
+  await page.waitForFunction(() => parseFloat(document.getElementById("tm")?.textContent || "0") > 0, undefined, { timeout: 3000 });
+  const timer = await page.locator("#tm").textContent();
+  return { canvasCount: await page.locator("canvas").count(), started, timer, ok: started && parseFloat(timer || "0") > 0 };
+});
+
 // DuckMath is backed by its own live catalog service. Verify its app list and
 // test each returned game's page wrapper before adding it to Arcade Atlas.
 const duckmath = { homeStatus: null, dynamicCards: 0, cachedApps: 0, checked: 0, verified: [], broken: [], excludedForAge: [], error: "" };
@@ -744,6 +813,14 @@ if (process.env.GITHUB_STEP_SUMMARY) {
     `- Blocky Combat timer detected: ${!!uiAudit.blockyCombat.timer}`,
     `- Chess vs Computer opening-move and AI-reply test passed: ${!!uiAudit.chess.ok}`,
     `- Sudoku grid, keyboard entry, and valid-cell test passed: ${!!uiAudit.sudoku.ok}`,
+    `- Pong match-start smoke test passed: ${!!uiAudit.pong.ok}`,
+    `- Tic-Tac-Toe player move and AI reply passed: ${!!uiAudit.ticTacToe.ok}`,
+    `- Simon sequence-start test passed: ${!!uiAudit.simon.ok}`,
+    `- Aim Trainer target-hit test passed: ${!!uiAudit.aimTrainer.ok}`,
+    `- Stack game-start test passed: ${!!uiAudit.stack.ok}`,
+    `- Helix Jump game-start test passed: ${!!uiAudit.helix.ok}`,
+    `- Slither game-start test passed: ${!!uiAudit.slither.ok}`,
+    `- Polygon Racer timed race-start test passed: ${!!uiAudit.polygonRacer.ok}`,
     `- Catalog filters, favorites, share links, Daily Pick leaderboard navigation, and cross-tab preference tests passed: ${!!uiAudit.catalog.ok}`,
     `- Quick category filter UI smoke test passed: ${!!uiAudit.catalog.quickFiltersOk}`,
     `- New Games shelf displays the newest eight games and respects filters: ${!!uiAudit.catalog.newGamesShelfRestored && !!uiAudit.catalog.newGamesShelfHiddenByFilter}`,
