@@ -388,16 +388,16 @@
     </div>  
 
     <div class="pinned-icons" style="display: flex; justify-content: center; align-items: center; gap: 15px;">
-        <a href="/static/embed.html#https://tiktok.com" style="display: inline-block;">
+        <a href="https://tiktok.com" style="display: inline-block;">
             <img src="/storage/ag/a/tiktok/IMG_5335.png" alt="TikTok">
         </a>
-        <a href="/static/embed.html#https://twitch.tv" style="display: inline-block;">
+        <a href="https://twitch.tv" style="display: inline-block;">
             <img src="/storage/ag/a/twitch/IMG_5336.png" alt="Twitch">
         </a>
-        <a href="/static/embed.html#https://google.com" style="display: inline-block;">
+        <a href="https://google.com" style="display: inline-block;">
             <img src="/storage/ag/a/google/IMG_5324.webp" alt="Google">
         </a>
-        <a href="/static/embed.html#https://now.gg" style="display: inline-block;">
+        <a href="https://now.gg" style="display: inline-block;">
             <img src="/storage/ag/a/nowgg/IMG_5325.png" alt="Now.gg">
         </a>
         <a href="#" id="add-pin-btn" class="add-pin-btn">
@@ -474,7 +474,7 @@
         // Create pin element
         function createPinElement(url, imageData) {
             const newPin = document.createElement('a');
-            newPin.href = `/static/embed.html#${url}`;
+            newPin.href = url;
             newPin.style.display = 'inline-block';
 
             const img = document.createElement('img');
