@@ -1,0 +1,4 @@
+Original game: 15 Puzzle, adapted from the self-contained sliding puzzle game in Jeffrey Hamilton's Arcadia project.
+Source: https://github.com/JeffreyHamilton6399/arcadia/tree/main/games/sliding-puzzle
+License: MIT. The full license is included in this folder.
+Adaptations: Updated the document title for Arcade Atlas.
