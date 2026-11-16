@@ -1239,6 +1239,8 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 </style>
   
 
+<style>.inline-feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:20px}.inline-setting,.inline-score-group{display:flex;flex-direction:column;gap:10px;padding:18px;border:1px solid rgba(107,157,255,.22);border-radius:14px;background:rgba(26,26,46,.55)}.inline-setting input:not([type=checkbox]),.inline-setting select{padding:10px;border-radius:9px;background:var(--bg-secondary);color:var(--text-primary);border:1px solid rgba(107,157,255,.35)}.inline-setting button{padding:10px;border:0;border-radius:9px;background:var(--accent-pink);font-weight:800;cursor:pointer}.inline-score-list{display:grid;gap:12px;margin-top:16px}.inline-score-group h2{margin:0}.inline-score-row{display:flex;justify-content:space-between;padding:8px 0;border-top:1px solid rgba(255,255,255,.1)}</style>
+<script>(function(){const $=id=>document.getElementById(id);const p=$('aa-particles');if(p){p.checked=localStorage.getItem('particlesEnabled')!=='false';p.onchange=()=>{localStorage.setItem('particlesEnabled',String(p.checked));const s=$('snow');if(s)s.style.display=p.checked?'':'none'}}const opts={default:['Arcade Atlas','/images/favicon.png'],google:['Google','https://www.google.com/favicon.ico'],classroom:['Google Classroom','https://ssl.gstatic.com/classroom/favicon.png'],docs:['Google Docs','/favicon/googledocs.png']};const c=$('aa-cloak');if(c){c.value=localStorage.getItem('tabCloak')||'default';c.onchange=()=>{let v=opts[c.value]?c.value:'default';localStorage.setItem('tabCloak',v);document.title=opts[v][0];let l=document.querySelector('link[rel~="icon"]');if(!l){l=document.createElement('link');l.rel='icon';document.head.append(l)}l.href=opts[v][1]}}const k=$('aa-autokey'),s=$('aa-speed'),pk=$('aa-panic');if(k){k.value=localStorage.getItem('autoClickerKeybind')||'a';s.value=localStorage.getItem('autoClickerSpeed')||1000;pk.value=localStorage.getItem('panicKeybind')||'\\';$('aa-save-auto').onclick=()=>{let v=k.value.trim(),n=Number(s.value);if([...v].length!==1||!Number.isInteger(n)||n<1||n>60000){$('aa-auto-status').textContent='Enter one key and a speed from 1 to 60000 ms.';return}localStorage.setItem('autoClickerKeybind',v);localStorage.setItem('autoClickerSpeed',n);$('aa-auto-status').textContent='Settings saved.'};$('aa-save-panic').onclick=()=>{if([...pk.value.trim()].length!==1){alert('Enter exactly one key.');return}localStorage.setItem('panicKeybind',pk.value.trim());alert('Shortcut saved.')}}document.addEventListener('keydown',e=>{if(e.repeat||e.ctrlKey||e.altKey||e.metaKey||/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName))return;if(e.key===(localStorage.getItem('panicKeybind')||'\\'))location.href='https://classroom.google.com'});async function scores(){let list=$('aa-score-list'),status=$('aa-score-status');if(!list||!status)return;list.replaceChildren();status.textContent='Loading scores…';if(!window.ArcadeScores){status.textContent='Score service is unavailable.';return}let rows=await window.ArcadeScores.getScores();if(window.ArcadeScores.lastLoadError){status.textContent='Could not load scores: '+window.ArcadeScores.lastLoadError;return}let groups=new Map();rows.filter(x=>Number(x.score)>0).forEach(x=>{let g=String(x.game_title||'Other');if(!groups.has(g))groups.set(g,[]);groups.get(g).push(x)});if(!groups.size){status.textContent='No scores have been submitted yet.';return}status.textContent='Loaded '+rows.length+' score records.';for(let [game,items] of [...groups].sort((a,b)=>a[0].localeCompare(b[0]))){let box=document.createElement('section');box.className='inline-score-group';let title=document.createElement('h2');title.textContent=game;box.append(title);items.sort((a,b)=>{let x=BigInt(String(a.score||0)),y=BigInt(String(b.score||0));return x>y?-1:x<y?1:0}).slice(0,10).forEach((r,i)=>{let row=document.createElement('div');row.className='inline-score-row';let n=document.createElement('span'),v=document.createElement('strong');n.textContent=(i+1)+'. '+(r.player_name||'Player');v.textContent=String(r.score);row.append(n,v);box.append(row)});list.append(box)}}$('aa-refresh-scores')?.addEventListener('click',scores);scores()})();</script>
 </head>
 <body>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8390067368864065"
@@ -1472,37 +1474,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
   </div>
 </div>
 
-<div id="settings-content" class="content-area">
-  <div class="container privacy-container">
-    <article class="privacy-panel feature-launcher">
-      <h1>Settings</h1>
-      <p>Manage your Arcade Atlas preferences, appearance, privacy controls, and other site settings.</p>
-      <a class="feature-action" href="./settings/" target="_self">Open Settings</a>
-    </article>
-  </div>
-</div>
-
-<div id="leaderboard-content" class="content-area">
-  <div class="container privacy-container">
-    <article class="privacy-panel feature-launcher">
-      <h1>Leaderboards</h1>
-      <p>View player rankings and game scores. The full leaderboard opens as a normal Arcade Atlas page, not an embedded frame.</p>
-      <a class="feature-action" href="./leaderboard/" target="_self">Open Leaderboards</a>
-    </article>
-  </div>
-</div>
-
-<div id="ai-content" class="content-area">
-  <div class="container privacy-container">
-    <article class="privacy-panel feature-launcher">
-      <h1>AI</h1>
-      <p>Open the Arcade Atlas AI experience in its own page. It will no longer be embedded inside the homepage.</p>
-      <a class="feature-action" href="./ai/" target="_self">Open AI</a>
-    </article>
-  </div>
-</div>
-
-<div id="privacy-content" class="content-area">
+<div id="settings-content" class="content-area"><div class="container privacy-container"><article class="privacy-panel feature-launcher"><h1>Settings</h1><p>Customize Arcade Atlas without leaving this page.</p><div class="inline-feature-grid"><section class="inline-setting"><h2>Appearance</h2><label><input id="aa-particles" type="checkbox"> Enable particles / snow</label><label for="aa-cloak">Tab appearance</label><select id="aa-cloak"><option value="default">Arcade Atlas</option><option value="google">Google</option><option value="classroom">Google Classroom</option><option value="docs">Google Docs</option></select></section><section class="inline-setting"><h2>Auto Clicker</h2><label>Shortcut key<input id="aa-autokey" maxlength="1"></label><label>Click interval (ms)<input id="aa-speed" type="number" min="1" max="60000"></label><button id="aa-save-auto" type="button">Save Auto Clicker</button><p id="aa-auto-status"></p></section><section class="inline-setting"><h2>Panic Shortcut</h2><label>Shortcut key<input id="aa-panic" maxlength="1"></label><button id="aa-save-panic" type="button">Save Shortcut</button><p>Press the saved key to open Google Classroom.</p></section></div></article></div></div><div id="leaderboard-content" class="content-area"><div class="container privacy-container"><article class="privacy-panel feature-launcher"><h1>Game Leaderboards</h1><p>Live player rankings displayed directly on Arcade Atlas.</p><button class="feature-action" id="aa-refresh-scores" type="button">Refresh scores</button><p id="aa-score-status" role="status">Loading scores…</p><div id="aa-score-list" class="inline-score-list"></div></article></div></div><div id="ai-content" class="content-area"><div class="container privacy-container"><article class="privacy-panel feature-launcher"><h1>Arcade Atlas AI</h1><p>The current AI experience is hosted by an external service and does not expose a configured in-page API for this website.</p><section class="inline-setting"><h2>Native AI integration</h2><p>To provide real AI chat here without an iframe or redirect, Arcade Atlas needs a supported AI API endpoint with credentials kept securely on the server. This panel will not pretend to send messages until that is configured.</p></section></article></div></div><div id="privacy-content" class="content-area">
     <div class="container privacy-container">
         <article class="privacy-panel">
             <h1>Privacy Policy</h1>
