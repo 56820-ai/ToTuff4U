@@ -1,0 +1,52 @@
+name: Deploy Arcade Atlas Neon API
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "neon/functions/arcadeapi/**"
+      - ".github/workflows/deploy-arcadeapi.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: neon/functions/arcadeapi/package.json
+
+      - name: Install API dependencies
+        working-directory: neon/functions/arcadeapi
+        run: npm install --no-audit --no-fund
+
+      - name: Deploy bundled function to Neon
+        env:
+          NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+        run: |
+          if [ -z "$NEON_API_KEY" ]; then
+            echo "::error::Add NEON_API_KEY in GitHub repository Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+          npx --yes neon@latest functions deploy arcadeapi \
+            --src neon/functions/arcadeapi \
+            --project-id blue-pine-80547059 \
+            --branch br-flat-grass-bdhxbnam \
+            --wait
+
+      - name: Verify deployed API
+        run: |
+          API="https://br-flat-grass-bdhxbnam-arcadeapi.compute.c-8.us-east-2.aws.neon.tech"
+          curl --fail --silent --show-error "$API/health" | tee /tmp/health.json
+          node -e 'const fs=require("fs"); const x=JSON.parse(fs.readFileSync("/tmp/health.json","utf8")); if(x.ok!==true) process.exit(1)'
+          curl --fail --silent --show-error "$API/scores" -o /tmp/scores.json
+          node -e 'const fs=require("fs"); const x=JSON.parse(fs.readFileSync("/tmp/scores.json","utf8")); if(!Array.isArray(x)) process.exit(1); console.log("Leaderboard API verified; rows:",x.length)'
