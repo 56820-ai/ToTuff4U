@@ -433,12 +433,29 @@ try {
   await page.waitForFunction(() => document.getElementById("catalogResultsCount")?.textContent === "1 game in Arcade Night", undefined, { timeout: 10000 });
   const filterPersistedAfterReload = await page.locator("#clearCollectionFilter").isVisible();
 
-  const downloadPromise = page.waitForEvent("download");
+  // The app exports through a programmatic anchor click. Capture the exact Blob
+  // and filename emitted by the page instead of relying on a download event.
+  await page.evaluate(() => {
+    window.__arcadeBackupBlob = null;
+    window.__arcadeBackupName = "";
+    const originalCreateObjectURL = URL.createObjectURL.bind(URL);
+    URL.createObjectURL = blob => {
+      window.__arcadeBackupBlob = blob;
+      return originalCreateObjectURL(blob);
+    };
+    const originalAnchorClick = HTMLAnchorElement.prototype.click;
+    HTMLAnchorElement.prototype.click = function () {
+      if (this.download) window.__arcadeBackupName = this.download;
+      return originalAnchorClick.call(this);
+    };
+  });
   await page.locator("#exportCollectionsButton").click();
-  const backupDownload = await downloadPromise;
-  const backupPath = await backupDownload.path();
-  const backup = backupPath ? JSON.parse(await readFile(backupPath, "utf8")) : null;
-  const backupValid = /^arcade-atlas-playlists-\d{4}-\d{2}-\d{2}\.json$/.test(backupDownload.suggestedFilename()) &&
+  const exportedBackup = await page.evaluate(async () => ({
+    filename: window.__arcadeBackupName,
+    json: window.__arcadeBackupBlob ? await window.__arcadeBackupBlob.text() : ""
+  }));
+  const backup = exportedBackup.json ? JSON.parse(exportedBackup.json) : null;
+  const backupValid = /^arcade-atlas-playlists-\\d{4}-\\d{2}-\\d{2}\\.json$/.test(exportedBackup.filename) &&
     backup?.format === "arcade-atlas-playlists" && backup.version === 1 && backup.collections?.[0]?.paths?.length === 1;
   const connectFourPath = await page.evaluate(() => cachedGames.find(game => game.title === "Connect Four").path);
   await page.locator("#collection-import-file").setInputFiles({
