@@ -2159,7 +2159,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
     async function loadGames() {
         if (cachedGames.length) return cachedGames;
         try {
-            const response = await fetch('games.json?v=2026-11-15-discovery2');
+            const response = await fetch('games.json?v=2026-11-15-expansion3');
             if (!response.ok) throw new Error('Could not load games.json: ' + response.status);
             const data = await response.json();
             cachedGames = Array.isArray(data.games) ? data.games : [];
@@ -3449,7 +3449,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 </style>
 <script>
 (function(){
-  const version="2026-11-15-20";
+  const version="2026-11-15-21";
   const overlay=document.getElementById("patchNotesOverlay");
   const reopen=document.getElementById("reopenPatchNotes");
   const close=()=>{overlay.classList.remove("visible");overlay.setAttribute("aria-hidden","true");localStorage.setItem("arcadeAtlasPatchNotesSeen",version);reopen.style.display="block";};
