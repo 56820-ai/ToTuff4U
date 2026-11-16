@@ -864,7 +864,17 @@ const failedUiChecks = [
   ["catalog and cross-tab preferences", !!uiAudit.catalog.ok],
   ["playlists", !!uiAudit.collections.ok],
   ["Daily Pick", !!uiAudit.dailyPick.ok],
-  ["Connect Four", !!uiAudit.connectFour.ok]
+  ["Connect Four", !!uiAudit.connectFour.ok],
+  ["Chess vs Computer", !!uiAudit.chess.ok],
+  ["Sudoku", !!uiAudit.sudoku.ok],
+  ["Pong", !!uiAudit.pong.ok],
+  ["Tic-Tac-Toe", !!uiAudit.ticTacToe.ok],
+  ["Simon", !!uiAudit.simon.ok],
+  ["Aim Trainer", !!uiAudit.aimTrainer.ok],
+  ["Stack", !!uiAudit.stack.ok],
+  ["Helix Jump", !!uiAudit.helix.ok],
+  ["Slither", !!uiAudit.slither.ok],
+  ["Polygon Racer", !!uiAudit.polygonRacer.ok]
 ].filter(([, passed]) => !passed).map(([name]) => name);
 if (failedUiChecks.length) {
   console.error("Arcade Atlas UI audit failed:", failedUiChecks.join(", "));
