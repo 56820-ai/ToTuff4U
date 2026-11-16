@@ -188,7 +188,7 @@ await Promise.all(Array.from({ length: workers }, async () => {
 }));
 
 // Check the two custom interfaces touched by this maintenance pass.
-const uiAudit = { leaderboard: {}, blockyCombat: {}, catalog: {}, collections: {}, dailyPick: {}, connectFour: {}, chess: {} };
+const uiAudit = { leaderboard: {}, blockyCombat: {}, catalog: {}, collections: {}, dailyPick: {}, connectFour: {}, chess: {}, sudoku: {} };
 try {
   const page = await browser.newPage({ viewport: { width: 1365, height: 768 } });
   const errors = [];
@@ -598,6 +598,32 @@ try {
   uiAudit.chess.error = String(e.message || e).slice(0, 300);
 }
 
+// Verify Sudoku's grid, keyboard input, conflict checking, and timer.
+try {
+  const page = await browser.newPage({ viewport: { width: 1365, height: 900 } });
+  const errors = [];
+  page.on("pageerror", e => errors.push(String(e.message || e).slice(0, 220)));
+  const response = await page.goto(BASE + "/g/sudoku/", { waitUntil: "domcontentloaded", timeout: 16000 });
+  await page.waitForSelector("#board .cell", { timeout: 8000 });
+  const cells = await page.locator("#board .cell").count();
+  const numberButtons = await page.locator("#numPad .num").count();
+  await page.locator('#board .cell[data-r="0"][data-c="0"]').click();
+  await page.keyboard.press("5");
+  const entered = await page.locator('#board .cell[data-r="0"][data-c="0"]').evaluate(cell => ({
+    value: cell.textContent.trim(),
+    valid: cell.classList.contains("valid"),
+    invalid: cell.classList.contains("invalid")
+  }));
+  const timer = await page.locator("#timer").textContent();
+  const ok = response?.status() === 200 && cells === 81 && numberButtons === 9 &&
+    entered.value === "5" && entered.valid && !entered.invalid &&
+    /^10:00$/.test(timer || "") && errors.length === 0;
+  uiAudit.sudoku = { status: response?.status() || null, cells, numberButtons, entered, timer, errors, ok };
+  await page.close();
+} catch (e) {
+  uiAudit.sudoku.error = String(e.message || e).slice(0, 300);
+}
+
 // DuckMath is backed by its own live catalog service. Verify its app list and
 // test each returned game's page wrapper before adding it to Arcade Atlas.
 const duckmath = { homeStatus: null, dynamicCards: 0, cachedApps: 0, checked: 0, verified: [], broken: [], excludedForAge: [], error: "" };
@@ -682,6 +708,7 @@ if (process.env.GITHUB_STEP_SUMMARY) {
     `- Daily Pick streak icon loaded: ${uiAudit.leaderboard.dailyStreakLogo === "../images/daily-pick-streak.svg" && uiAudit.leaderboard.dailyStreakIconStatus === 200}`,
     `- Blocky Combat timer detected: ${!!uiAudit.blockyCombat.timer}`,
     `- Chess vs Computer opening-move and AI-reply test passed: ${!!uiAudit.chess.ok}`,
+    `- Sudoku grid, keyboard entry, and valid-cell test passed: ${!!uiAudit.sudoku.ok}`,
     `- Catalog filters, favorites, share links, Daily Pick leaderboard navigation, and cross-tab preference tests passed: ${!!uiAudit.catalog.ok}`,
     `- Quick category filter UI smoke test passed: ${!!uiAudit.catalog.quickFiltersOk}`,
     `- Custom playlist create, backup, restore, filter persistence, random play, cross-tab sync, rename, delete, and import-limit tests passed: ${!!uiAudit.collections.ok}`,
