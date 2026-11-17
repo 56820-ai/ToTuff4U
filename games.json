@@ -309,7 +309,7 @@
       "title": "Stickman Golf",
       "path": "g/stickman-golf",
       "image": "g/stickman-golf/splash.png",
-      "category": "ADVENTURE"
+      "category": "SPORTS"
     },
     {
       "title": "Bitlife",
@@ -440,7 +440,7 @@
     {
       "title": "Arcade 3D",
       "path": "g/arcade-3d",
-      "image": "https://opengraph.githubassets.com/1/webgl-games/arcade-3d",
+      "image": "images/arcade-3d-card.svg",
       "category": "ACTION",
       "source": "https://github.com/webgl-games/arcade-3d"
     },
@@ -1072,7 +1072,7 @@
       "source": "https://github.com/mashukui/web-games"
     },
     {
-      "title": "Traffic Jam",
+      "title": "Rush Hour",
       "path": "g/web-games/rush-hour",
       "image": "images/rush-hour-card.webp",
       "category": "PUZZLE",

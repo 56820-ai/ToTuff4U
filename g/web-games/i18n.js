@@ -8133,7 +8133,7 @@
   /*   var GC_SITE = 'https://mashukui.goatcounter.com/count';            */
   /* Leaving it empty means nothing is loaded and no request is made.     */
   /* ------------------------------------------------------------------ */
-  var GC_SITE = 'https://mashukui.goatcounter.com/count';
+  var GC_SITE = ''; // Do not send Arcade Atlas visitors to upstream analytics.
 
   (function analytics() {
     if (!GC_SITE) return;                      /* disabled — load nothing */
