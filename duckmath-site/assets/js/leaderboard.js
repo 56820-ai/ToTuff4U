@@ -38,28 +38,35 @@ function getGameImage(row) {
     (titleKey === "daily pick streak" || gameKey === "daily pick streak" ? "../images/daily-pick-streak.svg" : "../assets/arcade-atlas-logo.png");
 }
 
+function formatCookieClickerScore(value) {
+  const raw = String(value ?? "—").trim();
+  if (!/^\d+$/.test(raw)) return raw;
+  const n = BigInt(raw);
+  if (n === 0n) return "0";
+  const names = [
+    "", "thousand", "million", "billion", "trillion", "quadrillion",
+    "quintillion", "sextillion", "septillion", "octillion", "nonillion",
+    "decillion", "undecillion", "duodecillion", "tredecillion",
+    "quattuordecillion", "quindecillion", "sexdecillion",
+    "septendecillion", "octodecillion", "novemdecillion", "vigintillion"
+  ];
+  const group = Math.floor((raw.length - 1) / 3);
+  if (group === 0) return n.toLocaleString("en-US");
+  const exponent = raw.length - 1;
+  const significant = raw.slice(0, 3);
+  const mantissa = Number(significant) / (10 ** (significant.length - 1));
+  const amount = mantissa.toFixed(2);
+  if (group < names.length) return amount + " " + names[group];
+  // Beyond vigintillion, retain the exact scale without unsafe Number conversion.
+  return amount + " × 10^" + exponent;
+}
+
 function formatScore(value, gameTitle) {
-  const raw = String(value ?? "—");
-  if (gameTitle.toLowerCase() === "cookie clicker" && /^\\d+$/.test(raw)) {
-    const n = BigInt(raw);
-    if (n === 0n) return "0";
-    const units = [
-      "", "thousand", "million", "billion", "trillion", "quadrillion",
-      "quintillion", "sextillion", "septillion", "octillion", "nonillion",
-      "decillion", "undecillion", "duodecillion", "tredecillion",
-      "quattuordecillion", "quindecillion", "sexdecillion",
-      "septendecillion", "octodecillion", "novemdecillion", "vigintillion"
-    ];
-    const group = Math.floor((raw.length - 1) / 3);
-    if (group === 0) return n.toLocaleString("en-US");
-    const leading = raw.slice(0, Math.min(3, raw.length));
-    const amount = Number(leading) / (10 ** (leading.length - 1));
-    const rounded = Number(amount.toFixed(2));
-    if (group < units.length) return rounded.toFixed(2) + " " + units[group];
-    // Keep huge scores readable and exact in scale, without converting BigInt to Number.
-    return rounded.toFixed(2) + " × 10^" + (raw.length - 1);
+  if (String(gameTitle || "").trim().toLowerCase() === "cookie clicker") {
+    return formatCookieClickerScore(value);
   }
-  if (/^\\d+(\\.\\d+)?$/.test(raw)) return Number(raw).toLocaleString("en-US", {maximumFractionDigits:3});
+  const raw = String(value ?? "—");
+  if (/^\d+(\.\d+)?$/.test(raw)) return Number(raw).toLocaleString("en-US", { maximumFractionDigits: 3 });
   return raw;
 }
 
