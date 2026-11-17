@@ -11,7 +11,7 @@ export default { async fetch(request) {
   const url = new URL(request.url), origin = request.headers.get("Origin") || "";
   if (request.method==="OPTIONS") {
     if (origin && !ALLOWED_ORIGINS.has(origin)) return new Response(null,{status:403});
-    return new Response(null,{status:204,headers:{"Access-Control-Allow-Origin":origin || "https://56820-ai.github.io","Access-Control-Allow-Methods":"GET, POST, OPTIONS","Access-Control-Allow-Headers":"Content-Type","Access-Control-Max-Age":"86400","Vary":"Origin"}});
+    return new Response(null,{status:204,headers:{"Access-Control-Allow-Origin":origin || "https://56820-ai.github.io","Access-Control-Allow-Methods":"GET, POST, OPTIONS","Access-Control-Allow-Headers":"Content-Type, X-Arcade-Player","Access-Control-Max-Age":"86400","Vary":"Origin"}});
   }
   if (origin && !ALLOWED_ORIGINS.has(origin)) return response({error:"Origin not allowed."},403,origin);
   if (request.method==="GET" && (url.pathname==="/" || url.pathname==="/health")) {
@@ -24,13 +24,25 @@ export default { async fetch(request) {
       return response(rows,200,origin);
     } catch(e) { console.error("Leaderboard read failed",e); return response({error:"The leaderboard could not be loaded."},500,origin); }
   }
+  if (request.method==="GET" && url.pathname==="/my-scores") {
+    const cookieId=request.headers.get("x-arcade-player") || "";
+    if(!/^[a-f0-9]{64}$/.test(cookieId)) return response({error:"A valid player cookie is required."},400,origin);
+    try {
+      const {rows}=await pool.query(
+        "SELECT DISTINCT ON (lower(trim(game_title))) id, player_name, game_title, score, created_at FROM scores WHERE player_cookie_id=$1 ORDER BY lower(trim(game_title)), length(ltrim(score,'0')) DESC, ltrim(score,'0') DESC, created_at DESC, id DESC",
+        [cookieId]
+      );
+      return response(rows,200,origin);
+    } catch(e) { console.error("Personal score read failed",e); return response({error:"Your scores could not be loaded."},500,origin); }
+  }
   if (request.method==="POST" && url.pathname==="/submit-score") {
     let body; try { body=await request.json(); } catch { return response({error:"Invalid JSON request."},400,origin); }
     const player=typeof body.player_name==="string"?body.player_name.trim().slice(0,24):"";
     const game=typeof body.game_title==="string"?body.game_title.trim().slice(0,60):"";
     const score=typeof body.score==="string"?body.score.trim():(Number.isSafeInteger(body.score)&&body.score>=0?String(body.score):"");
     const kind=body.kind==="session"?"session":body.kind==="score"?"score":"";
-    if(!player||!game||!kind||!/^[0-9]{1,500}$/.test(score)) return response({error:"Invalid player, game, submission type, or score."},400,origin);
+    const cookieId=typeof body.player_cookie_id==="string"?body.player_cookie_id:"";
+    if(!player||!game||!kind||!/^[a-f0-9]{64}$/.test(cookieId)||!/^[0-9]{1,500}$/.test(score)) return response({error:"Invalid player, game, submission type, or score."},400,origin);
     const value=BigInt(score);
     if(value===0n) return response({error:"Zero scores are not accepted."},400,origin);
     if(kind==="session"&&value<5n) return response({error:"Playtime submissions must be at least 5 seconds."},400,origin);
@@ -41,7 +53,7 @@ export default { async fetch(request) {
       const client=await pool.connect();
       try {
         await client.query("BEGIN");
-        const inserted=await client.query("INSERT INTO scores (player_name,game_title,score) VALUES ($1,$2,$3) RETURNING id",[player,game,score]);
+        const inserted=await client.query("INSERT INTO scores (player_name,game_title,score,player_cookie_id) VALUES ($1,$2,$3,$4) RETURNING id",[player,game,score,cookieId]);
         const secret=process.env.IP_HASH_SECRET;
         if(secret && secret.length>=32) {
           const key=await crypto.subtle.importKey("raw",new TextEncoder().encode(secret),{name:"HMAC",hash:"SHA-256"},false,["sign"]);
