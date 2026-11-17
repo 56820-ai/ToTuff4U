@@ -169,3 +169,95 @@ body.body {
     font-size: clamp(1.6rem, 7vw, 2.5rem);
   }
 }
+
+
+/* Fluid sizing: keep the original colors and shapes, but scale smoothly
+   between desktop, tablet, and phone widths without horizontal overflow. */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+.leaderboard-title {
+  font-size: clamp(3.25rem, 8vw, 7.5rem);
+  line-height: 1.05;
+  overflow-wrap: anywhere;
+}
+
+.main {
+  width: min(80%, 1100px);
+}
+
+.score-card {
+  width: min(78%, 900px);
+  max-width: 100%;
+  gap: 1rem;
+  align-items: center;
+}
+
+.card-text-align {
+  flex: 1 1 auto;
+  min-width: 0;
+  gap: 0.35rem;
+}
+
+.card-text {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  font-size: clamp(0.9rem, 1.35vw, 1.1rem);
+}
+
+.game-icon,
+.game-icon-container {
+  flex: 0 0 auto;
+  width: clamp(88px, 16vw, 200px);
+  height: clamp(88px, 16vw, 200px);
+}
+
+.submit-score {
+  font-size: clamp(1.6rem, 4.5vw, 4rem);
+  padding: 0.15em 0.55em;
+  text-align: center;
+}
+
+@media (min-width: 721px) and (max-width: 1050px) {
+  .main {
+    width: 90%;
+  }
+
+  .score-card {
+    width: 88%;
+  }
+}
+
+@media (max-width: 720px) {
+  .main {
+    width: 94%;
+  }
+
+  .score-card {
+    width: 100%;
+    gap: 0.75rem;
+  }
+
+  .card-text {
+    font-size: clamp(0.82rem, 3.2vw, 1rem);
+  }
+}
+
+@media (max-width: 420px) {
+  .score-card {
+    padding: 10px;
+    gap: 0.6rem;
+  }
+
+  .game-icon,
+  .game-icon-container {
+    width: 72px;
+    height: 72px;
+  }
+
+  .card-text {
+    font-size: 0.8rem;
+  }
+}
