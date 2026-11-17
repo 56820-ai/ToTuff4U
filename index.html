@@ -1169,6 +1169,8 @@ body {font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-se
 @media(max-width:600px){.games-grid{grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:10px}.game-card{padding:12px;min-height:150px}.game-card-image{width:60px;height:60px;border-radius:14px}}
 .game-card-title {font-family:inherit;font-size:14px;background:none;color:#eaf1ff;-webkit-text-fill-color:initial}
 .game-card-badge{position:absolute;top:9px;left:9px;z-index:1;padding:4px 7px;border:1px solid rgba(126,194,255,.32);border-radius:999px;background:rgba(8,18,35,.92);color:#a9dcff;font:800 9px/1 system-ui,sans-serif;letter-spacing:.45px}
+.game-card-player-tag{display:inline-flex;align-items:center;justify-content:center;gap:5px;margin:7px 0 2px;padding:4px 8px;border:1px solid rgba(86,220,180,.38);border-radius:999px;background:rgba(8,35,31,.78);color:#8cf2cf;font:800 9px/1 system-ui,sans-serif;letter-spacing:.45px;white-space:nowrap}
+.game-card-player-tag i{font-size:10px}
 .game-card-badge-new{right:9px;left:auto;border-color:rgba(240,98,146,.5);background:rgba(40,10,26,.92);color:#ffadc8}
 .game-card-description{max-width:100%;margin:6px 0 0;color:#aebbd0;font:500 11px/1.4 system-ui,sans-serif;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .game-rating{display:flex;justify-content:center;gap:2px;margin:5px 0 0}
@@ -1300,7 +1302,26 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
     <div class="sidebar-overlay"></div>
 
     <div class="main-container">
-<div class="homepage-ad-wrap" style="width:100%;max-width:970px;min-width:250px;margin:12px auto 20px;padding:0 12px;">
+
+        <div style="width:100%;max-width:728px;margin:12px auto;text-align:center;">
+            
+        </div>
+        <header class="app-header" id="app-header">
+            <div class="header-content">
+                <div class="logo-container">
+                    <div class="brand-lockup"><img src="./assets/arcade-atlas-logo.png" alt="" class="brand-logo"><h1 class="logo">Arcade Atlas</h1></div>
+                    <div class="time-spent" id="timeSpent">geeked vs locked in....</div>
+                </div>
+                
+                <div class="search-container">
+                    <div class="search-wrapper">
+                        <input type="text" id="searchInput" onkeyup="searchGames()" placeholder="Search games... (press /)" aria-label="Search games">
+                        <i class="fas fa-search search-icon"></i>
+                    </div>
+                </div>
+                <a class="profile-icon-link" href="./my-scores.html" aria-label="My scores" title="My scores"><i class="fas fa-user"></i></a>
+            </div>
+        </header><div class="homepage-ad-wrap" style="width:100%;max-width:970px;min-width:250px;margin:12px auto 20px;padding:0 12px;">
 <ins class="adsbygoogle" style="display:block;width:100%;min-width:250px;min-height:90px" data-ad-client="ca-pub-8390067368864065" data-ad-slot="9531168719" data-ad-format="auto" data-full-width-responsive="true"></ins>
 </div>
 <script>
@@ -1322,25 +1343,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
   window.addEventListener("resize", requestAdWhenSized);
 })();
 </script>
-        <div style="width:100%;max-width:728px;margin:12px auto;text-align:center;">
-            
-        </div>
-        <header class="app-header" id="app-header">
-            <div class="header-content">
-                <div class="logo-container">
-                    <div class="brand-lockup"><img src="./assets/arcade-atlas-logo.png" alt="" class="brand-logo"><h1 class="logo">Arcade Atlas</h1></div>
-                    <div class="time-spent" id="timeSpent">geeked vs locked in....</div>
-                </div>
-                
-                <div class="search-container">
-                    <div class="search-wrapper">
-                        <input type="text" id="searchInput" onkeyup="searchGames()" placeholder="Search games... (press /)" aria-label="Search games">
-                        <i class="fas fa-search search-icon"></i>
-                    </div>
-                </div>
-                <a class="profile-icon-link" href="./my-scores.html" aria-label="My scores" title="My scores"><i class="fas fa-user"></i></a>
-            </div>
-        </header>
+
 
         
         <div id="home-content" class="content-area active">
@@ -2138,7 +2141,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
     async function loadGames() {
         if (cachedGames.length) return cachedGames;
         try {
-            const response = await fetch('games.json?v=2026-11-17-tiles');
+            const response = await fetch('games.json?v=2026-11-17-player-tags');
             if (!response.ok) throw new Error('Could not load games.json: ' + response.status);
             const data = await response.json();
             cachedGames = Array.isArray(data.games) ? data.games : [];
@@ -2741,6 +2744,13 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
             title.className = 'game-card-title';
             title.textContent = game.title || 'Game';
             link.append(img, title);
+            if (/^2[–-]4$/.test(String(game.players || ''))) {
+                const playerTag = document.createElement('span');
+                playerTag.className = 'game-card-player-tag';
+                playerTag.innerHTML = '<i class="fas fa-users" aria-hidden="true"></i> 2–4 PLAYERS';
+                playerTag.setAttribute('aria-label', 'Supports 2 to 4 players');
+                link.appendChild(playerTag);
+            }
             if (game.description) {
                 const description = document.createElement('p');
                 description.className = 'game-card-description';

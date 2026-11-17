@@ -1,6 +1,20 @@
 {
   "games": [
     {
+      "title": "Tag",
+      "path": "g/tag",
+      "image": "https://cdn2.y8.com/cloudimage/4393/file/w380h285_webp-aea8907d45386d3490594fa39c49ae72.webp",
+      "category": "ARCADE",
+      "description": "Chase and dodge in this local multiplayer game for 2–4 players.",
+      "tags": [
+        "multiplayer",
+        "local multiplayer",
+        "party",
+        "tag"
+      ],
+      "players": "2–4"
+    },
+    {
       "title": "Slope",
       "path": "g/slope",
       "image": "./images/slope-card.webp",
@@ -47,7 +61,8 @@
         "multiplayer",
         "local multiplayer",
         "platform fighter"
-      ]
+      ],
+      "players": "2–4"
     },
     {
       "title": "Gun Mayhem 2",
@@ -58,7 +73,8 @@
         "multiplayer",
         "local multiplayer",
         "platform fighter"
-      ]
+      ],
+      "players": "2–4"
     },
     {
       "title": "Wall Smash",
@@ -101,7 +117,8 @@
         "multiplayer",
         "local multiplayer",
         "party"
-      ]
+      ],
+      "players": "2–4"
     },
     {
       "title": "Hole.io",
