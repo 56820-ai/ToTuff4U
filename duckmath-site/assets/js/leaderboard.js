@@ -57,7 +57,15 @@ function formatCookieClickerScore(value) {
   const mantissa = Number(significant) / (10 ** (significant.length - 1));
   const amount = mantissa.toFixed(2);
   if (group < names.length) return amount + " " + names[group];
-  // Beyond vigintillion, retain the exact scale without unsafe Number conversion.
+  if (group <= 66) {
+    const ones = ["", "un", "duo", "tre", "quattuor", "quin", "sex", "septen", "octo", "novem"];
+    const tens = ["", "", "viginti", "triginta", "quadraginta", "quinquaginta", "sexaginta"];
+    const ten = Math.floor(group / 10);
+    const one = group % 10;
+    const name = (one ? ones[one] : "") + tens[ten] + "illion";
+    return amount + " " + name;
+  }
+  // Beyond 200 zeroes, keep the magnitude readable without Number precision loss.
   return amount + " × 10^" + exponent;
 }
 
