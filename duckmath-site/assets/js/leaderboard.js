@@ -1,4 +1,5 @@
 // Arcade Atlas leaderboard — top three Neon scores for each game.
+// Retry commit: keep the medal rows and game-thumbnail presentation.
 const ARCADE_ATLAS_API="https://br-flat-grass-bdhxbnam-arcadeapi.compute.c-8.us-east-2.aws.neon.tech";
 const IMAGE_ROOT="/ToTuff4U/duckmath-site/assets/img/";
 const MEDALS=["🥇","🥈","🥉"];
