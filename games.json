@@ -1251,6 +1251,54 @@
       "image": "images/dominoes-card.webp",
       "category": "STRATEGY",
       "description": "Classic block dominoes against the computer: draw, block the ends and win on lowest pip count."
+    },
+    {
+      "title": "Clash of Space",
+      "path": "g/clash-of-space",
+      "image": "./images/clash-of-space-card.webp",
+      "category": "ACTION",
+      "source": "https://github.com/PB2204/Clash-Of-Space",
+      "description": "Pilot a fighter through an asteroid field, blast incoming ships and chase a bigger score each run."
+    },
+    {
+      "title": "Clumsy Bird",
+      "path": "g/clumsy-bird",
+      "image": "./images/clumsy-bird-card.webp",
+      "category": "ARCADE",
+      "source": "https://github.com/ellisonleao/clumsy-bird",
+      "description": "Flap through endless pipes, thread the gaps and see how far your clumsy bird can fly."
+    },
+    {
+      "title": "Tiny Platformer",
+      "path": "g/tiny-platformer",
+      "image": "./images/tiny-platformer-card.webp",
+      "category": "PLATFORMER",
+      "source": "https://github.com/jakesgordon/javascript-tiny-platformer",
+      "description": "A compact run-and-jump level: collect the gold and land on monsters instead of walking into them."
+    },
+    {
+      "title": "Star Battle",
+      "path": "g/star-battle",
+      "image": "./images/star-battle-card.webp",
+      "category": "ACTION",
+      "source": "https://github.com/gd4Ark/star-battle",
+      "description": "Fly, shoot and dodge while your fuel drains — grab fuel pods and score before the tank hits zero."
+    },
+    {
+      "title": "Tower Builder",
+      "path": "g/tower-builder",
+      "image": "./images/tower-builder-card.webp",
+      "category": "ARCADE",
+      "source": "https://github.com/iamkun/tower_game",
+      "description": "Time each drop to stack blocks into the tallest tower you can build without toppling it."
+    },
+    {
+      "title": "Evade and Destroy",
+      "path": "g/evade-and-destroy",
+      "image": "./images/evade-and-destroy-card.webp",
+      "category": "ACTION",
+      "source": "https://github.com/mikkun/evade-and-destroy",
+      "description": "Weave between bullets in a tight vertical shooter and return fire when the lane opens up."
     }
   ]
 }
