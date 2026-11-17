@@ -2990,6 +2990,8 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         
         updateTime();
         setInterval(updateTime, 1000);
+        // Let browser automation wait until all catalog controls and handlers are ready.
+        window.__arcadeAtlasReady = true;
     });
 </script>
 
