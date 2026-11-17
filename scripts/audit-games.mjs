@@ -324,7 +324,8 @@ try {
   const sharedFiltersLoaded = await page.locator("#sortFilter").inputValue() === "az" &&
     await page.locator('#category-quick-filters button[data-mode="multiplayer"]').getAttribute("aria-pressed") === "true";
   await page.locator("#shareCatalogButton").click();
-  const shareLinkCopied = await page.locator("#shareCatalogButton").textContent().then(text => String(text || "").includes("copied"));
+  await page.waitForFunction(() => /copied/i.test(document.getElementById("shareCatalogButton")?.textContent || ""), undefined, { timeout: 3000 });
+  const shareLinkCopied = await page.locator("#shareCatalogButton").textContent().then(text => String(text || "").toLowerCase().includes("copied"));
   const copiedShareUrl = await page.evaluate(async () => await navigator.clipboard.readText().catch(() => ""));
   const shareUrlValid = (() => { try { const url = new URL(copiedShareUrl); return url.searchParams.get("q") === "slope" && url.searchParams.get("category") === "ARCADE" && url.searchParams.get("sort") === "az" && url.searchParams.get("mode") === "multiplayer" && !url.searchParams.has("favorites") && !url.searchParams.has("collection"); } catch { return false; } })();
   await page.goto(BASE + "/", { waitUntil: "domcontentloaded", timeout: 16000 });
@@ -507,7 +508,7 @@ try {
   const randomLaunch = await page.evaluate(() => window.__collectionOpened || "");
   const allowedLaunches = await page.evaluate(() => ["Slope", "Connect Four"].map(title => buildGameHref(cachedGames.find(game => game.title === title).path)));
 
-  await page.locator('#collections-grid .collection-browse-button').last().click();
+  await page.locator('#collections-grid .collection-card').filter({ hasText: "Arcade Night" }).locator('.collection-browse-button').click();
   await page.waitForFunction(() => document.getElementById("catalogResultsCount")?.textContent === "2 games in Arcade Night", undefined, { timeout: 4000 });
   const filteredTitle = await page.locator('#all-games-grid .game-card-title').textContent();
   const filteredCards = await page.locator('#all-games-grid .game-card').count();
