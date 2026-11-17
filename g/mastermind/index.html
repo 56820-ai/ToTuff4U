@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Mastermind · Arcade Atlas</title>
+<meta name="description" content="Play Mastermind free in your browser: crack a four-peg colour code in ten guesses, with exact and near-match clues after every attempt.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔴</text></svg>">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(circle at 80% 0%,#1b3346 0%,#111c2a 55%,#080d14 100%);
+    color:#eef4fb;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    justify-content:safe center;min-height:100vh;min-height:100svh;padding:10px 8px 14px;user-select:none}
+  .shell{width:min(700px,100%);display:flex;flex-direction:column;gap:9px}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .brand{font-weight:800;font-size:15px}
+  .brand span{color:#6fe3c4}
+  .back{font-size:12px;font-weight:700;text-decoration:none;color:#eef4fb;padding:9px 12px;border-radius:9px;
+    background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12)}
+  .panel{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.1);border-radius:18px;
+    padding:14px;display:flex;flex-direction:column;gap:11px;box-shadow:0 22px 60px rgba(0,0,0,.55)}
+  .pillrow{display:flex;gap:7px;flex-wrap:wrap;justify-content:center}
+  .pill{background:rgba(0,0,0,.26);border:1px solid rgba(255,255,255,.12);border-radius:9px;
+    padding:6px 11px;font-size:10px;color:#b8cde0;text-transform:uppercase;letter-spacing:.06em}
+  .pill b{color:#fff;font-size:13px;margin-left:5px;letter-spacing:0}
+  .rows{display:flex;flex-direction:column;gap:5px}
+  .row{display:grid;grid-template-columns:26px repeat(4,1fr) 92px;gap:6px;align-items:center;
+    background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:9px;padding:5px 7px}
+  .row.current{border-color:rgba(111,227,196,.5);background:rgba(111,227,196,.07)}
+  .row .n{font-size:11px;color:#7f93a8;font-weight:800;text-align:center}
+  .peg{width:100%;max-width:34px;height:34px;margin:0 auto;border-radius:50%;background:rgba(255,255,255,.08);
+    border:2px solid rgba(255,255,255,.14);cursor:pointer;position:relative}
+  .peg.filled{border-color:rgba(255,255,255,.45)}
+  .clue{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+  .dot{width:11px;height:11px;border-radius:50%;border:1px solid rgba(255,255,255,.3)}
+  .dot.exact{background:#f4f7fb;border-color:#f4f7fb}
+  .dot.near{background:#2b3a4c;border-color:#8fb8d6}
+  .palette{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+  .swatch{width:44px;height:44px;border-radius:50%;border:3px solid rgba(255,255,255,.2);cursor:pointer;
+    transition:transform .12s,border-color .12s}
+  .swatch:hover{transform:scale(1.06)}
+  .swatch[aria-pressed="true"]{border-color:#fff;box-shadow:0 0 0 3px rgba(255,255,255,.2)}
+  .status{min-height:20px;text-align:center;font-size:13px;color:#b8cde0}
+  .status.good{color:#7ee2a8}.status.bad{color:#ff9b9b}
+  .bar{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+  .btn{min-height:42px;padding:0 18px;border-radius:9px;border:1px solid rgba(255,255,255,.16);
+    background:rgba(255,255,255,.08);color:#eef4fb;font:700 12px inherit;cursor:pointer}
+  .btn:hover:not(:disabled){background:rgba(255,255,255,.17)}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .btn.primary{background:#156b58;border-color:#6fe3c4}
+  .colors{display:flex;gap:10px;justify-content:center}
+  @media (max-width:520px){.row{grid-template-columns:20px repeat(4,1fr) 76px}.swatch{width:38px;height:38px}}
+  /* Keep the whole board on screen on short laptop and Chromebook displays. */
+  @media (max-height:720px){
+    .panel{gap:8px;padding:11px}
+    .rows{gap:3px}
+    .row{padding:3px 6px}
+    .peg{height:26px;max-width:26px}
+    .swatch{width:34px;height:34px}
+    .btn{min-height:36px}
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="topbar">
+    <div class="brand">🔴 MASTERMIND <span>·</span> Arcade Atlas</div>
+    <a class="back" href="../../">← Arcade Atlas</a>
+  </div>
+
+  <div class="panel">
+    <div class="pillrow">
+      <div class="pill">Guess<b id="guessnum">1/10</b></div>
+      <div class="pill">Solved<b id="solved">0</b></div>
+      <div class="pill">Best<b id="best">—</b></div>
+    </div>
+
+    <div class="rows" id="rows"></div>
+
+    <div class="palette" id="palette" role="group" aria-label="Colour palette"></div>
+    <div class="status" id="status" role="status" aria-live="polite">Pick a colour, then fill the four pegs. Press Check.</div>
+    <div class="bar">
+      <button class="btn primary" type="button" id="check">Check guess</button>
+      <button class="btn" type="button" id="clear">Clear row</button>
+      <button class="btn" type="button" id="new">New code</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  const COLOURS = [
+    { id: "red", hex: "#e04a3f" },
+    { id: "yellow", hex: "#f0c330" },
+    { id: "green", hex: "#3aa35a" },
+    { id: "blue", hex: "#3a73d0" },
+    { id: "purple", hex: "#8f52c9" },
+    { id: "orange", hex: "#e8863a" }
+  ];
+  const LENGTH = 4;
+  const TRIES = 10;
+  const STORE = "arcadeAtlasMastermind";
+
+  const rowsEl = document.getElementById("rows");
+  const paletteEl = document.getElementById("palette");
+  const statusEl = document.getElementById("status");
+
+  let secret = [];
+  let guesses = [];
+  let current = [];
+  let active = "red";
+  let solved = 0;
+  let done = false;
+
+  function readStats() {
+    try { return JSON.parse(localStorage.getItem(STORE)) || { solved: 0, best: 0 }; }
+    catch (e) { return { solved: 0, best: 0 }; }
+  }
+  function writeStats(s) {
+    try { localStorage.setItem(STORE, JSON.stringify(s)); } catch (e) { /* storage may be blocked */ }
+  }
+  function setStatus(text, cls) {
+    statusEl.className = "status" + (cls ? " " + cls : "");
+    statusEl.textContent = text;
+  }
+  function colourHex(id) {
+    return (COLOURS.find((c) => c.id === id) || {}).hex || "transparent";
+  }
+
+  function buildPalette() {
+    paletteEl.innerHTML = "";
+    COLOURS.forEach((c) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "swatch";
+      btn.style.background = c.hex;
+      btn.dataset.id = c.id;
+      btn.setAttribute("aria-label", c.id);
+      btn.setAttribute("aria-pressed", String(active === c.id));
+      btn.addEventListener("click", () => {
+        active = c.id;
+        [...paletteEl.children].forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.id === active)));
+      });
+      paletteEl.appendChild(btn);
+    });
+  }
+
+  function newGame() {
+    secret = Array.from({ length: LENGTH }, () => COLOURS[Math.floor(Math.random() * COLOURS.length)].id);
+    guesses = [];
+    current = [];
+    done = false;
+    active = "red";
+    buildPalette();
+    paintRows();
+    const s = readStats();
+    document.getElementById("solved").textContent = String(s.solved);
+    document.getElementById("best").textContent = s.best ? s.best + " guesses" : "—";
+    document.getElementById("check").disabled = false;
+    setStatus("Pick a colour, then fill the four pegs. Press Check.");
+  }
+
+  function clueFor(guess) {
+    const secretPool = secret.slice();
+    const open = guess.slice();
+    let exact = 0;
+    for (let i = 0; i < LENGTH; i++) {
+      if (open[i] === secretPool[i]) {
+        exact += 1;
+        open[i] = null;
+        secretPool[i] = null;
+      }
+    }
+    let near = 0;
+    open.forEach((c, i) => {
+      if (c === null) return;
+      const j = secretPool.indexOf(c);
+      if (j >= 0) {
+        near += 1;
+        secretPool[j] = null;
+      }
+    });
+    return { exact, near };
+  }
+
+  function paintRows() {
+    rowsEl.innerHTML = "";
+    for (let r = 0; r < TRIES; r++) {
+      const row = document.createElement("div");
+      row.className = "row" + (r === guesses.length && !done ? " current" : "");
+      const n = document.createElement("div");
+      n.className = "n";
+      n.textContent = String(r + 1);
+      row.appendChild(n);
+
+      const entry = guesses[r];
+      for (let i = 0; i < LENGTH; i++) {
+        const peg = document.createElement("button");
+        peg.type = "button";
+        peg.className = "peg";
+        const value = entry ? entry.guess[i] : (r === guesses.length ? current[i] : null);
+        if (value) {
+          peg.classList.add("filled");
+          peg.style.background = colourHex(value);
+        }
+        if (!entry && r === guesses.length && !done) {
+          peg.setAttribute("aria-label", "Peg " + (i + 1));
+          peg.addEventListener("click", () => {
+            current[i] = active;
+            paintRows();
+          });
+        } else {
+          peg.disabled = true;
+        }
+        row.appendChild(peg);
+      }
+
+      const clue = document.createElement("div");
+      clue.className = "clue";
+      if (entry) {
+        for (let i = 0; i < entry.exact; i++) {
+          const d = document.createElement("span");
+          d.className = "dot exact";
+          clue.appendChild(d);
+        }
+        for (let i = 0; i < entry.near; i++) {
+          const d = document.createElement("span");
+          d.className = "dot near";
+          clue.appendChild(d);
+        }
+      }
+      row.appendChild(clue);
+      rowsEl.appendChild(row);
+    }
+    document.getElementById("guessnum").textContent = Math.min(guesses.length + 1, TRIES) + "/" + TRIES;
+  }
+
+  function check() {
+    if (done) return;
+    if (current.filter(Boolean).length < LENGTH) {
+      setStatus("Fill all four pegs first.", "bad");
+      return;
+    }
+    const guess = current.slice();
+    const { exact, near } = clueFor(guess);
+    guesses.push({ guess, exact, near });
+    current = [];
+    paintRows();
+
+    if (exact === LENGTH) {
+      done = true;
+      const s = readStats();
+      s.solved += 1;
+      const used = guesses.length;
+      if (!s.best || used < s.best) s.best = used;
+      writeStats(s);
+      document.getElementById("solved").textContent = String(s.solved);
+      document.getElementById("best").textContent = s.best + " guesses";
+      document.getElementById("check").disabled = true;
+      setStatus("Cracked it in " + used + (used === 1 ? " guess!" : " guesses!"), "good");
+      return;
+    }
+    if (guesses.length >= TRIES) {
+      done = true;
+      document.getElementById("check").disabled = true;
+      setStatus("Out of guesses — the code was " + secret.map((c) => c).join(", ") + ".", "bad");
+      paintRows();
+      return;
+    }
+    setStatus(exact + " exact, " + near + " close. " + (TRIES - guesses.length) + " guesses left.");
+  }
+
+  document.getElementById("check").addEventListener("click", check);
+  document.getElementById("clear").addEventListener("click", () => {
+    if (done) return;
+    current = [];
+    paintRows();
+    setStatus("Row cleared.");
+  });
+  document.getElementById("new").addEventListener("click", newGame);
+
+  newGame();
+})();
+</script>
+</body>
+</html>

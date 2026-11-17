@@ -694,7 +694,7 @@
       "path": "g/sudoku",
       "image": "images/sudoku.svg",
       "category": "PUZZLE",
-      "description": "Fill the 9×9 grid so every row, column, and 3×3 box contains the numbers 1–9. Includes a timer and keyboard or touch input.",
+      "description": "Fill the 9\u00d79 grid so every row, column, and 3\u00d73 box contains the numbers 1\u20139. Includes a timer and keyboard or touch input.",
       "source": "https://github.com/sausi-7/games/tree/main/games/puzzle/sudoku",
       "tags": [
         "puzzle",
@@ -925,7 +925,7 @@
       "path": "g/web-games/battleship",
       "image": "images/battleship-card.webp",
       "category": "STRATEGY",
-      "description": "Place your fleet and find the computer’s hidden ships on a grid.",
+      "description": "Place your fleet and find the computer\u2019s hidden ships on a grid.",
       "source": "https://github.com/mashukui/web-games"
     },
     {
@@ -1212,6 +1212,27 @@
       "image": "images/typing-race-card.webp",
       "category": "CASUAL",
       "description": "Race a computer rival through a passage while a live counter tracks your words per minute and accuracy."
+    },
+    {
+      "title": "Trivia Quiz",
+      "path": "g/trivia-quiz",
+      "image": "images/trivia-quiz-card.webp",
+      "category": "CASUAL",
+      "description": "Ten timed questions on science, geography, history, sport, gaming and nature, with streaks, speed bonuses and a personal best."
+    },
+    {
+      "title": "Mastermind",
+      "path": "g/mastermind",
+      "image": "images/mastermind-card.webp",
+      "category": "PUZZLE",
+      "description": "Crack a four-peg colour code in ten guesses, using exact and close clues to narrow down the answer."
+    },
+    {
+      "title": "Dominoes",
+      "path": "g/dominoes",
+      "image": "images/dominoes-card.webp",
+      "category": "STRATEGY",
+      "description": "Classic block dominoes against the computer: draw, block the ends and win on lowest pip count."
     }
   ]
 }

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Trivia Quiz · Arcade Atlas</title>
+<meta name="description" content="Play a free trivia quiz in your browser: ten questions on science, geography, history, sport and gaming, with a countdown, streaks and a personal best.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>❓</text></svg>">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(circle at 20% 0%,#2a2350 0%,#151329 55%,#0a0814 100%);
+    color:#eef4fb;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    justify-content:safe center;min-height:100vh;min-height:100svh;padding:10px 8px 14px;user-select:none}
+  .shell{width:min(680px,100%);display:flex;flex-direction:column;gap:9px}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .brand{font-weight:800;font-size:15px}
+  .brand span{color:#c4a7ff}
+  .back{font-size:12px;font-weight:700;text-decoration:none;color:#eef4fb;padding:9px 12px;border-radius:9px;
+    background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12)}
+  .panel{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.1);border-radius:18px;
+    padding:16px;display:flex;flex-direction:column;gap:12px;box-shadow:0 22px 60px rgba(0,0,0,.55)}
+  .meta{display:flex;gap:7px;flex-wrap:wrap;justify-content:center}
+  .pill{background:rgba(0,0,0,.26);border:1px solid rgba(255,255,255,.12);border-radius:9px;
+    padding:6px 11px;font-size:10px;color:#c9bce4;text-transform:uppercase;letter-spacing:.06em}
+  .pill b{color:#fff;font-size:13px;margin-left:5px;letter-spacing:0}
+  .timerbar{height:7px;border-radius:6px;background:rgba(255,255,255,.1);overflow:hidden}
+  .timerbar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#8f6bff,#c4a7ff);transition:width .25s linear}
+  .question{font-size:clamp(17px,3.4vw,22px);font-weight:700;line-height:1.4;min-height:76px;display:flex;align-items:center}
+  .answers{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .answer{min-height:56px;border-radius:11px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);
+    color:#eef4fb;font:600 14px inherit;cursor:pointer;padding:8px 12px;text-align:left;transition:background .15s,transform .12s}
+  .answer:hover:not(:disabled){background:rgba(255,255,255,.14);transform:translateY(-1px)}
+  .answer:disabled{cursor:default}
+  .answer.right{background:#1f6b47;border-color:#7ee2a8}
+  .answer.wrong{background:#7a2733;border-color:#ff9b9b}
+  .status{min-height:20px;text-align:center;font-size:13px;color:#c3b6dd}
+  .status.good{color:#7ee2a8}.status.bad{color:#ff9b9b}
+  .bar{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+  .btn{min-height:40px;padding:0 16px;border-radius:9px;border:1px solid rgba(255,255,255,.16);
+    background:rgba(255,255,255,.08);color:#eef4fb;font:700 12px inherit;cursor:pointer}
+  .btn:hover{background:rgba(255,255,255,.17)}
+  .btn.primary{background:#4b2f8a;border-color:#c4a7ff}
+  .start{display:flex;flex-direction:column;gap:10px;align-items:center;text-align:center}
+  .start p{font-size:13px;color:#bdaed8;line-height:1.6;max-width:420px}
+  @media (max-width:520px){.answers{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="topbar">
+    <div class="brand">❓ TRIVIA QUIZ <span>·</span> Arcade Atlas</div>
+    <a class="back" href="../../">← Arcade Atlas</a>
+  </div>
+
+  <div class="panel">
+    <div class="meta">
+      <div class="pill">Question<b id="qnum">1/10</b></div>
+      <div class="pill">Score<b id="score">0</b></div>
+      <div class="pill">Streak<b id="streak">0</b></div>
+      <div class="pill">Best<b id="best">0</b></div>
+    </div>
+    <div class="timerbar"><i id="timerfill"></i></div>
+    <div class="question" id="question">Ready for ten questions?</div>
+    <div class="answers" id="answers"></div>
+    <div class="status" id="status" role="status" aria-live="polite"></div>
+    <div class="bar" id="bar"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  const BANK = [
+    ["Science", "Which planet is known as the Red Planet?", ["Mars", "Venus", "Jupiter", "Mercury"], 0],
+    ["Science", "What gas do plants absorb from the air?", ["Carbon dioxide", "Oxygen", "Nitrogen", "Helium"], 0],
+    ["Science", "How many bones does an adult human have?", ["206", "186", "246", "300"], 0],
+    ["Science", "What is the chemical symbol for gold?", ["Au", "Ag", "Gd", "Go"], 0],
+    ["Science", "Which part of the cell makes energy?", ["Mitochondria", "Nucleus", "Ribosome", "Vacuole"], 0],
+    ["Science", "What force keeps planets in orbit?", ["Gravity", "Friction", "Magnetism", "Tension"], 0],
+    ["Science", "What is H2O more commonly called?", ["Water", "Salt", "Hydrogen", "Ozone"], 0],
+    ["Science", "Which animal is the fastest on land?", ["Cheetah", "Lion", "Horse", "Greyhound"], 0],
+    ["Science", "What is the largest organ in the human body?", ["Skin", "Liver", "Brain", "Lungs"], 0],
+    ["Science", "What type of rock forms from cooling lava?", ["Igneous", "Sedimentary", "Metamorphic", "Limestone"], 0],
+    ["Geography", "What is the longest river in the world?", ["Nile", "Amazon", "Mississippi", "Yangtze"], 0],
+    ["Geography", "Which continent is the Sahara Desert on?", ["Africa", "Asia", "Australia", "South America"], 0],
+    ["Geography", "What is the capital of Japan?", ["Tokyo", "Kyoto", "Osaka", "Seoul"], 0],
+    ["Geography", "How many continents are there?", ["7", "5", "6", "8"], 0],
+    ["Geography", "Which ocean is the largest?", ["Pacific", "Atlantic", "Indian", "Arctic"], 0],
+    ["Geography", "Mount Everest sits on the border of Nepal and which country?", ["China", "India", "Bhutan", "Pakistan"], 0],
+    ["Geography", "What is the smallest country in the world?", ["Vatican City", "Monaco", "Malta", "Nauru"], 0],
+    ["Geography", "Which US state is the largest by area?", ["Alaska", "Texas", "California", "Montana"], 0],
+    ["Geography", "What country has the most people?", ["India", "China", "United States", "Indonesia"], 0],
+    ["Geography", "Which desert is the driest place on Earth?", ["Atacama", "Sahara", "Gobi", "Mojave"], 0],
+    ["History", "In which year did the Titanic sink?", ["1912", "1905", "1921", "1898"], 0],
+    ["History", "Who was the first person to walk on the Moon?", ["Neil Armstrong", "Buzz Aldrin", "Yuri Gagarin", "Michael Collins"], 0],
+    ["History", "Which ancient civilisation built the pyramids at Giza?", ["Egyptians", "Romans", "Greeks", "Mayans"], 0],
+    ["History", "The Berlin Wall fell in which year?", ["1989", "1979", "1991", "1985"], 0],
+    ["History", "Who painted the Mona Lisa?", ["Leonardo da Vinci", "Michelangelo", "Raphael", "Van Gogh"], 0],
+    ["History", "Which empire was ruled from Rome?", ["Roman Empire", "Ottoman Empire", "Mongol Empire", "Aztec Empire"], 0],
+    ["History", "What was the first successful powered aeroplane made by?", ["Wright brothers", "Da Vinci", "Edison", "Bell"], 0],
+    ["History", "Which country gifted the Statue of Liberty to the USA?", ["France", "Britain", "Spain", "Italy"], 0],
+    ["Sport", "How many players are on a soccer team on the field?", ["11", "10", "12", "9"], 0],
+    ["Sport", "How many points is a touchdown worth in American football?", ["6", "7", "3", "5"], 0],
+    ["Sport", "In which sport would you perform a slam dunk?", ["Basketball", "Volleyball", "Tennis", "Handball"], 0],
+    ["Sport", "How often are the Summer Olympics held?", ["Every 4 years", "Every 2 years", "Every 3 years", "Every 5 years"], 0],
+    ["Sport", "What is the maximum score in a single frame of ten-pin bowling?", ["30", "20", "10", "50"], 0],
+    ["Sport", "Which sport uses a shuttlecock?", ["Badminton", "Tennis", "Squash", "Table tennis"], 0],
+    ["Sport", "How many rings are on the Olympic flag?", ["5", "4", "6", "7"], 0],
+    ["Sport", "What colour card sends a soccer player off?", ["Red", "Yellow", "Blue", "Black"], 0],
+    ["Sport", "In chess, which piece can only move diagonally?", ["Bishop", "Rook", "Knight", "King"], 0],
+    ["Sport", "How long is a marathon, to the nearest kilometre?", ["42 km", "21 km", "32 km", "50 km"], 0],
+    ["Games", "In Minecraft, what do you need to make a crafting table?", ["Wood planks", "Stone", "Iron", "Wool"], 0],
+    ["Games", "Which game features a character called Steve?", ["Minecraft", "Roblox", "Fortnite", "Terraria"], 0],
+    ["Games", "What is the highest possible score with one dart?", ["60", "50", "40", "75"], 0],
+    ["Games", "In 2048, what happens when two equal tiles touch?", ["They merge", "They vanish", "They swap", "Nothing"], 0],
+    ["Games", "How many squares are on a chessboard?", ["64", "81", "100", "49"], 0],
+    ["Games", "Which classic game has falling tetrominoes?", ["Tetris", "Pac-Man", "Pong", "Frogger"], 0],
+    ["Games", "What colour is the ghost Inky in Pac-Man?", ["Cyan", "Red", "Pink", "Orange"], 0],
+    ["Games", "In UNO, what does a wild card let you do?", ["Choose the colour", "Skip a turn", "Draw two", "Reverse"], 0],
+    ["Games", "Which game is played on a 19x19 grid?", ["Go", "Checkers", "Reversi", "Sudoku"], 0],
+    ["Nature", "What is the largest animal on Earth?", ["Blue whale", "Elephant", "Giraffe", "Great white shark"], 0],
+    ["Nature", "How many legs does a spider have?", ["8", "6", "10", "12"], 0],
+    ["Nature", "Which bird cannot fly?", ["Penguin", "Eagle", "Sparrow", "Parrot"], 0],
+    ["Nature", "What do bees collect from flowers?", ["Nectar", "Water", "Seeds", "Leaves"], 0],
+    ["Nature", "What is a baby kangaroo called?", ["Joey", "Cub", "Kit", "Fawn"], 0],
+    ["Nature", "Which gas makes up most of Earth's atmosphere?", ["Nitrogen", "Oxygen", "Carbon dioxide", "Argon"], 0],
+    ["Nature", "How many hearts does an octopus have?", ["3", "1", "2", "4"], 0],
+    ["Nature", "What is the tallest species of tree?", ["Redwood", "Oak", "Pine", "Birch"], 0],
+    ["Nature", "Which planet has the most moons?", ["Saturn", "Jupiter", "Mars", "Neptune"], 0],
+    ["Nature", "What do you call a group of wolves?", ["Pack", "Herd", "Flock", "School"], 0]
+  ];
+  const ROUND = 10;
+  const SECONDS = 15;
+  const STORE = "arcadeAtlasTrivia";
+
+  const qEl = document.getElementById("question");
+  const answersEl = document.getElementById("answers");
+  const statusEl = document.getElementById("status");
+  const barEl = document.getElementById("bar");
+  const timerFill = document.getElementById("timerfill");
+  const scoreEl = document.getElementById("score");
+  const qnumEl = document.getElementById("qnum");
+  const streakEl = document.getElementById("streak");
+  const bestEl = document.getElementById("best");
+
+  let pool = [];
+  let index = 0;
+  let score = 0;
+  let streak = 0;
+  let best = 0;
+  let locked = false;
+  let deadline = 0;
+  let tick = null;
+  let playing = false;
+
+  function readBest() {
+    try { return parseInt(localStorage.getItem(STORE), 10) || 0; } catch (e) { return 0; }
+  }
+  function writeBest(v) {
+    try { localStorage.setItem(STORE, String(v)); } catch (e) { /* storage may be blocked */ }
+  }
+  function setStatus(text, cls) {
+    statusEl.className = "status" + (cls ? " " + cls : "");
+    statusEl.textContent = text;
+  }
+
+  function shuffle(list) {
+    const a = list.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function startRound() {
+    pool = shuffle(BANK).slice(0, ROUND).map((q) => {
+      const [cat, text, options, correctIndex] = q;
+      const correct = options[correctIndex];
+      const mixed = shuffle(options);
+      return { cat, text, options: mixed, correct: mixed.indexOf(correct) };
+    });
+    index = 0;
+    score = 0;
+    streak = 0;
+    best = readBest();
+    playing = true;
+    barEl.innerHTML = "";
+    scoreEl.textContent = "0";
+    streakEl.textContent = "0";
+    bestEl.textContent = String(best);
+    showQuestion();
+  }
+
+  function showQuestion() {
+    if (index >= pool.length) return finish();
+    locked = false;
+    const q = pool[index];
+    qnumEl.textContent = (index + 1) + "/" + ROUND;
+    qEl.textContent = q.text;
+    answersEl.innerHTML = "";
+    q.options.forEach((option, i) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "answer";
+      btn.textContent = option;
+      btn.addEventListener("click", () => answer(i));
+      answersEl.appendChild(btn);
+    });
+    setStatus(q.cat + " · " + SECONDS + " seconds");
+    deadline = Date.now() + SECONDS * 1000;
+    timerFill.style.width = "100%";
+    clearInterval(tick);
+    tick = setInterval(() => {
+      const left = Math.max(0, deadline - Date.now());
+      timerFill.style.width = (left / (SECONDS * 1000) * 100) + "%";
+      if (left <= 0 && !locked) {
+        locked = true;
+        clearInterval(tick);
+        reveal(-1);
+        setStatus("Time's up — the answer was " + pool[index].options[pool[index].correct] + ".", "bad");
+        streak = 0;
+        streakEl.textContent = "0";
+        setTimeout(next, 1400);
+      }
+    }, 200);
+  }
+
+  function answer(choice) {
+    if (locked || !playing) return;
+    locked = true;
+    clearInterval(tick);
+    reveal(choice);
+    const q = pool[index];
+    if (choice === q.correct) {
+      const speedBonus = Math.max(0, Math.round((deadline - Date.now()) / 1000));
+      score += 10 + speedBonus;
+      streak += 1;
+      scoreEl.textContent = String(score);
+      streakEl.textContent = String(streak);
+      setStatus(streak >= 3 ? "Correct — " + streak + " in a row!" : "Correct!", "good");
+    } else {
+      streak = 0;
+      streakEl.textContent = "0";
+      setStatus("Not quite — the answer was " + q.options[q.correct] + ".", "bad");
+    }
+    setTimeout(next, 1250);
+  }
+
+  function reveal(choice) {
+    [...answersEl.children].forEach((btn, i) => {
+      btn.disabled = true;
+      if (i === pool[index].correct) btn.classList.add("right");
+      else if (i === choice) btn.classList.add("wrong");
+    });
+  }
+
+  function next() {
+    index += 1;
+    if (index >= pool.length) return finish();
+    showQuestion();
+  }
+
+  function finish() {
+    playing = false;
+    clearInterval(tick);
+    const previous = readBest();
+    if (score > previous) writeBest(score);
+    bestEl.textContent = String(Math.max(score, previous));
+    qEl.textContent = "Round complete";
+    answersEl.innerHTML = "";
+    timerFill.style.width = "0%";
+    barEl.innerHTML = "";
+    const again = document.createElement("button");
+    again.type = "button";
+    again.className = "btn primary";
+    again.textContent = "Play again";
+    again.addEventListener("click", startRound);
+    barEl.appendChild(again);
+    setStatus(
+      score > previous
+        ? "Final score " + score + " — a new personal best!"
+        : "Final score " + score + ". Best so far: " + Math.max(score, previous) + ".",
+      score > previous ? "good" : ""
+    );
+  }
+
+  function showStart() {
+    qEl.textContent = "Ten questions. Fifteen seconds each. How many can you get?";
+    answersEl.innerHTML = "";
+    barEl.innerHTML = "";
+    const start = document.createElement("button");
+    start.type = "button";
+    start.className = "btn primary";
+    start.textContent = "Start quiz";
+    start.addEventListener("click", startRound);
+    barEl.appendChild(start);
+    bestEl.textContent = String(readBest());
+    setStatus("Science, geography, history, sport, gaming and nature.");
+  }
+
+  showStart();
+})();
+</script>
+</body>
+</html>
