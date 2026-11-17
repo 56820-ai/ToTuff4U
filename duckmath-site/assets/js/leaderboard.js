@@ -2,12 +2,20 @@
 const ARCADE_ATLAS_API = "https://br-flat-grass-bdhxbnam-arcadeapi.compute.c-8.us-east-2.aws.neon.tech";
 const MEDALS = ["🥇", "🥈", "🥉"];
 const catalogLogos = new Map();
+window.catalogLogos = catalogLogos;
+window.getGameLogo = function (value) {
+  const key = String(value || "").trim().toLowerCase();
+  const alias = key === "retro bowl time" ? "retro bowl" :
+    key === "blocky combat swat time" ? "blocky combat swat" : key;
+  return catalogLogos.get(alias) || (key === "daily pick streak" ? "../images/daily-pick-streak.svg" : "../assets/arcade-atlas-logo.png");
+};
 
 async function loadCatalogLogos() {
   try {
     const response = await fetch("../games.json", { cache: "no-cache" });
     if (!response.ok) return;
     const data = await response.json();
+    catalogLogos.set("daily pick streak", "../images/daily-pick-streak.svg");
     (data.games || []).forEach(game => {
       const key = String(game.title || "").trim().toLowerCase();
       const image = String(game.image || "").trim();
