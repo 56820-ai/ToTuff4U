@@ -49,36 +49,31 @@ function formatScore(value, gameTitle) {
   return raw;
 }
 
-function makeScoreCard(row, rank) {
+function makePodiumCard(row, rank) {
   const card = document.createElement("article");
-  card.className = "score-card";
+  card.className = "podium-card podium-rank-" + rank;
+  card.setAttribute("aria-label", "Rank " + rank + ": " + (row.player_name || "Unknown player"));
   const medal = document.createElement("div");
-  medal.className = "rank-medal";
-  medal.textContent = MEDALS[rank - 1] || String(rank);
-  const imageWrap = document.createElement("div");
-  imageWrap.className = "game-icon-container";
+  medal.className = "podium-medal";
+  medal.textContent = MEDALS[rank - 1];
+  const place = document.createElement("p");
+  place.className = "podium-place";
+  place.textContent = rank === 1 ? "1st Place" : rank === 2 ? "2nd Place" : "3rd Place";
   const image = document.createElement("img");
-  image.className = "game-icon";
+  image.className = "podium-game-image";
   image.src = getGameImage(row);
   image.alt = (row.game_title || "Game") + " logo";
   image.onerror = () => { image.onerror = null; image.src = "../assets/arcade-atlas-logo.png"; };
-  imageWrap.append(image);
-  const text = document.createElement("div");
-  text.className = "card-text-align";
   const player = document.createElement("h3");
-  player.className = "player-name";
+  player.className = "podium-player";
   player.textContent = row.player_name || "Unknown player";
-  const game = document.createElement("p");
-  game.className = "game-name";
-  game.textContent = row.game_title || "Unknown game";
-  const date = document.createElement("p");
-  date.className = "score-date";
-  date.textContent = row.created_at ? new Date(row.created_at).toLocaleDateString() : "";
-  text.append(player, game, date);
-  const score = document.createElement("div");
-  score.className = "leaderboard-score";
+  const score = document.createElement("strong");
+  score.className = "podium-score";
   score.textContent = formatScore(row.score, String(row.game_title || ""));
-  card.append(medal, imageWrap, text, score);
+  const date = document.createElement("p");
+  date.className = "podium-date";
+  date.textContent = row.created_at ? new Date(row.created_at).toLocaleDateString() : "";
+  card.append(medal, place, image, player, score, date);
   return card;
 }
 
@@ -121,9 +116,19 @@ async function loadArcadeAtlasLeaderboard() {
       board.className = "game-board";
       const heading = document.createElement("h2");
       heading.className = "game-board-title";
-      heading.textContent = title;
+      const headingImage = document.createElement("img");
+      headingImage.className = "game-title-image";
+      headingImage.src = getGameImage(gameRows[0]);
+      headingImage.alt = "";
+      headingImage.onerror = () => { headingImage.onerror = null; headingImage.src = "../assets/arcade-atlas-logo.png"; };
+      const headingText = document.createElement("span");
+      headingText.textContent = title;
+      heading.append(headingImage, headingText);
       board.append(heading);
-      gameRows.slice(0,3).forEach((row,index) => board.append(makeScoreCard(row,index+1)));
+      const stage = document.createElement("div");
+      stage.className = "podium-stage";
+      gameRows.slice(0,3).forEach((row,index) => stage.append(makePodiumCard(row,index+1)));
+      board.append(stage);
       list.append(board);
     });
   } catch (error) {
