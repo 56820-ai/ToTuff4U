@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Typing Race · Arcade Atlas</title>
+<meta name="description" content="Race a computer opponent while you type a passage: live words-per-minute, accuracy and a progress track. Great for practising keyboard skills on a Chromebook.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⌨️</text></svg>">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(circle at 80% 0%,#202a46 0%,#111826 55%,#080b12 100%);
+    color:#eef4fb;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    justify-content:safe center;min-height:100vh;min-height:100svh;padding:10px 8px 14px}
+  .shell{width:min(780px,100%);display:flex;flex-direction:column;gap:9px}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .brand{font-weight:800;font-size:15px}
+  .brand span{color:#8fb8ff}
+  .back{font-size:12px;font-weight:700;text-decoration:none;color:#eef4fb;padding:9px 12px;border-radius:9px;
+    background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12)}
+  .panel{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.1);border-radius:18px;
+    padding:14px;display:flex;flex-direction:column;gap:11px;box-shadow:0 22px 60px rgba(0,0,0,.5)}
+  .track{display:flex;flex-direction:column;gap:6px}
+  .lane{position:relative;height:26px;border-radius:8px;background:rgba(0,0,0,.28);overflow:hidden;
+    border:1px solid rgba(255,255,255,.08)}
+  .lane i{position:absolute;inset:0 auto 0 0;width:0;transition:width .18s linear}
+  .lane.you i{background:linear-gradient(90deg,#1f6b47,#7ee2a8)}
+  .lane.bot i{background:linear-gradient(90deg,#5b3f8a,#b692f6)}
+  .lane span{position:absolute;left:9px;top:50%;transform:translateY(-50%);font:800 10px inherit;
+    letter-spacing:.13em;text-transform:uppercase;color:#eaf6ff;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+  .lane em{position:absolute;right:9px;top:50%;transform:translateY(-50%);font:800 11px inherit;
+    color:#eaf6ff;font-style:normal}
+  .stats{display:flex;gap:7px;flex-wrap:wrap;justify-content:center}
+  .stat{background:rgba(255,255,255,.06);border-radius:9px;padding:6px 11px;font-size:10px;color:#b9c7d8;
+    text-transform:uppercase;letter-spacing:.06em;text-align:center;min-width:78px}
+  .stat b{display:block;font-size:15px;color:#fff;letter-spacing:0;margin-top:2px}
+  .passage{font:500 17px/1.75 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:rgba(0,0,0,.26);
+    border:1px solid rgba(255,255,255,.09);border-radius:12px;padding:14px;max-height:190px;overflow:auto;
+    white-space:pre-wrap;color:#7c8fa6}
+  .passage .ok{color:#c8ffe0}
+  .passage .bad{color:#ffb3b3;background:rgba(224,74,63,.22);border-radius:3px}
+  .passage .cur{background:#2b6b8c;color:#fff;border-radius:3px}
+  textarea{width:100%;min-height:76px;resize:vertical;border-radius:10px;border:1px solid rgba(255,255,255,.16);
+    background:rgba(0,0,0,.32);color:#eef4fb;font:500 15px/1.5 ui-monospace,Menlo,Consolas,monospace;
+    padding:10px 12px;outline:none}
+  textarea:focus{border-color:#8fb8ff;box-shadow:0 0 0 3px rgba(143,184,255,.18)}
+  .status{min-height:18px;text-align:center;font-size:12px;color:#a9bccf}
+  .status.good{color:#7ee2a8}.status.bad{color:#ff9b9b}
+  .bar{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+  .btn{min-height:40px;padding:0 16px;border-radius:9px;border:1px solid rgba(255,255,255,.16);
+    background:rgba(255,255,255,.08);color:#eef4fb;font:700 12px inherit;cursor:pointer}
+  .btn:hover{background:rgba(255,255,255,.17)}
+  .btn.primary{background:#245c8c;border-color:#8fb8ff}
+  @media (max-width:560px){.passage{font-size:15px}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="topbar">
+    <div class="brand">⌨️ TYPING RACE <span>·</span> Arcade Atlas</div>
+    <a class="back" href="../../">← Arcade Atlas</a>
+  </div>
+
+  <div class="panel">
+    <div class="track">
+      <div class="lane you"><i id="youbar"></i><span>You</span><em id="youpct">0%</em></div>
+      <div class="lane bot"><i id="botbar"></i><span>Nova</span><em id="botpct">0%</em></div>
+    </div>
+
+    <div class="stats">
+      <div class="stat">WPM<b id="wpm">0</b></div>
+      <div class="stat">Accuracy<b id="acc">100%</b></div>
+      <div class="stat">Time<b id="time">0.0s</b></div>
+      <div class="stat">Best<b id="best">—</b></div>
+    </div>
+
+    <div class="passage" id="passage"></div>
+    <textarea id="input" placeholder="Start typing the passage here…" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off"></textarea>
+
+    <div class="status" id="status" role="status" aria-live="polite">Press Start race, then type the passage above.</div>
+    <div class="bar">
+      <button class="btn primary" type="button" id="start">Start race</button>
+      <button class="btn" type="button" id="reset">New passage</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  const PASSAGES = [
+    "The best way to get better at typing is to keep your hands on the home row and look at the screen instead of the keys. Speed comes later; accuracy comes first.",
+    "A tiny robot rolled into the classroom, blinked twice, and asked politely whether it could join the spelling bee. Nobody had the heart to say no.",
+    "Somewhere past the last streetlight the road turned to gravel, and the bike kept going anyway, rattling over stones until the hill finally flattened out.",
+    "Rain tapped on the library windows while three friends argued in whispers about whether a hot dog counted as a sandwich. The librarian pretended not to listen.",
+    "If you practice for ten minutes a day, your fingers start to remember where the letters live, and suddenly whole words appear on the screen without you thinking about them.",
+    "The science fair project was supposed to be a volcano. It ended up being a small city built from cardboard, string and a lot of questionable glue.",
+    "Every good puzzle has one clean solution and about twenty messy ones. Finding the clean one is the fun part, especially when the clock is running.",
+    "The ball bounced off the rim, hung in the air for what felt like a full minute, and then dropped through the net while the whole gym exploded."
+  ];
+  const STORE = "arcadeAtlasTyping";
+
+  const passageEl = document.getElementById("passage");
+  const inputEl = document.getElementById("input");
+  const youBar = document.getElementById("youbar");
+  const botBar = document.getElementById("botbar");
+  const youPct = document.getElementById("youpct");
+  const botPct = document.getElementById("botpct");
+  const wpmEl = document.getElementById("wpm");
+  const accEl = document.getElementById("acc");
+  const timeEl = document.getElementById("time");
+  const bestEl = document.getElementById("best");
+  const statusEl = document.getElementById("status");
+
+  let target = "";
+  let running = false;
+  let finished = false;
+  let startedAt = 0;
+  let botProgress = 0;
+  let botSpeed = 5.2; // percent per second
+  let rafId = null;
+  let lastFrame = 0;
+  let totalKeystrokes = 0;
+  let totalErrors = 0;
+
+  function readBest() {
+    try { return parseFloat(localStorage.getItem(STORE)) || 0; } catch (e) { return 0; }
+  }
+  function writeBest(v) {
+    try { localStorage.setItem(STORE, String(v)); } catch (e) { /* storage may be blocked */ }
+  }
+  function paintBest() {
+    const b = readBest();
+    bestEl.textContent = b ? Math.round(b) + " wpm" : "—";
+  }
+  function setStatus(text, cls) {
+    statusEl.className = "status" + (cls ? " " + cls : "");
+    statusEl.textContent = text;
+  }
+
+  function pickPassage() {
+    target = PASSAGES[Math.floor(Math.random() * PASSAGES.length)];
+    passageEl.textContent = target;
+    inputEl.value = "";
+    running = false;
+    finished = false;
+    botProgress = 0;
+    totalKeystrokes = 0;
+    totalErrors = 0;
+    youBar.style.width = "0%";
+    botBar.style.width = "0%";
+    youPct.textContent = "0%";
+    botPct.textContent = "0%";
+    wpmEl.textContent = "0";
+    accEl.textContent = "100%";
+    timeEl.textContent = "0.0s";
+    cancelAnimationFrame(rafId);
+    renderPassage();
+    setStatus("Press Start race, then type the passage above.");
+  }
+
+  function renderPassage() {
+    const typed = inputEl.value;
+    let html = "";
+    for (let i = 0; i < target.length; i++) {
+      const char = target[i] === " " ? " " : target[i];
+      const escaped = char.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+      if (i < typed.length) {
+        html += typed[i] === target[i]
+          ? '<span class="ok">' + escaped + "</span>"
+          : '<span class="bad">' + escaped + "</span>";
+      } else if (i === typed.length && running) {
+        html += '<span class="cur">' + escaped + "</span>";
+      } else {
+        html += escaped;
+      }
+    }
+    passageEl.innerHTML = html;
+  }
+
+  function accuracy() {
+    return totalKeystrokes === 0 ? 100 : Math.max(0, Math.round(((totalKeystrokes - totalErrors) / totalKeystrokes) * 100));
+  }
+
+  function wpm() {
+    const minutes = (performance.now() - startedAt) / 60000;
+    if (minutes <= 0) return 0;
+    const correctChars = Math.max(0, inputEl.value.length - totalErrors);
+    return Math.round((correctChars / 5) / minutes);
+  }
+
+  function frame(now) {
+    if (!running) return;
+    const dt = Math.min(120, now - lastFrame) / 1000;
+    lastFrame = now;
+    botProgress = Math.min(100, botProgress + botSpeed * dt);
+    botBar.style.width = botProgress + "%";
+    botPct.textContent = Math.round(botProgress) + "%";
+
+    const progress = Math.min(100, (inputEl.value.length / target.length) * 100);
+    youBar.style.width = progress + "%";
+    youPct.textContent = Math.round(progress) + "%";
+    wpmEl.textContent = String(wpm());
+    timeEl.textContent = ((now - startedAt) / 1000).toFixed(1) + "s";
+
+    if (botProgress >= 100 && !finished) {
+      finished = true;
+      running = false;
+      setStatus("Nova finished first. You were " + Math.round(progress) + "% of the way through.", "bad");
+      inputEl.disabled = true;
+    }
+    rafId = requestAnimationFrame(frame);
+  }
+
+  function start() {
+    pickPassage();
+    running = true;
+    lastFrame = performance.now();
+    startedAt = performance.now();
+    inputEl.disabled = false;
+    inputEl.focus();
+    setStatus("Go! Type the passage as accurately as you can.");
+    rafId = requestAnimationFrame(frame);
+  }
+
+  inputEl.addEventListener("input", () => {
+    if (!running) {
+      if (!finished) setStatus("Press Start race first.");
+      return;
+    }
+    const typed = inputEl.value;
+    const before = totalKeystrokes;
+    totalKeystrokes = typed.length;
+    if (typed.length > before) {
+      for (let i = before; i < typed.length; i++) if (typed[i] !== target[i]) totalErrors += 1;
+    }
+    accEl.textContent = accuracy() + "%";
+    renderPassage();
+
+    if (typed.length >= target.length) {
+      finished = true;
+      running = false;
+      cancelAnimationFrame(rafId);
+      const finalWpm = wpm();
+      const previous = readBest();
+      if (finalWpm > previous) writeBest(finalWpm);
+      paintBest();
+      youBar.style.width = "100%";
+      youPct.textContent = "100%";
+      const correct = typed === target;
+      setStatus(correct
+        ? "Finished in " + timeEl.textContent + " at " + finalWpm + " wpm with " + accuracy() + "% accuracy."
+        : "Passage complete, but there are typos — accuracy " + accuracy() + "%.", correct ? "good" : "bad");
+      inputEl.disabled = true;
+    }
+  });
+
+  inputEl.addEventListener("keydown", (event) => {
+    if (event.key === "Tab") event.preventDefault();
+  });
+
+  document.getElementById("start").addEventListener("click", start);
+  document.getElementById("reset").addEventListener("click", () => { cancelAnimationFrame(rafId); pickPassage(); inputEl.disabled = false; });
+  paintBest();
+  pickPassage();
+})();
+</script>
+</body>
+</html>

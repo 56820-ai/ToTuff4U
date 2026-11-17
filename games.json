@@ -1198,6 +1198,20 @@
       "image": "images/bomberman-card.webp",
       "category": "ARCADE",
       "description": "Drop bombs, blast through crates, clear three roaming enemies and find the hidden exit before the clock runs out."
+    },
+    {
+      "title": "Word Search",
+      "path": "g/word-search",
+      "image": "images/word-search-card.webp",
+      "category": "PUZZLE",
+      "description": "Find eight hidden words in a 12x12 grid across space, animals, food, school and sports themes."
+    },
+    {
+      "title": "Typing Race",
+      "path": "g/typing-race",
+      "image": "images/typing-race-card.webp",
+      "category": "CASUAL",
+      "description": "Race a computer rival through a passage while a live counter tracks your words per minute and accuracy."
     }
   ]
 }

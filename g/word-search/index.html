@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Word Search · Arcade Atlas</title>
+<meta name="description" content="Play Word Search free in your browser: find eight hidden words in a 12x12 grid across animals, food, space and school themes. Drag across letters to select.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔎</text></svg>">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(circle at 15% 0%,#1b2f4a 0%,#101a2a 55%,#080d16 100%);
+    color:#eef4fb;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    justify-content:safe center;min-height:100vh;min-height:100svh;padding:10px 8px 14px;user-select:none}
+  .shell{width:min(760px,100%);display:flex;flex-direction:column;gap:9px}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .brand{font-weight:800;font-size:15px}
+  .brand span{color:#7ee2a8}
+  .back{font-size:12px;font-weight:700;text-decoration:none;color:#eef4fb;padding:9px 12px;border-radius:9px;
+    background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12)}
+  .panel{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.1);border-radius:18px;
+    padding:12px;display:grid;grid-template-columns:minmax(0,1fr) 190px;gap:12px;
+    box-shadow:0 22px 60px rgba(0,0,0,.5)}
+  #grid{display:grid;grid-template-columns:repeat(12,1fr);gap:3px;touch-action:none}
+  .cell{aspect-ratio:1;display:grid;place-items:center;border-radius:5px;background:rgba(255,255,255,.05);
+    font:800 clamp(9px,2.1vw,15px) inherit;color:#dbe8f6;cursor:pointer;transition:background .1s,color .1s}
+  .cell:hover{background:rgba(126,226,168,.18)}
+  .cell.picking{background:#2c6b8c;color:#fff}
+  .cell.found{background:#1f6b47;color:#c8ffe0}
+  .side{display:flex;flex-direction:column;gap:8px}
+  .stat{background:rgba(255,255,255,.06);border-radius:9px;padding:6px 10px;display:flex;
+    justify-content:space-between;font-size:11px;color:#b9c7d8;text-transform:uppercase;letter-spacing:.05em}
+  .stat b{color:#fff;font-size:13px;letter-spacing:0}
+  .words{display:flex;flex-direction:column;gap:4px}
+  .word{background:rgba(255,255,255,.05);border-radius:8px;padding:5px 9px;font:700 12px inherit;
+    letter-spacing:.04em;color:#dbe8f6;display:flex;justify-content:space-between;align-items:center}
+  .word.done{background:#173527;color:#7ee2a8;text-decoration:line-through}
+  .status{min-height:18px;font-size:12px;text-align:center;color:#a9bccf}
+  .status.good{color:#7ee2a8}
+  .btn{min-height:38px;border-radius:9px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.08);
+    color:#eef4fb;font:700 12px inherit;cursor:pointer;width:100%}
+  .btn:hover{background:rgba(255,255,255,.17)}
+  .btn.primary{background:#166b47;border-color:#7ee2a8}
+  @media (max-width:640px){.panel{grid-template-columns:1fr}.words{flex-direction:row;flex-wrap:wrap}
+    .word{flex:1 0 40%}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="topbar">
+    <div class="brand">🔎 WORD SEARCH <span>·</span> Arcade Atlas</div>
+    <a class="back" href="../../">← Arcade Atlas</a>
+  </div>
+
+  <div class="panel">
+    <div id="grid" role="grid" aria-label="Word search grid"></div>
+    <div class="side">
+      <div class="stat"><span>Found</span><b id="found">0/8</b></div>
+      <div class="stat"><span>Time</span><b id="timer">0:00</b></div>
+      <div class="stat"><span>Theme</span><b id="theme">—</b></div>
+      <div class="words" id="words"></div>
+      <button class="btn primary" type="button" id="new">New puzzle</button>
+      <div class="status" id="status" role="status" aria-live="polite">Drag across the letters of a word.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  const SIZE = 12;
+  const THEMES = {
+    Animals: ["TIGER", "PANDA", "OTTER", "EAGLE", "KOALA", "ZEBRA", "MOOSE", "GECKO"],
+    Space: ["COMET", "ORBIT", "LUNAR", "SOLAR", "NEBULA", "ROCKET", "SATURN", "GALAXY"],
+    School: ["PENCIL", "RECESS", "SCIENCE", "LOCKER", "HOMEWORK", "LIBRARY", "TEACHER", "NOTEBOOK"],
+    Food: ["PIZZA", "MANGO", "WAFFLE", "BURRITO", "NOODLE", "CHEESE", "BANANA", "PRETZEL"],
+    Sports: ["SOCCER", "TENNIS", "HOCKEY", "SKATING", "ROWING", "BOXING", "DIVING", "ARCHERY"]
+  };
+  const DIRS = [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, -1], [1, -1], [-1, 1]];
+
+  const gridEl = document.getElementById("grid");
+  const wordsEl = document.getElementById("words");
+  const statusEl = document.getElementById("status");
+  const timerEl = document.getElementById("timer");
+
+  let letters = [];
+  let placements = {};
+  let found = new Set();
+  let picking = false;
+  let startCell = null;
+  let path = [];
+  let startedAt = 0;
+  let timerId = null;
+
+  function setStatus(text, cls) {
+    statusEl.className = "status" + (cls ? " " + cls : "");
+    statusEl.textContent = text;
+  }
+
+  function place(words) {
+    letters = Array.from({ length: SIZE }, () => Array(SIZE).fill(""));
+    placements = {};
+    words.forEach((word) => {
+      for (let attempt = 0; attempt < 400; attempt++) {
+        const dir = DIRS[Math.floor(Math.random() * DIRS.length)];
+        const row = Math.floor(Math.random() * SIZE);
+        const col = Math.floor(Math.random() * SIZE);
+        const endR = row + dir[1] * (word.length - 1);
+        const endC = col + dir[0] * (word.length - 1);
+        if (endR < 0 || endR >= SIZE || endC < 0 || endC >= SIZE) continue;
+        let fits = true;
+        for (let i = 0; i < word.length; i++) {
+          const r = row + dir[1] * i;
+          const c = col + dir[0] * i;
+          const existing = letters[r][c];
+          if (existing && existing !== word[i]) { fits = false; break; }
+        }
+        if (!fits) continue;
+        for (let i = 0; i < word.length; i++) {
+          const r = row + dir[1] * i;
+          const c = col + dir[0] * i;
+          letters[r][c] = word[i];
+        }
+        placements[word] = { row, col, dr: dir[1], dc: dir[0] };
+        return;
+      }
+    });
+    const filler = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    for (let r = 0; r < SIZE; r++) {
+      for (let c = 0; c < SIZE; c++) {
+        if (!letters[r][c]) letters[r][c] = filler[Math.floor(Math.random() * filler.length)];
+      }
+    }
+  }
+
+  function paintGrid() {
+    gridEl.innerHTML = "";
+    for (let r = 0; r < SIZE; r++) {
+      for (let c = 0; c < SIZE; c++) {
+        const cell = document.createElement("div");
+        cell.className = "cell";
+        cell.dataset.r = String(r);
+        cell.dataset.c = String(c);
+        cell.textContent = letters[r][c];
+        cell.setAttribute("role", "gridcell");
+        gridEl.appendChild(cell);
+      }
+    }
+    markFound();
+  }
+
+  function cellFromPoint(event) {
+    const el = document.elementFromPoint(event.clientX, event.clientY);
+    if (!el || !el.classList.contains("cell")) return null;
+    return { r: Number(el.dataset.r), c: Number(el.dataset.c), el };
+  }
+
+  function clearPicking() {
+    gridEl.querySelectorAll(".cell.picking").forEach((c) => c.classList.remove("picking"));
+    path = [];
+  }
+
+  function paintPath() {
+    clearPicking();
+    path.forEach((p) => {
+      const el = gridEl.querySelector('[data-r="' + p.r + '"][data-c="' + p.c + '"]');
+      if (el) el.classList.add("picking");
+    });
+  }
+
+  function lineBetween(a, b) {
+    const dr = Math.sign(b.r - a.r);
+    const dc = Math.sign(b.c - a.c);
+    const len = Math.max(Math.abs(b.r - a.r), Math.abs(b.c - a.c));
+    const straight = a.r === b.r || a.c === b.c || Math.abs(a.r - b.r) === Math.abs(a.c - b.c);
+    if (!straight) return null;
+    const cells = [];
+    for (let i = 0; i <= len; i++) cells.push({ r: a.r + dr * i, c: a.c + dc * i });
+    return cells;
+  }
+
+  function checkWord(cells) {
+    const text = cells.map((p) => letters[p.r][p.c]).join("");
+    const reversed = [...text].reverse().join("");
+    const match = Object.keys(placements).find((w) => (w === text || w === reversed) && !found.has(w));
+    if (!match) return false;
+    found.add(match);
+    markFound();
+    paintWords();
+    document.getElementById("found").textContent = found.size + "/" + Object.keys(placements).length;
+    setStatus("Found " + match + "!", "good");
+    if (found.size === Object.keys(placements).length) {
+      clearInterval(timerId);
+      setStatus("Puzzle complete in " + timerEl.textContent + "!", "good");
+    }
+    return true;
+  }
+
+  function markFound() {
+    gridEl.querySelectorAll(".cell.found").forEach((c) => c.classList.remove("found"));
+    found.forEach((word) => {
+      const p = placements[word];
+      if (!p) return;
+      for (let i = 0; i < word.length; i++) {
+        const r = p.row + p.dr * i;
+        const c = p.col + p.dc * i;
+        const el = gridEl.querySelector('[data-r="' + r + '"][data-c="' + c + '"]');
+        if (el) el.classList.add("found");
+      }
+    });
+  }
+
+  function paintWords() {
+    wordsEl.innerHTML = "";
+    Object.keys(placements).forEach((word) => {
+      const row = document.createElement("div");
+      row.className = "word" + (found.has(word) ? " done" : "");
+      row.textContent = word;
+      wordsEl.appendChild(row);
+    });
+  }
+
+  function newPuzzle() {
+    const names = Object.keys(THEMES);
+    const theme = names[Math.floor(Math.random() * names.length)];
+    const words = THEMES[theme].slice(0, 8);
+    place(words);
+    found = new Set();
+    document.getElementById("theme").textContent = theme;
+    document.getElementById("found").textContent = "0/" + words.length;
+    paintGrid();
+    paintWords();
+    setStatus("Drag across the letters of a word.");
+    clearInterval(timerId);
+    startedAt = Date.now();
+    timerEl.textContent = "0:00";
+    timerId = setInterval(() => {
+      const secs = Math.floor((Date.now() - startedAt) / 1000);
+      timerEl.textContent = Math.floor(secs / 60) + ":" + String(secs % 60).padStart(2, "0");
+    }, 500);
+  }
+
+  gridEl.addEventListener("pointerdown", (event) => {
+    const cell = cellFromPoint(event);
+    if (!cell) return;
+    event.preventDefault();
+    picking = true;
+    startCell = cell;
+    path = [{ r: cell.r, c: cell.c }];
+    paintPath();
+  });
+
+  gridEl.addEventListener("pointermove", (event) => {
+    if (!picking) return;
+    const cell = cellFromPoint(event);
+    if (!cell) return;
+    const line = lineBetween(startCell, cell);
+    if (!line) return;
+    path = line;
+    paintPath();
+  });
+
+  function endPick() {
+    if (!picking) return;
+    picking = false;
+    if (path.length > 1) checkWord(path);
+    clearPicking();
+    startCell = null;
+  }
+
+  window.addEventListener("pointerup", endPick);
+  window.addEventListener("pointercancel", () => { picking = false; clearPicking(); });
+
+  // Tap-to-start, tap-to-finish also works on touch screens.
+  gridEl.addEventListener("click", (event) => {
+    if (event.pointerType === "mouse" && path.length === 0 && startCell === null) return;
+    const cell = cellFromPoint(event);
+    if (!cell || picking) return;
+    if (!startCell) { startCell = cell; setStatus("Tap the last letter of the word."); return; }
+    const line = lineBetween(startCell, cell);
+    if (line && line.length > 1) checkWord(line);
+    startCell = null;
+    setStatus("Drag across the letters of a word.");
+  });
+
+  document.getElementById("new").addEventListener("click", newPuzzle);
+  newPuzzle();
+})();
+</script>
+</body>
+</html>
