@@ -192,7 +192,7 @@ const uiAudit = { leaderboard: {}, blockyCombat: {}, catalog: {}, collections: {
 try {
   const page = await browser.newPage({ viewport: { width: 1365, height: 768 } });
   const errors = [];
-  page.on("pageerror", e => errors.push(String(e.message || e).slice(0, 220)));
+  page.on("pageerror", e => errors.push(String(e.stack || e.message || e).slice(0, 900)));
   const response = await page.goto(BASE + "/leaderboard/", { waitUntil: "domcontentloaded", timeout: 16000 });
   await page.waitForTimeout(1200);
   const state = await page.evaluate(() => ({
@@ -211,7 +211,7 @@ try {
 try {
   const page = await browser.newPage({ viewport: { width: 1365, height: 768 } });
   const errors = [];
-  page.on("pageerror", e => errors.push(String(e.message || e).slice(0, 220)));
+  page.on("pageerror", e => errors.push(String(e.stack || e.message || e).slice(0, 900)));
   const response = await page.goto(BASE + "/g/duckdb2-blocky-combat-swat-main/", { waitUntil: "domcontentloaded", timeout: 16000 });
   await page.waitForTimeout(1200);
   const state = await page.evaluate(() => ({
@@ -229,7 +229,7 @@ try {
   catalogContext = await browser.newContext({ viewport: { width: 1365, height: 768 } });
   const page = await catalogContext.newPage();
   const errors = [];
-  page.on("pageerror", e => errors.push(String(e.message || e).slice(0, 220)));
+  page.on("pageerror", e => errors.push(String(e.stack || e.message || e).slice(0, 900)));
   const response = await page.goto(BASE + "/", { waitUntil: "domcontentloaded", timeout: 16000 });
   await page.waitForSelector("#favoritesOnlyToggle", { timeout: 12000 });
   await page.waitForSelector("#all-games-grid .game-card .favorite-star", { timeout: 12000 });
@@ -378,6 +378,7 @@ try {
     mostPlayedVisibleAfterClear,
     sharedFiltersLoaded,
     shareLinkCopied,
+    shareButtonText: await page.locator("#shareCatalogButton").textContent().catch(() => ""),
     shareUrlValid,
     dailyStreakLinkWorks,
     crossTabPreferencesSynced,
@@ -399,11 +400,12 @@ try {
   uiAudit.catalog.error = String(e.message || e).slice(0, 300);
 }
 
+let collectionsStage = "opening catalog";
 try {
   const collectionsContext = await browser.newContext({ viewport: { width: 1365, height: 900 } });
   const page = await collectionsContext.newPage();
   const errors = [];
-  page.on("pageerror", e => errors.push(String(e.message || e).slice(0, 220)));
+  page.on("pageerror", e => errors.push(String(e.stack || e.message || e).slice(0, 900)));
   const response = await page.goto(BASE + "/", { waitUntil: "domcontentloaded", timeout: 16000 });
   await page.waitForSelector("#createCollectionButton", { timeout: 12000 });
   await page.evaluate(() => {
@@ -484,7 +486,7 @@ try {
     importState[0].paths.every(path => !/^https?:/i.test(path)) && importState[1].paths.length === 1;
 
   const syncPage = await collectionsContext.newPage();
-  syncPage.on("pageerror", e => errors.push(String(e.message || e).slice(0, 220)));
+  syncPage.on("pageerror", e => errors.push(String(e.stack || e.message || e).slice(0, 900)));
   await syncPage.goto(BASE + "/", { waitUntil: "domcontentloaded", timeout: 16000 });
   await syncPage.waitForSelector("#collections-grid .collection-card", { timeout: 10000 });
   await syncPage.evaluate(() => {
@@ -493,7 +495,7 @@ try {
   });
   const secondTabCollections = await syncPage.locator("#collections-grid .collection-card").count();
   await syncPage.locator("#collections-grid .collection-card").filter({ hasText: "Arcade Night" }).locator(".collection-browse-button").last().click();
-  await syncPage.waitForFunction(() => document.getElementById("catalogResultsCount")?.textContent === "2 games in Arcade Night", undefined, { timeout: 4000 });
+  collectionsStage = "waitForFunction #1"; await syncPage.waitForFunction(() => document.getElementById("catalogResultsCount")?.textContent === "2 games in Arcade Night", undefined, { timeout: 4000 });
 
   await page.evaluate(() => { window.__collectionOpened = ""; window.open = url => { window.__collectionOpened = url; return null; }; });
   await page.locator('#collections-grid .collection-card').filter({ hasText: "Arcade Night" }).locator('.collection-play-button').click();
@@ -511,15 +513,15 @@ try {
   await page.locator('#collection-name-input').fill("Arcade Favorites");
   await page.locator('#collection-form').evaluate(form => form.requestSubmit());
   await page.waitForFunction(() => JSON.parse(localStorage.getItem("arcadeAtlasCollectionsV1") || "[]").some(item => item.name === "Arcade Favorites"), undefined, { timeout: 4000 });
-  await syncPage.waitForFunction(() => document.querySelector("#collections-grid h3")?.textContent === "Arcade Favorites", undefined, { timeout: 4000 });
-  await syncPage.waitForFunction(() => document.getElementById("catalogResultsCount")?.textContent === "2 games in Arcade Favorites", undefined, { timeout: 4000 });
+  collectionsStage = "waitForFunction #2"; await syncPage.waitForFunction(() => document.querySelector("#collections-grid h3")?.textContent === "Arcade Favorites", undefined, { timeout: 4000 });
+  collectionsStage = "waitForFunction #3"; await syncPage.waitForFunction(() => document.getElementById("catalogResultsCount")?.textContent === "2 games in Arcade Favorites", undefined, { timeout: 4000 });
   await page.locator('#collections-grid button[aria-label="Delete Arcade Favorites"]').click();
   const customDeleteDialog = await page.locator('#collection-dialog').evaluate(dialog => dialog.open) &&
     (await page.locator('#collection-dialog-title').textContent()) === "Delete playlist?";
   await page.locator('#collection-form').evaluate(form => form.requestSubmit());
   await page.waitForFunction(() => !JSON.parse(localStorage.getItem("arcadeAtlasCollectionsV1") || "[]").some(item => item.name === "Arcade Favorites"), undefined, { timeout: 4000 });
-  await syncPage.waitForFunction(() => document.getElementById("clearCollectionFilter")?.style.display === "none", undefined, { timeout: 4000 });
-  await syncPage.waitForFunction(() => document.getElementById("catalogResultsCount")?.textContent === "100 games", undefined, { timeout: 4000 });
+  collectionsStage = "waitForFunction #4"; await syncPage.waitForFunction(() => document.getElementById("clearCollectionFilter")?.style.display === "none", undefined, { timeout: 4000 });
+  collectionsStage = "waitForFunction #5"; await syncPage.waitForFunction(() => document.getElementById("catalogResultsCount")?.textContent === "100 games", undefined, { timeout: 4000 });
   const deleted = await page.locator('#collections-grid .collection-card').count() === 1 &&
     (await page.locator('#collections-grid h3').textContent()) === "Co-op Night";
   const crossTabSynced = secondTabCollections === 2;
@@ -539,13 +541,13 @@ try {
   await page.close();
   await collectionsContext.close();
 } catch (e) {
-  uiAudit.collections.error = String(e.message || e).slice(0, 300);
+  uiAudit.collections.error = collectionsStage + ": " + String(e.stack || e.message || e).slice(0, 900);
 }
 
 try {
   const page = await browser.newPage({ viewport: { width: 1365, height: 768 } });
   const errors = [];
-  page.on("pageerror", e => errors.push(String(e.message || e).slice(0, 220)));
+  page.on("pageerror", e => errors.push(String(e.stack || e.message || e).slice(0, 900)));
   const response = await page.goto(BASE + "/", { waitUntil: "domcontentloaded", timeout: 16000 });
   await page.waitForSelector("#daily-pick-play", { timeout: 12000 });
   await page.waitForSelector("#daily-pick-title", { timeout: 12000 });
@@ -599,7 +601,7 @@ try {
 try {
   const page = await browser.newPage({ viewport: { width: 1200, height: 850 } });
   const errors = [];
-  page.on("pageerror", e => errors.push(String(e.message || e).slice(0, 220)));
+  page.on("pageerror", e => errors.push(String(e.stack || e.message || e).slice(0, 900)));
   const response = await page.goto(BASE + "/g/connect-four/", { waitUntil: "domcontentloaded", timeout: 16000 });
   await page.waitForSelector("#board button", { timeout: 10000 });
   const buttonCount = await page.locator("#board button").count();
@@ -626,7 +628,7 @@ try {
 try {
   const page = await browser.newPage({ viewport: { width: 1365, height: 768 } });
   const errors = [];
-  page.on("pageerror", e => errors.push(String(e.message || e).slice(0, 220)));
+  page.on("pageerror", e => errors.push(String(e.stack || e.message || e).slice(0, 900)));
   const response = await page.goto(BASE + "/g/chess/", { waitUntil: "domcontentloaded", timeout: 16000 });
   const canvas = page.locator("#game canvas");
   await canvas.waitFor({ state: "visible", timeout: 12000 });
@@ -654,7 +656,7 @@ try {
 try {
   const page = await browser.newPage({ viewport: { width: 1365, height: 900 } });
   const errors = [];
-  page.on("pageerror", e => errors.push(String(e.message || e).slice(0, 220)));
+  page.on("pageerror", e => errors.push(String(e.stack || e.message || e).slice(0, 900)));
   const response = await page.goto(BASE + "/g/sudoku/", { waitUntil: "domcontentloaded", timeout: 16000 });
   await page.waitForSelector("#board .cell", { timeout: 8000 });
   const cells = await page.locator("#board .cell").count();
@@ -704,7 +706,7 @@ try {
 async function runArcadeSmokeTest(key, path, selector, exercise) {
   const page = await browser.newPage({ viewport: { width: 1365, height: 900 } });
   const errors = [];
-  page.on("pageerror", e => errors.push(String(e.message || e).slice(0, 220)));
+  page.on("pageerror", e => errors.push(String(e.stack || e.message || e).slice(0, 900)));
   try {
     const response = await page.goto(BASE + path, { waitUntil: "domcontentloaded", timeout: 16000 });
     await page.waitForSelector(selector, { timeout: 10000 });
