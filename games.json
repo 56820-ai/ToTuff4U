@@ -1395,6 +1395,70 @@
       "category": "ACTION",
       "source": "https://github.com/humancto/legacy-games",
       "description": "A neon cyberpunk shooter: run, shoot and crouch your way past the enemies holding the street."
+    },
+    {
+      "title": "Bullet Hell",
+      "path": "g/bullet-hell",
+      "image": "./images/bullet-hell-card.webp",
+      "category": "ACTION",
+      "source": "https://github.com/prateek121/90s-games",
+      "description": "Thread your ship between dense curtains of bullets, survive each wave and climb the score."
+    },
+    {
+      "title": "Earth Digger",
+      "path": "g/earth-digger",
+      "image": "./images/earth-digger-card.webp",
+      "category": "ARCADE",
+      "source": "https://github.com/prateek121/90s-games",
+      "description": "Dig deeper for gems while dodging the hazards underground, and bank as much gold as you can carry."
+    },
+    {
+      "title": "8-Bit Quest",
+      "path": "g/8bit-quest",
+      "image": "./images/8bit-quest-card.webp",
+      "category": "PLATFORMER",
+      "source": "https://github.com/prateek121/90s-games",
+      "description": "A pixel platformer with gold to collect, enemies to hit and levels to clear one jump at a time."
+    },
+    {
+      "title": "Cipher Crack",
+      "path": "g/cipher-crack",
+      "image": "./images/cipher-crack-card.webp",
+      "category": "PUZZLE",
+      "source": "https://github.com/prateek121/90s-games",
+      "description": "Work out the substitution cipher: map each scrambled letter to its real one and read the message."
+    },
+    {
+      "title": "Forest Guardian",
+      "path": "g/forest-guardian",
+      "image": "./images/forest-guardian-card.webp",
+      "category": "STRATEGY",
+      "source": "https://github.com/prateek121/90s-games",
+      "description": "Hold the line against wave after wave of attackers and keep as many trees standing as you can."
+    },
+    {
+      "title": "Chrono Jump",
+      "path": "g/chrono-jump",
+      "image": "./images/chrono-jump-card.webp",
+      "category": "PLATFORMER",
+      "source": "https://github.com/prateek121/90s-games",
+      "description": "Jump between platforms as time shifts around you, timing each hop to stay on solid ground."
+    },
+    {
+      "title": "Flood It",
+      "path": "g/flood-it",
+      "image": "./images/flood-it-card.webp",
+      "category": "PUZZLE",
+      "source": "https://github.com/tvanas/html5-games",
+      "description": "Start from the corner and flood the whole board into a single colour before you run out of moves."
+    },
+    {
+      "title": "Brick It",
+      "path": "g/brick-it",
+      "image": "./images/brick-it-card.webp",
+      "category": "ARCADE",
+      "source": "https://github.com/tvanas/html5-games",
+      "description": "An Arkanoid-style brick breaker: bounce the ball, clear every brick and keep the paddle under it."
     }
   ]
 }
