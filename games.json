@@ -459,7 +459,7 @@
     {
       "title": "Flappy 2048",
       "path": "g/flappy-2048",
-      "image": "g/flappy-2048/meta/apple-touch-icon.png",
+      "image": "images/flappy-2048-card.webp",
       "category": "ARCADE"
     },
     {
@@ -507,7 +507,7 @@
     {
       "title": "Rooftop Snipers 2",
       "path": "g/rooftop-snipers-2-main",
-      "image": "g/rooftop-snipers-2-main/895b299e7e49558ca383b23648314860.jpg",
+      "image": "images/rooftop-snipers-2-card.webp",
       "category": "ACTION"
     },
     {
