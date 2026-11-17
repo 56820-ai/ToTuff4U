@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tower Defense</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <h1>🏰 Tower Defense</h1>
+      <p class="tagline">Place towers, stop the creeps from reaching the base.</p>
+    </header>
+
+    <section class="hud" aria-label="Game statistics">
+      <div class="stat"><span class="stat-label">Money</span><span class="stat-value" id="money">100</span></div>
+      <div class="stat"><span class="stat-label">Lives</span><span class="stat-value" id="lives">20</span></div>
+      <div class="stat"><span class="stat-label">Wave</span><span class="stat-value" id="wave">1</span></div>
+    </section>
+
+    <div class="stage">
+      <canvas id="game" width="520" height="520"></canvas>
+      <p class="message" id="message">Click an empty tile to build a tower. Click Start to send a wave.</p>
+    </div>
+
+    <footer class="controls">
+      <button class="btn" id="start">Start Wave</button>
+      <button class="btn" id="restart">Restart</button>
+      <a href="../../">← Back to Arcade Atlas</a>
+    </footer>
+  </main>
+
+  <script src="game.js"></script>
+</body>
+</html>

@@ -1,0 +1,3 @@
+Source: https://github.com/stonedhawk/pixel-platformer
+Upstream commit: 5458c98c85384320740ebaa0edfbb2a2dc5fae81
+License: MIT; see LICENSE.

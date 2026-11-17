@@ -1,0 +1,3 @@
+Source: https://github.com/weizixiao/fruit-box-game
+Upstream commit: de7b1f59bff021d76f5138af17bed37220f7783e
+License: MIT; see LICENSE.

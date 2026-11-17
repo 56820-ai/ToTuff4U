@@ -1673,6 +1673,11 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         return [game.title, game.category, game.description, ...tags].filter(Boolean).join(' ').toLowerCase();
     }
 
+    function matchesGameSearch(game, query) {
+        const searchText = getGameSearchText(game);
+        return !query || query.split(/\s+/).every(term => searchText.includes(term));
+    }
+
     function hasMultiplayerTag(game) {
         return Array.isArray(game.tags) && game.tags.some(tag => /multiplayer|co-op|two-player|2-player/i.test(String(tag)));
     }
@@ -2112,7 +2117,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
     async function loadGames() {
         if (cachedGames.length) return cachedGames;
         try {
-            const response = await fetch('games.json?v=2026-11-15-expansion4');
+            const response = await fetch('games.json?v=2026-11-16-library');
             if (!response.ok) throw new Error('Could not load games.json: ' + response.status);
             const data = await response.json();
             cachedGames = Array.isArray(data.games) ? data.games : [];
@@ -2573,7 +2578,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         const collectionPaths = activeCollection ? new Set(activeCollection.paths) : null;
         if (activeGameCollectionId && !activeCollection) { activeGameCollectionId = ''; persistActiveGameCollection(); }
         const filteredGames = allGames.filter(game => {
-            const matchesQuery = getGameSearchText(game).includes(query);
+            const matchesQuery = matchesGameSearch(game, query);
             const matchesCategory = !category || String(game.category || '').toUpperCase() === category;
             const matchesFavorite = !favoritePaths || favoritePaths.has(normalizeGamePath(game.path));
             const matchesMode = activeCatalogMode !== 'multiplayer' || hasMultiplayerTag(game);
@@ -2669,7 +2674,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         const activeCollection = getGameCollections().find(collection => collection.id === activeGameCollectionId);
         const collectionPaths = activeCollection ? new Set(activeCollection.paths) : null;
         const eligible = cachedGames.filter(game => {
-            const matchesQuery = !query || getGameSearchText(game).includes(query);
+            const matchesQuery = !query || matchesGameSearch(game, query);
             const matchesCategory = !category || String(game.category || '').toUpperCase() === category;
             const matchesFavorite = !favoritePaths || favoritePaths.has(normalizeGamePath(game.path));
             const matchesMode = activeCatalogMode !== 'multiplayer' || hasMultiplayerTag(game);

@@ -225,7 +225,7 @@
     {
       "title": "Bloons TD5",
       "path": "g/btd5",
-      "image": "./duckmath-site/assets/img/icons/bloons1.webp",
+      "image": "images/btd5.png",
       "category": "STRATEGY",
       "description": "Place dart-throwing monkeys and other defenses to stop waves of balloons."
     },
@@ -308,7 +308,7 @@
     {
       "title": "Stickman Golf",
       "path": "g/stickman-golf",
-      "image": "images/stickman.png",
+      "image": "g/stickman-golf/splash.png",
       "category": "ADVENTURE"
     },
     {
@@ -419,21 +419,21 @@
     {
       "title": "Hextris",
       "path": "g/hextris",
-      "image": "https://raw.githubusercontent.com/Hextris/hextris/gh-pages/images/facebook-opengraph.png",
+      "image": "g/hextris/images/icons/apple-touch-512.png",
       "category": "PUZZLE",
       "source": "https://github.com/Hextris/hextris"
     },
     {
       "title": "A Dark Room",
       "path": "g/a-dark-room",
-      "image": "https://raw.githubusercontent.com/doublespeakgames/adarkroom/main/img/adr.png",
+      "image": "g/a-dark-room/img/Logo1.jpg",
       "category": "ADVENTURE",
       "source": "https://github.com/doublespeakgames/adarkroom"
     },
     {
       "title": "HexGL",
       "path": "g/hexgl",
-      "image": "https://raw.githubusercontent.com/BKcore/HexGL/master/icon_256.png",
+      "image": "g/hexgl/icon_256.png",
       "category": "RACING",
       "source": "https://github.com/BKcore/HexGL"
     },
@@ -507,7 +507,7 @@
     {
       "title": "Rooftop Snipers 2",
       "path": "g/rooftop-snipers-2-main",
-      "image": "g/rooftop-snipers-2-main/1-small.jpg",
+      "image": "g/rooftop-snipers-2-main/895b299e7e49558ca383b23648314860.jpg",
       "category": "ACTION"
     },
     {
@@ -606,7 +606,7 @@
     {
       "title": "Waterworks",
       "path": "g/waterworks",
-      "image": "g/waterworks/icon.png",
+      "image": "g/waterworks/square.png",
       "category": "PUZZLE"
     },
     {
@@ -847,6 +847,301 @@
         "single player",
         "touch"
       ]
+    },
+    {
+      "title": "Frogger",
+      "path": "g/frogger",
+      "image": "images/frogger-card.webp",
+      "category": "ARCADE",
+      "description": "Hop across busy roads and rivers to reach safety.",
+      "source": "https://github.com/prateek121/90s-games"
+    },
+    {
+      "title": "Space Invaders",
+      "path": "g/space-invaders",
+      "image": "images/space-invaders-card.webp",
+      "category": "ARCADE",
+      "description": "Defend your ship against waves of descending invaders.",
+      "source": "https://github.com/prateek121/90s-games"
+    },
+    {
+      "title": "Retro Racer",
+      "path": "g/retro-racer",
+      "image": "images/retro-racer-card.webp",
+      "category": "RACING",
+      "description": "Steer through traffic and keep your car on the road.",
+      "source": "https://github.com/prateek121/90s-games"
+    },
+    {
+      "title": "Tower Defense",
+      "path": "g/tower-defense",
+      "image": "images/tower-defense-card.webp",
+      "category": "STRATEGY",
+      "description": "Build towers along the path and defend your base from enemy waves.",
+      "source": "https://github.com/gamelabz/html5-game-tower-defense"
+    },
+    {
+      "title": "Bubble Shooter",
+      "path": "g/web-games/bubble-shooter",
+      "image": "images/bubble-shooter-card.webp",
+      "category": "PUZZLE",
+      "description": "Aim bubbles to match colors and drop connected clusters.",
+      "source": "https://github.com/mashukui/web-games"
+    },
+    {
+      "title": "Merge Drop",
+      "path": "g/web-games/merge-drop",
+      "image": "images/merge-drop-card.webp",
+      "category": "PUZZLE",
+      "description": "Drop and merge matching fruit while keeping the pile below the line.",
+      "source": "https://github.com/mashukui/web-games"
+    },
+    {
+      "title": "Water Sort",
+      "path": "g/web-games/water-sort",
+      "image": "images/water-sort-card.webp",
+      "category": "PUZZLE",
+      "description": "Pour colored liquids between tubes until each tube contains one color.",
+      "source": "https://github.com/mashukui/web-games"
+    },
+    {
+      "title": "Gem Match",
+      "path": "g/web-games/gem-match",
+      "image": "images/gem-match-card.webp",
+      "category": "PUZZLE",
+      "description": "Swap neighboring gems to make matches and chain reactions.",
+      "source": "https://github.com/mashukui/web-games"
+    },
+    {
+      "title": "Air Hockey",
+      "path": "g/web-games/air-hockey",
+      "image": "images/air-hockey-card.webp",
+      "category": "SPORTS",
+      "description": "Defend your goal and shoot the puck past the computer.",
+      "source": "https://github.com/mashukui/web-games"
+    },
+    {
+      "title": "Battleship",
+      "path": "g/web-games/battleship",
+      "image": "images/battleship-card.webp",
+      "category": "STRATEGY",
+      "description": "Place your fleet and find the computer’s hidden ships on a grid.",
+      "source": "https://github.com/mashukui/web-games"
+    },
+    {
+      "title": "Sokoban",
+      "path": "g/web-games/sokoban",
+      "image": "images/sokoban-card.webp",
+      "category": "PUZZLE",
+      "description": "Push crates onto targets across 30 levels, with undo for tricky moves.",
+      "source": "https://github.com/mashukui/web-games"
+    },
+    {
+      "title": "Lights Out",
+      "path": "g/web-games/lights-out",
+      "image": "images/lights-out-card.webp",
+      "category": "PUZZLE",
+      "description": "Flip neighboring lights and try to switch off the entire board.",
+      "source": "https://github.com/mashukui/web-games"
+    },
+    {
+      "title": "Pipe Connect",
+      "path": "g/web-games/pipe-connect",
+      "image": "images/pipe-connect-card.webp",
+      "category": "PUZZLE",
+      "description": "Rotate pipes to connect a source to its outlet before time runs out.",
+      "source": "https://github.com/mashukui/web-games"
+    },
+    {
+      "title": "Nonogram",
+      "path": "g/web-games/nonogram",
+      "image": "images/nonogram-card.webp",
+      "category": "PUZZLE",
+      "description": "Use number clues to reveal a picture on the grid.",
+      "source": "https://github.com/mashukui/web-games"
+    },
+    {
+      "title": "Checkers",
+      "path": "g/web-games/checkers",
+      "image": "images/checkers-card.webp",
+      "category": "STRATEGY",
+      "description": "Jump opposing pieces and crown kings in a match against the computer.",
+      "source": "https://github.com/mashukui/web-games"
+    },
+    {
+      "title": "Mini Golf",
+      "path": "g/web-games/mini-golf",
+      "image": "images/mini-golf-card.webp",
+      "category": "SPORTS",
+      "description": "Putt through nine holes with walls, sand and water hazards.",
+      "source": "https://github.com/mashukui/web-games"
+    },
+    {
+      "title": "Bowling",
+      "path": "g/web-games/bowling",
+      "image": "images/bowling-card.webp",
+      "category": "SPORTS",
+      "description": "Aim and spin the ball through ten frames of bowling.",
+      "source": "https://github.com/mashukui/web-games"
+    },
+    {
+      "title": "Penalty Kick",
+      "path": "g/web-games/penalty-kick",
+      "image": "images/penalty-kick-card.webp",
+      "category": "SPORTS",
+      "description": "Shoot and save in a five-round penalty shootout.",
+      "source": "https://github.com/mashukui/web-games"
+    },
+    {
+      "title": "Dino Run",
+      "path": "g/web-games/dino-run",
+      "image": "images/dino-run-card.webp",
+      "category": "ENDLESS RUNNER",
+      "description": "Jump cacti and duck birds as the desert speeds up.",
+      "source": "https://github.com/mashukui/web-games"
+    },
+    {
+      "title": "Fruit Slice",
+      "path": "g/web-games/fruit-slice",
+      "image": "images/fruit-slice-card.webp",
+      "category": "ARCADE",
+      "description": "Slice flying fruit and avoid the bombs to keep your streak going.",
+      "source": "https://github.com/mashukui/web-games"
+    },
+    {
+      "title": "Fruit Box",
+      "path": "g/fruit-box",
+      "image": "images/fruit-box-card.webp",
+      "category": "PUZZLE",
+      "description": "Select rectangles of apples that add up to ten on a daily board.",
+      "source": "https://github.com/weizixiao/fruit-box-game"
+    },
+    {
+      "title": "Arcade Soccer",
+      "path": "g/arcade-soccer",
+      "image": "images/arcade-soccer-card.webp",
+      "category": "SPORTS",
+      "description": "Play four-a-side soccer against the computer or a friend on one keyboard.",
+      "source": "https://github.com/iamsorenl/arcade-soccer",
+      "tags": [
+        "soccer",
+        "football",
+        "two-player",
+        "local multiplayer",
+        "sports"
+      ]
+    },
+    {
+      "title": "Mahjong Link",
+      "path": "g/web-games/mahjong-link",
+      "image": "images/mahjong-link-card.webp",
+      "category": "PUZZLE",
+      "description": "Match identical tiles connected by a path with no more than two turns.",
+      "source": "https://github.com/mashukui/web-games"
+    },
+    {
+      "title": "Mancala",
+      "path": "g/web-games/mancala",
+      "image": "images/mancala-card.webp",
+      "category": "STRATEGY",
+      "description": "Sow seeds, capture stones and play for extra turns against the computer.",
+      "source": "https://github.com/mashukui/web-games"
+    },
+    {
+      "title": "Tower of Hanoi",
+      "path": "g/web-games/hanoi",
+      "image": "images/hanoi-card.webp",
+      "category": "PUZZLE",
+      "description": "Move the stack between pegs without placing a larger disk on a smaller one.",
+      "source": "https://github.com/mashukui/web-games"
+    },
+    {
+      "title": "Reversi",
+      "path": "g/web-games/reversi",
+      "image": "images/reversi-card.webp",
+      "category": "STRATEGY",
+      "description": "Surround opposing discs to flip them in this classic board game.",
+      "source": "https://github.com/mashukui/web-games"
+    },
+    {
+      "title": "Gomoku",
+      "path": "g/web-games/gomoku",
+      "image": "images/gomoku-card.webp",
+      "category": "STRATEGY",
+      "description": "Place five stones in a row before your computer opponent.",
+      "source": "https://github.com/mashukui/web-games"
+    },
+    {
+      "title": "Traffic Jam",
+      "path": "g/web-games/rush-hour",
+      "image": "images/rush-hour-card.webp",
+      "category": "PUZZLE",
+      "description": "Slide cars out of the way to free the red car across twelve levels.",
+      "source": "https://github.com/mashukui/web-games"
+    },
+    {
+      "title": "Snakes and Ladders",
+      "path": "g/web-games/snakes-ladders",
+      "image": "images/snakes-ladders-card.webp",
+      "category": "STRATEGY",
+      "description": "Roll the dice and race the computer to square 100.",
+      "source": "https://github.com/mashukui/web-games"
+    },
+    {
+      "title": "Helicopter Tunnel",
+      "path": "g/web-games/helicopter",
+      "image": "images/helicopter-card.webp",
+      "category": "ARCADE",
+      "description": "Fly through an endless cave, holding to climb and releasing to descend.",
+      "source": "https://github.com/mashukui/web-games"
+    },
+    {
+      "title": "Hoop Shot",
+      "path": "g/web-games/hoop-shot",
+      "image": "images/hoop-shot-card.webp",
+      "category": "SPORTS",
+      "description": "Shoot baskets into a moving hoop before the clock runs out.",
+      "source": "https://github.com/mashukui/web-games"
+    },
+    {
+      "title": "Slingshot",
+      "path": "g/web-games/slingshot",
+      "image": "images/slingshot-card.webp",
+      "category": "SPORTS",
+      "description": "Aim your slingshot and hit targets across a series of levels.",
+      "source": "https://github.com/mashukui/web-games"
+    },
+    {
+      "title": "Piano Tap",
+      "path": "g/web-games/piano-tap",
+      "image": "images/piano-tap-card.webp",
+      "category": "ARCADE",
+      "description": "Tap the black tiles as they roll past and avoid the white ones.",
+      "source": "https://github.com/mashukui/web-games"
+    },
+    {
+      "title": "Balloon Pop",
+      "path": "g/web-games/balloon-pop",
+      "image": "images/balloon-pop-card.webp",
+      "category": "ARCADE",
+      "description": "Pop balloons, dodge bombs and build combos before time runs out.",
+      "source": "https://github.com/mashukui/web-games"
+    },
+    {
+      "title": "Pixel Platformer",
+      "path": "g/pixel-platformer",
+      "image": "images/pixel-platformer-card.webp",
+      "category": "PLATFORMER",
+      "description": "Run, jump and collect coins through a colorful side-scrolling platformer.",
+      "source": "https://github.com/stonedhawk/pixel-platformer"
+    },
+    {
+      "title": "Devil Dupe",
+      "path": "g/devil-dupe",
+      "image": "images/devil-dupe-card.webp",
+      "category": "PLATFORMER",
+      "description": "Jump through tricky levels filled with unexpected traps.",
+      "source": "https://github.com/sidharthabj/level-devil-dupe"
     }
   ]
 }

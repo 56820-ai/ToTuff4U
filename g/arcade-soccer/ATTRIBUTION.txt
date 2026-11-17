@@ -1,0 +1,5 @@
+Source: https://github.com/iamsorenl/arcade-soccer
+Upstream commit: 2aeafa880f22e754a0915c4ece648b7386a4c5db
+License: MIT; see LICENSE.
+Player sprites: Kenney Sports Pack, CC0: https://opengameart.org/content/sports-pack-350
+Online league disabled; local matches and team builder remain available.

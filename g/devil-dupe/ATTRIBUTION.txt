@@ -1,0 +1,3 @@
+Source: https://github.com/sidharthabj/level-devil-dupe
+Upstream commit: ff1a448b2e089109cc340c0ed1ce0797bfb23617
+License: MIT; see LICENSE.
