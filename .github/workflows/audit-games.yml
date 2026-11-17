@@ -55,8 +55,11 @@ jobs:
           done
           cat /tmp/arcade-server.log
           exit 1
+      - name: Validate browser audit script syntax
+        run: node --check scripts/audit-games.mjs
       - name: Audit Arcade Atlas games in Chromium
-        run: node scripts/audit-games.mjs
+        timeout-minutes: 25
+        run: node --unhandled-rejections=strict scripts/audit-games.mjs
       - name: Commit verified game catalog cleanup
         if: success()
         run: |
