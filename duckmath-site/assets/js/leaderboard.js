@@ -40,12 +40,26 @@ function getGameImage(row) {
 
 function formatScore(value, gameTitle) {
   const raw = String(value ?? "—");
-  if (gameTitle.toLowerCase() === "cookie clicker" && /^\d+$/.test(raw)) {
+  if (gameTitle.toLowerCase() === "cookie clicker" && /^\\d+$/.test(raw)) {
     const n = BigInt(raw);
-    if (n >= 1000000000000n) return (Number(n / 1000000000n) / 1000).toLocaleString("en-US", {maximumFractionDigits:3}) + " trillion";
-    return n.toLocaleString("en-US");
+    if (n === 0n) return "0";
+    const units = [
+      "", "thousand", "million", "billion", "trillion", "quadrillion",
+      "quintillion", "sextillion", "septillion", "octillion", "nonillion",
+      "decillion", "undecillion", "duodecillion", "tredecillion",
+      "quattuordecillion", "quindecillion", "sexdecillion",
+      "septendecillion", "octodecillion", "novemdecillion", "vigintillion"
+    ];
+    const group = Math.floor((raw.length - 1) / 3);
+    if (group === 0) return n.toLocaleString("en-US");
+    const leading = raw.slice(0, Math.min(3, raw.length));
+    const amount = Number(leading) / (10 ** (leading.length - 1));
+    const rounded = Number(amount.toFixed(2));
+    if (group < units.length) return rounded.toFixed(2) + " " + units[group];
+    // Keep huge scores readable and exact in scale, without converting BigInt to Number.
+    return rounded.toFixed(2) + " × 10^" + (raw.length - 1);
   }
-  if (/^\d+(\.\d+)?$/.test(raw)) return Number(raw).toLocaleString("en-US", {maximumFractionDigits:3});
+  if (/^\\d+(\\.\\d+)?$/.test(raw)) return Number(raw).toLocaleString("en-US", {maximumFractionDigits:3});
   return raw;
 }
 
