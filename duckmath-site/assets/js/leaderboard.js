@@ -3,11 +3,12 @@ const ARCADE_ATLAS_API = "https://br-flat-grass-bdhxbnam-arcadeapi.compute.c-8.u
 const MEDALS = ["🥇", "🥈", "🥉"];
 const catalogLogos = new Map();
 window.catalogLogos = catalogLogos;
+function normalizeGameKey(value) {
+  return String(value || "").trim().toLowerCase().replace(/\\s+time$/, "").replace(/[^a-z0-9]+/g, " ").trim();
+}
 window.getGameLogo = function (value) {
-  const key = String(value || "").trim().toLowerCase();
-  const alias = key === "retro bowl time" ? "retro bowl" :
-    key === "blocky combat swat time" ? "blocky combat swat" : key;
-  return catalogLogos.get(alias) || (key === "daily pick streak" ? "../images/daily-pick-streak.svg" : "../assets/arcade-atlas-logo.png");
+  const key = normalizeGameKey(value);
+  return catalogLogos.get(key) || (key === "daily pick streak" ? "../images/daily-pick-streak.svg" : "../assets/arcade-atlas-logo.png");
 };
 
 async function loadCatalogLogos() {
@@ -23,6 +24,7 @@ async function loadCatalogLogos() {
       const external = /^(https?:|data:|blob:|\/\/)/i.test(image);
       const resolved = external ? image : image.startsWith("/") ? image : "../" + image.replace(/^\.\//, "");
       catalogLogos.set(key, resolved);
+      catalogLogos.set(normalizeGameKey(key), resolved);
     });
   } catch (error) {
     console.warn("Arcade Atlas: game image catalog unavailable.", error);
@@ -30,10 +32,10 @@ async function loadCatalogLogos() {
 }
 
 function getGameImage(row) {
-  const title = String(row.game_title || "").trim().toLowerCase();
-  const alias = title === "retro bowl time" ? "retro bowl" :
-    title === "blocky combat swat time" ? "blocky combat swat" : title;
-  return row.game_image || catalogLogos.get(alias) || "../assets/arcade-atlas-logo.png";
+  const titleKey = normalizeGameKey(row.game_title);
+  const gameKey = normalizeGameKey(row.game_key);
+  return row.game_image || catalogLogos.get(titleKey) || catalogLogos.get(gameKey) ||
+    (titleKey === "daily pick streak" || gameKey === "daily pick streak" ? "../images/daily-pick-streak.svg" : "../assets/arcade-atlas-logo.png");
 }
 
 function formatScore(value, gameTitle) {
