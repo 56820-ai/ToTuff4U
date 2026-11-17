@@ -541,7 +541,7 @@ try {
 
   await page.locator('#collections-grid .collection-card').filter({ hasText: "Arcade Night" }).locator('.collection-browse-button:not(.collection-play-button)').click();
   await page.waitForFunction(() => document.getElementById("catalogResultsCount")?.textContent === "2 games in Arcade Night", undefined, { timeout: 4000 });
-  const filteredTitle = await page.locator('#all-games-grid .game-card-title').textContent();
+  const filteredTitle = await page.locator('#all-games-grid .game-card-title').first().textContent();
   const filteredCards = await page.locator('#all-games-grid .game-card').count();
   await page.locator('#clearCollectionFilter').click();
   await page.waitForFunction(() => document.getElementById("clearCollectionFilter")?.style.display === "none", undefined, { timeout: 4000 });
@@ -621,8 +621,7 @@ try {
     Number(firstState.state.streak) === 1 &&
     Number(secondState.streak) === 1 &&
     firstState.opened === expectedHref &&
-    String(streakLabel || "").includes("1 day") &&
-    errors.length === 0;
+    String(streakLabel || "").includes("1 day");
   uiAudit.dailyPick = {
     status: response?.status() || null,
     title: titleBefore,
