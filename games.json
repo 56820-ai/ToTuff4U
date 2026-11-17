@@ -1323,6 +1323,78 @@
       "category": "PLATFORMER",
       "source": "https://github.com/egeexyz/jumper",
       "description": "Hop between platforms in a stripped-back Phaser platformer and keep climbing without falling."
+    },
+    {
+      "title": "Burrow Bop",
+      "path": "g/burrow-bop",
+      "image": "./images/burrow-bop-card.webp",
+      "category": "ARCADE",
+      "source": "https://github.com/bytenimble/free-html5-games",
+      "description": "Whack each mole the moment it pops out of its burrow and keep the streak alive for forty seconds."
+    },
+    {
+      "title": "Maze Dash",
+      "path": "g/maze-dash",
+      "image": "./images/maze-dash-card.webp",
+      "category": "PUZZLE",
+      "source": "https://github.com/bytenimble/free-html5-games",
+      "description": "Steer through a fresh maze, grab the markers and reach the exit before the clock runs down."
+    },
+    {
+      "title": "Sort It Out",
+      "path": "g/sort-it-out",
+      "image": "./images/sort-it-out-card.webp",
+      "category": "PUZZLE",
+      "source": "https://github.com/bytenimble/free-html5-games",
+      "description": "Drag every animal into the group it belongs to and clear all of the categories."
+    },
+    {
+      "title": "Wardrobe Studio",
+      "path": "g/wardrobe-studio",
+      "image": "./images/wardrobe-studio-card.webp",
+      "category": "CASUAL",
+      "source": "https://github.com/bytenimble/free-html5-games",
+      "description": "Mix tops, trousers and shoes to build an outfit, then hit randomise for a surprise look."
+    },
+    {
+      "title": "Streets of Fight",
+      "path": "g/streets-of-fight",
+      "image": "./images/streets-of-fight-card.webp",
+      "category": "FIGHTING",
+      "source": "https://github.com/humancto/legacy-games",
+      "description": "A side-scrolling brawler: punch, kick and dive-kick through the street before the timer runs out."
+    },
+    {
+      "title": "Tiny RPG Forest",
+      "path": "g/tiny-rpg-forest",
+      "image": "./images/tiny-rpg-forest-card.webp",
+      "category": "ADVENTURE",
+      "source": "https://github.com/humancto/legacy-games",
+      "description": "Explore three forest areas as a small hero, using melee attacks, arrows and a shotgun against the wildlife."
+    },
+    {
+      "title": "Underwater Diving",
+      "path": "g/underwater-diving",
+      "image": "./images/underwater-diving-card.webp",
+      "category": "ADVENTURE",
+      "source": "https://github.com/humancto/legacy-games",
+      "description": "Swim deeper into a dark reef, manage your air and see how far down you can get."
+    },
+    {
+      "title": "Grotto Escape",
+      "path": "g/grotto-escape",
+      "image": "./images/grotto-escape-card.webp",
+      "category": "PLATFORMER",
+      "source": "https://github.com/humancto/legacy-games",
+      "description": "Climb and jump out of a collapsing cave, dodging hazards on the way back to the surface."
+    },
+    {
+      "title": "Warped City",
+      "path": "g/warped-city",
+      "image": "./images/warped-city-card.webp",
+      "category": "ACTION",
+      "source": "https://github.com/humancto/legacy-games",
+      "description": "A neon cyberpunk shooter: run, shoot and crouch your way past the enemies holding the street."
     }
   ]
 }
