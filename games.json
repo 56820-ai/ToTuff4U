@@ -3,7 +3,7 @@
     {
       "title": "Tag",
       "path": "g/tag",
-      "image": "https://cdn2.y8.com/cloudimage/4393/file/w380h285_webp-aea8907d45386d3490594fa39c49ae72.webp",
+      "image": "./images/tag-card.webp",
       "category": "ARCADE",
       "description": "Chase and dodge in this local multiplayer game for 2–4 players.",
       "tags": [
@@ -42,7 +42,7 @@
     },
     {
       "title": "Learn To Fly",
-      "path": "g/learntofly",
+      "path": "g/learntofly/1",
       "image": "./images/learntofly-card.webp",
       "category": "ARCADE"
     },
@@ -184,7 +184,7 @@
     },
     {
       "title": "Time Shooter",
-      "path": "g/timeshooter",
+      "path": "g/timeshooter/1",
       "image": "./images/timeshooter-card.webp",
       "category": "ACTION"
     },
@@ -280,7 +280,7 @@
     },
     {
       "title": "Duck Life",
-      "path": "g/ducklife",
+      "path": "g/ducklife1",
       "image": "./images/ducklife-card.webp",
       "category": "SIMULATION",
       "description": "Train a duck in running, swimming, flying, and climbing before racing."
@@ -317,10 +317,11 @@
       "description": "Balance your vehicle across tricky physics courses without flipping over."
     },
     {
-      "title": "Papa's Games",
-      "path": "g/papas-game",
+      "title": "Papa's Freezeria",
+      "path": "g/papas-game/freezeria",
       "image": "./images/papas-game-card.webp",
-      "category": "SIMULATION"
+      "category": "SIMULATION",
+      "description": "Run Papa's ice-cream shop: take orders, then blend, layer and top every sundae before the customers run out of patience."
     },
     {
       "title": "Stickman Golf",
@@ -354,7 +355,7 @@
     },
     {
       "title": "MotoX3M",
-      "path": "g/motox3m",
+      "path": "g/motox3m/motox3m",
       "image": "./images/motox3m-card.webp",
       "category": "RACING",
       "description": "Ride a stunt bike through obstacle courses, flips, and timed checkpoints."
@@ -601,7 +602,7 @@
     },
     {
       "title": "Minecraft 1.12.2",
-      "path": "g/mc",
+      "path": "g/mc/1.12.2",
       "image": "./images/mc-card.webp",
       "category": "SANDBOX",
       "description": "Explore a browser-hosted block world, gather materials, and build with friends or solo."
