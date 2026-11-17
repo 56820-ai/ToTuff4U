@@ -10,6 +10,11 @@ const browser = await chromium.launch({
 });
 // The Chromium audit uses software WebGL so GPU-backed arcade games can be checked in CI.
 const results = [];
+const auditStartedAt = Date.now();
+function progress(message) {
+  const elapsed = Math.round((Date.now() - auditStartedAt) / 1000);
+  console.log(`[audit +${elapsed}s] ${message}`);
+}
 const ignoreUrl = /googletagmanager|google-analytics|doubleclick|pagead|adsbygoogle|hotjar|posthog|favicon|apple-touch-icon|manifest|source-map/i;
 
 function gameUrl(game) {
@@ -74,6 +79,8 @@ function normalizeIcon(icon) {
 }
 async function checkGame(game) {
   const page = await browser.newPage({ viewport: { width: 1365, height: 768 } });
+  page.setDefaultTimeout(8000);
+  page.setDefaultNavigationTimeout(12000);
   const localFailures = [];
   const externalFailures = [];
   const pageErrors = [];
@@ -89,7 +96,7 @@ async function checkGame(game) {
   let navigationError = "";
   const url = gameUrl(game);
   try {
-    response = await page.goto(url, { waitUntil: "domcontentloaded", timeout: 16000 });
+    response = await page.goto(url, { waitUntil: "domcontentloaded", timeout: 12000 });
     await page.waitForTimeout(900);
     if (String(game.path || "").startsWith("g/one-button-collection/?")) {
       await page.waitForFunction(() => document.querySelector("canvas"), undefined, { timeout: 10000 }).catch(() => {});
@@ -140,6 +147,7 @@ async function checkGame(game) {
 }
 
 // Verify every catalog logo actually loads in Chromium.
+progress(`Starting logo checks for ${catalog.length} catalog entries.`);
 const logoPage = await browser.newPage();
 const logoUrls = catalog.map(game => {
   const image = String(game.image || "");
@@ -177,17 +185,28 @@ const logoAudit = await logoPage.evaluate(async items => {
   return results;
 }, logoUrls, { timeout: 180000 }).catch(error => [{ title: "Logo audit", ok: false, reason: String(error.message || error) }]);
 await logoPage.close();
+progress(`Logo checks finished: ${logoAudit.filter(x => x.ok).length}/${logoAudit.length} loaded.`);
 
-const workers = 4;
+const workers = 6;
 let cursor = 0;
+let completedGames = 0;
+progress(`Starting Chromium checks for ${catalog.length} games using ${workers} workers.`);
 await Promise.all(Array.from({ length: workers }, async () => {
   while (cursor < catalog.length) {
     const i = cursor++;
-    results[i] = await checkGame(catalog[i]);
+    try {
+      results[i] = await checkGame(catalog[i]);
+    } catch (error) {
+      results[i] = { title: catalog[i]?.title || `Catalog entry ${i + 1}`, url: gameUrl(catalog[i] || {}), status: null, pageTitle: "", mainFrameUrl: "", hardFailure: true, navigationError: String(error?.stack || error).slice(0, 500), localFailures: [], missingCoreAssets: [], criticalPageErrors: [], failedGameFrames: [], externalFailures: [], pageErrors: [], iframeSources: [], canvasCount: 0, missingCanvas: false };
+    }
+    completedGames++;
+    progress(`Game checks: ${completedGames}/${catalog.length} complete${results[i].hardFailure ? ` (failed: ${results[i].title})` : ""}.`);
   }
 }));
+progress("All catalog game checks finished; starting interface and gameplay tests.");
 
-// Check the two custom interfaces touched by this maintenance pass.
+// Check the custom interfaces and gameplay flows touched by this maintenance pass.
+progress("Checking leaderboard and Blocky Combat.");
 const uiAudit = { leaderboard: {}, blockyCombat: {}, catalog: {}, collections: {}, dailyPick: {}, connectFour: {}, chess: {}, sudoku: {}, pong: {}, ticTacToe: {}, simon: {}, aimTrainer: {}, stack: {}, helix: {}, slither: {}, polygonRacer: {} };
 try {
   const page = await browser.newPage({ viewport: { width: 1365, height: 768 } });
@@ -224,6 +243,7 @@ try {
   uiAudit.blockyCombat.error = String(e.message || e).slice(0, 300);
 }
 
+progress("Checking catalog, favorites, filters, playlists, and cross-tab behavior.");
 let catalogContext;
 try {
   catalogContext = await browser.newContext({ viewport: { width: 1365, height: 768 } });
@@ -631,6 +651,7 @@ try {
   uiAudit.connectFour.error = String(e.message || e).slice(0, 300);
 }
 
+progress("Checking Chess, Sudoku, and arcade gameplay controls.");
 // Exercise Chess beyond a simple HTTP load: start a match, make e2-e4,
 // and confirm the computer responds and hands the turn back to the player.
 try {
@@ -795,6 +816,7 @@ await runArcadeSmokeTest("polygonRacer", "/g/polygon-racer/", "#c", async page =
   return { canvasCount: await page.locator("canvas").count(), started, timer, ok: started && parseFloat(timer || "0") > 0 };
 });
 
+progress("Gameplay checks finished; preparing audit report.");
 // DuckMath is backed by its own live catalog service. Verify its app list and
 // test each returned game's page wrapper before adding it to Arcade Atlas.
 const duckmath = { homeStatus: null, dynamicCards: 0, cachedApps: 0, checked: 0, verified: [], broken: [], excludedForAge: [], error: "" };
