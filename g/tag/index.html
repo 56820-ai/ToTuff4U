@@ -6,23 +6,16 @@
 <title>Tag · Arcade Atlas</title>
 <link rel="icon" href="../../images/favicon.png">
 <style>
-:root{color-scheme:dark;--line:#263451;--cyan:#42e8ff;--muted:#a9b6d0}
-*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(ellipse at 50% -20%,#1b3261 0%,#0b1022 55%,#070a15 100%);color:#fff;font-family:Montserrat,Arial,sans-serif}
-body{padding:18px;display:flex;justify-content:center}.shell{width:min(1180px,100%)}header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 16px}a{color:var(--cyan);text-decoration:none;font-weight:800}.brand{font-family:monospace;font-weight:1000;letter-spacing:2px;color:#fff;text-shadow:0 0 16px #31dfff;font-size:clamp(18px,3vw,26px)}.pill{border:1px solid var(--line);border-radius:999px;padding:8px 12px;color:var(--muted);font-size:12px;font-weight:800;letter-spacing:1px}
-h1{font-size:clamp(28px,5vw,48px);margin:8px 0 4px;text-transform:uppercase;letter-spacing:3px;text-shadow:0 0 22px #25cfff}.sub{color:var(--muted);margin:0 0 18px}.panel{background:linear-gradient(145deg,#151d35f2,#0d1326f5);border:1px solid #2a3b60;border-radius:18px;padding:14px;box-shadow:0 18px 55px #0008}
-.game-frame{position:relative;width:100%;aspect-ratio:16/9;min-height:360px;max-height:760px;overflow:hidden;background:#070b16;border:1px solid #29466c;border-radius:13px}.game-frame iframe{display:block;width:100%;height:100%;border:0;background:#070b16}
-.bottom{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:13px}.note{font-size:12px;color:var(--muted);line-height:1.5}button{font:inherit;border-radius:10px;border:1px solid #315477;background:#13213b;color:white;padding:11px 15px;font-weight:900;cursor:pointer}button:hover{filter:brightness(1.15)}
-@media(max-width:650px){body{padding:10px}.panel{padding:8px}.game-frame{min-height:300px;aspect-ratio:4/3}}
+*{box-sizing:border-box}
+html,body{width:100%;height:100%;min-height:100%;margin:0;overflow:hidden;background:#070b16}
+body{padding:0}
+.game-frame{position:fixed;inset:0;width:100%;height:100%;height:100dvh;overflow:hidden;background:#070b16}
+.game-frame iframe{display:block;width:100%;height:100%;border:0;background:#070b16}
 </style>
 </head>
 <body>
-<div class="shell">
-<header><a href="../../index.html" class="brand">ARCADE ATLAS</a><span class="pill">2–4 PLAYERS</span></header>
-<h1>TAG</h1><p class="sub">Chase, dodge, and pass the tag. Play with 2–4 people on the same keyboard.</p>
-<section class="panel">
-<div class="game-frame"><iframe src="https://taggame.io/" title="Tag Game — 2 to 4 player local multiplayer game" allow="fullscreen; autoplay; gamepad" allowfullscreen loading="eager" referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
-<div class="bottom"><span class="note">If the game does not load here, open it directly on Tag Game. Desktop keyboard play supports up to four players: WASD, arrow keys, IJL, and TFH.</span><button onclick="window.open('https://taggame.io/','_blank','noopener')">OPEN GAME ↗</button></div>
-</section>
-</div>
+<main class="game-frame">
+<iframe src="https://burgerbounty.github.io/s3/tag/" title="Tag Game" allow="fullscreen; autoplay; gamepad" allowfullscreen loading="eager" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+</main>
 </body>
 </html>
