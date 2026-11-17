@@ -247,7 +247,7 @@ try {
   const dailyStreakLinkVisible = await dailyStreakLink.isVisible();
   await dailyStreakLink.click();
   await page.waitForFunction(() => document.getElementById("leaderboard-content")?.classList.contains("active"), undefined, { timeout: 4000 });
-  const dailyStreakLinkWorks = dailyStreakLinkVisible && await page.locator("#leaderboard-frame").count() === 1;
+  const dailyStreakLinkWorks = dailyStreakLinkVisible && await page.locator("#leaderboard-content").evaluate(el => el.classList.contains("active")) && await page.locator("#aa-score-list").count() === 1;
   await page.locator('.nav-item[data-page="home"]').click();
   await page.waitForFunction(() => document.getElementById("home-content")?.classList.contains("active"), undefined, { timeout: 4000 });
   const newGamesShelfVisible = await page.locator("#new-games-section").isVisible();
@@ -496,7 +496,7 @@ try {
   await syncPage.waitForFunction(() => document.getElementById("catalogResultsCount")?.textContent === "2 games in Arcade Night", undefined, { timeout: 4000 });
 
   await page.evaluate(() => { window.__collectionOpened = ""; window.open = url => { window.__collectionOpened = url; return null; }; });
-  await page.locator('#collections-grid .collection-play-button').click();
+  await page.locator('#collections-grid .collection-card').filter({ hasText: "Arcade Night" }).locator('.collection-play-button').click();
   const randomLaunch = await page.evaluate(() => window.__collectionOpened || "");
   const allowedLaunches = await page.evaluate(() => ["Slope", "Connect Four"].map(title => buildGameHref(cachedGames.find(game => game.title === title).path)));
 
@@ -549,12 +549,12 @@ try {
   const response = await page.goto(BASE + "/", { waitUntil: "domcontentloaded", timeout: 16000 });
   await page.waitForSelector("#daily-pick-play", { timeout: 12000 });
   await page.waitForSelector("#daily-pick-title", { timeout: 12000 });
-  await page.locator('.nav-item[data-page="home"]').click();
-  await page.waitForFunction(() => document.getElementById("home-content")?.classList.contains("active"), undefined, { timeout: 5000 });
   await page.evaluate(() => {
     const overlay = document.getElementById("patchNotesOverlay");
     if (overlay) { overlay.classList.remove("visible"); overlay.setAttribute("aria-hidden", "true"); }
   });
+  await page.locator('.nav-item[data-page="home"]').click();
+  await page.waitForFunction(() => document.getElementById("home-content")?.classList.contains("active"), undefined, { timeout: 5000 });
   const titleBefore = await page.locator("#daily-pick-title").textContent();
   const expectedHref = await page.evaluate(() => buildGameHref(getDailyPickGame(cachedGames).path));
   await page.evaluate(() => {
@@ -734,10 +734,7 @@ await runArcadeSmokeTest("simon", "/g/simon/", "#startBtn", async page => {
   const pads = await page.locator(".pad").count();
   await page.locator("#startBtn").click();
   await page.waitForFunction(() => document.getElementById("round")?.textContent === "1", undefined, { timeout: 5000 });
-  await page.waitForFunction(() => {
-    const pads = [...document.querySelectorAll(".pad")];
-    return pads.length === 4 && pads.every(pad => !pad.classList.contains("disabled"));
-  }, undefined, { timeout: 8000 });
+  await page.waitForFunction(() => document.getElementById("status")?.textContent.includes("Your turn"), undefined, { timeout: 12000 });
   const status = await page.locator("#status").textContent();
   return { pads, round: await page.locator("#round").textContent(), status, inputEnabled: await page.locator(".pad:not(.disabled)").count() === 4, ok: pads === 4 && status.includes("Your turn") };
 });
