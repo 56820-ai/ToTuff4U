@@ -91,6 +91,7 @@
   let picking = false;
   let startCell = null;
   let path = [];
+  let justDragged = false;
   let startedAt = 0;
   let timerId = null;
 
@@ -159,7 +160,6 @@
 
   function clearPicking() {
     gridEl.querySelectorAll(".cell.picking").forEach((c) => c.classList.remove("picking"));
-    path = [];
   }
 
   function paintPath() {
@@ -265,8 +265,10 @@
   function endPick() {
     if (!picking) return;
     picking = false;
+    justDragged = path.length > 1;
     if (path.length > 1) checkWord(path);
     clearPicking();
+    path = [];
     startCell = null;
   }
 
@@ -275,13 +277,18 @@
 
   // Tap-to-start, tap-to-finish also works on touch screens.
   gridEl.addEventListener("click", (event) => {
-    if (event.pointerType === "mouse" && path.length === 0 && startCell === null) return;
+    if (justDragged) { justDragged = false; return; }
     const cell = cellFromPoint(event);
     if (!cell || picking) return;
-    if (!startCell) { startCell = cell; setStatus("Tap the last letter of the word."); return; }
+    if (!startCell) { startCell = cell; setStatus("Now tap the last letter of the word."); return; }
     const line = lineBetween(startCell, cell);
-    if (line && line.length > 1) checkWord(line);
+    if (line && line.length > 1) {
+      path = line;
+      checkWord(line);
+      clearPicking();
+    }
     startCell = null;
+    path = [];
     setStatus("Drag across the letters of a word.");
   });
 

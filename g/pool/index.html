@@ -312,7 +312,8 @@
   canvas.addEventListener("pointermove", updateAim);
   canvas.addEventListener("pointerdown", (event) => {
     updateAim(event);
-    if (moving || finished) return;
+    if (moving) { setStatus("Wait for the balls to stop rolling."); return; }
+    if (finished) return;
     charging = true;
     power = 0;
     chargeStart = performance.now();

@@ -365,8 +365,10 @@
       const victim = players[nextIndex(1)];
       drawCards(amount, victim);
       turn = nextIndex(2);
-      setStatus(victim.name + " draws " + (amount === 2 ? "two" : "four") + ". " +
-        (players[turn].human ? "Your turn." : players[turn].name + "'s turn."));
+      const drawn = victim.human
+        ? "You draw " + (amount === 2 ? "two" : "four") + " and lose your turn."
+        : victim.name + " draws " + (amount === 2 ? "two" : "four") + " and is skipped.";
+      setStatus(drawn + " " + (players[turn].human ? "Your turn." : players[turn].name + "'s turn."));
     } else {
       turn = nextIndex(1);
       setStatus(players[turn].human ? "Your turn." : players[turn].name + "'s turn.");
@@ -464,7 +466,9 @@
       const victim = players[nextIndex(1)];
       drawCards(amount, victim);
       turn = nextIndex(2);
-      setStatus(victim.name + " draws " + amount + " and is skipped.");
+      setStatus(victim.human
+        ? "You draw " + amount + " and lose your turn."
+        : victim.name + " draws " + amount + " and is skipped.");
     } else {
       turn = nextIndex(1);
     }

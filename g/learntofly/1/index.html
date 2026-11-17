@@ -26,7 +26,7 @@
       }
 
       var cdnScript = document.createElement('script');
-      cdnScript.src = 'https://unpkg.com/@ruffle-rs/ruffle';
+      cdnScript.src = '../../../js/ruffle/ruffle.js';
       cdnScript.onerror = loadLocalRuffle;
       document.body.appendChild(cdnScript);
     </script>
