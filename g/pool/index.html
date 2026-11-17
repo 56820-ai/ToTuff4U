@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>8-Ball Pool · Arcade Atlas</title>
+<meta name="description" content="Play 8-ball pool free in your browser: aim with the mouse, set your power and clear all fifteen balls from a real physics table in as few shots as possible.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎱</text></svg>">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(circle at 50% 0%,#1d2f24 0%,#0f1a18 55%,#070d0c 100%);
+    color:#eef7f2;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    justify-content:safe center;min-height:100vh;min-height:100svh;padding:10px 8px 14px;user-select:none}
+  .shell{width:min(880px,100%);display:flex;flex-direction:column;gap:10px}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .brand{font-weight:800;font-size:15px}
+  .brand span{color:#f2c14e}
+  .back{font-size:12px;font-weight:700;text-decoration:none;color:#eef7f2;padding:9px 12px;border-radius:9px;
+    background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12)}
+  .panel{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.1);border-radius:18px;
+    padding:10px;display:flex;flex-direction:column;gap:9px;box-shadow:0 22px 60px rgba(0,0,0,.55)}
+  canvas{width:100%;height:auto;display:block;border-radius:12px;touch-action:none;cursor:crosshair}
+  .bar{display:flex;gap:7px;flex-wrap:wrap;align-items:center;justify-content:center}
+  .pill{background:rgba(0,0,0,.25);border:1px solid rgba(255,255,255,.12);border-radius:9px;
+    padding:6px 10px;font-size:11px;color:#cfe4da;text-transform:uppercase;letter-spacing:.05em}
+  .pill b{color:#fff;font-size:13px;margin-left:5px;letter-spacing:0}
+  .power{flex:1;min-width:150px;height:38px;border-radius:9px;border:1px solid rgba(255,255,255,.14);
+    background:rgba(0,0,0,.28);position:relative;overflow:hidden}
+  .power i{position:absolute;inset:0 100% 0 0;background:linear-gradient(90deg,#3fbf7f,#f2c14e,#e05d5d);
+    transition:right .05s linear}
+  .power span{position:absolute;inset:0;display:grid;place-items:center;font-size:11px;font-weight:800;
+    letter-spacing:.1em;text-transform:uppercase;color:#eaf6ef}
+  .btn{min-height:38px;padding:0 14px;border-radius:9px;border:1px solid rgba(255,255,255,.16);
+    background:rgba(255,255,255,.09);color:#eef7f2;font:700 12px inherit;cursor:pointer}
+  .btn:hover{background:rgba(255,255,255,.18)}
+  .btn.primary{background:#166b47;border-color:#7ee2a8}
+  .status{min-height:18px;text-align:center;font-size:12px;color:#b6c8d8}
+  .status.good{color:#7ee2a8}.status.bad{color:#ff9b9b}
+  .hint{font-size:11px;color:#93b0a4;text-align:center;line-height:1.5}
+  @media (max-width:620px){.brand{font-size:13px}.pill{font-size:10px;padding:5px 8px}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="topbar">
+    <div class="brand">🎱 8-BALL POOL <span>·</span> Arcade Atlas</div>
+    <a class="back" href="../../">← Arcade Atlas</a>
+  </div>
+
+  <div class="panel">
+    <canvas id="table" width="900" height="470" aria-label="Pool table. Move the mouse to aim and click to shoot."></canvas>
+    <div class="bar">
+      <div class="pill">Shots<b id="shots">0</b></div>
+      <div class="pill">Balls left<b id="left">15</b></div>
+      <div class="pill">Best<b id="best">—</b></div>
+      <div class="power" id="powerbar"><i id="powerfill"></i><span>Hold to charge</span></div>
+      <button class="btn primary" type="button" id="new">New rack</button>
+    </div>
+    <div class="status" id="status" role="status" aria-live="polite">Aim with the pointer, then press and hold to charge your shot.</div>
+    <p class="hint">The cue ball follows your aim line. Pocket the 8-ball last — sinking it early re-spots it and costs a shot.</p>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  const canvas = document.getElementById("table");
+  const ctx = canvas.getContext("2d");
+  const shotsEl = document.getElementById("shots");
+  const leftEl = document.getElementById("left");
+  const bestEl = document.getElementById("best");
+  const statusEl = document.getElementById("status");
+  const powerFill = document.getElementById("powerfill");
+  const STORE = "arcadeAtlasPool";
+
+  const W = canvas.width;
+  const H = canvas.height;
+  const RAIL = 34;
+  const R = 11.5;
+  const POCKET = 20;
+  const FRICTION = 0.98805;
+  const STOP = 0.07;
+  const MAX_POWER = 11;
+
+  const COLORS = {
+    1: "#f2cf3d", 2: "#2f6fd0", 3: "#d0453a", 4: "#7b48b4", 5: "#e08c2c",
+    6: "#2f9c5a", 7: "#8b2f3a", 8: "#16222f", 9: "#f2cf3d", 10: "#2f6fd0",
+    11: "#d0453a", 12: "#7b48b4", 13: "#e08c2c", 14: "#2f9c5a", 15: "#8b2f3a"
+  };
+  const POCKETS = [
+    { x: RAIL - 4, y: RAIL - 4 }, { x: W / 2, y: RAIL - 8 }, { x: W - RAIL + 4, y: RAIL - 4 },
+    { x: RAIL - 4, y: H - RAIL + 4 }, { x: W / 2, y: H - RAIL + 8 }, { x: W - RAIL + 4, y: H - RAIL + 4 }
+  ];
+
+  let balls = [];
+  let cue = null;
+  let shots = 0;
+  let charging = false;
+  let power = 0;
+  let aim = -0.35;
+  let moving = false;
+  let finished = false;
+  let respotTimer = 0;
+
+  function readBest() {
+    try { return parseInt(localStorage.getItem(STORE), 10) || 0; } catch (e) { return 0; }
+  }
+  function writeBest(v) {
+    try { localStorage.setItem(STORE, String(v)); } catch (e) { /* storage may be blocked */ }
+  }
+  function paintBest() {
+    const b = readBest();
+    bestEl.textContent = b ? b + " shots" : "—";
+  }
+  function setStatus(text, cls) {
+    statusEl.className = "status" + (cls ? " " + cls : "");
+    statusEl.textContent = text;
+  }
+
+  function rack() {
+    balls = [];
+    shots = 0;
+    finished = false;
+    moving = false;
+    charging = false;
+    power = 0;
+    powerFill.style.right = "100%";
+    shotsEl.textContent = "0";
+
+    cue = { id: 0, x: RAIL + (W - RAIL * 2) * 0.25, y: H / 2, vx: 0, vy: 0, radius: R, color: "#fdfcf7", cue: true };
+    balls.push(cue);
+
+    const order = [1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15, 8];
+    const apex = { x: RAIL + (W - RAIL * 2) * 0.66, y: H / 2 };
+    const dx = R * 2 + 0.8;
+    const dy = R * 2 + 0.8;
+    let idx = 0;
+    for (let col = 0; col < 5; col++) {
+      for (let row = 0; row <= col; row++) {
+        const id = order[idx++];
+        const x = apex.x + col * dx;
+        const y = H / 2 + (row - col / 2) * dy;
+        balls.push({ id, x, y, vx: 0, vy: 0, radius: R, color: COLORS[id], cue: false });
+      }
+    }
+    updateCounts();
+    setStatus("Aim with the pointer, then press and hold to charge your shot.");
+    draw();
+  }
+
+  function updateCounts() {
+    const remaining = balls.filter((b) => !b.cue && !b.potted);
+    leftEl.textContent = String(remaining.length);
+    if (!remaining.length && !finished) {
+      finished = true;
+      const previous = readBest();
+      if (!previous || shots < previous) writeBest(shots);
+      paintBest();
+      setStatus("Table cleared in " + shots + " shots!" + (shots < previous || !previous ? " New personal best." : ""), "good");
+    }
+  }
+
+  function inPlay() {
+    return balls.filter((b) => !b.potted);
+  }
+
+  function step() {
+    if (!moving) return;
+    let anyMoving = false;
+    const active = inPlay();
+
+    for (const b of active) {
+      b.x += b.vx;
+      b.y += b.vy;
+      b.vx *= FRICTION;
+      b.vy *= FRICTION;
+      if (Math.hypot(b.vx, b.vy) < STOP) { b.vx = 0; b.vy = 0; }
+      else anyMoving = true;
+
+      // Pockets
+      for (const p of POCKETS) {
+        if (Math.hypot(b.x - p.x, b.y - p.y) < POCKET) {
+          b.potted = true;
+          b.vx = b.vy = 0;
+          onPotted(b);
+          break;
+        }
+      }
+      if (b.potted) continue;
+
+      // Rails
+      const minX = RAIL + b.radius;
+      const maxX = W - RAIL - b.radius;
+      const minY = RAIL + b.radius;
+      const maxY = H - RAIL - b.radius;
+      if (b.x < minX) { b.x = minX; b.vx = Math.abs(b.vx) * 0.86; }
+      if (b.x > maxX) { b.x = maxX; b.vx = -Math.abs(b.vx) * 0.86; }
+      if (b.y < minY) { b.y = minY; b.vy = Math.abs(b.vy) * 0.86; }
+      if (b.y > maxY) { b.y = maxY; b.vy = -Math.abs(b.vy) * 0.86; }
+    }
+
+    // Ball collisions
+    for (let i = 0; i < active.length; i++) {
+      for (let j = i + 1; j < active.length; j++) {
+        const a = active[i];
+        const b = active[j];
+        if (a.potted || b.potted) continue;
+        const dx = b.x - a.x;
+        const dy = b.y - a.y;
+        const dist = Math.hypot(dx, dy);
+        const minDist = a.radius + b.radius;
+        if (dist === 0 || dist >= minDist) continue;
+        const nx = dx / dist;
+        const ny = dy / dist;
+        const overlap = minDist - dist;
+        a.x -= nx * overlap / 2;
+        a.y -= ny * overlap / 2;
+        b.x += nx * overlap / 2;
+        b.y += ny * overlap / 2;
+        const p = a.vx * nx + a.vy * ny - (b.vx * nx + b.vy * ny);
+        if (p <= 0) continue;
+        // Equal masses: swap the normal components so momentum carries through the pack.
+        const transfer = p * 0.97;
+        a.vx -= transfer * nx;
+        a.vy -= transfer * ny;
+        b.vx += transfer * nx;
+        b.vy += transfer * ny;
+      }
+    }
+
+    draw();
+    if (!anyMoving) {
+      moving = false;
+      const remaining = balls.filter((b) => !b.cue && !b.potted).length;
+      if (!finished && remaining) {
+        setStatus(remaining + (remaining === 1 ? " ball" : " balls") + " left on the table. Line up the next shot.");
+      }
+      const cueBall = balls[0];
+      if (cueBall.potted) {
+        cueBall.potted = false;
+        cueBall.x = RAIL + (W - RAIL * 2) * 0.25;
+        cueBall.y = H / 2;
+        cueBall.vx = cueBall.vy = 0;
+        setStatus("Cue ball scratched — it has been placed back on the table.", "bad");
+      }
+      updateCounts();
+    } else {
+      requestAnimationFrame(step);
+    }
+  }
+
+  function onPotted(ball) {
+    if (ball.cue) return;
+    const others = balls.filter((b) => !b.cue && !b.potted && b.id !== 8).length;
+    if (ball.id === 8 && others > 0) {
+      // Re-spot immediately so the table can still be finished.
+      ball.potted = false;
+      let spot = { x: W / 2 + 60, y: H / 2 };
+      for (let ring = 0; ring < 6; ring++) {
+        const x = W / 2 + 60 - ring * 26;
+        if (!balls.some((b) => b !== ball && !b.potted && Math.hypot(b.x - x, b.y - spot.y) < R * 2.4)) {
+          spot.x = x;
+          break;
+        }
+      }
+      ball.x = spot.x;
+      ball.y = spot.y;
+      ball.vx = ball.vy = 0;
+      shots += 1;
+      shotsEl.textContent = shots;
+      setStatus("The 8-ball went in early — it is back on the table and you lose a shot.", "bad");
+    }
+  }
+
+  function shoot() {
+    if (finished || moving || power <= 0.05) return;
+    shots += 1;
+    shotsEl.textContent = shots;
+    const speed = power * MAX_POWER;
+    cue.vx = Math.cos(aim) * speed;
+    cue.vy = Math.sin(aim) * speed;
+    power = 0;
+    powerFill.style.right = "100%";
+    moving = true;
+    setStatus("Shot away!");
+    requestAnimationFrame(step);
+  }
+
+  function ballAt(x, y) {
+    return inPlay().find((b) => Math.hypot(b.x - x, b.y - y) <= b.radius + 4);
+  }
+
+  function pointerPos(event) {
+    const rect = canvas.getBoundingClientRect();
+    const point = event.touches ? event.touches[0] : event;
+    return {
+      x: (point.clientX - rect.left) * (W / rect.width),
+      y: (point.clientY - rect.top) * (H / rect.height)
+    };
+  }
+
+  function updateAim(event) {
+    if (moving || finished) return;
+    const { x, y } = pointerPos(event);
+    aim = Math.atan2(y - cue.y, x - cue.x);
+    draw();
+  }
+
+  canvas.addEventListener("pointermove", updateAim);
+  canvas.addEventListener("pointerdown", (event) => {
+    updateAim(event);
+    if (moving || finished) return;
+    charging = true;
+    power = 0;
+    chargeStart = performance.now();
+    event.preventDefault();
+  });
+  let chargeStart = 0;
+
+  window.addEventListener("pointerup", () => {
+    if (!charging) return;
+    charging = false;
+    shoot();
+  });
+
+  function chargeLoop(now) {
+    if (charging) {
+      const ms = now - chargeStart;
+      power = Math.min(1, ms / 1100);
+      powerFill.style.right = (100 - power * 100) + "%";
+    }
+    requestAnimationFrame(chargeLoop);
+  }
+  requestAnimationFrame(chargeLoop);
+
+  function draw() {
+    // Table surface
+    const grad = ctx.createLinearGradient(0, 0, 0, H);
+    grad.addColorStop(0, "#1f6b47");
+    grad.addColorStop(1, "#14563a");
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+
+    // Rail
+    ctx.fillStyle = "#3a2418";
+    ctx.fillRect(0, 0, W, RAIL);
+    ctx.fillRect(0, H - RAIL, W, RAIL);
+    ctx.fillRect(0, 0, RAIL, H);
+    ctx.fillRect(W - RAIL, 0, RAIL, H);
+    ctx.strokeStyle = "rgba(0,0,0,.35)";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(RAIL, RAIL, W - RAIL * 2, H - RAIL * 2);
+
+    // Pockets
+    POCKETS.forEach((p) => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, POCKET, 0, Math.PI * 2);
+      ctx.fillStyle = "#070b0a";
+      ctx.fill();
+      ctx.strokeStyle = "rgba(240,240,230,.25)";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    });
+
+    // Aim line
+    if (!moving && !finished && cue && !cue.potted) {
+      ctx.save();
+      ctx.setLineDash([9, 9]);
+      ctx.strokeStyle = "rgba(255,255,255,.55)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(cue.x, cue.y);
+      ctx.lineTo(cue.x + Math.cos(aim) * 260, cue.y + Math.sin(aim) * 260);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // Balls
+    inPlay().forEach((b) => {
+      ctx.beginPath();
+      ctx.arc(b.x + 2, b.y + 3, b.radius, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(0,0,0,.28)";
+      ctx.fill();
+
+      const g = ctx.createRadialGradient(b.x - b.radius * 0.35, b.y - b.radius * 0.4, b.radius * 0.15, b.x, b.y, b.radius);
+      g.addColorStop(0, "#ffffff");
+      g.addColorStop(0.28, b.color);
+      g.addColorStop(1, b.cue ? "#d9d4c7" : shade(b.color));
+      ctx.beginPath();
+      ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
+      ctx.fillStyle = g;
+      ctx.fill();
+
+      if (!b.cue) {
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.radius * 0.52, 0, Math.PI * 2);
+        ctx.fillStyle = "#fbf8ef";
+        ctx.fill();
+        ctx.fillStyle = "#16222f";
+        ctx.font = "800 " + Math.round(b.radius * 0.85) + "px system-ui, sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(String(b.id), b.x, b.y + 0.5);
+      }
+    });
+  }
+
+  function shade(hex) {
+    const n = parseInt(hex.slice(1), 16);
+    const r = Math.max(0, ((n >> 16) & 255) - 70);
+    const g = Math.max(0, ((n >> 8) & 255) - 70);
+    const b = Math.max(0, (n & 255) - 70);
+    return "rgb(" + r + "," + g + "," + b + ")";
+  }
+
+  document.getElementById("new").addEventListener("click", rack);
+  paintBest();
+  rack();
+})();
+</script>
+</body>
+</html>

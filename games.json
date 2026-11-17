@@ -1177,6 +1177,27 @@
       "image": "images/solitaire-card.webp",
       "category": "CARD",
       "description": "Classic Klondike: build four suits from ace to king, flip the deck and undo any move."
+    },
+    {
+      "title": "8-Ball Pool",
+      "path": "g/pool",
+      "image": "images/pool-card.webp",
+      "category": "SPORTS",
+      "description": "Break, aim and pocket every ball on a real physics table. Sinking the 8-ball early re-spots it and costs a shot."
+    },
+    {
+      "title": "UNO",
+      "path": "g/uno",
+      "image": "images/uno-card.webp",
+      "category": "CARD",
+      "description": "Match colours and numbers against three computer players, with skips, reverses, draw twos and wild cards."
+    },
+    {
+      "title": "Bomberman",
+      "path": "g/bomberman",
+      "image": "images/bomberman-card.webp",
+      "category": "ARCADE",
+      "description": "Drop bombs, blast through crates, clear three roaming enemies and find the hidden exit before the clock runs out."
     }
   ]
 }

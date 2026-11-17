@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Bomberman · Arcade Atlas</title>
+<meta name="description" content="Play Bomberman free in your browser: drop bombs, blast through crates, clear three roaming enemies and find the hidden exit before the timer runs out.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💣</text></svg>">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(circle at 50% 0%,#232a3d 0%,#121724 55%,#070a11 100%);
+    color:#eef3fb;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    justify-content:safe center;min-height:100vh;min-height:100svh;padding:10px 8px 14px;user-select:none}
+  .shell{width:min(760px,100%);display:flex;flex-direction:column;gap:9px}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .brand{font-weight:800;font-size:15px}
+  .brand span{color:#ffb347}
+  .back{font-size:12px;font-weight:700;text-decoration:none;color:#eef3fb;padding:9px 12px;border-radius:9px;
+    background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.13)}
+  .panel{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.1);border-radius:18px;
+    padding:10px;display:flex;flex-direction:column;gap:8px;box-shadow:0 22px 60px rgba(0,0,0,.55)}
+  canvas{width:100%;height:auto;display:block;border-radius:12px;touch-action:none;background:#0d1220}
+  .bar{display:flex;gap:7px;flex-wrap:wrap;align-items:center;justify-content:center}
+  .pill{background:rgba(0,0,0,.26);border:1px solid rgba(255,255,255,.12);border-radius:9px;
+    padding:6px 11px;font-size:11px;color:#cbd8ea;text-transform:uppercase;letter-spacing:.05em}
+  .pill b{color:#fff;font-size:13px;margin-left:5px;letter-spacing:0}
+  .btn{min-height:40px;padding:0 14px;border-radius:9px;border:1px solid rgba(255,255,255,.16);
+    background:rgba(255,255,255,.08);color:#eef3fb;font:700 12px inherit;cursor:pointer}
+  .btn:hover{background:rgba(255,255,255,.17)}
+  .btn.primary{background:#8a4a13;border-color:#ffb347}
+  .status{min-height:18px;text-align:center;font-size:12px;color:#b6c4d8}
+  .status.good{color:#7ee2a8}.status.bad{color:#ff9b9b}
+  .pad{display:none;grid-template-columns:repeat(3,58px);gap:6px;justify-content:center;margin-top:2px}
+  .pad button{height:52px;border-radius:10px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.08);
+    color:#eef3fb;font-size:19px;font-weight:800;cursor:pointer}
+  .pad .bomb{background:#8a2d13;border-color:#ff8f5e}
+  @media (hover:none),(max-width:700px){.pad{display:grid}}
+  @media (max-width:520px){.pill{font-size:10px;padding:5px 8px}.brand{font-size:13px}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="topbar">
+    <div class="brand">💣 BOMBERMAN <span>·</span> Arcade Atlas</div>
+    <a class="back" href="../../">← Arcade Atlas</a>
+  </div>
+
+  <div class="panel">
+    <canvas id="board" width="600" height="440" aria-label="Bomberman arena"></canvas>
+    <div class="bar">
+      <div class="pill">Lives<b id="lives">3</b></div>
+      <div class="pill">Enemies<b id="enemies">3</b></div>
+      <div class="pill">Time<b id="time">120</b></div>
+      <button class="btn primary" type="button" id="bomb">Drop bomb</button>
+      <button class="btn" type="button" id="new">New arena</button>
+    </div>
+    <div class="status" id="status" role="status" aria-live="polite">Arrow keys or WASD to move, Space to drop a bomb.</div>
+    <div class="pad">
+      <span></span><button type="button" data-dir="up" aria-label="Up">▲</button><span></span>
+      <button type="button" data-dir="left" aria-label="Left">◀</button>
+      <button type="button" data-dir="bomb" class="bomb" aria-label="Bomb">💣</button>
+      <button type="button" data-dir="right" aria-label="Right">▶</button>
+      <span></span><button type="button" data-dir="down" aria-label="Down">▼</button><span></span>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  const canvas = document.getElementById("board");
+  const ctx = canvas.getContext("2d");
+  const COLS = 15;
+  const ROWS = 11;
+  const TILE = 40;
+  const W = COLS * TILE;
+  const H = ROWS * TILE;
+  canvas.width = W;
+  canvas.height = H;
+
+  const EMPTY = 0;
+  const WALL = 1;
+  const CRATE = 2;
+  const BOMB = 3;
+
+  const livesEl = document.getElementById("lives");
+  const enemiesEl = document.getElementById("enemies");
+  const timeEl = document.getElementById("time");
+  const statusEl = document.getElementById("status");
+
+  let grid = [];
+  let player = null;
+  let enemies = [];
+  let bombs = [];
+  let blasts = [];
+  let exit = null;
+  let lives = 3;
+  let timeLeft = 120;
+  let running = false;
+  let paused = false;
+  let loopId = null;
+  let lastTick = 0;
+  let secondAcc = 0;
+  let keys = {};
+  let moveCooldown = 0;
+
+  function setStatus(text, cls) {
+    statusEl.className = "status" + (cls ? " " + cls : "");
+    statusEl.textContent = text;
+  }
+
+  function cellAt(col, row) {
+    if (col < 0 || row < 0 || col >= COLS || row >= ROWS) return WALL;
+    return grid[row][col];
+  }
+
+  function buildArena() {
+    grid = [];
+    for (let r = 0; r < ROWS; r++) {
+      const row = [];
+      for (let c = 0; c < COLS; c++) {
+        let v = EMPTY;
+        if (r === 0 || c === 0 || r === ROWS - 1 || c === COLS - 1) v = WALL;
+        else if (r % 2 === 0 && c % 2 === 0) v = WALL;
+        row.push(v);
+      }
+      grid.push(row);
+    }
+    // Breakable crates, never on the player's starting cross.
+    for (let r = 1; r < ROWS - 1; r++) {
+      for (let c = 1; c < COLS - 1; c++) {
+        if (grid[r][c] !== EMPTY) continue;
+        if ((r <= 2 && c <= 2) || (r === 1 && c <= 3) || (c === 1 && r <= 3)) continue;
+        if (Math.random() < 0.42) grid[r][c] = CRATE;
+      }
+    }
+    player = { col: 1, row: 1, x: TILE * 1.5, y: TILE * 1.5, radius: 13, speed: 2.1, alive: true, invulnerable: 0 };
+    enemies = [];
+    const spots = [[13, 9], [7, 9], [13, 3], [9, 5]];
+    spots.slice(0, 3).forEach(([c, r]) => {
+      if (grid[r][c] === EMPTY) {
+        enemies.push({ col: c, row: r, x: c * TILE + TILE / 2, y: r * TILE + TILE / 2,
+          radius: 12, speed: 1.15, dir: Math.random() * Math.PI * 2, alive: true });
+      }
+    });
+    // Hide the exit under a crate far from the start.
+    exit = { col: COLS - 3, row: ROWS - 3 };
+    if (grid[exit.row][exit.col] === EMPTY) grid[exit.row][exit.col] = CRATE;
+    bombs = [];
+    blasts = [];
+    timeLeft = 120;
+    lives = 3;
+    updateHud();
+    draw();
+  }
+
+  function start() {
+    buildArena();
+    running = true;
+    paused = false;
+    lastTick = performance.now();
+    cancelAnimationFrame(loopId);
+    loopId = requestAnimationFrame(loop);
+    setStatus("Clear the three enemies, then find the exit under a crate.");
+  }
+
+  function updateHud() {
+    livesEl.textContent = String(lives);
+    enemiesEl.textContent = String(enemies.filter((e) => e.alive).length);
+    timeEl.textContent = String(Math.max(0, Math.ceil(timeLeft)));
+  }
+
+  function solid(col, row) {
+    const v = cellAt(col, row);
+    if (v === WALL || v === CRATE) return true;
+    if (bombs.some((b) => b.col === col && b.row === row)) return true;
+    return false;
+  }
+
+  function canStand(col, row) {
+    return !solid(col, row);
+  }
+
+  function moveEntity(entity, dx, dy, dt) {
+    const step = entity.speed * dt * 0.06;
+    const nextX = entity.x + dx * step;
+    const nextY = entity.y + dy * step;
+    const col = Math.floor(nextX / TILE);
+    const row = Math.floor(nextY / TILE);
+    // Check the cell the entity would occupy with its radius.
+    const testCol = Math.floor((nextX + Math.sign(dx) * (entity.radius - 2)) / TILE);
+    const testRow = Math.floor((nextY + Math.sign(dy) * (entity.radius - 2)) / TILE);
+    if (canStand(testCol, testRow)) {
+      entity.x = nextX;
+      entity.y = nextY;
+      entity.col = Math.floor(entity.x / TILE);
+      entity.row = Math.floor(entity.y / TILE);
+      return true;
+    }
+    // Snap to the tube center when blocked so corners feel smooth.
+    if (dx !== 0) {
+      entity.x = (col + 0.5) * TILE + Math.sign(dx) * (TILE / 2 - entity.radius - 1);
+    }
+    if (dy !== 0) {
+      entity.y = (row + 0.5) * TILE + Math.sign(dy) * (TILE / 2 - entity.radius - 1);
+    }
+    return false;
+  }
+
+  function centerOk(entity) {
+    const col = Math.floor(entity.x / TILE);
+    const row = Math.floor(entity.y / TILE);
+    const cx = col * TILE + TILE / 2;
+    const cy = row * TILE + TILE / 2;
+    return { col, row, dx: cx - entity.x, dy: cy - entity.y };
+  }
+
+  function dropBomb(who) {
+    if (!running || paused || !who.alive) return;
+    const col = Math.floor(who.x / TILE);
+    const row = Math.floor(who.y / TILE);
+    if (bombs.some((b) => b.col === col && b.row === row)) return;
+    if (bombs.length >= 2) return;
+    bombs.push({ col, row, timer: 2.6, range: 2, owner: who });
+    setStatus("Bomb set — get clear!");
+  }
+
+  function explode(bomb) {
+    const cells = [{ col: bomb.col, row: bomb.row }];
+    const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+    dirs.forEach(([dx, dy]) => {
+      for (let i = 1; i <= bomb.range; i++) {
+        const c = bomb.col + dx * i;
+        const r = bomb.row + dy * i;
+        const v = cellAt(c, r);
+        if (v === WALL) break;
+        if (v === CRATE) { cells.push({ col: c, row: r, crate: true }); break; }
+        cells.push({ col: c, row: r });
+      }
+    });
+    cells.forEach((cell) => {
+      if (cell.crate) grid[cell.row][cell.col] = EMPTY;
+      blasts.push({ col: cell.col, row: cell.row, life: 0.55 });
+    });
+    // Chain reaction
+    bombs.forEach((other) => {
+      if (other !== bomb && cells.some((c) => c.col === other.col && c.row === other.row)) other.timer = Math.min(other.timer, 0.08);
+    });
+  }
+
+  function hitByBlast(entity) {
+    return blasts.some((b) => {
+      const cx = b.col * TILE + TILE / 2;
+      const cy = b.row * TILE + TILE / 2;
+      return Math.hypot(entity.x - cx, entity.y - cy) < TILE * 0.62;
+    });
+  }
+
+  function damagePlayer() {
+    if (player.invulnerable > 0 || !player.alive) return;
+    lives -= 1;
+    updateHud();
+    if (lives <= 0) {
+      running = false;
+      setStatus("Out of lives — press New arena to try again.", "bad");
+      return;
+    }
+    player.col = 1;
+    player.row = 1;
+    player.x = TILE * 1.5;
+    player.y = TILE * 1.5;
+    player.invulnerable = 2;
+    setStatus("Ouch! " + lives + " " + (lives === 1 ? "life" : "lives") + " left.", "bad");
+  }
+
+  function updateEnemies(dt) {
+    enemies.forEach((e) => {
+      if (!e.alive) return;
+      const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+      const chosen = dirs[Math.floor(Math.random() * 4)];
+      const speed = e.speed * dt * 0.055;
+      const nx = e.x + chosen[0] * speed;
+      const ny = e.y + chosen[1] * speed;
+      const testCol = Math.floor((nx + chosen[0] * (e.radius - 2)) / TILE);
+      const testRow = Math.floor((ny + chosen[1] * (e.radius - 2)) / TILE);
+      if (canStand(testCol, testRow) && !(chosen[0] === 0 && Math.abs(nx - (Math.floor(nx / TILE) * TILE + TILE / 2)) > 5)) {
+        if (chosen[0] !== 0 && Math.abs(ny - (Math.floor(ny / TILE) * TILE + TILE / 2)) > 6) {
+          e.y += Math.sign((Math.floor(e.y / TILE) * TILE + TILE / 2) - e.y) * speed;
+        } else if (chosen[1] !== 0 && Math.abs(nx - (Math.floor(nx / TILE) * TILE + TILE / 2)) > 6) {
+          e.x += Math.sign((Math.floor(e.x / TILE) * TILE + TILE / 2) - e.x) * speed;
+        } else {
+          e.x = nx;
+          e.y = ny;
+        }
+      }
+      e.col = Math.floor(e.x / TILE);
+      e.row = Math.floor(e.y / TILE);
+      if (hitByBlast(e)) {
+        e.alive = false;
+        updateHud();
+        setStatus("Enemy cleared. " + enemies.filter((x) => x.alive).length + " left.", "good");
+      }
+      if (Math.hypot(e.x - player.x, e.y - player.y) < e.radius + player.radius - 2) {
+        damagePlayer();
+      }
+    });
+  }
+
+  function loop(now) {
+    if (!running) return;
+    const dt = Math.min(48, now - lastTick);
+    lastTick = now;
+    if (!paused && player.alive) {
+      secondAcc += dt;
+      if (secondAcc > 1000) { secondAcc -= 1000; timeLeft -= 1; updateHud(); }
+      if (timeLeft <= 0) {
+        running = false;
+        setStatus("Time ran out — press New arena to try again.", "bad");
+        draw();
+        return;
+      }
+
+      let dx = 0;
+      let dy = 0;
+      if (keys.ArrowLeft || keys.a) dx -= 1;
+      if (keys.ArrowRight || keys.d) dx += 1;
+      if (keys.ArrowUp || keys.w) dy -= 1;
+      if (keys.ArrowDown || keys.s) dy += 1;
+      if (dx || dy) {
+        if (dx && dy) { dy = 0; }
+        moveEntity(player, dx, dy, dt);
+      }
+
+      player.invulnerable = Math.max(0, player.invulnerable - dt / 1000);
+
+      bombs.forEach((b) => { b.timer -= dt / 1000; });
+      bombs = bombs.filter((b) => {
+        if (b.timer <= 0) { explode(b); return false; }
+        return true;
+      });
+
+      blasts.forEach((b) => { b.life -= dt / 1000; });
+      blasts = blasts.filter((b) => b.life > 0);
+
+      if (hitByBlast(player)) damagePlayer();
+      updateEnemies(dt);
+
+      // Exit check
+      const col = Math.floor(player.x / TILE);
+      const row = Math.floor(player.y / TILE);
+      if (col === exit.col && row === exit.row && cellAt(col, row) === EMPTY) {
+        if (enemies.some((e) => e.alive)) {
+          setStatus("The exit is sealed — clear the enemies first.", "bad");
+        } else {
+          running = false;
+          setStatus("You escaped with " + Math.ceil(timeLeft) + " seconds left!", "good");
+          draw();
+          return;
+        }
+      }
+    }
+    draw();
+    loopId = requestAnimationFrame(loop);
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    // Floor
+    ctx.fillStyle = "#16203a";
+    ctx.fillRect(0, 0, W, H);
+    for (let r = 0; r < ROWS; r++) {
+      for (let c = 0; c < COLS; c++) {
+        const x = c * TILE;
+        const y = r * TILE;
+        const v = grid[r][c];
+        if ((r + c) % 2 === 0) {
+          ctx.fillStyle = "rgba(255,255,255,.025)";
+          ctx.fillRect(x, y, TILE, TILE);
+        }
+        if (v === WALL) {
+          ctx.fillStyle = "#2b3652";
+          ctx.fillRect(x, y, TILE, TILE);
+          ctx.fillStyle = "#3a4767";
+          ctx.fillRect(x + 3, y + 3, TILE - 6, TILE - 9);
+          ctx.fillStyle = "rgba(0,0,0,.25)";
+          ctx.fillRect(x + 3, y + TILE - 8, TILE - 6, 5);
+        } else if (v === CRATE) {
+          ctx.fillStyle = "#8a5a2b";
+          ctx.fillRect(x + 3, y + 3, TILE - 6, TILE - 6);
+          ctx.strokeStyle = "#5f3a18";
+          ctx.lineWidth = 3;
+          ctx.strokeRect(x + 3, y + 3, TILE - 6, TILE - 6);
+          ctx.beginPath();
+          ctx.moveTo(x + 6, y + 6);
+          ctx.lineTo(x + TILE - 6, y + TILE - 6);
+          ctx.moveTo(x + TILE - 6, y + 6);
+          ctx.lineTo(x + 6, y + TILE - 6);
+          ctx.stroke();
+        }
+      }
+    }
+
+    // Exit marker when the crate above it is gone
+    if (cellAt(exit.col, exit.row) === EMPTY) {
+      const x = exit.col * TILE;
+      const y = exit.row * TILE;
+      ctx.fillStyle = "rgba(126,226,168,.22)";
+      ctx.fillRect(x + 5, y + 5, TILE - 10, TILE - 10);
+      ctx.strokeStyle = "#7ee2a8";
+      ctx.lineWidth = 3;
+      ctx.strokeRect(x + 5, y + 5, TILE - 10, TILE - 10);
+      ctx.fillStyle = "#7ee2a8";
+      ctx.font = "700 16px system-ui, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("EXIT", x + TILE / 2, y + TILE / 2);
+    }
+
+    // Bombs
+    bombs.forEach((b) => {
+      const cx = b.col * TILE + TILE / 2;
+      const cy = b.row * TILE + TILE / 2;
+      const pulse = 1 + Math.sin((2.1 - b.timer) * 18) * 0.08;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 14 * pulse, 0, Math.PI * 2);
+      ctx.fillStyle = "#f4f1e8";
+      ctx.fill();
+      ctx.strokeStyle = "#1b2230";
+      ctx.lineWidth = 3;
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(cx + 4, cy - 13);
+      ctx.quadraticCurveTo(cx + 13, cy - 22, cx + 6, cy - 25);
+      ctx.strokeStyle = "#ffb347";
+      ctx.lineWidth = 3;
+      ctx.stroke();
+    });
+
+    // Blasts
+    blasts.forEach((b) => {
+      const alpha = Math.max(0, Math.min(1, b.life / 0.55));
+      ctx.fillStyle = "rgba(255, 179, 71, " + (0.75 * alpha) + ")";
+      ctx.fillRect(b.col * TILE + 3, b.row * TILE + 3, TILE - 6, TILE - 6);
+      ctx.fillStyle = "rgba(255, 240, 190, " + (0.9 * alpha) + ")";
+      ctx.fillRect(b.col * TILE + TILE * 0.3, b.row * TILE + TILE * 0.3, TILE * 0.4, TILE * 0.4);
+    });
+
+    // Enemies
+    enemies.forEach((e) => {
+      if (!e.alive) return;
+      ctx.beginPath();
+      ctx.ellipse(e.x, e.y + 8, e.radius * 0.9, 5, 0, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(0,0,0,.28)";
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(e.x, e.y, e.radius, 0, Math.PI * 2);
+      ctx.fillStyle = "#c94f4f";
+      ctx.fill();
+      ctx.fillStyle = "#fff";
+      ctx.beginPath();
+      ctx.arc(e.x - 4, e.y - 3, 3.4, 0, Math.PI * 2);
+      ctx.arc(e.x + 4, e.y - 3, 3.4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "#2a1010";
+      ctx.beginPath();
+      ctx.arc(e.x - 4, e.y - 3, 1.6, 0, Math.PI * 2);
+      ctx.arc(e.x + 4, e.y - 3, 1.6, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // Player
+    if (player && player.alive) {
+      const blink = player.invulnerable > 0 && Math.floor(player.invulnerable * 8) % 2 === 0;
+      if (!blink) {
+        ctx.beginPath();
+        ctx.ellipse(player.x, player.y + 9, 11, 5, 0, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(0,0,0,.3)";
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(player.x, player.y - 1, player.radius, 0, Math.PI * 2);
+        ctx.fillStyle = "#eef4ff";
+        ctx.fill();
+        ctx.fillStyle = "#2f6fd0";
+        ctx.beginPath();
+        ctx.arc(player.x, player.y - 8, player.radius * 0.72, Math.PI, 0);
+        ctx.fill();
+        ctx.fillStyle = "#16222f";
+        ctx.beginPath();
+        ctx.arc(player.x - 4, player.y + 1, 2.4, 0, Math.PI * 2);
+        ctx.arc(player.x + 4, player.y + 1, 2.4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  }
+
+  document.addEventListener("keydown", (event) => {
+    const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
+    keys[key] = true;
+    if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " "].includes(event.key)) event.preventDefault();
+    if (event.key === " ") dropBomb(player);
+  });
+  document.addEventListener("keyup", (event) => {
+    const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
+    keys[key] = false;
+  });
+
+  document.getElementById("bomb").addEventListener("click", () => dropBomb(player));
+  document.getElementById("new").addEventListener("click", start);
+  document.querySelector(".pad").addEventListener("click", (event) => {
+    const btn = event.target.closest("[data-dir]");
+    if (!btn) return;
+    const dir = btn.dataset.dir;
+    if (dir === "bomb") return dropBomb(player);
+    const map = { up: ["ArrowUp"], down: ["ArrowDown"], left: ["ArrowLeft"], right: ["ArrowRight"] };
+    const key = map[dir][0];
+    keys[key] = true;
+    setTimeout(() => { keys[key] = false; }, 160);
+  });
+
+  start();
+  setStatus("Arrow keys or WASD to move, Space to drop a bomb.");
+})();
+</script>
+</body>
+</html>
