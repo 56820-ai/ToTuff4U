@@ -1236,25 +1236,21 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 .proxy-launch-form input { width: 100%; box-sizing: border-box; padding: 14px 16px; border-radius: 10px; border: 1px solid rgba(150,180,220,.3); background: var(--bg-secondary); color: var(--text-primary); font: inherit; }
 .proxy-launch-form button { justify-self: start; }
 .feature-note { font-size: .92rem; opacity: .85; }
+
+.profile-icon-link{flex:0 0 auto;width:44px;height:44px;margin-left:14px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;text-decoration:none;font-size:1.35rem;background:linear-gradient(135deg,var(--accent-pink),var(--accent-purple));border:2px solid rgba(255,255,255,.2);box-shadow:0 0 14px rgba(255,107,157,.25);transition:transform .2s ease,box-shadow .2s ease}
+.profile-icon-link:hover{transform:translateY(-2px) scale(1.05);box-shadow:0 0 20px rgba(255,107,157,.45)}
+@media(max-width:700px){.profile-icon-link{width:38px;height:38px;margin-left:8px}.header-content{gap:8px}.search-container{min-width:0}}
+
 </style>
   
 
-<style>.inline-feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:20px}.inline-setting,.inline-score-group{display:flex;flex-direction:column;gap:10px;padding:18px;border:1px solid rgba(107,157,255,.22);border-radius:14px;background:rgba(26,26,46,.55)}.inline-setting input:not([type=checkbox]),.inline-setting select{padding:10px;border-radius:9px;background:var(--bg-secondary);color:var(--text-primary);border:1px solid rgba(107,157,255,.35)}.inline-setting button{padding:10px;border:0;border-radius:9px;background:var(--accent-pink);font-weight:800;cursor:pointer}.inline-score-list{display:grid;gap:12px;margin-top:16px}.inline-score-group h2{margin:0}.inline-score-row{display:flex;justify-content:space-between;padding:8px 0;border-top:1px solid rgba(255,255,255,.1)}</style>
+<style>.inline-feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:20px}.inline-setting,.inline-score-group{display:flex;flex-direction:column;gap:10px;padding:18px;border:1px solid rgba(107,157,255,.22);border-radius:14px;background:rgba(26,26,46,.55)}.inline-setting input:not([type=checkbox]),.inline-setting select{padding:10px;border-radius:9px;background:var(--bg-secondary);color:var(--text-primary);border:1px solid rgba(107,157,255,.35)}.inline-setting button{padding:10px;border:0;border-radius:9px;background:var(--accent-pink);font-weight:800;cursor:pointer}.inline-score-list{display:grid;gap:18px;margin-top:16px}.inline-score-group{display:flex;flex-direction:column;gap:10px;padding:clamp(12px,2vw,20px);border:1px solid rgba(125,150,255,.25);border-radius:18px;background:linear-gradient(145deg,rgba(31,34,62,.9),rgba(14,18,39,.96));box-shadow:0 12px 30px rgba(0,0,0,.2)}.inline-score-group h2{margin:0;text-align:center;font-family:Orbitron, sans-serif;font-size:clamp(1rem,2.5vw,1.3rem);color:#f3edff;padding-bottom:10px;border-bottom:1px solid rgba(160,140,255,.22)}.inline-podium-stage{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:end;gap:clamp(7px,1.5vw,16px);max-width:760px;width:100%;margin:36px auto 4px;padding:0 4px}.inline-podium{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;min-width:0;text-align:center;padding:28px 7px 12px;border:1px solid rgba(255,255,255,.35);border-radius:15px 15px 9px 9px;box-shadow:0 14px 28px rgba(0,0,0,.3),inset 0 2px rgba(255,255,255,.55)}.inline-podium-1{grid-column:2;grid-row:1;min-height:250px;background:linear-gradient(155deg,#fff3a8,#f4c94f 35%,#c88b16 75%,#80500e);z-index:2}.inline-podium-2{grid-column:1;grid-row:1;min-height:205px;background:linear-gradient(155deg,#f4f7ff,#c4cedc 35%,#8291a5 75%,#48576b)}.inline-podium-3{grid-column:3;grid-row:1;min-height:175px;background:linear-gradient(155deg,#ffdfc5,#df9a6c 35%,#ad643e 75%,#693a27)}.inline-podium-medal{position:absolute;top:-31px;left:50%;transform:translateX(-50%);font-size:2.45rem;line-height:1;filter:drop-shadow(0 4px 5px rgba(0,0,0,.35))}.inline-podium-place{font:800 .72rem Orbitron,sans-serif;letter-spacing:.7px;text-transform:uppercase;color:#332719;margin:0 0 9px}.inline-podium-player{font:700 clamp(.72rem,1.7vw,1rem)/1.2 'Pixelify Sans',sans-serif;color:#211a17;overflow-wrap:anywhere;margin:0 0 10px}.inline-podium-score{display:block;width:100%;margin-top:auto;padding:9px 4px;border-radius:9px;background:rgba(25,20,18,.25);border:1px solid rgba(255,255,255,.3);color:#fff;font:800 clamp(.65rem,1.5vw,.9rem) Orbitron,sans-serif;overflow-wrap:anywhere;text-shadow:0 2px 4px rgba(0,0,0,.4)}.inline-podium-date{font-size:.72rem;color:rgba(35,25,20,.75);margin:7px 0 0}@media(max-width:520px){.inline-podium-stage{gap:5px;margin-top:32px}.inline-podium{padding:25px 4px 9px;border-radius:11px 11px 7px 7px}.inline-podium-1{min-height:205px}.inline-podium-2{min-height:175px}.inline-podium-3{min-height:150px}.inline-podium-medal{font-size:2rem;top:-26px}.inline-podium-place{font-size:.56rem}.inline-podium-player{font-size:.7rem}.inline-podium-score{font-size:.62rem;padding:7px 2px}}</style>
 
 </head>
 <body>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8390067368864065"
      crossorigin="anonymous"></script>
-<!-- Vertical Ad Type -->
-<ins class="adsbygoogle"
-     style="display:block"
-     data-ad-client="ca-pub-8390067368864065"
-     data-ad-slot="9531168719"
-     data-ad-format="auto"
-     data-full-width-responsive="true"></ins>
-<script>
-     (adsbygoogle = window.adsbygoogle || []).push({});
-</script>
+
     <div id="snow"></div>
 
 <nav class="sidebar">
@@ -1302,6 +1298,28 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
     <div class="sidebar-overlay"></div>
 
     <div class="main-container">
+<div class="homepage-ad-wrap" style="width:100%;max-width:970px;min-width:250px;margin:12px auto 20px;padding:0 12px;">
+<ins class="adsbygoogle" style="display:block;width:100%;min-width:250px;min-height:90px" data-ad-client="ca-pub-8390067368864065" data-ad-slot="9531168719" data-ad-format="auto" data-full-width-responsive="true"></ins>
+</div>
+<script>
+(function () {
+  const ad = document.querySelector(".homepage-ad-wrap ins.adsbygoogle");
+  let requested = false;
+  function requestAdWhenSized() {
+    if (requested || !ad || !ad.isConnected) return;
+    if (ad.getBoundingClientRect().width < 250) return;
+    try {
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
+      requested = true;
+    } catch (error) {
+      console.warn("Ad slot could not be initialized yet.", error);
+    }
+  }
+  if (document.readyState === "complete") requestAnimationFrame(requestAdWhenSized);
+  else window.addEventListener("load", () => requestAnimationFrame(requestAdWhenSized), { once: true });
+  window.addEventListener("resize", requestAdWhenSized);
+})();
+</script>
         <div style="width:100%;max-width:728px;margin:12px auto;text-align:center;">
             
         </div>
@@ -1318,6 +1336,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
                         <i class="fas fa-search search-icon"></i>
                     </div>
                 </div>
+                <a class="profile-icon-link" href="./my-scores.html" aria-label="My scores" title="My scores"><i class="fas fa-user"></i></a>
             </div>
         </header>
 
@@ -2417,13 +2436,17 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
     function submitDailyStreakRecord(streak) {
         if (!window.ArcadeScores || !window.ArcadeScores.configured || !Number.isSafeInteger(streak) || streak < 1) return;
         let previousBest = 0;
-        try { previousBest = Number(localStorage.getItem('arcadeAtlasDailyStreakSubmittedBest')) || 0; } catch (error) {}
-        if (streak <= previousBest) return;
-        const playerName = window.ArcadeScores.getPlayerName('Choose a nickname for the public Daily Pick Streak leaderboard (24 characters max). Cancel to play without submitting.');
-        if (!playerName) return;
+        let playerName = '';
+        try {
+            previousBest = Number(localStorage.getItem('arcadeAtlasDailyStreakSubmittedBest')) || 0;
+            playerName = (localStorage.getItem('arcadeLeaderboardPlayerName') || '').trim().slice(0, 24);
+        } catch (error) {}
+        // Daily Pick must launch immediately without an unexpected nickname prompt.
+        // Submit a streak only when the player has already opted in with a saved name.
+        if (!playerName || streak <= previousBest) return;
         window.ArcadeScores.submit('Daily Pick Streak', streak, playerName).then(ok => {
             if (ok) { try { localStorage.setItem('arcadeAtlasDailyStreakSubmittedBest', String(streak)); } catch (error) {} }
-        });
+        }).catch(error => console.warn('Arcade Atlas: daily streak was not submitted.', error));
     }
 
     function launchDailyPick() {
@@ -2991,6 +3014,8 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         
         updateTime();
         setInterval(updateTime, 1000);
+        // Let browser automation wait until all catalog controls and handlers are ready.
+        window.__arcadeAtlasReady = true;
     });
 </script>
 
@@ -3326,7 +3351,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 </script>
 <script src="./js/arcade-score-config.js"></script>
 <script src="./js/arcade-scores.js"></script>
-<script>(function(){const $=id=>document.getElementById(id);const p=$('aa-particles');if(p){p.checked=localStorage.getItem('particlesEnabled')!=='false';p.onchange=()=>{localStorage.setItem('particlesEnabled',String(p.checked));const s=$('snow');if(s)s.style.display=p.checked?'':'none'}}const opts={default:['Arcade Atlas','/images/favicon.png'],google:['Google','https://www.google.com/favicon.ico'],classroom:['Google Classroom','https://ssl.gstatic.com/classroom/favicon.png'],docs:['Google Docs','/favicon/googledocs.png']};const c=$('aa-cloak');if(c){c.value=localStorage.getItem('tabCloak')||'default';c.onchange=()=>{let v=opts[c.value]?c.value:'default';localStorage.setItem('tabCloak',v);document.title=opts[v][0];let l=document.querySelector('link[rel~="icon"]');if(!l){l=document.createElement('link');l.rel='icon';document.head.append(l)}l.href=opts[v][1]}}const k=$('aa-autokey'),s=$('aa-speed'),pk=$('aa-panic');if(k){k.value=localStorage.getItem('autoClickerKeybind')||'a';s.value=localStorage.getItem('autoClickerSpeed')||1000;pk.value=localStorage.getItem('panicKeybind')||'\\';$('aa-save-auto').onclick=()=>{let v=k.value.trim(),n=Number(s.value);if([...v].length!==1||!Number.isInteger(n)||n<1||n>60000){$('aa-auto-status').textContent='Enter one key and a speed from 1 to 60000 ms.';return}localStorage.setItem('autoClickerKeybind',v);localStorage.setItem('autoClickerSpeed',n);$('aa-auto-status').textContent='Settings saved.'};$('aa-save-panic').onclick=()=>{if([...pk.value.trim()].length!==1){alert('Enter exactly one key.');return}localStorage.setItem('panicKeybind',pk.value.trim());alert('Shortcut saved.')}}document.addEventListener('keydown',e=>{if(e.repeat||e.ctrlKey||e.altKey||e.metaKey||/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName))return;if(e.key===(localStorage.getItem('panicKeybind')||'\\'))location.href='https://classroom.google.com'});async function scores(){let list=$('aa-score-list'),status=$('aa-score-status');if(!list||!status)return;list.replaceChildren();status.textContent='Loading scores…';if(!window.ArcadeScores){status.textContent='Score service is unavailable.';return}let rows=await window.ArcadeScores.getScores();if(window.ArcadeScores.lastLoadError){status.textContent='Could not load scores: '+window.ArcadeScores.lastLoadError;return}let groups=new Map();rows.filter(x=>Number(x.score)>0).forEach(x=>{let g=String(x.game_title||'Other');if(!groups.has(g))groups.set(g,[]);groups.get(g).push(x)});if(!groups.size){status.textContent='No scores have been submitted yet.';return}status.textContent='Loaded '+rows.length+' score records.';for(let [game,items] of [...groups].sort((a,b)=>a[0].localeCompare(b[0]))){let box=document.createElement('section');box.className='inline-score-group';let title=document.createElement('h2');title.textContent=game;box.append(title);items.sort((a,b)=>{let x=BigInt(String(a.score||0)),y=BigInt(String(b.score||0));return x>y?-1:x<y?1:0}).slice(0,10).forEach((r,i)=>{let row=document.createElement('div');row.className='inline-score-row';let n=document.createElement('span'),v=document.createElement('strong');n.textContent=(i+1)+'. '+(r.player_name||'Player');v.textContent=String(r.score);row.append(n,v);box.append(row)});list.append(box)}}$('aa-refresh-scores')?.addEventListener('click',scores);scores()})();</script>
+<script>(function(){const $=id=>document.getElementById(id);const p=$('aa-particles');if(p){p.checked=localStorage.getItem('particlesEnabled')!=='false';p.onchange=()=>{localStorage.setItem('particlesEnabled',String(p.checked));const s=$('snow');if(s)s.style.display=p.checked?'':'none'}}const opts={default:['Arcade Atlas','/images/favicon.png'],google:['Google','https://www.google.com/favicon.ico'],classroom:['Google Classroom','https://ssl.gstatic.com/classroom/favicon.png'],docs:['Google Docs','/favicon/googledocs.png']};const c=$('aa-cloak');if(c){c.value=localStorage.getItem('tabCloak')||'default';c.onchange=()=>{let v=opts[c.value]?c.value:'default';localStorage.setItem('tabCloak',v);document.title=opts[v][0];let l=document.querySelector('link[rel~="icon"]');if(!l){l=document.createElement('link');l.rel='icon';document.head.append(l)}l.href=opts[v][1]}}const k=$('aa-autokey'),s=$('aa-speed'),pk=$('aa-panic');if(k){k.value=localStorage.getItem('autoClickerKeybind')||'a';s.value=localStorage.getItem('autoClickerSpeed')||1000;pk.value=localStorage.getItem('panicKeybind')||'\\';$('aa-save-auto').onclick=()=>{let v=k.value.trim(),n=Number(s.value);if([...v].length!==1||!Number.isInteger(n)||n<1||n>60000){$('aa-auto-status').textContent='Enter one key and a speed from 1 to 60000 ms.';return}localStorage.setItem('autoClickerKeybind',v);localStorage.setItem('autoClickerSpeed',n);$('aa-auto-status').textContent='Settings saved.'};$('aa-save-panic').onclick=()=>{if([...pk.value.trim()].length!==1){alert('Enter exactly one key.');return}localStorage.setItem('panicKeybind',pk.value.trim());alert('Shortcut saved.')}}document.addEventListener('keydown',e=>{if(e.repeat||e.ctrlKey||e.altKey||e.metaKey||/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName))return;if(e.key===(localStorage.getItem('panicKeybind')||'\\'))location.href='https://classroom.google.com'});function formatCookieClickerScore(value) { const raw = String(value ?? "—").trim(); if (!/^\d+$/.test(raw)) return raw; const n = BigInt(raw); if (n === 0n) return "0"; const names = [  "", "thousand", "million", "billion", "trillion", "quadrillion",  "quintillion", "sextillion", "septillion", "octillion", "nonillion",  "decillion", "undecillion", "duodecillion", "tredecillion",  "quattuordecillion", "quindecillion", "sexdecillion",  "septendecillion", "octodecillion", "novemdecillion", "vigintillion" ]; const group = Math.floor((raw.length - 1) / 3); if (group === 0) return n.toLocaleString("en-US"); const exponent = raw.length - 1; const significant = raw.slice(0, 3); const mantissa = Number(significant) / (10 ** (significant.length - 1)); const amount = mantissa.toFixed(2); if (group < names.length) return amount + " " + names[group]; if (group <= 66) {  const ones = ["", "un", "duo", "tre", "quattuor", "quin", "sex", "septen", "octo", "novem"];  const tens = ["", "", "vigint", "trigint", "quadragint", "quinquagint", "sexagint"];  const ten = Math.floor(group / 10);  const one = group % 10;  const name = (one ? ones[one] : "") + tens[ten] + "illion";  return amount + " " + name; } /* Beyond 200 zeroes, keep the magnitude readable without Number precision loss. */ return amount + " × 10^" + exponent;}function aaFormatScore(value,game){if(String(game||'').trim().toLowerCase()==='cookie clicker')return formatCookieClickerScore(value);let raw=String(value??'—');if(/^\d+(\.\d+)?$/.test(raw))return Number(raw).toLocaleString('en-US',{maximumFractionDigits:3});return raw}async function scores(){let list=$('aa-score-list'),status=$('aa-score-status');if(!list||!status)return;list.replaceChildren();status.textContent='Loading scores…';if(!window.ArcadeScores){status.textContent='Score service is unavailable.';return}let rows=await window.ArcadeScores.getScores();if(window.ArcadeScores.lastLoadError){status.textContent='Could not load scores: '+window.ArcadeScores.lastLoadError;return}let groups=new Map();rows.filter(x=>Number(x.score)>0).forEach(x=>{let g=String(x.game_title||'Other');if(!groups.has(g))groups.set(g,[]);groups.get(g).push(x)});if(!groups.size){status.textContent='No scores have been submitted yet.';return}status.textContent='Loaded '+rows.length+' score records.';for(let [game,items] of [...groups].sort((a,b)=>a[0].localeCompare(b[0]))){let box=document.createElement('section');box.className='inline-score-group';let title=document.createElement('h2');title.textContent=game;box.append(title);items.sort((a,b)=>{try{let x=BigInt(String(a.score||0)),y=BigInt(String(b.score||0));return x>y?-1:x<y?1:0}catch{return Number(b.score)-Number(a.score)}});let stage=document.createElement('div');stage.className='inline-podium-stage';items.slice(0,3).forEach((r,i)=>{let rank=i+1,card=document.createElement('article');card.className='inline-podium inline-podium-'+rank;let medal=document.createElement('div');medal.className='inline-podium-medal';medal.textContent=['🥇','🥈','🥉'][i];let place=document.createElement('p');place.className='inline-podium-place';place.textContent=['1st Place','2nd Place','3rd Place'][i];let player=document.createElement('h3');player.className='inline-podium-player';player.textContent=r.player_name||'Player';let score=document.createElement('strong');score.className='inline-podium-score';score.textContent=aaFormatScore(r.score,game);let date=document.createElement('p');date.className='inline-podium-date';date.textContent=r.created_at?new Date(r.created_at).toLocaleDateString():'';card.append(medal,place,player,score,date);stage.append(card)});box.append(stage);list.append(box)}}$('aa-refresh-scores')?.addEventListener('click',scores);scores()})();</script>
 </body>
 </html>
 

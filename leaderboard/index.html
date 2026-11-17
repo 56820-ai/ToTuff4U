@@ -1,741 +1,172 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8390067368864065" crossorigin="anonymous"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0a0a1a">
+  <title>Arcade Atlas — Leaderboard</title>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8390067368864065" crossorigin="anonymous"></script>
   <script src="../js/timeTracker.js" defer></script>
   <script src="../js/favicon.js"></script>
   <script src="../js/panic.js"></script>
   <script src="../js/autoclicker.js"></script>
-  <title>Grades & Attendance</title>
-  <link rel="icon" type="image/x-icon" href="../images/favicon.png">  
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-  
+  <link rel="icon" type="image/x-icon" href="../images/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Orbitron:wght@500;600;700;800&family=Pixelify+Sans:wght@500;600;700&family=VT323&display=swap" rel="stylesheet">
   <style>
-    @import url("https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;700&family=Orbitron:wght@400;500&family=VT323&family=Pixelify+Sans&display=swap");
-
     :root {
-      --bg-primary: #0a0a1a;
-      --bg-secondary: #1a1a2e;
-      --bg-tertiary: #25253a;
-      --accent-pink: #ff6b9d;
-      --accent-blue: #6b9dff;
-      --accent-purple: #9d6bff;
-      --accent-cyan: #6bffd9;
-      --text-primary: #ffffff;
-      --text-secondary: #c0c0d0;
-      --shadow-md: 0 8px 15px rgba(0, 0, 0, 0.2);
-      --shadow-lg: 0 15px 30px rgba(0, 0, 0, 0.3);
-      --transition-normal: 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-      --transition-bounce: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      color-scheme: dark;
+      --bg: #090a18;
+      --panel: rgba(23, 25, 48, .88);
+      --panel-soft: rgba(31, 34, 61, .78);
+      --pink: #ff6b9d;
+      --blue: #6b9dff;
+      --purple: #a477ff;
+      --cyan: #6bffd9;
+      --text: #f7f7ff;
+      --muted: #b9bfd5;
+      --line: rgba(126, 151, 255, .2);
+      --shadow: 0 16px 40px rgba(0, 0, 0, .28);
     }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+    * { box-sizing: border-box; }
+    html { min-height: 100%; overflow-x: hidden; }
     body {
-      font-family: "Chakra Petch", sans-serif;
-      background-color: var(--bg-primary);
-      color: var(--text-primary);
-      min-height: 100vh;
-      line-height: 1.6;
-      background-image: 
-        radial-gradient(circle at 10% 20%, rgba(157, 107, 255, 0.05) 0%, transparent 20%),
-        radial-gradient(circle at 90% 80%, rgba(255, 107, 157, 0.05) 0%, transparent 20%);
+      margin: 0; min-height: 100vh; overflow-x: hidden;
+      color: var(--text); font-family: "Chakra Petch", sans-serif; line-height: 1.55;
+      background:
+        radial-gradient(ellipse at 12% 4%, rgba(164,119,255,.16), transparent 32rem),
+        radial-gradient(ellipse at 92% 28%, rgba(255,107,157,.10), transparent 30rem),
+        linear-gradient(180deg, #090a18 0%, #0c1022 52%, #090a18 100%);
     }
-
-    .leaderboard-container {
-      max-width: 1000px;
-      margin: 0 auto;
-      padding: 2.5rem;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .leaderboard-header {
-      text-align: center;
-      margin-bottom: 2rem;
-      position: relative;
-      padding-bottom: 1.5rem;
-    }
-
+    .leaderboard-container { width: min(100% - 32px, 980px); margin: 0 auto; padding: clamp(22px, 4vw, 48px) 0 56px; }
+    .leaderboard-header { position: relative; text-align: center; margin: 0 0 28px; padding: 8px 12px 24px; }
     .leaderboard-header::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 200px;
-      height: 4px;
-      background: linear-gradient(90deg, var(--accent-pink), var(--accent-purple));
-      border-radius: 2px;
+      content: ""; position: absolute; left: 50%; bottom: 0; transform: translateX(-50%);
+      width: min(240px, 55vw); height: 3px; border-radius: 9px;
+      background: linear-gradient(90deg, transparent, var(--pink), var(--purple), var(--blue), transparent);
+      box-shadow: 0 0 22px rgba(164,119,255,.45);
     }
-
-    .beta-label {
-      display: inline-block;
-      vertical-align: middle;
-      margin-left: 0.5rem;
-      padding: 0.25rem 0.55rem;
-      border: 1px solid var(--accent-cyan);
-      border-radius: 999px;
-      color: var(--accent-cyan);
-      background: rgba(107, 255, 217, 0.10);
-      font-family: "Chakra Petch", sans-serif;
-      font-size: 0.72rem;
-      letter-spacing: 1px;
-      text-shadow: none;
-      -webkit-text-fill-color: var(--accent-cyan);
-    }
-
+    .arcade-brand { display: inline-flex; align-items: center; justify-content: center; margin: 0 auto 14px; }
+    .arcade-brand img { display: block; width: min(270px, 68vw); max-height: 112px; object-fit: contain; filter: drop-shadow(0 7px 24px rgba(107,157,255,.24)); }
     h1 {
-      font-family: "Orbitron", sans-serif;
-      font-size: 2.2rem;
-      background: linear-gradient(135deg, var(--accent-pink), var(--accent-blue), var(--accent-purple));
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      text-shadow: 0 2px 10px rgba(255, 107, 157, 0.3);
-      letter-spacing: 2px;
-      margin-bottom: 1.5rem;
+      margin: 0; font: 800 clamp(1.45rem, 5vw, 2.35rem)/1.2 "Orbitron", sans-serif;
+      letter-spacing: clamp(1px, .35vw, 3px);
+      background: linear-gradient(100deg, #ff8bb4 8%, #b58aff 50%, #78c7ff 92%);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      text-shadow: 0 5px 28px rgba(164,119,255,.16);
     }
-
-    .game-logo {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      object-fit: cover;
-      margin-bottom: 1rem;
-      border: 4px solid transparent;
-      background: linear-gradient(var(--bg-secondary), var(--bg-secondary)) padding-box,
-                  linear-gradient(135deg, var(--accent-pink), var(--accent-blue)) border-box;
-      box-shadow: var(--shadow-md);
-      transition: all var(--transition-bounce);
+    .beta-label {
+      display: inline-block; vertical-align: middle; margin-left: 7px; padding: 4px 8px;
+      border: 1px solid rgba(107,255,217,.55); border-radius: 999px; color: var(--cyan);
+      background: rgba(107,255,217,.08); font: 700 .62rem "Chakra Petch", sans-serif; letter-spacing: 1px;
+      -webkit-text-fill-color: var(--cyan);
     }
-
-    .game-logo:hover {
-      transform: scale(1.05) rotate(5deg);
-      box-shadow: 0 10px 25px rgba(255, 107, 157, 0.4);
-    }
-
-    .submit-btn, .submit-btn-link button {
-      padding: 0.9rem 1.8rem;
-      background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
-      color: var(--text-primary);
-      font-family: "Chakra Petch", sans-serif;
-      font-weight: 700;
-      font-size: 1rem;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: all var(--transition-bounce);
-      box-shadow: var(--shadow-md);
-      position: relative;
-      overflow: hidden;
-      z-index: 1;
-      margin: 0.5rem;
-    }
-
-    .submit-btn::before, .submit-btn-link button::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
-      z-index: -1;
-      opacity: 0;
-      transition: opacity var(--transition-normal);
-    }
-
-    .submit-btn:hover, .submit-btn-link button:hover {
-      transform: translateY(-3px);
-      box-shadow: var(--shadow-lg);
-    }
-
-    .submit-btn:hover::before, .submit-btn-link button:hover::before {
-      opacity: 1;
-    }
-
+    .submit-note { max-width: 690px; margin: 12px auto 0; color: var(--muted); font-size: .98rem; }
     .leaderboard {
-      width: 100%;
-      background-color: rgba(26, 26, 46, 0.7);
-      backdrop-filter: blur(10px);
-      border-radius: 20px;
-      box-shadow: var(--shadow-lg),
-                  inset 0 1px 1px rgba(255, 255, 255, 0.1);
-      padding: 1.5rem;
-      border: 1px solid rgba(107, 157, 255, 0.2);
-      max-height: 70vh;
-      overflow-y: auto;
-      -ms-overflow-style: none;
-      scrollbar-width: none;
+      position: relative; padding: clamp(12px, 2.5vw, 22px); border: 1px solid var(--line);
+      border-radius: 24px; background: linear-gradient(145deg, rgba(24,27,51,.86), rgba(13,17,36,.92));
+      box-shadow: var(--shadow), inset 0 1px rgba(255,255,255,.05); backdrop-filter: blur(14px);
     }
-
-    .leaderboard::-webkit-scrollbar {
-      display: none;
+    #score-list { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+    .game-board {
+      min-width: 0; padding: clamp(12px, 2.4vw, 20px); border: 1px solid rgba(107,157,255,.2);
+      border-radius: 18px; background: linear-gradient(135deg, rgba(35,37,66,.72), rgba(20,24,47,.78));
+      box-shadow: 0 8px 24px rgba(0,0,0,.18);
     }
-
-    #score-list {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 1.2rem;
+    .game-board-title {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      margin: 0 0 14px; padding-bottom: 12px; border-bottom: 1px solid rgba(151,139,255,.18);
+      color: #f5f3ff; text-align: center; font: 700 clamp(1rem, 2.7vw, 1.35rem)/1.3 "Orbitron", sans-serif;
+      overflow-wrap: anywhere;
     }
-
-    .leaderboard-item {
-      display: flex;
-      align-items: center;
-      background: linear-gradient(135deg, 
-                  rgba(37, 37, 58, 0.9), 
-                  rgba(26, 26, 46, 0.9));
-      border-radius: 16px;
-      padding: 1.5rem;
-      box-shadow: var(--shadow-md);
-      transition: all var(--transition-bounce);
-      border: 1px solid rgba(107, 157, 255, 0.1);
-      position: relative;
-      overflow: hidden;
+    .game-board-title::before, .game-board-title::after {
+      content: ""; width: clamp(18px, 5vw, 48px); height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,107,157,.7));
     }
-
-    .leaderboard-item:hover {
-      transform: translateY(-5px);
-      box-shadow: var(--shadow-lg);
-      border-color: rgba(255, 107, 157, 0.3);
+    .game-board-title::after { transform: scaleX(-1); }
+    .podium-stage {
+      display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: end;
+      gap: clamp(9px, 2vw, 20px); padding: 44px clamp(4px, 2vw, 18px) 8px;
+      max-width: 850px; margin: 0 auto; min-height: 390px;
     }
-
-    .leaderboard-item::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle, rgba(255, 107, 157, 0.1) 0%, transparent 70%);
-      transform: rotate(30deg);
-      transition: all var(--transition-normal);
-      opacity: 0;
+    .podium-card {
+      position: relative; display: flex; flex-direction: column; justify-content: flex-end;
+      min-width: 0; text-align: center; border-radius: 18px 18px 12px 12px;
+      padding: 0 clamp(7px, 1.5vw, 14px) 16px; isolation: isolate;
+      box-shadow: 0 18px 34px rgba(0,0,0,.32), inset 0 1px rgba(255,255,255,.42);
+      border: 1px solid rgba(255,255,255,.22); transition: transform .2s ease, filter .2s ease;
     }
-
-    .leaderboard-item:hover::before {
-      opacity: 1;
-      transform: rotate(0deg);
+    .podium-card:hover { transform: translateY(-5px); filter: brightness(1.08); }
+    .podium-rank-1 { grid-column: 2; grid-row: 1; min-height: 285px; z-index: 2;
+      background: linear-gradient(155deg,#fff2a6 0%,#f5c94d 24%,#d99a19 62%,#88500b 100%);
+      box-shadow: 0 0 34px rgba(255,207,75,.19), 0 18px 34px rgba(0,0,0,.34), inset 0 2px rgba(255,255,255,.7); }
+    .podium-rank-2 { grid-column: 1; grid-row: 1; min-height: 235px;
+      background: linear-gradient(155deg,#f4f7ff 0%,#b9c5d5 28%,#78879b 68%,#3d4a5d 100%);
+      box-shadow: 0 0 28px rgba(184,205,232,.14), 0 18px 34px rgba(0,0,0,.34), inset 0 2px rgba(255,255,255,.72); }
+    .podium-rank-3 { grid-column: 3; grid-row: 1; min-height: 195px;
+      background: linear-gradient(155deg,#ffd0a8 0%,#d88b56 30%,#a85d32 68%,#61301e 100%);
+      box-shadow: 0 0 28px rgba(220,137,87,.14), 0 18px 34px rgba(0,0,0,.34), inset 0 2px rgba(255,255,255,.55); }
+    .podium-medal { position: absolute; top: -39px; left: 50%; transform: translateX(-50%);
+      font-size: clamp(2rem, 5vw, 3rem); line-height: 1; filter: drop-shadow(0 5px 7px rgba(0,0,0,.35)); }
+    .podium-place { margin: 0 0 8px; color: rgba(25,20,30,.82); font: 800 clamp(.68rem,1.5vw,.9rem) "Orbitron",sans-serif; letter-spacing: 1.5px; text-transform: uppercase; }
+    .podium-player { margin: 0 auto 8px; max-width: 100%; color: #17131d;
+      font: 700 clamp(.9rem,2vw,1.22rem)/1.2 "Pixelify Sans",sans-serif; overflow-wrap: anywhere; text-shadow: 0 1px rgba(255,255,255,.28); }
+    .podium-game-image { width: clamp(38px,6vw,58px); height: clamp(38px,6vw,58px); margin: 0 auto 8px;
+      object-fit: cover; border-radius: 12px; border: 2px solid rgba(255,255,255,.55);
+      box-shadow: 0 5px 14px rgba(0,0,0,.25); }
+    .podium-score { display: block; width: 100%; margin-top: auto; padding: 10px 5px;
+      color: #fff; border-radius: 10px; background: rgba(27,20,17,.22);
+      border: 1px solid rgba(255,255,255,.25); font: 800 clamp(.75rem,1.8vw,1.05rem)/1.3 "Orbitron",sans-serif;
+      overflow-wrap: anywhere; text-shadow: 0 2px 5px rgba(0,0,0,.38); }
+    .podium-date { margin: 7px 0 0; color: rgba(30,24,28,.78); font: 400 .85rem "VT323",monospace; }
+    .game-board-title { gap: 12px; }
+    .game-title-image { width: 42px; height: 42px; object-fit: cover; border-radius: 10px;
+      border: 1px solid rgba(160,175,255,.45); box-shadow: 0 4px 14px rgba(0,0,0,.3); }
+    @media (max-width: 520px) {
+      .podium-stage { gap: 7px; min-height: 290px; padding: 38px 0 4px; }
+      .podium-card { border-radius: 13px 13px 9px 9px; padding: 0 5px 10px; }
+      .podium-rank-1 { min-height: 220px; }
+      .podium-rank-2 { min-height: 185px; }
+      .podium-rank-3 { min-height: 155px; }
+      .podium-medal { top: -31px; }
+      .podium-place { font-size: .58rem; letter-spacing: .5px; }
+      .podium-player { font-size: .78rem; }
+      .podium-score { font-size: .66rem; padding: 7px 3px; }
+      .podium-date { font-size: .72rem; }
     }
-
-    .user-icon {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      overflow: hidden;
-      margin-right: 1.5rem;
-      border: 3px solid transparent;
-      background: linear-gradient(var(--bg-secondary), var(--bg-secondary)) padding-box,
-                  linear-gradient(135deg, var(--accent-pink), var(--accent-blue)) border-box;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-      transition: all var(--transition-bounce);
-      flex-shrink: 0;
-      position: relative;
-      z-index: 2;
+    @media (max-width: 350px) {
+      .podium-stage { gap: 4px; }
+      .podium-player { font-size: .68rem; }
     }
-
-    .leaderboard-item:hover .user-icon {
-      transform: scale(1.1);
-      box-shadow: 0 8px 25px rgba(255, 107, 157, 0.4);
+    .leaderboard-status { padding: 28px 12px; color: var(--muted); text-align: center; font-size: 1rem; }
+    @media (max-width: 520px) {
+      .leaderboard-container { width: min(100% - 18px, 980px); padding-top: 18px; }
+      .leaderboard { padding: 9px; border-radius: 18px; }
+      .game-board { padding: 10px 8px; border-radius: 14px; }
+      .score-card { gap: 8px; padding: 9px 7px; border-radius: 12px; }
+      .rank-medal { flex-basis: 25px; font-size: 1.25rem; }
+      .game-icon-container { flex-basis: 40px; width: 40px; height: 40px; border-radius: 10px; }
+      .leaderboard-score { max-width: 32%; padding: 6px 7px; font-size: .7rem; }
+      .game-name, .score-date { font-size: .86rem; }
     }
-
-    .user-icon img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .player-info {
-      flex-grow: 1;
-      position: relative;
-      z-index: 2;
-    }
-
-    .game-title {
-      font-family: "Pixelify Sans", sans-serif;
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: 0.5rem;
-      display: flex;
-      align-items: center;
-      gap: 0.7rem;
-    }
-
-    .game-title i {
-      color: var(--accent-pink);
-      transition: transform var(--transition-normal);
-    }
-
-    .leaderboard-item:hover .game-title i {
-      transform: scale(1.2);
-    }
-
-    .username {
-      font-family: "VT323", monospace;
-      font-size: 1.5rem;
-      color: var(--text-primary);
-      margin-bottom: 0.3rem;
-      display: flex;
-      align-items: center;
-      gap: 0.7rem;
-    }
-
-    .username i {
-      color: var(--accent-blue);
-      transition: transform var(--transition-normal);
-    }
-
-    .leaderboard-item:hover .username i {
-      transform: scale(1.2);
-    }
-
-    .date {
-      font-family: "VT323", monospace;
-      font-size: 1.3rem;
-      color: var(--text-secondary);
-      display: flex;
-      align-items: center;
-      gap: 0.7rem;
-    }
-
-    .date i {
-      color: var(--accent-purple);
-      transition: transform var(--transition-normal);
-    }
-
-    .leaderboard-item:hover .date i {
-      transform: scale(1.2);
-    }
-
-    .score {
-      font-family: "Orbitron", sans-serif;
-      font-size: 1.5rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, var(--accent-pink), var(--accent-blue));
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      padding: 0.8rem 1.2rem;
-      border-radius: 12px;
-      border: 2px solid rgba(107, 157, 255, 0.3);
-      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
-      transition: all var(--transition-normal);
-      flex-shrink: 0;
-      margin-left: 1rem;
-      position: relative;
-      z-index: 2;
-    }
-
-    .leaderboard-item:hover .score {
-      border-color: rgba(255, 107, 157, 0.5);
-      box-shadow: 0 5px 15px rgba(255, 107, 157, 0.2);
-    }
-
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-      .leaderboard-container {
-        padding: 1.5rem;
-      }
-      
-      h1 {
-        font-size: 1.8rem;
-      }
-      
-      .leaderboard-item {
-        flex-direction: column;
-        text-align: center;
-        padding: 1.5rem 1rem;
-      }
-      
-      .user-icon {
-        margin-right: 0;
-        margin-bottom: 1rem;
-        width: 70px;
-        height: 70px;
-      }
-      
-      .player-info {
-        margin-right: 0;
-        margin-bottom: 1rem;
-      }
-      
-      .game-title, .username, .date {
-        justify-content: center;
-      }
-      
-      .score {
-        margin-left: 0;
-        margin-top: 0.5rem;
-      }
-    }
-
-    @media (max-width: 480px) {
-      h1 {
-        font-size: 1.5rem;
-      }
-      
-      .submit-btn, .submit-btn-link button {
-        padding: 0.7rem 1.4rem;
-        font-size: 0.9rem;
-      }
-      
-      .game-title {
-        font-size: 1.3rem;
-      }
-      
-      .username, .date {
-        font-size: 1.2rem;
-      }
-      
-      .score {
-        font-size: 1.3rem;
-      }
-    }
-  
-    /* Standalone leaderboard page: keep normal document scrolling enabled. */
-    html { height: auto; min-height: 100%; overflow-x: hidden; overflow-y: auto; }
-    body { height: auto; min-height: 100vh; overflow-x: hidden; overflow-y: auto; }
-    .leaderboard-container { width: min(100%, 1000px); min-width: 0; padding: clamp(0.75rem, 4vw, 2.5rem); }
-    .leaderboard { height: auto !important; max-height: none !important; overflow: visible !important; }
-    #score-list { min-width: 0; }
-    .leaderboard-item { min-width: 0; }
-    .player-info { min-width: 0; overflow-wrap: anywhere; }
-    .game-title, .username, .date, .score { overflow-wrap: anywhere; }
-    @media (max-width: 700px) {
-      .leaderboard-container { padding: 1rem 0.75rem; }
-      h1 { font-size: clamp(1.25rem, 6vw, 1.8rem); letter-spacing: 1px; }
-      .leaderboard-item { gap: 0.5rem; }
-      .game-title { font-size: 1.1rem; }
-      .username, .date { font-size: 1rem; }
-      .score { font-size: 1.15rem; }
-    }
-
- 
-    /* Top-three podium */
-    #score-list { list-style:none; display:flex; flex-direction:column; gap:2rem; }
-    .podium-section { padding:1.25rem; border:1px solid rgba(107,255,217,.18); border-radius:20px; background:rgba(18,25,42,.72); }
-    .daily-streak-note { margin:-.75rem 0 1.25rem; text-align:center; color:#aab8cb; font:500 .8rem/1.45 system-ui,sans-serif; }
-    .podium-game-title { text-align:center; font:700 1.35rem "Orbitron",sans-serif; margin:0 0 1.4rem; color:#e9faff; }
-    .podium { display:flex; align-items:flex-end; justify-content:center; gap:clamp(.5rem,2vw,1.25rem); max-width:680px; margin:0 auto; min-height:245px; }
-    .podium-place { flex:1; min-width:0; display:flex; flex-direction:column; align-items:center; text-align:center; gap:.45rem; }
-    .podium-avatar { width:clamp(48px,9vw,76px); height:clamp(48px,9vw,76px); border-radius:50%; object-fit:cover; border:3px solid #6b9dff; background:#1a1a2e; }
-    .podium-crown { font-size:1.4rem; line-height:1.2; min-height:1.4rem; }
-    .podium-name { width:100%; overflow-wrap:anywhere; font:700 clamp(1rem,2.4vw,1.25rem) "Chakra Petch",sans-serif; color:#fff; }
-    .podium-score { font:700 clamp(.85rem,2vw,1.1rem) "Orbitron",sans-serif; color:#6bffd9; overflow-wrap:anywhere; }
-    .podium-block { width:100%; display:flex; justify-content:center; align-items:center; border-radius:12px 12px 0 0; font:700 1.5rem "Orbitron",sans-serif; color:#101522; min-height:74px; background:linear-gradient(180deg,#8d9bb0,#586579); }
-    .podium-place.first .podium-block { min-height:126px; background:linear-gradient(180deg,#ffe58a,#d49a25); }
-    .podium-place.second .podium-block { min-height:96px; background:linear-gradient(180deg,#e5edf8,#8e9eaf); }
-    .podium-place.third .podium-block { min-height:74px; background:linear-gradient(180deg,#e9a477,#a95c38); }
-    .podium-place.first .podium-avatar { border-color:#ffd45e; }
-    .podium-place.second .podium-avatar { border-color:#c5d2e2; }
-    .podium-place.third .podium-avatar { border-color:#cd875e; }
-    .podium-empty { opacity:.5; font-size:.85rem; }
-    @media(max-width:480px) { .podium-section{padding:.8rem .45rem}.podium{gap:.35rem;min-height:205px}.podium-place.first .podium-block{min-height:105px}.podium-place.second .podium-block{min-height:80px}.podium-place.third .podium-block{min-height:62px}.podium-name{font-size:.95rem}.podium-score{font-size:.8rem} }
-\n    </style>
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; } }
+  </style>
 </head>
 <body>
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8390067368864065"
-     crossorigin="anonymous"></script>
-<!-- Vertical Ad Type -->
-<ins class="adsbygoogle"
-     style="display:block"
-     data-ad-client="ca-pub-8390067368864065"
-     data-ad-slot="9531168719"
-     data-ad-format="auto"
-     data-full-width-responsive="true"></ins>
-<script>
-     (adsbygoogle = window.adsbygoogle || []).push({});
-</script>
   <div class="leaderboard-container">
     <header class="leaderboard-header">
+      <a class="arcade-brand" href="../" aria-label="Arcade Atlas home"><img src="../assets/arcade-atlas-logo.png" alt="Arcade Atlas logo"></a>
       <h1>Game High Scores <span class="beta-label">BETA</span></h1>
-      <p class="submit-note">Scores are collected automatically in supported games. Enter your name when prompted; it is remembered for future games. Minecraft, Retro Bowl, and Blocky Combat SWAT rank by total playtime.</p>
-      <a href="../">
-      </a>
+      <p class="submit-note">The top three scores for every game. Play, set a new record, and climb the ranks.</p>
     </header>
     <div class="leaderboard">
-      <div id="score-list"></div>
+      <div id="score-list" aria-live="polite"></div>
     </div>
   </div>
-
-  <script src="../js/arcade-score-config.js?v=cloudflare1"></script>
-  <script src="../js/arcade-scores.js?v=cloudflare1"></script>
-  <script>
-    const scoreList = document.getElementById("score-list");
-    const catalogLogos = new Map();
-
-    async function loadCatalogLogos() {
-      try {
-        const response = await fetch("../games.json", { cache: "no-cache" });
-        if (!response.ok) return;
-        const data = await response.json();
-        (data.games || []).forEach(game => {
-          const key = String(game.title || "").trim().toLowerCase();
-          const image = String(game.image || "").trim();
-          if (!key || !image) return;
-          const external = image.startsWith("https://") || image.startsWith("http://") ||
-            image.startsWith("data:") || image.startsWith("blob:") || image.startsWith("//");
-          const cleanImage = image.startsWith("/") ? image.slice(1) : image;
-          const resolved = external ? image : image.startsWith("/ToTuff4U/") ? image : "../" + cleanImage;
-          catalogLogos.set(key, resolved);
-        });
-      } catch (error) {
-        console.warn("Arcade Atlas: game logo catalog could not be loaded.", error);
-      }
-    }
-
-
-    function getGameLogo(gameTitle) {
-      const game = String(gameTitle || "").trim().toLowerCase();
-      const alias = game === "retro bowl time" ? "retro bowl" : game === "blocky combat swat time" ? "blocky combat swat" : game;
-      const catalogImage = catalogLogos.get(alias);
-      if (catalogImage) return catalogImage;
-      const logos = {
-        "slope": "../images/slope.png",
-        "daily pick streak": "../images/daily-pick-streak.svg",
-        "retro bowl": "../images/retrobowl.jpg",
-        "retro bowl time": "../images/retrobowl.jpg",
-        "blocky combat swat time": "https://unblocked-games.s3.amazonaws.com/media/posts/425/blocky-combat-swat.jpg",
-        "gunspin": "../images/gunspin.png",
-        "block blast": "../images/blockblast.png",
-        "drift boss": "../images/driftboss.png",
-        "snow rider 3d": "../images/snowrider3d.png",
-        "stacktris": "../images/stacktris.jpg",
-        "minecraft": "../images/mc.png",
-        "2048": "../images/2048.png",
-        "cookie clicker": "../g/cookieclicker/img/icon.png",
-        "geometry dash": "../images/geodash.jpg",
-        "subway surfers": "data:image/svg+xml;charset=UTF-8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><defs><linearGradient id="g" x2="1" y2="1"><stop stop-color="#27d9e8"/><stop offset="1" stop-color="#2875ff"/></linearGradient></defs><rect width="128" height="128" rx="28" fill="#17233b"/><path d="M64 13 80 35 74 58 94 83 81 112 49 112 34 84 50 58 44 35Z" fill="url(#g)"/><circle cx="64" cy="28" r="11" fill="#ffd36a"/><path d="m50 52 14 11 14-11M49 84l-16 15m45-15 17 15" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>'),
-        "breakout": "data:image/svg+xml;charset=UTF-8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><defs><linearGradient id="g" x2="1" y2="1"><stop stop-color="#ffb347"/><stop offset="1" stop-color="#ff416c"/></linearGradient></defs><rect width="128" height="128" rx="28" fill="#17172b"/><g fill="url(#g)"><rect x="17" y="20" width="27" height="13" rx="4"/><rect x="50" y="20" width="27" height="13" rx="4"/><rect x="83" y="20" width="27" height="13" rx="4"/><rect x="17" y="39" width="27" height="13" rx="4"/><rect x="50" y="39" width="27" height="13" rx="4"/><rect x="83" y="39" width="27" height="13" rx="4"/></g><circle cx="66" cy="75" r="8" fill="#fff"/><rect x="39" y="99" width="50" height="9" rx="4.5" fill="#6b9dff"/></svg>'),
-        "reaction test": "data:image/svg+xml;charset=UTF-8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><defs><linearGradient id="g" x2="1" y2="1"><stop stop-color="#65f0bd"/><stop offset="1" stop-color="#3987ff"/></linearGradient></defs><rect width="128" height="128" rx="28" fill="#17172b"/><circle cx="64" cy="64" r="42" fill="none" stroke="url(#g)" stroke-width="10"/><path d="M64 34v31l22 13" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><path d="M64 8v10M120 64h-10M64 120v-10M8 64h10" stroke="#fff" stroke-width="5" stroke-linecap="round"/></svg>')
-      };
-      return logos[game] || "../images/favicon.png";
-    }
-
-    // Cookie Clicker scores can be far beyond Number.MAX_SAFE_INTEGER.
-    // Keep them as decimal strings/BigInts for exact sorting and display.
-    function compareCookieScores(a, b) {
-      const left = BigInt(String(a.score || "0"));
-      const right = BigInt(String(b.score || "0"));
-      return left > right ? -1 : left < right ? 1 : 0;
-    }
-
-    function formatCookieScore(value) {
-      const raw = String(value == null ? "0" : value).trim();
-      if (!/^[0-9]+$/.test(raw)) return raw;
-      const digits = raw.replace(/^0+(?=\d)/, "");
-      if (digits.length <= 3) return BigInt(digits).toLocaleString("en-US");
-
-      const units = [
-        "", "thousand", "million", "billion", "trillion", "quadrillion",
-        "quintillion", "sextillion", "septillion", "octillion", "nonillion",
-        "decillion", "undecillion", "duodecillion", "tredecillion",
-        "quattuordecillion", "quindecillion", "sexdecillion",
-        "septendecillion", "octodecillion", "novemdecillion", "vigintillion",
-        "unvigintillion", "duovigintillion", "tresvigintillion", "quattuorvigintillion",
-        "quinvigintillion", "sesvigintillion", "septemvigintillion", "octovigintillion",
-        "novemvigintillion", "trigintillion", "untrigintillion", "duotrigintillion",
-        "trestrigintillion", "quattuortrigintillion", "quintrigintillion", "sestrigintillion",
-        "septentrigintillion", "octotrigintillion", "novemtrigintillion", "quadragintillion",
-        "unquadragintillion", "duoquadragintillion", "tresquadragintillion",
-        "quattuorquadragintillion", "quinquadragintillion", "sesquadragintillion",
-        "septenquadragintillion", "octoquadragintillion", "novemquadragintillion",
-        "quinquagintillion", "unquinquagintillion", "duoquinquagintillion",
-        "tresquinquagintillion", "quattuorquinquagintillion", "quinquinquagintillion",
-        "sesquinquagintillion", "septenquinquagintillion", "octoquinquagintillion",
-        "novemquinquagintillion", "sexagintillion", "unsexagintillion",
-        "duosexagintillion", "tresexagintillion", "quattuorsexagintillion",
-        "quinsexagintillion", "sesexagintillion"
-      ];
-      const group = Math.floor((digits.length - 1) / 3);
-      // For named units beyond this list, show the exact full number with
-      // commas instead of falling back to scientific/power notation.
-      if (group >= units.length) return BigInt(digits).toLocaleString("en-US");
-      const unit = units[group];
-      const leadingLength = digits.length - group * 3;
-      const leading = digits.slice(0, leadingLength);
-      // Take exactly three digits after the decimal and discard the rest.
-      // This truncates rather than rounds, and keeps a consistent three-place display.
-      const fraction = (digits.slice(leadingLength, leadingLength + 3) + "000").slice(0, 3);
-      return leading + "." + fraction + " " + unit;
-    }
-
-    function createPodiumSection(gameTitle, players, timedGames) {
-      const section = document.createElement("section");
-      section.className = "podium-section";
-      const heading = document.createElement("h2");
-      heading.className = "podium-game-title";
-      heading.textContent = gameTitle;
-      const description = gameTitle === "Daily Pick Streak" ? document.createElement("p") : null;
-      if (description) { description.className = "daily-streak-note"; description.textContent = "Player-submitted daily launches. Streaks are not independently verified."; }
-      const podium = document.createElement("div");
-      podium.className = "podium";
-      const order = [
-        { rank: 2, cls: "second", medal: "🥈" },
-        { rank: 1, cls: "first", medal: "👑" },
-        { rank: 3, cls: "third", medal: "🥉" }
-      ];
-      order.forEach(place => {
-        const item = players[place.rank - 1];
-        const card = document.createElement("div");
-        card.className = "podium-place " + place.cls;
-        if (item) {
-          const crown = document.createElement("div");
-          crown.className = "podium-crown";
-          crown.textContent = place.medal;
-          const avatar = document.createElement("img");
-          avatar.className = "podium-avatar";
-          avatar.src = getGameLogo(item.game_title);
-          avatar.alt = "";
-          const name = document.createElement("div");
-          name.className = "podium-name";
-          name.textContent = item.player_name || "Player";
-          const gameKey = String(item.game_title || "").trim().toLowerCase();
-          const seconds = Math.max(0, Number(item.score) || 0);
-          const timed = timedGames.has(gameKey);
-          const reaction = gameKey === "reaction test";
-          const driftBoss = gameKey === "drift boss";
-          const displayScore = gameKey === "daily pick streak" ? seconds.toLocaleString() + (seconds === 1 ? " day" : " days")
-            : gameKey === "cookie clicker" ? formatCookieScore(item.score)
-            : timed
-            ? Math.floor(seconds / 86400) + "d " + Math.floor((seconds % 86400) / 3600) + "h " + Math.floor((seconds % 3600) / 60) + "m " + (seconds % 60) + "s"
-            : reaction ? Math.max(0, 10000 - seconds).toLocaleString() + " ms"
-            : driftBoss ? seconds.toLocaleString() + " m" : seconds.toLocaleString();
-          const score = document.createElement("div");
-          score.className = "podium-score";
-          score.textContent = displayScore;
-          if (gameKey === "cookie clicker") score.title = BigInt(String(item.score || "0")).toLocaleString("en-US") + " cookies";
-          const block = document.createElement("div");
-          block.className = "podium-block";
-          block.textContent = String(place.rank);
-          card.append(crown, avatar, name, score, block);
-        } else {
-          const empty = document.createElement("div");
-          empty.className = "podium-empty";
-          empty.textContent = "—";
-          const block = document.createElement("div");
-          block.className = "podium-block";
-          block.textContent = String(place.rank);
-          card.append(empty, block);
-        }
-        podium.appendChild(card);
-      });
-      section.append(heading);
-      if (description) section.appendChild(description);
-      section.appendChild(podium);
-      scoreList.appendChild(section);
-    }
-
-    async function renderLeaderboard() {
-      await loadCatalogLogos();
-      const loadedScores = window.ArcadeScores ? await window.ArcadeScores.getScores() : [];
-      // Hide legacy/invalid Slope entries above the 1,500-point limit.
-      const onlineScores = loadedScores.filter(item =>
-        String(item.game_title || "").trim().toLowerCase() !== "slope" || Number(item.score) <= 1500
-      );
-      if (!window.ArcadeScores || !window.ArcadeScores.configured || window.ArcadeScores.lastLoadError) {
-        const empty = document.createElement("p");
-        empty.className = "leaderboard-empty";
-        empty.style.cssText = "text-align:center;padding:2rem;color:#c0c0d0;overflow-wrap:anywhere;";
-        empty.textContent = "The leaderboard couldn't connect to the score database. " +
-          (window.ArcadeScores && window.ArcadeScores.lastLoadError ? "Error: " + window.ArcadeScores.lastLoadError : "Check the score database configuration and try again.");
-        scoreList.appendChild(empty);
-        return;
-      }
-
-      // Keep every submitted score as its own leaderboard record.
-      // A player may appear multiple times when they submit multiple runs.
-      const timedGames = new Set(["minecraft", "retro bowl time", "blocky combat swat time"]);
-      // These are the games that currently submit scores or playtime to the leaderboard.
-      // Pre-create their sections so compatible games remain visible before the first submission.
-      const supportedGames = [
-        ["2048", "2048"],
-        ["blocky combat swat time", "Blocky Combat SWAT · Total Playtime"],
-        ["breakout", "Breakout"],
-        ["cookie clicker", "Cookie Clicker"],
-        ["daily pick streak", "Daily Pick Streak"],
-        ["drift boss", "Drift Boss"],
-        ["minecraft", "Minecraft"],
-        ["reaction test", "Reaction Test"],
-        ["retro bowl time", "Retro Bowl · Total Playtime"],
-        ["slope", "Slope"],
-        ["stacktris", "Stacktris"]
-      ];
-      const byGame = new Map(supportedGames.map(([key]) => [key, []]));
-      onlineScores.forEach(item => {
-        const key = String(item.game_title || "Game").trim().toLowerCase();
-        if (!byGame.has(key)) byGame.set(key, []);
-        byGame.get(key).push(item);
-      });
-
-      [...byGame.entries()].sort((a,b) => a[0].localeCompare(b[0])).forEach(([key, players]) => {
-        // Reaction Test stores an inverted score (10000 - milliseconds),
-        // so a higher stored value means a faster reaction and ranks first.
-        if (timedGames.has(key)) {
-          // Session records are accumulated so the podium ranks each player
-          // by their total visible playtime, not their longest single session.
-          const totalByPlayer = new Map();
-          players.forEach(item => {
-            const playerKey = String(item.player_name || "").trim().toLocaleLowerCase();
-            if (!playerKey) return;
-            const seconds = Math.max(0, Number(item.score) || 0);
-            const previous = totalByPlayer.get(playerKey);
-            if (!previous) {
-              totalByPlayer.set(playerKey, { ...item, score: seconds });
-            } else {
-              previous.score += seconds;
-              if (item.created_at && (!previous.created_at || new Date(item.created_at) > new Date(previous.created_at))) {
-                previous.created_at = item.created_at;
-              }
-            }
-          });
-          players = [...totalByPlayer.values()].sort((a,b) => Number(b.score) - Number(a.score));
-        } else {
-          // Higher scores rank first. Use BigInt for Cookie Clicker to avoid
-          // precision loss when scores reach quadrillions and beyond.
-          players.sort(key === "cookie clicker"
-            ? compareCookieScores
-            : (a,b) => Number(b.score) - Number(a.score));
-        }
-        // Cookie Clicker and Daily Pick Streak rank each player by their personal best.
-        // This prevents repeat submissions from occupying multiple podium places.
-        if (key === "cookie clicker" || key === "daily pick streak") {
-          const bestByPlayer = new Map();
-          players.forEach(item => {
-            const playerKey = String(item.player_name || "").trim().toLocaleLowerCase();
-            if (!playerKey) return;
-            const previous = bestByPlayer.get(playerKey);
-            const isBetter = key === "cookie clicker"
-              ? (!previous || BigInt(String(item.score || "0")) > BigInt(String(previous.score || "0")))
-              : (!previous || Number(item.score) > Number(previous.score));
-            if (isBetter) {
-              bestByPlayer.set(playerKey, item);
-            }
-          });
-          players = [...bestByPlayer.values()].sort(key === "cookie clicker" ? compareCookieScores : (a,b) => Number(b.score) - Number(a.score));
-        }
-        const knownTitle = supportedGames.find(([gameKey]) => gameKey === key);
-        const title = key === "retro bowl time" ? "Retro Bowl · Total Playtime"
-          : key === "blocky combat swat time" ? "Blocky Combat SWAT · Total Playtime"
-          : (players[0] && players[0].game_title) || (knownTitle && knownTitle[1]) || key;
-        createPodiumSection(title, players.slice(0,3), timedGames);
-      });
-    }
-    renderLeaderboard();
-    // Report the rendered document height so the main page owns scrolling.
-
-
-  </script>
-
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8390067368864065" crossorigin="anonymous"></script>
+  <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-8390067368864065" data-ad-slot="9531168719" data-ad-format="auto" data-full-width-responsive="true"></ins>
+  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  <script src="../duckmath-site/assets/js/leaderboard.js?v=podium-neon-1" defer></script>
 </body>
 </html>
