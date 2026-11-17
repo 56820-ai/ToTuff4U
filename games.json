@@ -3,9 +3,9 @@
     {
       "title": "Tag",
       "path": "g/tag",
-      "image": "./images/tag-card.webp",
+      "image": "https://cdn2.y8.com/cloudimage/4393/file/w380h285_webp-aea8907d45386d3490594fa39c49ae72.webp",
       "category": "ARCADE",
-      "description": "A fast local multiplayer game for 2–4 players. Chase, dodge, and pass the tag before time runs out.",
+      "description": "Chase and dodge in this local multiplayer game for 2–4 players.",
       "tags": [
         "multiplayer",
         "local multiplayer",
