@@ -1236,6 +1236,11 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 .proxy-launch-form input { width: 100%; box-sizing: border-box; padding: 14px 16px; border-radius: 10px; border: 1px solid rgba(150,180,220,.3); background: var(--bg-secondary); color: var(--text-primary); font: inherit; }
 .proxy-launch-form button { justify-self: start; }
 .feature-note { font-size: .92rem; opacity: .85; }
+
+.profile-icon-link{flex:0 0 auto;width:44px;height:44px;margin-left:14px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;text-decoration:none;font-size:1.35rem;background:linear-gradient(135deg,var(--accent-pink),var(--accent-purple));border:2px solid rgba(255,255,255,.2);box-shadow:0 0 14px rgba(255,107,157,.25);transition:transform .2s ease,box-shadow .2s ease}
+.profile-icon-link:hover{transform:translateY(-2px) scale(1.05);box-shadow:0 0 20px rgba(255,107,157,.45)}
+@media(max-width:700px){.profile-icon-link{width:38px;height:38px;margin-left:8px}.header-content{gap:8px}.search-container{min-width:0}}
+
 </style>
   
 
@@ -1331,6 +1336,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
                         <i class="fas fa-search search-icon"></i>
                     </div>
                 </div>
+                <a class="profile-icon-link" href="./my-scores.html" aria-label="My scores" title="My scores"><i class="fas fa-user"></i></a>
             </div>
         </header>
 
