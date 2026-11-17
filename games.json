@@ -1299,6 +1299,30 @@
       "category": "ACTION",
       "source": "https://github.com/mikkun/evade-and-destroy",
       "description": "Weave between bullets in a tight vertical shooter and return fire when the lane opens up."
+    },
+    {
+      "title": "Diablo JS",
+      "path": "g/diablo-js",
+      "image": "./images/diablo-js-card.webp",
+      "category": "ADVENTURE",
+      "source": "https://github.com/mitallast/diablo-js",
+      "description": "An isometric dungeon crawler rendered entirely in canvas: walk the map, meet monsters and fight through the shadows."
+    },
+    {
+      "title": "Tower Platformer",
+      "path": "g/tower-platformer",
+      "image": "./images/tower-platformer-card.webp",
+      "category": "PLATFORMER",
+      "source": "https://github.com/jakesgordon/javascript-tower-platformer",
+      "description": "Climb a vertical course of platforms, hunt for coins and keep your footing above the drop."
+    },
+    {
+      "title": "Jumper",
+      "path": "g/jumper",
+      "image": "./images/jumper-card.webp",
+      "category": "PLATFORMER",
+      "source": "https://github.com/egeexyz/jumper",
+      "description": "Hop between platforms in a stripped-back Phaser platformer and keep climbing without falling."
     }
   ]
 }
