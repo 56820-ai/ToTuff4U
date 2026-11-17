@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Darts · Arcade Atlas</title>
+<meta name="description" content="Play darts free in your browser: aim at a full 20-sector board with doubles, triples and bullseyes, then finish 301 in as few darts as possible.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎯</text></svg>">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(circle at 50% 0%,#163049 0%,#0b1220 55%,#070b13 100%);
+    color:#eef4fb;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    justify-content:safe center;min-height:100vh;min-height:100svh;padding:10px 10px 14px;user-select:none}
+  .shell{width:min(760px,100%);display:flex;flex-direction:column;gap:10px}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .brand{font-weight:800;font-size:15px}
+  .brand span{color:#62d98b}
+  .back{font-size:12px;font-weight:700;text-decoration:none;color:#eef4fb;padding:9px 12px;border-radius:9px;
+    background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)}
+  .panel{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.1);border-radius:18px;
+    padding:12px;display:grid;grid-template-columns:minmax(0,1fr) 200px;gap:12px;align-items:start;
+    box-shadow:0 22px 60px rgba(0,0,0,.5)}
+  .boardwrap{position:relative;display:grid;place-items:center}
+  canvas{width:100%;height:auto;max-width:520px;display:block;border-radius:14px;cursor:crosshair;touch-action:manipulation}
+  .side{display:flex;flex-direction:column;gap:8px}
+  .stat{background:rgba(255,255,255,.06);border-radius:10px;padding:8px 10px;display:flex;
+    justify-content:space-between;align-items:baseline;font-size:11px;color:#b9c7d8;letter-spacing:.06em;text-transform:uppercase}
+  .stat b{font-size:19px;color:#fff;letter-spacing:0}
+  .throws{list-style:none;display:flex;flex-direction:column;gap:4px;min-height:96px}
+  .throws li{background:rgba(255,255,255,.05);border-radius:8px;padding:5px 8px;font-size:12px;
+    display:flex;justify-content:space-between;color:#cfe0f2}
+  .throws li b{color:#62d98b}
+  .status{min-height:18px;font-size:12px;color:#a9bccf;text-align:center}
+  .status.good{color:#7ee2a8}.status.bad{color:#ff9b9b}
+  .btn{min-height:42px;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.07);
+    color:#eef4fb;font:700 13px inherit;cursor:pointer;width:100%}
+  .btn:hover{background:rgba(255,255,255,.14)}
+  .btn.primary{background:#165f3d;border-color:#62d98b}
+  .hint{font-size:11px;color:#8fa3ba;line-height:1.5}
+  :focus-visible{outline:3px solid #62d98b;outline-offset:2px}
+  @media (max-width:680px){.panel{grid-template-columns:1fr}.side{flex-direction:row;flex-wrap:wrap}
+    .stat{flex:1;min-width:96px;flex-direction:column;gap:2px}.throws{flex:1 0 100%;flex-direction:row;flex-wrap:wrap;min-height:0}
+    .throws li{flex:1 0 30%}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="topbar">
+    <div class="brand">🎯 DARTS <span>·</span> Arcade Atlas</div>
+    <a class="back" href="../../">← Arcade Atlas</a>
+  </div>
+
+  <div class="panel">
+    <div class="boardwrap">
+      <canvas id="board" width="560" height="560" aria-label="Dartboard. Click or tap to throw."></canvas>
+    </div>
+    <div class="side">
+      <div class="stat"><span>Score left</span><b id="left">301</b></div>
+      <div class="stat"><span>Darts thrown</span><b id="darts">0</b></div>
+      <div class="stat"><span>Best finish</span><b id="best">—</b></div>
+      <ul class="throws" id="throws" aria-label="Last darts"></ul>
+      <div class="status" id="status" role="status" aria-live="polite">Click the board to throw.</div>
+      <button class="btn primary" type="button" id="reset">New game</button>
+      <p class="hint">Start at 301. Each visit is three darts. Bullseye is 50, outer bull 25, and the thin rings score double or triple.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  const canvas = document.getElementById("board");
+  const ctx = canvas.getContext("2d");
+  const leftEl = document.getElementById("left");
+  const dartsEl = document.getElementById("darts");
+  const throwsEl = document.getElementById("throws");
+  const statusEl = document.getElementById("status");
+  const bestEl = document.getElementById("best");
+  const STORE = "arcadeAtlasDarts";
+
+  const SECTORS = [20, 1, 18, 4, 13, 6, 10, 15, 2, 17, 3, 19, 7, 16, 8, 11, 14, 9, 12, 5];
+  const SIZE = canvas.width;
+  const C = SIZE / 2;
+  const R = SIZE * 0.46;
+  const BANDS = {
+    bull: 0.055,
+    outerBull: 0.115,
+    tripleIn: 0.50,
+    tripleOut: 0.57,
+    doubleIn: 0.88,
+    doubleOut: 0.995
+  };
+
+  let score = 301;
+  let darts = 0;
+  let visit = [];
+  let visitDarts = 0;
+  let marks = [];
+  let finished = false;
+
+  function best() {
+    try {
+      const v = parseInt(localStorage.getItem(STORE), 10);
+      return Number.isFinite(v) && v > 0 ? v : null;
+    } catch (e) { return null; }
+  }
+  function saveBest(value) {
+    try { localStorage.setItem(STORE, String(value)); } catch (e) { /* storage may be blocked */ }
+  }
+  function paintBest() {
+    const b = best();
+    bestEl.textContent = b ? b + " darts" : "—";
+  }
+
+  function setStatus(text, cls) {
+    statusEl.className = "status" + (cls ? " " + cls : "");
+    statusEl.textContent = text;
+  }
+
+  function drawBoard() {
+    ctx.clearRect(0, 0, SIZE, SIZE);
+    ctx.fillStyle = "#0a1220";
+    ctx.fillRect(0, 0, SIZE, SIZE);
+
+    // Matte surround
+    const surround = ctx.createRadialGradient(C, C, R * 0.9, C, C, R * 1.12);
+    surround.addColorStop(0, "#1d2a3c");
+    surround.addColorStop(1, "#0d1626");
+    ctx.beginPath();
+    ctx.arc(C, C, R * 1.06, 0, Math.PI * 2);
+    ctx.fillStyle = surround;
+    ctx.fill();
+
+    // Sector wedges
+    for (let i = 0; i < 20; i++) {
+      const start = (i - 0.5) * (Math.PI / 10) - Math.PI / 2;
+      const end = start + Math.PI / 10;
+      const dark = i % 2 === 0;
+      // single band (cream / dark)
+      wedge(R * BANDS.outerBull, R * BANDS.doubleIn, start, end, dark ? "#1b2536" : "#eedfc6");
+      // triple ring
+      wedge(R * BANDS.tripleIn, R * BANDS.tripleOut, start, end, dark ? "#2f8f5b" : "#c14b3a");
+      // double ring
+      wedge(R * BANDS.doubleIn, R * BANDS.doubleOut, start, end, dark ? "#2f8f5b" : "#c14b3a");
+      // number labels
+      const mid = (start + end) / 2;
+      const lx = C + Math.cos(mid) * R * 1.035;
+      const ly = C + Math.sin(mid) * R * 1.035;
+      ctx.fillStyle = "#dbe7f4";
+      ctx.font = "700 " + Math.round(SIZE * 0.032) + "px system-ui, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(String(SECTORS[i]), lx, ly);
+    }
+    // Wire lines
+    ctx.strokeStyle = "rgba(8,14,22,.85)";
+    ctx.lineWidth = 2;
+    for (let i = 0; i < 20; i++) {
+      const a = (i - 0.5) * (Math.PI / 10) - Math.PI / 2;
+      ctx.beginPath();
+      ctx.moveTo(C + Math.cos(a) * R * BANDS.outerBull, C + Math.sin(a) * R * BANDS.outerBull);
+      ctx.lineTo(C + Math.cos(a) * R * BANDS.doubleOut, C + Math.sin(a) * R * BANDS.doubleOut);
+      ctx.stroke();
+    }
+    [BANDS.outerBull, BANDS.tripleIn, BANDS.tripleOut, BANDS.doubleIn, BANDS.doubleOut].forEach((band) => {
+      ctx.beginPath();
+      ctx.arc(C, C, R * band, 0, Math.PI * 2);
+      ctx.stroke();
+    });
+
+    // Bull
+    ctx.beginPath();
+    ctx.arc(C, C, R * BANDS.outerBull, 0, Math.PI * 2);
+    ctx.fillStyle = "#2f8f5b";
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(C, C, R * BANDS.bull, 0, Math.PI * 2);
+    ctx.fillStyle = "#c14b3a";
+    ctx.fill();
+
+    // Dart marks
+    marks.forEach((m) => {
+      ctx.beginPath();
+      ctx.arc(m.x, m.y, SIZE * 0.011, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(255, 236, 128, .95)";
+      ctx.fill();
+      ctx.strokeStyle = "rgba(20,24,32,.9)";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    });
+  }
+
+  function wedge(inner, outer, start, end, color) {
+    ctx.beginPath();
+    ctx.arc(C, C, outer, start, end);
+    ctx.arc(C, C, inner, end, start, true);
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.fill();
+  }
+
+  function scoreAt(x, y) {
+    const dx = x - C;
+    const dy = y - C;
+    const dist = Math.hypot(dx, dy);
+    const rel = dist / R;
+    if (rel > BANDS.doubleOut) return { label: "MISS", value: 0, ring: "miss" };
+    if (rel <= BANDS.bull) return { label: "BULLSEYE", value: 50, ring: "bull" };
+    if (rel <= BANDS.outerBull) return { label: "OUTER BULL", value: 25, ring: "outer-bull" };
+    let angle = Math.atan2(dy, dx) + Math.PI / 2;
+    if (angle < 0) angle += Math.PI * 2;
+    const index = Math.floor((angle + Math.PI / 20) / (Math.PI / 10)) % 20;
+    const sector = SECTORS[index];
+    if (rel >= BANDS.tripleIn && rel <= BANDS.tripleOut) return { label: "TRIPLE " + sector, value: sector * 3, ring: "triple" };
+    if (rel >= BANDS.doubleIn) return { label: "DOUBLE " + sector, value: sector * 2, ring: "double" };
+    return { label: "SINGLE " + sector, value: sector, ring: "single" };
+  }
+
+  function paintThrows() {
+    throwsEl.innerHTML = "";
+    visit.forEach((t) => {
+      const li = document.createElement("li");
+      const name = document.createElement("span");
+      const val = document.createElement("b");
+      name.textContent = t.label;
+      val.textContent = t.bust ? "bust" : String(t.value);
+      li.append(name, val);
+      throwsEl.appendChild(li);
+    });
+  }
+
+  function throwDart(event) {
+    if (finished) return;
+    const rect = canvas.getBoundingClientRect();
+    const point = event.touches ? event.touches[0] : event;
+    const x = (point.clientX - rect.left) * (SIZE / rect.width);
+    const y = (point.clientY - rect.top) * (SIZE / rect.height);
+
+    const result = scoreAt(x, y);
+    marks.push({ x, y });
+    if (marks.length > 3) marks.shift();
+    darts += 1;
+    visitDarts += 1;
+    dartsEl.textContent = darts;
+
+    const remaining = score - result.value;
+    if (remaining < 0) {
+      visit.push({ label: result.label, bust: true });
+      paintThrows();
+      setStatus("Bust — you went past zero. Visit score cancelled.", "bad");
+      darts -= visitDarts;
+      dartsEl.textContent = darts;
+      endVisit(true);
+      return;
+    }
+
+    score = remaining;
+    visit.push({ label: result.label, value: result.value });
+    leftEl.textContent = score;
+    paintThrows();
+    drawBoard();
+
+    if (score === 0) {
+      finished = true;
+      const previous = best();
+      if (!previous || darts < previous) { saveBest(darts); paintBest(); }
+      setStatus("Checked out in " + darts + " darts!", "good");
+      return;
+    }
+
+    setStatus(result.label + " — " + score + " left.");
+    if (visitDarts === 3) endVisit(false);
+  }
+
+  function endVisit(bust) {
+    if (bust) score = score + visit.reduce((sum, t) => sum + (t.bust ? 0 : t.value), 0);
+    // Recalculate from the board state to avoid drift after a bust.
+    visit = [];
+    visitDarts = 0;
+    marks = [];
+    leftEl.textContent = score;
+    throwsEl.innerHTML = "";
+    drawBoard();
+    if (!finished && score > 0) setStatus("Next visit — three darts. " + score + " to go.");
+  }
+
+  function reset() {
+    score = 301;
+    darts = 0;
+    visit = [];
+    visitDarts = 0;
+    marks = [];
+    finished = false;
+    leftEl.textContent = "301";
+    dartsEl.textContent = "0";
+    throwsEl.innerHTML = "";
+    setStatus("Click the board to throw.");
+    drawBoard();
+  }
+
+  canvas.addEventListener("click", throwDart);
+  document.getElementById("reset").addEventListener("click", reset);
+
+  paintBest();
+  drawBoard();
+})();
+</script>
+</body>
+</html>

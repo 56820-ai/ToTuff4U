@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Yahtzee · Arcade Atlas</title>
+<meta name="description" content="Play Yahtzee free in your browser: roll five dice up to three times, hold the ones you like and fill all thirteen scoring boxes, including the 35-point upper bonus.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎲</text></svg>">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(circle at 20% 0%,#243b2e 0%,#101826 55%,#070b12 100%);
+    color:#eef4fb;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    justify-content:safe center;min-height:100vh;min-height:100svh;padding:10px 10px 14px;user-select:none}
+  .shell{width:min(880px,100%);display:flex;flex-direction:column;gap:10px}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .brand{font-weight:800;font-size:15px}
+  .brand span{color:#f2c14e}
+  .back{font-size:12px;font-weight:700;text-decoration:none;color:#eef4fb;padding:9px 12px;border-radius:9px;
+    background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)}
+  .panel{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.1);border-radius:18px;
+    padding:14px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:14px;
+    box-shadow:0 22px 60px rgba(0,0,0,.5)}
+  .dicecol{display:flex;flex-direction:column;gap:12px}
+  .dice{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+  .die{width:60px;height:60px;border-radius:12px;background:#f7fafc;color:#14202e;position:relative;
+    border:2px solid #c9d7e4;display:grid;place-items:center;cursor:pointer;transition:transform .12s ease,box-shadow .12s ease}
+  .die:hover{transform:translateY(-3px)}
+  .die[aria-pressed="true"]{background:#ffe9a8;border-color:#f2c14e;box-shadow:0 0 0 3px rgba(242,193,78,.45)}
+  .die.rolling{animation:roll .4s ease}
+  @keyframes roll{0%{transform:rotate(-8deg) translateY(-6px)}50%{transform:rotate(7deg) translateY(2px)}100%{transform:none}}
+  .pip{position:absolute;width:11px;height:11px;border-radius:50%;background:#16222f}
+  .stats{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+  .stat{background:rgba(255,255,255,.06);border-radius:10px;padding:7px 12px;font-size:11px;color:#b9c7d8;
+    letter-spacing:.05em;text-transform:uppercase;text-align:center;min-width:88px}
+  .stat b{display:block;font-size:18px;color:#fff;letter-spacing:0;margin-top:2px}
+  .status{min-height:20px;text-align:center;font-size:13px;color:#b6c8d8}
+  .status.good{color:#7ee2a8}
+  .buttons{display:flex;gap:8px;flex-wrap:wrap}
+  .btn{flex:1;min-height:46px;border-radius:11px;border:1px solid rgba(255,255,255,.14);
+    background:rgba(255,255,255,.07);color:#eef4fb;font:800 13px inherit;cursor:pointer}
+  .btn:hover:not(:disabled){background:rgba(255,255,255,.14)}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .btn.primary{background:#1f6b46;border-color:#62d98b}
+  .sheet{display:flex;flex-direction:column;gap:4px;font-size:13px}
+  .sheet h3{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#8fa8bd;margin-bottom:2px}
+  .slot{display:flex;align-items:center;gap:8px;border-radius:9px;border:1px solid rgba(255,255,255,.07);
+    background:rgba(255,255,255,.04);padding:5px 9px;text-align:left;color:#e6eef8;font:600 13px inherit;cursor:pointer}
+  .slot:hover:not(:disabled){background:rgba(255,255,255,.1);border-color:rgba(242,193,78,.5)}
+  .slot span{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .slot b{font-variant-numeric:tabular-nums;color:#f2c14e;min-width:30px;text-align:right}
+  .slot small{color:#8fa8bd;font-size:11px;min-width:26px;text-align:right}
+  .slot.filled{background:#173527;border-color:#2f8f5b;cursor:default}
+  .slot.filled b{color:#a8f0c2}
+  .slot:disabled{opacity:.9}
+  .slot.bonus{background:rgba(242,193,78,.09);border-color:rgba(242,193,78,.3)}
+  .divider{height:1px;background:rgba(255,255,255,.1);margin:5px 0}
+  @media (max-width:720px){.panel{grid-template-columns:1fr}.die{width:52px;height:52px}
+    .pip{width:9px;height:9px}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="topbar">
+    <div class="brand">🎲 YAHTZEE <span>·</span> Arcade Atlas</div>
+    <a class="back" href="../../">← Arcade Atlas</a>
+  </div>
+
+  <div class="panel">
+    <div class="dicecol">
+      <div class="dice" id="dice" role="group" aria-label="Dice. Click one to hold it."></div>
+      <div class="stats">
+        <div class="stat">Rolls left<b id="rolls">3</b></div>
+        <div class="stat">Total<b id="total">0</b></div>
+        <div class="stat">Best<b id="best">0</b></div>
+      </div>
+      <div class="status" id="status" role="status" aria-live="polite">Roll the dice to start.</div>
+      <div class="buttons">
+        <button class="btn primary" type="button" id="roll">Roll dice</button>
+        <button class="btn" type="button" id="new">New game</button>
+      </div>
+    </div>
+
+    <div class="sheet" id="sheet"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  const CATS = [
+    { key: "ones", label: "Ones", hint: "sum of 1s" },
+    { key: "twos", label: "Twos", hint: "sum of 2s" },
+    { key: "threes", label: "Threes", hint: "sum of 3s" },
+    { key: "fours", label: "Fours", hint: "sum of 4s" },
+    { key: "fives", label: "Fives", hint: "sum of 5s" },
+    { key: "sixes", label: "Sixes", hint: "sum of 6s" },
+    { key: "threeKind", label: "Three of a kind", hint: "sum" },
+    { key: "fourKind", label: "Four of a kind", hint: "sum" },
+    { key: "fullHouse", label: "Full house", hint: "25" },
+    { key: "smallStraight", label: "Small straight", hint: "30" },
+    { key: "largeStraight", label: "Large straight", hint: "40" },
+    { key: "yahtzee", label: "Yahtzee", hint: "50" },
+    { key: "chance", label: "Chance", hint: "sum" }
+  ];
+  const STORE = "arcadeAtlasYahtzee";
+  const UPPER = CATS.slice(0, 6).map((c) => c.key);
+  const PIPS = {
+    1: [[50, 50]], 2: [[28, 28], [72, 72]], 3: [[26, 26], [50, 50], [74, 74]],
+    4: [[30, 30], [70, 30], [30, 70], [70, 70]],
+    5: [[28, 28], [72, 28], [50, 50], [28, 72], [72, 72]],
+    6: [[30, 26], [70, 26], [30, 50], [70, 50], [30, 74], [70, 74]]
+  };
+
+  const diceEl = document.getElementById("dice");
+  const sheetEl = document.getElementById("sheet");
+  const statusEl = document.getElementById("status");
+  const rollBtn = document.getElementById("roll");
+
+  let dice = [1, 1, 1, 1, 1];
+  let held = [false, false, false, false, false];
+  let rollsLeft = 3;
+  let scores = {};
+  let gameOver = false;
+
+  function readBest() {
+    try { return parseInt(localStorage.getItem(STORE), 10) || 0; } catch (e) { return 0; }
+  }
+  function writeBest(v) {
+    try { localStorage.setItem(STORE, String(v)); } catch (e) { /* storage may be blocked */ }
+  }
+
+  function upperTotal() {
+    return UPPER.reduce((sum, k) => sum + (scores[k] || 0), 0);
+  }
+  function upperBonus() {
+    return upperTotal() >= 63 ? 35 : 0;
+  }
+  function grandTotal() {
+    return CATS.reduce((sum, c) => sum + (scores[c.key] || 0), 0) + upperBonus();
+  }
+
+  function counts() {
+    const c = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
+    dice.forEach((d) => { c[d] += 1; });
+    return c;
+  }
+  function sum() {
+    return dice.reduce((a, b) => a + b, 0);
+  }
+  function hasStraight(length) {
+    const set = new Set(dice);
+    return [...set].some((start) => {
+      for (let i = 0; i < length; i++) if (!set.has(start + i)) return false;
+      return true;
+    });
+  }
+
+  function scoreFor(key) {
+    const c = counts();
+    switch (key) {
+      case "ones": return c[1] * 1;
+      case "twos": return c[2] * 2;
+      case "threes": return c[3] * 3;
+      case "fours": return c[4] * 4;
+      case "fives": return c[5] * 5;
+      case "sixes": return c[6] * 6;
+      case "threeKind": return Object.values(c).some((n) => n >= 3) ? sum() : 0;
+      case "fourKind": return Object.values(c).some((n) => n >= 4) ? sum() : 0;
+      case "fullHouse": return Object.values(c).sort().join("") === "23" ? 25 : 0;
+      case "smallStraight": return hasStraight(4) ? 30 : 0;
+      case "largeStraight": return hasStraight(5) ? 40 : 0;
+      case "yahtzee": return Object.values(c).some((n) => n === 5) ? 50 : 0;
+      case "chance": return sum();
+      default: return 0;
+    }
+  }
+
+  function renderDie(value, index, rolling) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "die" + (rolling ? " rolling" : "");
+    btn.dataset.index = String(index);
+    btn.setAttribute("aria-pressed", String(held[index]));
+    btn.setAttribute("aria-label", "Die " + (index + 1) + " showing " + value + (held[index] ? ", held" : ""));
+    PIPS[value].forEach(([x, y]) => {
+      const pip = document.createElement("i");
+      pip.className = "pip";
+      pip.style.left = "calc(" + x + "% - 5.5px)";
+      pip.style.top = "calc(" + y + "% - 5.5px)";
+      btn.appendChild(pip);
+    });
+    btn.addEventListener("click", () => {
+      if (rollsLeft === 3 || gameOver) { setStatus(rollsLeft === 3 ? "Roll first, then hold the dice you want to keep." : "The game is over — start a new one."); return; }
+      held[index] = !held[index];
+      paintDice();
+    });
+    return btn;
+  }
+
+  function paintDice(rolling) {
+    diceEl.innerHTML = "";
+    dice.forEach((value, i) => diceEl.appendChild(renderDie(value, i, rolling)));
+  }
+
+  function setStatus(text, cls) {
+    statusEl.className = "status" + (cls ? " " + cls : "");
+    statusEl.textContent = text;
+  }
+
+  function paintSheet() {
+    sheetEl.innerHTML = "";
+    const head = document.createElement("h3");
+    head.textContent = "Upper section";
+    sheetEl.appendChild(head);
+
+    const addSlot = (cat, preview) => {
+      const filled = Object.prototype.hasOwnProperty.call(scores, cat.key);
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "slot" + (filled ? " filled" : "");
+      btn.disabled = filled || gameOver || rollsLeft === 3;
+      const name = document.createElement("span");
+      name.textContent = cat.label;
+      const hint = document.createElement("small");
+      hint.textContent = cat.hint;
+      const value = document.createElement("b");
+      value.textContent = filled ? String(scores[cat.key]) : preview;
+      btn.append(name, hint, value);
+      btn.setAttribute("aria-label", cat.label + (filled ? " scored " + scores[cat.key] : " would score " + preview));
+      btn.addEventListener("click", () => takeCategory(cat.key));
+      sheetEl.appendChild(btn);
+    };
+
+    CATS.slice(0, 6).forEach((cat) => addSlot(cat, String(scoreFor(cat.key))));
+
+    const bonus = document.createElement("div");
+    bonus.className = "slot bonus";
+    bonus.innerHTML = "<span>Upper bonus</span><small>need 63</small><b>" + upperBonus() +
+      "</b>";
+    sheetEl.appendChild(bonus);
+
+    const totalRow = document.createElement("div");
+    totalRow.className = "slot";
+    totalRow.innerHTML = "<span>Upper total</span><small>of 63</small><b>" + upperTotal() + "</b>";
+    sheetEl.appendChild(totalRow);
+
+    const div = document.createElement("div");
+    div.className = "divider";
+    sheetEl.appendChild(div);
+
+    const lower = document.createElement("h3");
+    lower.textContent = "Lower section";
+    sheetEl.appendChild(lower);
+    CATS.slice(6).forEach((cat) => addSlot(cat, String(scoreFor(cat.key))));
+
+    const grand = document.createElement("div");
+    grand.className = "slot filled";
+    grand.innerHTML = "<span>Grand total</span><small></small><b>" + grandTotal() + "</b>";
+    sheetEl.appendChild(grand);
+  }
+
+  function paintTotals() {
+    document.getElementById("total").textContent = grandTotal();
+    document.getElementById("rolls").textContent = rollsLeft;
+    const best = Math.max(readBest(), grandTotal());
+    document.getElementById("best").textContent = best;
+  }
+
+  function takeCategory(key) {
+    if (gameOver) return;
+    if (rollsLeft === 3) { setStatus("Roll the dice before scoring a box."); return; }
+    scores[key] = scoreFor(key);
+    held = [false, false, false, false, false];
+    rollsLeft = 3;
+    paintDice();
+    paintSheet();
+    paintTotals();
+    rollBtn.disabled = false;
+    if (Object.keys(scores).length === CATS.length) return finish();
+    setStatus("Scored " + scores[key] + ". Roll again.");
+  }
+
+  function finish() {
+    gameOver = true;
+    const total = grandTotal();
+    const previousBest = readBest();
+    if (total > previousBest) writeBest(total);
+    paintTotals();
+    paintSheet();
+    rollBtn.disabled = true;
+    setStatus("Final score " + total + ". " + (total > previousBest ? "New personal best!" : "Nice game — try to beat it."), "good");
+  }
+
+  function roll() {
+    if (gameOver) return;
+    if (rollsLeft <= 0) { setStatus("No rolls left — pick a scoring box."); return; }
+    rollsLeft -= 1;
+    for (let i = 0; i < 5; i++) if (!held[i] || rollsLeft === 2) dice[i] = 1 + Math.floor(Math.random() * 6);
+    if (rollsLeft === 2) held = [false, false, false, false, false];
+    paintDice(true);
+    paintSheet();
+    paintTotals();
+    rollBtn.disabled = rollsLeft === 0;
+    setStatus(rollsLeft === 0
+      ? "Last roll — choose a box to score."
+      : "Click dice to hold them, then roll again.");
+  }
+
+  function newGame() {
+    dice = [1, 1, 1, 1, 1];
+    held = [false, false, false, false, false];
+    rollsLeft = 3;
+    scores = {};
+    gameOver = false;
+    rollBtn.disabled = false;
+    paintDice();
+    paintSheet();
+    paintTotals();
+    setStatus("New game — roll the dice to start.");
+  }
+
+  rollBtn.addEventListener("click", roll);
+  document.getElementById("new").addEventListener("click", newGame);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "r" || e.key === "R" || e.key === " ") { e.preventDefault(); roll(); }
+    else if (/^[1-5]$/.test(e.key)) {
+      const i = Number(e.key) - 1;
+      if (rollsLeft < 3 && !gameOver) { held[i] = !held[i]; paintDice(); }
+    }
+  });
+
+  newGame();
+})();
+</script>
+</body>
+</html>

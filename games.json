@@ -1142,6 +1142,41 @@
       "category": "PLATFORMER",
       "description": "Jump through tricky levels filled with unexpected traps.",
       "source": "https://github.com/sidharthabj/level-devil-dupe"
+    },
+    {
+      "title": "Wordle",
+      "path": "g/wordle",
+      "image": "images/wordle-card.webp",
+      "category": "PUZZLE",
+      "description": "Guess a five-letter word in six tries; green, yellow and grey tiles show how close each letter is."
+    },
+    {
+      "title": "Hangman",
+      "path": "g/hangman",
+      "image": "images/hangman-card.webp",
+      "category": "PUZZLE",
+      "description": "Reveal a hidden word one letter at a time across animals, food, sports, school, games and space."
+    },
+    {
+      "title": "Darts",
+      "path": "g/darts",
+      "image": "images/darts-card.webp",
+      "category": "SPORTS",
+      "description": "Aim at a full 20-sector board with doubles, triples and bullseyes, then check out from 301."
+    },
+    {
+      "title": "Yahtzee",
+      "path": "g/yahtzee",
+      "image": "images/yahtzee-card.webp",
+      "category": "CASUAL",
+      "description": "Roll five dice three times, lock the ones you like and fill all thirteen score boxes for the bonus."
+    },
+    {
+      "title": "Solitaire",
+      "path": "g/solitaire",
+      "image": "images/solitaire-card.webp",
+      "category": "CARD",
+      "description": "Classic Klondike: build four suits from ace to king, flip the deck and undo any move."
     }
   ]
 }

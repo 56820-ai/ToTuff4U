@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Wordle · Arcade Atlas</title>
+<meta name="description" content="Play Wordle free in your browser: guess the five-letter word in six tries with green, yellow and grey clues. A new daily puzzle plus unlimited practice rounds.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🟩</text></svg>">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(circle at 12% 0%,#16304d 0%,#0b1220 52%,#0a0f1a 100%);
+    color:#eaf2fb;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    justify-content:safe center;min-height:100vh;min-height:100svh;padding:10px 10px 14px;user-select:none;
+  }
+  a{color:#8fd6ff}
+  .shell{width:min(560px,100%);display:flex;flex-direction:column;gap:10px}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .brand{display:flex;align-items:center;gap:8px;font-weight:800;letter-spacing:.02em;font-size:15px}
+  .brand span{color:#4cc9f0}
+  .back{font-size:12px;font-weight:700;text-decoration:none;padding:9px 12px;border-radius:9px;
+    background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)}
+  .back:hover{background:rgba(255,255,255,.12)}
+  .panel{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.1);border-radius:18px;
+    padding:14px;box-shadow:0 22px 60px rgba(0,0,0,.45);display:flex;flex-direction:column;gap:12px}
+  .modes{display:flex;gap:6px}
+  .modes button{flex:1;min-height:38px;border-radius:10px;border:1px solid rgba(255,255,255,.12);
+    background:rgba(255,255,255,.04);color:#cfe0f2;font:700 12px inherit;cursor:pointer;letter-spacing:.04em}
+  .modes button[aria-pressed="true"]{background:#123b52;border-color:#4cc9f0;color:#dff6ff}
+  .board{display:grid;grid-template-rows:repeat(6,1fr);gap:6px;margin:0 auto;width:min(300px,86vw)}
+  .row{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+  .tile{aspect-ratio:1;display:grid;place-items:center;border-radius:8px;border:2px solid rgba(255,255,255,.14);
+    background:rgba(255,255,255,.03);font-weight:800;font-size:clamp(18px,5.2vw,26px);text-transform:uppercase;
+    transition:transform .12s ease,background .18s ease,border-color .18s ease}
+  .tile.filled{border-color:rgba(255,255,255,.4)}
+  .tile.pop{transform:scale(1.06)}
+  .tile.correct{background:#2f8f5b;border-color:#2f8f5b;color:#fff}
+  .tile.present{background:#b58a1c;border-color:#b58a1c;color:#fff}
+  .tile.absent{background:#2b3444;border-color:#2b3444;color:#a9b7c9}
+  .keys{display:flex;flex-direction:column;gap:6px}
+  .krow{display:flex;gap:5px;justify-content:center}
+  .key{flex:1 1 0;min-width:0;min-height:46px;border-radius:8px;border:0;background:#2a3444;color:#eaf2fb;
+    font:800 13px inherit;cursor:pointer;text-transform:uppercase;transition:background .15s}
+  .key:hover{background:#37445a}
+  .key.wide{flex:1.7 1 0;font-size:11px}
+  .key.correct{background:#2f8f5b}
+  .key.present{background:#b58a1c}
+  .key.absent{background:#1c2431;color:#6f7f93}
+  .status{min-height:20px;text-align:center;font-size:13px;color:#a9bccf}
+  .status.good{color:#7ee2a8}
+  .status.bad{color:#ff9b9b}
+  .footer{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+  .btn{min-height:42px;padding:0 16px;border-radius:10px;border:1px solid rgba(255,255,255,.14);
+    background:rgba(255,255,255,.06);color:#eaf2fb;font:700 13px inherit;cursor:pointer}
+  .btn:hover{background:rgba(255,255,255,.13)}
+  .btn.primary{background:#0f6f8c;border-color:#4cc9f0}
+  .stats{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;font-size:12px;color:#a9bccf}
+  .stats b{color:#eaf2fb}
+  .toast{position:fixed;left:50%;top:14px;transform:translateX(-50%) translateY(-140%);
+    background:#0f2233;border:1px solid #4cc9f0;color:#eaf6ff;padding:9px 14px;border-radius:10px;
+    font-size:13px;font-weight:700;transition:transform .22s ease;z-index:9}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+  :focus-visible{outline:3px solid #4cc9f0;outline-offset:2px}
+  @media (max-width:420px){.key{min-height:42px;font-size:12px}.key.wide{font-size:10px}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="topbar">
+    <div class="brand">🟩 WORDLE <span>·</span> Arcade Atlas</div>
+    <a class="back" href="../../">← Arcade Atlas</a>
+  </div>
+
+  <div class="panel">
+    <div class="modes" role="group" aria-label="Game mode">
+      <button type="button" id="mode-daily" aria-pressed="true">Daily puzzle</button>
+      <button type="button" id="mode-practice" aria-pressed="false">Practice</button>
+    </div>
+
+    <div class="board" id="board" role="grid" aria-label="Wordle board"></div>
+    <div class="status" id="status" role="status" aria-live="polite">Guess the five-letter word in six tries.</div>
+    <div class="keys" id="keys"></div>
+
+    <div class="stats">
+      <span>Played <b id="s-played">0</b></span>
+      <span>Won <b id="s-won">0</b></span>
+      <span>Streak <b id="s-streak">0</b></span>
+      <span>Best <b id="s-best">0</b></span>
+    </div>
+    <div class="footer">
+      <button class="btn primary" type="button" id="again">New practice word</button>
+      <button class="btn" type="button" id="help">How to play</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  // 5-letter answers and extra allowed guesses. Kept school-appropriate.
+  const ANSWERS = `about above actor adapt admit adult after again agent agree ahead alarm album alert alike alive allow alone along alter amber among angle angry ankle apart apple apply arena argue arise armor aroma arrow aside asset atlas audio audit avoid awake award aware badge baker basic basil batch beach beard beast began begin being below bench berry birth black blade blame blank blast blaze blend bless blind block bloom bluff board boast bonus boost booth bound brain brake brand brave bread break breed brick bride brief bring brisk broad broke brown brush build built bunch burst cabin cable camel candy canoe cargo carry carve catch cause cedar chain chair chalk charm chart chase cheap cheat check cheek cheer chess chest chief child chill chime chips choir chose chunk cider civic claim clamp clash class clean clear clerk click cliff climb cling cloak clock close cloth cloud clown coach coast cobra cocoa colon color comet coral couch cough could count court cover crack craft crane crash crate crazy cream creek crest crisp cross crowd crown crude crumb crush crust cycle daily dairy dance dared dealt debit debut decay decor delay delta dense depth derby devil diary digit diner dirty disco ditch diver dizzy dodge doing donor dough dozen draft drain drama drank dream dress dried drift drill drink drive drone drove drown drum  dry  dusty eager eagle early earth easel ebony edge  eight elbow elder elect elite email ember empty enjoy enter entry equal equip error essay event every exact exist extra fable faith false fancy fault favor feast fence ferry fetch fever fiber field fiery fifth fifty fight final finch first flame flash fleet flesh flick fling flint float flock flood floor flour fluid flute focus force forge forth forty forum found frame fresh friar fried frost fruit fudge funny gauge ghost giant gift  glass gleam globe glory glove glued goose grace grade grain grand grant grape graph grasp grass grave great green greet grief grill grind groan groom group grove growl grown guard guess guest guide guild guilt habit handy happy harsh haste hatch haunt haven heart heavy hedge hello hence hobby honey honor horse hotel hound house hover human humid humor hunch hurry ideal image imply index inner input irony issue ivory jelly jewel joint jolly judge juice jumbo knack kneel knife knock known label labor lance large laser later laugh layer learn lease least leave legal lemon level lever light lilac limit linen liner liver llama lobby local lodge logic loose lorry lousy loyal lucid lucky lunar lunch lyric magic magma major maker mango manor maple march marsh match mayor meant medal media melon mercy merge merit merry metal meter midst might mimic miner minor minus mirth mixed model moist money month moral mossy motor mound mount mourn mouse mouth movie mural music musty naive nasty naval never newly niche night noble noise north notch novel nurse nylon oasis occur ocean offer often olive onion opera orbit order organ other otter ought ounce outer owner oxide ozone paint panel panic paper party pasta patch patio pause peace peach pearl pedal penny perch petal phase phone photo piano piece pilot pinch pitch pivot pixel pizza place plain plane plant plate plaza plead pluck plumb plush poach point polar porch pouch pound power press price pride prime print prior prism prize probe prone proof proud prove prune pulse punch pupil puppy purse quack quail quilt quirk quota radar radio raise rally ranch range rapid ratio raven reach react ready realm rebel refer reign relax relay renew repay reply resin rhyme ridge rifle right rigid rinse ripen risen risky rival river roast robin robot rocky rogue roman roomy roost roots rough round route royal rugby ruler rumor rural rusty saber salad salon salsa sandy satin sauce savor scale scalp scarf scene scent scoop scope score scout scrap scrub seize sense serve seven shade shaft shake shape share shark sharp shave sheep sheet shelf shell shift shine shiny shirt shock shore short shout shove shown shrub shrug sight silly since siren skate skill skirt slate sleek sleep slice slide slope small smart smash smell smile smoke snack snail snake snare sneak sniff snowy socks solar solid solve sonic sorry sound south space spare spark speak spear speed spell spend spice spicy spike spill spine spiny spire spite split spoil spoke spoon sport spray spread spring sprout squad squat stack staff stage stain stair stake stale stamp stand stare start state steam steel steep steer stern stick still sting stock stool stoop store storm story stove strap straw stray strip stuck study stuff stump style sugar suite sunny super surge sushi swamp swarm swear sweat sweep sweet swell swift swing sword syrup table taken tally tango taste teach tempo tenor thank theme there thick thief thing think third thorn those three throw thumb tiger tight timer tired title toast today token tonic tooth topic torch total touch tough towel tower toxic trace track trade trail train trait trash treat trend trial tribe trick tried tripe troop trout truck truly trunk trust truth tulip tumor tunic turbo tutor twice twist ultra uncle under union unite unity until upper upset urban usage usher usual utter valid value vapor vault venue verse video vigor villa vinyl viral virus visit vital vivid vocal vodka vowel wagon waist waltz waste watch water weary weave wedge weigh weird whale wheat wheel where which while whirl whisk white whole wick  widow width wield wince wind  witch witty woman woody world worry worse worst worth would wound woven wrath wreck wrist write wrong wrote yacht yeast yield young youth zebra zesty zonal`.split(/\s+/).filter((w) => w.length === 5 && /^[a-z]+$/.test(w));
+
+  const VALID = new Set(ANSWERS);
+  const EXTRA = `adieu arise atone audio blaze blush chirp cider decoy dodge emote fable fjord fudge gaudy glyph grove haiku hasty hippo hoard hutch joust junky kebab lanky latex ledge lyric macaw nudge oxbow paddy plumb quash quilt raven rowdy rerun rinsing sassy scald scoff shard skimp slosh snout spiky spore squib swami tawny tilde tonic trawl vault vixen waltz wharf whoop wryly yacht yodel zebra zippy`.split(/\s+/).filter((w) => w.length === 5 && /^[a-z]+$/.test(w));
+  EXTRA.forEach((w) => VALID.add(w));
+
+  const KEY_ROWS = ["qwertyuiop", "asdfghjkl", "\u23CEzxcvbnm\u232B"];
+  const STORE = "arcadeAtlasWordle";
+  const DAY_INDEX = Math.floor(Date.now() / 86400000);
+
+  const boardEl = document.getElementById("board");
+  const keysEl = document.getElementById("keys");
+  const statusEl = document.getElementById("status");
+  const toastEl = document.getElementById("toast");
+  const dailyBtn = document.getElementById("mode-daily");
+  const practiceBtn = document.getElementById("mode-practice");
+  const againBtn = document.getElementById("again");
+
+  let mode = "daily";
+  let answer = "";
+  let rows = [];
+  let current = "";
+  let rowIndex = 0;
+  let done = false;
+  let locked = false;
+
+  function load() {
+    try {
+      return JSON.parse(localStorage.getItem(STORE)) || {};
+    } catch (e) {
+      return {};
+    }
+  }
+  function save(data) {
+    try { localStorage.setItem(STORE, JSON.stringify(data)); } catch (e) { /* storage may be blocked */ }
+  }
+  function stats() {
+    const d = load();
+    return d.stats || { played: 0, won: 0, streak: 0, best: 0 };
+  }
+  function renderStats() {
+    const s = stats();
+    document.getElementById("s-played").textContent = s.played;
+    document.getElementById("s-won").textContent = s.won;
+    document.getElementById("s-streak").textContent = s.streak;
+    document.getElementById("s-best").textContent = s.best;
+  }
+
+  function toast(message) {
+    toastEl.textContent = message;
+    toastEl.classList.add("show");
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => toastEl.classList.remove("show"), 1600);
+  }
+
+  function buildBoard() {
+    boardEl.innerHTML = "";
+    for (let r = 0; r < 6; r++) {
+      const row = document.createElement("div");
+      row.className = "row";
+      row.setAttribute("role", "row");
+      for (let c = 0; c < 5; c++) {
+        const tile = document.createElement("div");
+        tile.className = "tile";
+        tile.setAttribute("role", "gridcell");
+        tile.setAttribute("aria-label", "empty");
+        row.appendChild(tile);
+      }
+      boardEl.appendChild(row);
+    }
+  }
+
+  function buildKeys() {
+    keysEl.innerHTML = "";
+    KEY_ROWS.forEach((rowText) => {
+      const row = document.createElement("div");
+      row.className = "krow";
+      [...rowText].forEach((ch) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "key";
+        if (ch === "\u23CE") { btn.textContent = "Enter"; btn.classList.add("wide"); btn.dataset.key = "Enter"; }
+        else if (ch === "\u232B") { btn.textContent = "⌫"; btn.classList.add("wide"); btn.dataset.key = "Backspace"; }
+        else { btn.textContent = ch; btn.dataset.key = ch; }
+        btn.addEventListener("click", () => press(btn.dataset.key));
+        row.appendChild(btn);
+      });
+      keysEl.appendChild(row);
+    });
+  }
+
+  function paintRow(r) {
+    const tiles = boardEl.children[r].children;
+    const guess = rows[r] || "";
+    for (let i = 0; i < 5; i++) {
+      const tile = tiles[i];
+      tile.textContent = guess[i] ? guess[i].toUpperCase() : "";
+      tile.className = "tile" + (guess[i] ? " filled" : "");
+    }
+  }
+
+  function paintCurrent() {
+    if (done) return;
+    const tiles = boardEl.children[rowIndex].children;
+    for (let i = 0; i < 5; i++) {
+      tiles[i].textContent = current[i] ? current[i].toUpperCase() : "";
+      tiles[i].className = "tile" + (current[i] ? " filled" : "");
+    }
+  }
+
+  function evaluate(guess) {
+    const result = Array(5).fill("absent");
+    const counts = {};
+    for (let i = 0; i < 5; i++) {
+      if (guess[i] === answer[i]) result[i] = "correct";
+      else counts[answer[i]] = (counts[answer[i]] || 0) + 1;
+    }
+    for (let i = 0; i < 5; i++) {
+      if (result[i] === "correct") continue;
+      const ch = guess[i];
+      if (counts[ch] > 0) { result[i] = "present"; counts[ch] -= 1; }
+    }
+    return result;
+  }
+
+  function paintGuess(r) {
+    const result = evaluate(rows[r]);
+    const tiles = boardEl.children[r].children;
+    result.forEach((state, i) => {
+      tiles[i].className = "tile " + state;
+      tiles[i].setAttribute("aria-label", rows[r][i].toUpperCase() + " " + state);
+    });
+    const rank = { absent: 0, present: 1, correct: 2 };
+    result.forEach((state, i) => {
+      const key = keysEl.querySelector('[data-key="' + rows[r][i] + '"]');
+      if (!key) return;
+      const existing = key.dataset.state || "absent";
+      if (!key.dataset.state || rank[state] > rank[existing]) {
+        key.classList.remove("correct", "present", "absent");
+        key.classList.add(state);
+        key.dataset.state = state;
+      }
+    });
+  }
+
+  function isRealWord(guess) {
+    return VALID.has(guess) || ANSWERS.includes(guess);
+  }
+
+  function press(key) {
+    if (locked) return;
+    if (done) {
+      if (key === "Enter") newRound();
+      return;
+    }
+    if (key === "Enter") return submit();
+    if (key === "Backspace") {
+      current = current.slice(0, -1);
+      return paintCurrent();
+    }
+    if (/^[a-z]$/.test(key) && current.length < 5) {
+      current += key;
+      paintCurrent();
+    }
+  }
+
+  function submit() {
+    if (current.length < 5) { toast("Not enough letters"); return; }
+    if (!isRealWord(current)) { toast("Not in the word list"); return; }
+    rows[rowIndex] = current;
+    paintGuess(rowIndex);
+    const won = current === answer;
+    if (won) return finish(true);
+    const used = rowIndex + 1;
+    current = "";
+    rowIndex += 1;
+    if (rowIndex === 6) return finish(false);
+    const left = 6 - used;
+    setStatus(left === 1 ? "One guess left." : left + " guesses left.");
+    lockRows();
+  }
+
+  function lockRows() {
+    // Brief lock stops a fast Enter from skipping the reveal animation.
+    locked = true;
+    setTimeout(() => { locked = false; }, 120);
+  }
+
+  function finish(won) {
+    done = true;
+    const s = stats();
+    s.played += 1;
+    if (won) {
+      s.won += 1;
+      s.streak += 1;
+      s.best = Math.max(s.best, s.streak);
+    } else {
+      s.streak = 0;
+    }
+    const data = load();
+    data.stats = s;
+    if (mode === "daily") data.dailyDate = DAY_INDEX;
+    save(data);
+    renderStats();
+    statusEl.className = "status " + (won ? "good" : "bad");
+    statusEl.textContent = won
+      ? "Solved in " + (rowIndex + 1) + (rowIndex === 0 ? " guess!" : " guesses!")
+      : "Out of guesses — the word was " + answer.toUpperCase() + ".";
+    againBtn.textContent = mode === "daily" ? "Play a practice word" : "New practice word";
+    toast(won ? "Nice!" : "The word was " + answer.toUpperCase());
+  }
+
+  function setStatus(text, cls) {
+    statusEl.className = "status" + (cls ? " " + cls : "");
+    statusEl.textContent = text;
+  }
+
+  function startRound(nextAnswer, message) {
+    answer = nextAnswer;
+    rows = [];
+    current = "";
+    rowIndex = 0;
+    done = false;
+    locked = false;
+    buildBoard();
+    buildKeys();
+    setStatus(message || "Guess the five-letter word in six tries.");
+  }
+
+  function newRound() {
+    if (mode === "daily") {
+      mode = "practice";
+      dailyBtn.setAttribute("aria-pressed", "false");
+      practiceBtn.setAttribute("aria-pressed", "true");
+    }
+    const pick = ANSWERS[Math.floor(Math.random() * ANSWERS.length)];
+    startRound(pick, "Practice round — a fresh word every time.");
+  }
+
+  function startDaily() {
+    const picked = ANSWERS[DAY_INDEX % ANSWERS.length];
+    const data = load();
+    startRound(picked, "Daily puzzle — the same word for everyone today.");
+    if (data.dailyDate === DAY_INDEX) {
+      setStatus("You already played today's word. Switch to Practice for a new one.", "good");
+    }
+  }
+
+  function setMode(next) {
+    mode = next;
+    dailyBtn.setAttribute("aria-pressed", String(next === "daily"));
+    practiceBtn.setAttribute("aria-pressed", String(next === "practice"));
+    if (next === "daily") startDaily();
+    else {
+      const pick = ANSWERS[Math.floor(Math.random() * ANSWERS.length)];
+      startRound(pick, "Practice round — a fresh word every time.");
+    }
+    againBtn.textContent = next === "daily" ? "Play a practice word" : "New practice word";
+  }
+
+  document.addEventListener("keydown", (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === "Enter") { e.preventDefault(); press("Enter"); }
+    else if (e.key === "Backspace") { e.preventDefault(); press("Backspace"); }
+    else if (/^[a-zA-Z]$/.test(e.key)) press(e.key.toLowerCase());
+  });
+
+  dailyBtn.addEventListener("click", () => setMode("daily"));
+  practiceBtn.addEventListener("click", () => setMode("practice"));
+  againBtn.addEventListener("click", newRound);
+  document.getElementById("help").addEventListener("click", () => {
+    toast("Green = right spot · Yellow = wrong spot · Grey = not in the word");
+  });
+
+  buildKeys();
+  renderStats();
+  startDaily();
+})();
+</script>
+</body>
+</html>
