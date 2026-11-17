@@ -59,7 +59,7 @@ function formatCookieClickerScore(value) {
   if (group < names.length) return amount + " " + names[group];
   if (group <= 66) {
     const ones = ["", "un", "duo", "tre", "quattuor", "quin", "sex", "septen", "octo", "novem"];
-    const tens = ["", "", "viginti", "triginta", "quadraginta", "quinquaginta", "sexaginta"];
+    const tens = ["", "", "vigint", "trigint", "quadragint", "quinquagint", "sexagint"];
     const ten = Math.floor(group / 10);
     const one = group % 10;
     const name = (one ? ones[one] : "") + tens[ten] + "illion";
