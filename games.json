@@ -1,6 +1,20 @@
 {
   "games": [
     {
+      "title": "Tag",
+      "path": "g/tag",
+      "image": "./images/tag-card.webp",
+      "category": "ARCADE",
+      "description": "A fast local multiplayer game for 2–4 players. Chase, dodge, and pass the tag before time runs out.",
+      "tags": [
+        "multiplayer",
+        "local multiplayer",
+        "party",
+        "tag"
+      ],
+      "players": "2–4"
+    },
+    {
       "title": "Slope",
       "path": "g/slope",
       "image": "./images/slope-card.webp",

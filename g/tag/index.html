@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Tag · Arcade Atlas</title>
+<link rel="icon" href="../../images/favicon.png">
+<style>
+:root{color-scheme:dark;--bg:#080b19;--panel:#11172b;--line:#263451;--cyan:#42e8ff;--pink:#ff4fa3;--gold:#ffd45c;--muted:#a9b6d0}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:radial-gradient(ellipse at 50% -20%,#1b3261 0%,#0b1022 55%,#070a15 100%);color:#fff;font-family:Montserrat,Arial,sans-serif}
+body{padding:18px;display:flex;justify-content:center}.shell{width:min(1100px,100%)}header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 16px}a{color:var(--cyan);text-decoration:none;font-weight:800}.brand{font-family:monospace;font-weight:1000;letter-spacing:2px;color:#fff;text-shadow:0 0 16px #31dfff;font-size:clamp(18px,3vw,26px)}.pill{border:1px solid var(--line);border-radius:999px;padding:8px 12px;color:var(--muted);font-size:12px;font-weight:800;letter-spacing:1px}
+h1{font-size:clamp(28px,5vw,48px);margin:8px 0 4px;text-transform:uppercase;letter-spacing:3px;text-shadow:0 0 22px #25cfff} .sub{color:var(--muted);margin:0 0 18px}
+.panel{background:linear-gradient(145deg,#151d35f2,#0d1326f5);border:1px solid #2a3b60;border-radius:18px;padding:16px;box-shadow:0 18px 55px #0008}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}.stats{display:flex;gap:10px;flex-wrap:wrap}.stat{background:#080e20;border:1px solid var(--line);border-radius:12px;padding:9px 13px;min-width:100px}.stat small{display:block;color:var(--muted);font-size:10px;letter-spacing:1px;font-weight:900}.stat strong{font-size:21px;font-family:monospace}
+canvas{display:block;width:100%;aspect-ratio:16/9;max-height:620px;background:#0b1630;border:1px solid #29466c;border-radius:13px;touch-action:none}
+.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-top:13px}.control{background:#0a1021;border:1px solid #243653;border-radius:12px;padding:11px}.control b{display:block;margin-bottom:5px}.control span{color:var(--muted);font-size:12px;line-height:1.6}
+button,select{font:inherit;border-radius:10px;border:1px solid #315477;background:#13213b;color:white;padding:11px 15px;font-weight:900;cursor:pointer}button.primary{background:linear-gradient(90deg,#00aeea,#6956f5);border:0;box-shadow:0 0 22px #258cff55}button:hover{filter:brightness(1.15)}.overlay{position:fixed;inset:0;background:#050816d9;display:grid;place-items:center;padding:18px;z-index:5}.modal{width:min(460px,100%);background:#111a31;border:1px solid #3a5681;border-radius:20px;padding:25px;text-align:center;box-shadow:0 25px 80px #000b}.modal h2{font-size:30px;margin:0 0 8px}.modal p{color:var(--muted);line-height:1.55}.modal select{width:100%;margin:8px 0 14px}.modal button{width:100%;margin-top:7px}.hide{display:none!important}
+@media(max-width:600px){body{padding:10px}.panel{padding:10px}.stat{min-width:78px;padding:7px 9px}.stat strong{font-size:17px}.topbar{align-items:flex-start}}
+</style>
+</head>
+<body>
+<div class="shell">
+<header><a href="../../index.html" class="brand">ARCADE ATLAS</a><span class="pill">LOCAL MULTIPLAYER</span></header>
+<h1>TAG</h1><p class="sub">Run, dodge, and pass the tag before the timer hits zero.</p>
+<section class="panel">
+<div class="topbar"><div class="stats"><div class="stat"><small>TIME LEFT</small><strong id="time">90</strong></div><div class="stat"><small>IT PLAYER</small><strong id="it">P1</strong></div><div class="stat"><small>TAGS</small><strong id="tags">0</strong></div></div><button id="restart">↻ RESTART</button></div>
+<canvas id="game" width="960" height="540" aria-label="Tag multiplayer game arena"></canvas>
+<div class="controls" id="controls"></div>
+</section>
+</div>
+<div class="overlay" id="menu"><div class="modal"><h2>READY TO PLAY?</h2><p>Choose how many players are joining. Everyone plays on the same keyboard.</p><select id="count"><option value="2">2 PLAYERS</option><option value="3">3 PLAYERS</option><option value="4" selected>4 PLAYERS</option></select><button class="primary" id="start">START GAME</button><p style="font-size:11px;margin-bottom:0">Player 1 starts as IT. Touch another player to pass it!</p></div></div>
+<div class="overlay hide" id="end"><div class="modal"><h2>TIME'S UP!</h2><p id="result"></p><button class="primary" id="again">PLAY AGAIN</button></div></div>
+<script>
+(()=>{
+const canvas=document.getElementById('game'),ctx=canvas.getContext('2d'),W=960,H=540;
+const colors=['#35d9ff','#ff55a5','#ffe06a','#8b79ff'];
+const keys=[['w','s','a','d'],['arrowup','arrowdown','arrowleft','arrowright'],['i','k','j','l'],['t','g','f','h']];
+const labels=['W A S D','↑ ↓ ← →','I K J L','T G F H'];
+let players=[],count=4,it=0,tags=0,time=90,last=0,running=false,raf=0,held={};
+const $=id=>document.getElementById(id);
+function setup(){
+ count=+$('count').value;players=Array.from({length:count},(_,i)=>({x:[145,815,145,815][i],y:[120,120,420,420][i],r:19,speed:245,score:0,dx:0,dy:0,trail:[]}));
+ it=0;tags=0;time=90;last=performance.now();running=true;$('menu').classList.add('hide');$('end').classList.add('hide');$('time').textContent='90';$('it').textContent='P1';$('tags').textContent='0';drawControls();cancelAnimationFrame(raf);raf=requestAnimationFrame(loop);
+}
+function drawControls(){$('controls').innerHTML=players.map((p,i)=>'<div class="control"><b style="color:'+colors[i]+'">PLAYER '+(i+1)+(i===it?' · IT':'')+'</b><span>Move: '+labels[i]+'</span></div>').join('')}
+window.addEventListener('keydown',e=>{const k=e.key.toLowerCase();if(keys.some(set=>set.includes(k))){e.preventDefault();held[k]=true}});
+window.addEventListener('keyup',e=>{held[e.key.toLowerCase()]=false});
+function loop(now){if(!running)return;let dt=Math.min((now-last)/1000,.035);last=now;time-=dt;if(time<=0){time=0;finish();return}
+players.forEach((p,i)=>{const [up,down,left,right]=keys[i];let x=(held[right]?1:0)-(held[left]?1:0),y=(held[down]?1:0)-(held[up]?1:0),len=Math.hypot(x,y)||1;p.dx=x/len*p.speed;p.dy=y/len*p.speed;p.x=Math.max(35,Math.min(W-35,p.x+p.dx*dt));p.y=Math.max(35,Math.min(H-35,p.y+p.dy*dt));p.trail.push([p.x,p.y]);if(p.trail.length>7)p.trail.shift()});
+const hunter=players[it];for(let i=0;i<count;i++){if(i===it)continue;const p=players[i];if(Math.hypot(hunter.x-p.x,hunter.y-p.y)<hunter.r+p.r+4){it=i;tags++;$('it').textContent='P'+(it+1);$('tags').textContent=tags;drawControls();break}}
+$('time').textContent=Math.ceil(time);draw();raf=requestAnimationFrame(loop)}
+function draw(){
+ctx.clearRect(0,0,W,H);ctx.fillStyle='#0b1730';ctx.fillRect(0,0,W,H);
+ctx.strokeStyle='#1c3557';ctx.lineWidth=1;for(let x=0;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke()}for(let y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}
+ctx.strokeStyle='#33567d';ctx.lineWidth=5;ctx.strokeRect(13,13,W-26,H-26);
+for(let i=0;i<count;i++){const p=players[i];p.trail.forEach((pt,j)=>{ctx.globalAlpha=(j+1)/p.trail.length*.16;ctx.fillStyle=colors[i];ctx.beginPath();ctx.arc(pt[0],pt[1],p.r*(j+1)/p.trail.length,0,Math.PI*2);ctx.fill()});ctx.globalAlpha=1;ctx.shadowBlur=i===it?28:15;ctx.shadowColor=colors[i];ctx.fillStyle=colors[i];ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;ctx.fillStyle='#07101f';ctx.font='bold 13px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(i+1,p.x,p.y);if(i===it){ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.beginPath();ctx.arc(p.x,p.y,p.r+7,0,Math.PI*2);ctx.stroke();ctx.fillStyle='#fff';ctx.font='bold 12px Arial';ctx.fillText('IT',p.x,p.y-34)}}
+ctx.textAlign='left';ctx.fillStyle='#a9b6d0';ctx.font='bold 12px Arial';ctx.fillText('DODGE THE GLOWING PLAYER',28,H-24)}
+function finish(){running=false;cancelAnimationFrame(raf);const survivors=players.map((p,i)=>({i,score:time>0?p.score:0})).filter(x=>x.i!==it);$('result').textContent='Player '+(it+1)+' was IT when time ran out! '+tags+' tag'+(tags===1?'':'s')+' passed. Play another round to settle the score.';$('end').classList.remove('hide')}
+$('start').addEventListener('click',setup);$('restart').addEventListener('click',()=>{$('count').value=String(count);setup()});$('again').addEventListener('click',()=>{$('count').value=String(count);setup()});
+draw();
+})();
+</script>
+</body>
+</html>
