@@ -3,7 +3,7 @@
     {
       "title": "Slope",
       "path": "g/slope",
-      "image": "./duckmath-site/assets/img/icons/slope.webp",
+      "image": "./images/slope-card.webp",
       "category": "RACING",
       "description": "Guide a rolling ball down a steep neon course and dodge gaps and obstacles."
     },
@@ -16,26 +16,26 @@
     {
       "title": "1v1.lol",
       "path": "g/1v1lol",
-      "image": "./duckmath-site/assets/img/icons/1v1.webp",
+      "image": "./images/1v1lol-card.webp",
       "category": "ACTION",
       "description": "Build ramps and walls, then practice quick one-on-one building and aim battles."
     },
     {
       "title": "Idle Breakout",
       "path": "g/idle-breakout",
-      "image": "images/idlebreakout.png",
+      "image": "./images/idle-breakout-card.webp",
       "category": "IDLE"
     },
     {
       "title": "Learn To Fly",
       "path": "g/learntofly",
-      "image": "./duckmath-site/assets/img/icons/learntofly2.webp",
+      "image": "./images/learntofly-card.webp",
       "category": "ARCADE"
     },
     {
       "title": "Baldi's Basics",
       "path": "g/baldisbasics",
-      "image": "./duckmath-site/assets/img/icons/baldis.webp",
+      "image": "./images/baldisbasics-card.webp",
       "category": "HORROR"
     },
     {
@@ -52,7 +52,7 @@
     {
       "title": "Gun Mayhem 2",
       "path": "g/gunmayhem2",
-      "image": "images/gunmayhem2.png",
+      "image": "./images/gunmayhem2-card.webp",
       "category": "ACTION",
       "tags": [
         "multiplayer",
@@ -69,14 +69,14 @@
     {
       "title": "Drift Boss",
       "path": "g/driftboss",
-      "image": "./duckmath-site/assets/img/icons/driftboss.webp",
+      "image": "./images/driftboss-card.webp",
       "category": "RACING",
       "description": "Time each turn carefully to keep your car drifting along a narrow track."
     },
     {
       "title": "Jack Smith",
       "path": "g/jacksmith",
-      "image": "./duckmath-site/assets/img/icons/jackSmith.webp",
+      "image": "./images/jacksmith-card.webp",
       "category": "ADVENTURE"
     },
     {
@@ -89,13 +89,13 @@
     {
       "title": "Lazy Jump 3D",
       "path": "g/lazyjump3d",
-      "image": "images/lazyjump3d.png",
+      "image": "./images/lazyjump3d-card.webp",
       "category": "ARCADE"
     },
     {
       "title": "House Of Hazards",
       "path": "g/houseofhazards",
-      "image": "images/houseofhazards.png",
+      "image": "./images/houseofhazards-card.webp",
       "category": "ACTION",
       "tags": [
         "multiplayer",
@@ -106,7 +106,7 @@
     {
       "title": "Hole.io",
       "path": "g/holeio",
-      "image": "./duckmath-site/assets/img/icons/hole.io.webp",
+      "image": "./images/holeio-card.webp",
       "category": "IO",
       "description": "Move a growing hole around the city and swallow objects before time runs out."
     },
@@ -124,13 +124,13 @@
     {
       "title": "Draw The Hill",
       "path": "g/draw-the-hill",
-      "image": "images/drawthehill.png",
+      "image": "./images/draw-the-hill-card.webp",
       "category": "PUZZLE"
     },
     {
       "title": "Basketball Bros",
       "path": "g/basketballio",
-      "image": "images/basketballio.png",
+      "image": "./images/basketballio-card.webp",
       "category": "SPORTS"
     },
     {
@@ -149,38 +149,38 @@
     {
       "title": "Tetris",
       "path": "g/tetris",
-      "image": "./duckmath-site/assets/img/icons/tetris.webp",
+      "image": "./images/tetris-card.webp",
       "category": "PUZZLE",
       "description": "Fit falling shapes together to clear lines and keep the stack from reaching the top."
     },
     {
       "title": "Checkout Frenzy",
       "path": "g/checkoutfrenzy",
-      "image": "images/checkoutfrenzy.png",
+      "image": "./images/checkoutfrenzy-card.webp",
       "category": "SIMULATION"
     },
     {
       "title": "Tiny Fishing",
       "path": "g/tinyfishing",
-      "image": "images/tinyfishing.png",
+      "image": "./images/tinyfishing-card.webp",
       "category": "CASUAL"
     },
     {
       "title": "Time Shooter",
       "path": "g/timeshooter",
-      "image": "images/timeshooter.png",
+      "image": "./images/timeshooter-card.webp",
       "category": "ACTION"
     },
     {
       "title": "Getaway Shootout",
       "path": "g/getaway-shootout",
-      "image": "images/getawayshootout.png",
+      "image": "./images/getaway-shootout-card.webp",
       "category": "ACTION"
     },
     {
       "title": "Soccer Random",
       "path": "g/soccer-random",
-      "image": "images/soccerrandom.png",
+      "image": "./images/soccer-random-card.webp",
       "category": "SPORTS",
       "tags": [
         "multiplayer",
@@ -191,7 +191,7 @@
     {
       "title": "Rooftop Sniper",
       "path": "g/rooftopsnipers",
-      "image": "./duckmath-site/assets/img/icons/rooftop.webp",
+      "image": "./images/rooftopsnipers-card.webp",
       "category": "ACTION",
       "tags": [
         "multiplayer",
@@ -219,7 +219,7 @@
     {
       "title": "MonkeyMart",
       "path": "g/monkey-mart",
-      "image": "./duckmath-site/assets/img/icons/monkey-mart.webp",
+      "image": "./images/monkey-mart-card.webp",
       "category": "SIMULATION"
     },
     {
@@ -244,7 +244,7 @@
     {
       "title": "Run 3",
       "path": "g/run3",
-      "image": "./duckmath-site/assets/img/icons/run3.webp",
+      "image": "./images/run3-card.webp",
       "category": "ARCADE",
       "description": "Sprint and jump through tunnels that twist as you move across their walls."
     },
@@ -257,14 +257,14 @@
     {
       "title": "Plants V Zombies",
       "path": "g/pvz",
-      "image": "./duckmath-site/assets/img/icons/pvz.webp",
+      "image": "./images/pvz-card.webp",
       "category": "STRATEGY",
       "description": "Place plants with different abilities to defend your garden from silly zombies."
     },
     {
       "title": "Duck Life",
       "path": "g/ducklife",
-      "image": "./duckmath-site/assets/img/icons/dl1.webp",
+      "image": "./images/ducklife-card.webp",
       "category": "SIMULATION",
       "description": "Train a duck in running, swimming, flying, and climbing before racing."
     },
@@ -289,7 +289,7 @@
     {
       "title": "DBZ Devolution",
       "path": "g/dbz",
-      "image": "images/dbz.png",
+      "image": "./images/dbz-card.webp",
       "category": "FIGHTING"
     },
     {
@@ -308,19 +308,19 @@
     {
       "title": "Stickman Golf",
       "path": "g/stickman-golf",
-      "image": "g/stickman-golf/splash.png",
+      "image": "./images/stickman-golf-card.webp",
       "category": "SPORTS"
     },
     {
       "title": "Bitlife",
       "path": "g/bitlife",
-      "image": "./duckmath-site/assets/img/icons/bitlife.webp",
+      "image": "./images/bitlife-card.webp",
       "category": "SIMULATION"
     },
     {
       "title": "Subway Surfers",
       "path": "g/subway-surfers",
-      "image": "./duckmath-site/assets/img/icons/subway.webp",
+      "image": "./images/subway-surfers-card.webp",
       "category": "ENDLESS RUNNER",
       "description": "Dash along train tracks, switch lanes, jump barriers, and collect coins."
     },
@@ -338,26 +338,26 @@
     {
       "title": "MotoX3M",
       "path": "g/motox3m",
-      "image": "./duckmath-site/assets/img/icons/motox3m.webp",
+      "image": "./images/motox3m-card.webp",
       "category": "RACING",
       "description": "Ride a stunt bike through obstacle courses, flips, and timed checkpoints."
     },
     {
       "title": "Cookie Clicker",
       "path": "g/cookieclicker",
-      "image": "./duckmath-site/assets/img/icons/cookieclicker.webp",
+      "image": "./images/cookieclicker-card.webp",
       "category": "IDLE"
     },
     {
       "title": "Temple Run 2",
       "path": "g/temple-run-2",
-      "image": "./duckmath-site/assets/img/icons/templerun2.webp",
+      "image": "./images/temple-run-2-card.webp",
       "category": "ENDLESS RUNNER"
     },
     {
       "title": "CSGO Case Opener",
       "path": "g/case-clicker",
-      "image": "images/csgoclicker.png",
+      "image": "./images/case-clicker-card.webp",
       "category": "SIMULATION"
     },
     {
@@ -369,21 +369,21 @@
     {
       "title": "Jetpack Joyride",
       "path": "g/jetpack-joyride",
-      "image": "./duckmath-site/assets/img/icons/jetpackjoyride.webp",
+      "image": "./images/jetpack-joyride-card.webp",
       "category": "ARCADE",
       "description": "Fly through a lab with a jetpack, avoid hazards, and grab coins."
     },
     {
       "title": "Geometry Dash",
       "path": "g/geodash",
-      "image": "./duckmath-site/assets/img/icons/geometrydash.webp",
+      "image": "./images/geodash-card.webp",
       "category": "PLATFORMER",
       "description": "Jump and fly to the beat through obstacle courses that reward precise timing."
     },
     {
       "title": "Duck Life 1",
       "path": "g/ducklife1",
-      "image": "./duckmath-site/assets/img/icons/dl1.webp",
+      "image": "./images/ducklife1-card.webp",
       "category": "SIMULATION"
     },
     {
@@ -433,7 +433,7 @@
     {
       "title": "HexGL",
       "path": "g/hexgl",
-      "image": "g/hexgl/icon_256.png",
+      "image": "./images/hexgl-card.webp",
       "category": "RACING",
       "source": "https://github.com/BKcore/HexGL"
     },
@@ -453,7 +453,7 @@
     {
       "title": "Flappy Bird",
       "path": "g/flappy-bird",
-      "image": "g/flappy-bird/assets/thumb.png",
+      "image": "./images/flappy-bird-card.webp",
       "category": "ARCADE"
     },
     {
@@ -471,13 +471,13 @@
     {
       "title": "World's Hardest Game",
       "path": "g/worlds-hardest-game",
-      "image": "./duckmath-site/assets/img/icons/hardgame1.webp",
+      "image": "./images/worlds-hardest-game-card.webp",
       "category": "PUZZLE"
     },
     {
       "title": "Agar.io",
       "path": "g/agario",
-      "image": "./duckmath-site/assets/img/icons/agar.webp",
+      "image": "./images/agario-card.webp",
       "category": "IO",
       "description": "Grow a cell by collecting pellets and try to outmaneuver larger opponents."
     },
@@ -496,7 +496,7 @@
     {
       "title": "Fireboy & Watergirl",
       "path": "g/fireboywatergirlforsettemple",
-      "image": "./duckmath-site/assets/img/icons/fireboy.webp",
+      "image": "./images/fireboywatergirlforsettemple-card.webp",
       "category": "PLATFORMER",
       "tags": [
         "co-op",
@@ -513,14 +513,14 @@
     {
       "title": "OvO",
       "path": "g/ovo",
-      "image": "images/ovo.jpg",
+      "image": "./images/ovo-card.webp",
       "category": "PLATFORMER",
       "description": "Race through precise platforming levels using jumps, slides, and wall moves."
     },
     {
       "title": "Pac-Man",
       "path": "g/pacman",
-      "image": "./duckmath-site/assets/img/icons/pacman.webp",
+      "image": "./images/pacman-card.webp",
       "category": "ARCADE",
       "source": "https://github.com/8tentaculos/jsPacman",
       "description": "Clear each maze while avoiding ghosts and collecting power pellets."
@@ -528,20 +528,20 @@
     {
       "title": "Doodle Jump",
       "path": "g/doodle-jump",
-      "image": "./duckmath-site/assets/img/icons/doodle.webp",
+      "image": "./images/doodle-jump-card.webp",
       "category": "PLATFORMER",
       "source": "https://github.com/freemany/gamedoh"
     },
     {
       "title": "Duck Life 2",
       "path": "g/ducklife2",
-      "image": "./duckmath-site/assets/img/icons/dl2.webp",
+      "image": "./images/ducklife2-card.webp",
       "category": "ARCADE"
     },
     {
       "title": "Duck Life 3",
       "path": "g/ducklife3",
-      "image": "./duckmath-site/assets/img/icons/dl3.webp",
+      "image": "./images/ducklife3-card.webp",
       "category": "ARCADE"
     },
     {
@@ -560,14 +560,14 @@
     {
       "title": "2048",
       "path": "g/2048",
-      "image": "images/2048.png",
+      "image": "./images/2048-card.webp",
       "category": "PUZZLE",
       "description": "Slide numbered tiles together to combine them and reach the 2048 tile."
     },
     {
       "title": "Ace Gangster",
       "path": "g/acegangster",
-      "image": "images/acegangster.jpg",
+      "image": "./images/acegangster-card.webp",
       "category": "ACTION"
     },
     {
@@ -585,28 +585,28 @@
     {
       "title": "Minecraft 1.12.2",
       "path": "g/mc",
-      "image": "images/mc.png",
+      "image": "./images/mc-card.webp",
       "category": "SANDBOX",
       "description": "Explore a browser-hosted block world, gather materials, and build with friends or solo."
     },
     {
       "title": "Retro Bowl",
       "path": "g/retro-bowl",
-      "image": "images/retrobowl.jpg",
+      "image": "./images/retro-bowl-card.webp",
       "category": "SPORTS",
       "description": "Manage a retro-style football team and call plays on offense."
     },
     {
       "title": "Survev.io",
       "path": "g/survev",
-      "image": "images/survev.png",
+      "image": "./images/survev-card.webp",
       "category": "ACTION",
       "description": "Search for equipment, stay inside the safe zone, and survive a top-down battle royale."
     },
     {
       "title": "Waterworks",
       "path": "g/waterworks",
-      "image": "g/waterworks/square.png",
+      "image": "./images/waterworks-card.webp",
       "category": "PUZZLE"
     },
     {
@@ -694,7 +694,7 @@
       "path": "g/sudoku",
       "image": "images/sudoku.svg",
       "category": "PUZZLE",
-      "description": "Fill the 9\u00d79 grid so every row, column, and 3\u00d73 box contains the numbers 1\u20139. Includes a timer and keyboard or touch input.",
+      "description": "Fill the 9×9 grid so every row, column, and 3×3 box contains the numbers 1–9. Includes a timer and keyboard or touch input.",
       "source": "https://github.com/sausi-7/games/tree/main/games/puzzle/sudoku",
       "tags": [
         "puzzle",
@@ -925,7 +925,7 @@
       "path": "g/web-games/battleship",
       "image": "images/battleship-card.webp",
       "category": "STRATEGY",
-      "description": "Place your fleet and find the computer\u2019s hidden ships on a grid.",
+      "description": "Place your fleet and find the computer’s hidden ships on a grid.",
       "source": "https://github.com/mashukui/web-games"
     },
     {
