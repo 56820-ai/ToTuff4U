@@ -537,9 +537,7 @@ try {
     mimeType: "application/json",
     buffer: Buffer.from(JSON.stringify({ format: "arcade-atlas-playlists", version: 1, collections: tooManyCollections }))
   });
-  await page.waitForFunction(() => JSON.parse(localStorage.getItem("arcadeAtlasCollectionsV1") || "[]").length === 12, undefined, { timeout: 4000   const runtimeErrors = await page.evaluate(() => window.__arcadeAuditRuntimeErrors || []);
-  const syncRuntimeErrors = await syncPage.evaluate(() => window.__arcadeAuditRuntimeErrors || []);
-  errors.push(...runtimeErrors.map(error => "window-error: " + error), ...syncRuntimeErrors.map(error => "sync-window-error: " + error));
+  await page.waitForFunction(() => JSON.parse(localStorage.getItem("arcadeAtlasCollectionsV1") || "[]").length === 12, undefined, { timeout: 4000 });
 });
   const importLimitRespected = await page.evaluate(() => JSON.parse(localStorage.getItem("arcadeAtlasCollectionsV1") || "[]").length === MAX_GAME_COLLECTIONS);
   const ok = response?.status() === 200 && created && storedPaths.length === 1 && backupValid && importMergedAndSanitized && allowedLaunches.includes(randomLaunch) &&
