@@ -1,0 +1,71 @@
+name: Add Search Console verification to HTML pages
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/add-search-console-verification.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  add-verification:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Add verification meta tag to every HTML document
+        env:
+          VERIFICATION_CONTENT: uBDEapMmF1jmMtAC2MZve959FPIf4xm0gGhv3RCUUpA
+        run: |
+          python3 <<'PY'
+          import os
+          import subprocess
+          from pathlib import Path
+
+          tag = f'<meta name="google-site-verification" content="{os.environ["VERIFICATION_CONTENT"]}">'
+          changed = []
+          skipped = []
+
+          files = subprocess.check_output(
+              ["git", "ls-files", "-z", "*.html", "*.htm"]
+          ).decode().split("\0")
+
+          for name in filter(None, files):
+              path = Path(name)
+              try:
+                  original = path.read_text(encoding="utf-8")
+              except (UnicodeDecodeError, OSError):
+                  skipped.append(name)
+                  continue
+
+              if "google-site-verification" in original:
+                  continue
+
+              lower = original.lower()
+              head = lower.find("<head")
+              if head < 0:
+                  skipped.append(name)
+                  continue
+
+              end = original.find(">", head)
+              if end < 0:
+                  skipped.append(name)
+                  continue
+
+              updated = original[:end + 1] + "\n" + tag + original[end + 1:]
+              path.write_text(updated, encoding="utf-8")
+              changed.append(name)
+
+          print(f"Updated {len(changed)} HTML files; skipped {len(skipped)} files without a usable head or UTF-8 text.")
+          if changed:
+              subprocess.run(["git", "config", "user.name", "github-actions[bot]"], check=True)
+              subprocess.run(["git", "config", "user.email", "41898282+github-actions[bot]@users.noreply.github.com"], check=True)
+              subprocess.run(["git", "add", "--", *changed], check=True)
+              subprocess.run(["git", "commit", "-m", "Add Search Console verification to all HTML pages"], check=True)
+              subprocess.run(["git", "push"], check=True)
+          PY
