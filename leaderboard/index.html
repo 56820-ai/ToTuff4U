@@ -8,7 +8,7 @@
   <script src="../js/favicon.js"></script>
   <script src="../js/panic.js"></script>
   <script src="../js/autoclicker.js"></script>
-  <title>Grades & Attendance</title>
+  <title>Arcade Atlas — Leaderboard</title>
   <link rel="icon" type="image/x-icon" href="../images/favicon.png">  
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
@@ -441,7 +441,27 @@
     .podium-place.third .podium-avatar { border-color:#cd875e; }
     .podium-empty { opacity:.5; font-size:.85rem; }
     @media(max-width:480px) { .podium-section{padding:.8rem .45rem}.podium{gap:.35rem;min-height:205px}.podium-place.first .podium-block{min-height:105px}.podium-place.second .podium-block{min-height:80px}.podium-place.third .podium-block{min-height:62px}.podium-name{font-size:.95rem}.podium-score{font-size:.8rem} }
-\n    </style>
+\n
+    .arcade-brand { display:inline-flex; justify-content:center; align-items:center; margin:0 auto 1.15rem; text-decoration:none; }
+    .arcade-brand img { display:block; width:min(250px,65vw); height:auto; max-height:105px; object-fit:contain; filter:drop-shadow(0 5px 16px rgba(107,157,255,.22)); }
+    .leaderboard-header h1 { margin-bottom:.8rem; }
+    .leaderboard-header .submit-note { max-width:720px; margin:0 auto; color:var(--text-secondary); font-size:.95rem; }
+    #score-list { list-style:none; display:flex; flex-direction:column; gap:1.2rem; }
+    .game-board { padding:1.2rem; border:1px solid rgba(107,157,255,.2); border-radius:20px; background:rgba(26,26,46,.7); box-shadow:var(--shadow-md); }
+    .game-board-title { margin:0 0 .9rem; text-align:center; font:700 clamp(1.1rem,2.5vw,1.45rem) "Orbitron",sans-serif; color:#fff; }
+    .score-card { display:flex; align-items:center; gap:1rem; min-width:0; padding:.85rem 1rem; margin:.65rem 0; border:1px solid rgba(107,157,255,.13); border-radius:14px; background:linear-gradient(135deg,rgba(37,37,58,.92),rgba(26,26,46,.92)); box-shadow:var(--shadow-md); transition:transform var(--transition-normal),border-color var(--transition-normal); }
+    .score-card:hover { transform:translateY(-2px); border-color:rgba(255,107,157,.42); }
+    .rank-medal { flex:0 0 2.4rem; text-align:center; font-size:1.8rem; }
+    .game-icon-container { flex:0 0 58px; width:58px; height:58px; border-radius:13px; overflow:hidden; border:2px solid rgba(107,157,255,.45); background:var(--bg-tertiary); }
+    .game-icon { width:100%; height:100%; object-fit:cover; display:block; }
+    .card-text-align { flex:1; min-width:0; }
+    .player-name { margin:0; color:var(--text-primary); font:700 1.2rem "Pixelify Sans",sans-serif; overflow-wrap:anywhere; }
+    .game-name,.score-date { margin:.12rem 0 0; color:var(--text-secondary); font:1.05rem "VT323",monospace; overflow-wrap:anywhere; }
+    .leaderboard-score { flex:0 0 auto; max-width:38%; text-align:right; color:var(--accent-cyan); font:700 clamp(.9rem,2vw,1.2rem) "Orbitron",sans-serif; overflow-wrap:anywhere; }
+    .leaderboard-status { padding:1.5rem; text-align:center; color:var(--text-secondary); }
+    @media(max-width:520px) { .game-board{padding:.8rem .55rem}.score-card{gap:.55rem;padding:.7rem .55rem}.rank-medal{flex-basis:1.8rem;font-size:1.45rem}.game-icon-container{flex-basis:46px;width:46px;height:46px}.player-name{font-size:1.05rem}.game-name,.score-date{font-size:.95rem}.leaderboard-score{font-size:.78rem;max-width:34%} }
+
+    </style>
 </head>
 <body>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8390067368864065"
@@ -468,274 +488,7 @@
     </div>
   </div>
 
-  <script src="../js/arcade-score-config.js?v=cloudflare1"></script>
-  <script src="../js/arcade-scores.js?v=cloudflare1"></script>
-  <script>
-    const scoreList = document.getElementById("score-list");
-    const catalogLogos = new Map();
-
-    async function loadCatalogLogos() {
-      try {
-        const response = await fetch("../games.json", { cache: "no-cache" });
-        if (!response.ok) return;
-        const data = await response.json();
-        (data.games || []).forEach(game => {
-          const key = String(game.title || "").trim().toLowerCase();
-          const image = String(game.image || "").trim();
-          if (!key || !image) return;
-          const external = image.startsWith("https://") || image.startsWith("http://") ||
-            image.startsWith("data:") || image.startsWith("blob:") || image.startsWith("//");
-          const cleanImage = image.startsWith("/") ? image.slice(1) : image;
-          const resolved = external ? image : image.startsWith("/ToTuff4U/") ? image : "../" + cleanImage;
-          catalogLogos.set(key, resolved);
-        });
-      } catch (error) {
-        console.warn("Arcade Atlas: game logo catalog could not be loaded.", error);
-      }
-    }
-
-
-    function getGameLogo(gameTitle) {
-      const game = String(gameTitle || "").trim().toLowerCase();
-      const alias = game === "retro bowl time" ? "retro bowl" : game === "blocky combat swat time" ? "blocky combat swat" : game;
-      const catalogImage = catalogLogos.get(alias);
-      if (catalogImage) return catalogImage;
-      const logos = {
-        "slope": "../images/slope.png",
-        "daily pick streak": "../images/daily-pick-streak.svg",
-        "retro bowl": "../images/retrobowl.jpg",
-        "retro bowl time": "../images/retrobowl.jpg",
-        "blocky combat swat time": "https://unblocked-games.s3.amazonaws.com/media/posts/425/blocky-combat-swat.jpg",
-        "gunspin": "../images/gunspin.png",
-        "block blast": "../images/blockblast.png",
-        "drift boss": "../images/driftboss.png",
-        "snow rider 3d": "../images/snowrider3d.png",
-        "stacktris": "../images/stacktris.jpg",
-        "minecraft": "../images/mc.png",
-        "2048": "../images/2048.png",
-        "cookie clicker": "../g/cookieclicker/img/icon.png",
-        "geometry dash": "../images/geodash.jpg",
-        "subway surfers": "data:image/svg+xml;charset=UTF-8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><defs><linearGradient id="g" x2="1" y2="1"><stop stop-color="#27d9e8"/><stop offset="1" stop-color="#2875ff"/></linearGradient></defs><rect width="128" height="128" rx="28" fill="#17233b"/><path d="M64 13 80 35 74 58 94 83 81 112 49 112 34 84 50 58 44 35Z" fill="url(#g)"/><circle cx="64" cy="28" r="11" fill="#ffd36a"/><path d="m50 52 14 11 14-11M49 84l-16 15m45-15 17 15" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>'),
-        "breakout": "data:image/svg+xml;charset=UTF-8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><defs><linearGradient id="g" x2="1" y2="1"><stop stop-color="#ffb347"/><stop offset="1" stop-color="#ff416c"/></linearGradient></defs><rect width="128" height="128" rx="28" fill="#17172b"/><g fill="url(#g)"><rect x="17" y="20" width="27" height="13" rx="4"/><rect x="50" y="20" width="27" height="13" rx="4"/><rect x="83" y="20" width="27" height="13" rx="4"/><rect x="17" y="39" width="27" height="13" rx="4"/><rect x="50" y="39" width="27" height="13" rx="4"/><rect x="83" y="39" width="27" height="13" rx="4"/></g><circle cx="66" cy="75" r="8" fill="#fff"/><rect x="39" y="99" width="50" height="9" rx="4.5" fill="#6b9dff"/></svg>'),
-        "reaction test": "data:image/svg+xml;charset=UTF-8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><defs><linearGradient id="g" x2="1" y2="1"><stop stop-color="#65f0bd"/><stop offset="1" stop-color="#3987ff"/></linearGradient></defs><rect width="128" height="128" rx="28" fill="#17172b"/><circle cx="64" cy="64" r="42" fill="none" stroke="url(#g)" stroke-width="10"/><path d="M64 34v31l22 13" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><path d="M64 8v10M120 64h-10M64 120v-10M8 64h10" stroke="#fff" stroke-width="5" stroke-linecap="round"/></svg>')
-      };
-      return logos[game] || "../images/favicon.png";
-    }
-
-    // Cookie Clicker scores can be far beyond Number.MAX_SAFE_INTEGER.
-    // Keep them as decimal strings/BigInts for exact sorting and display.
-    function compareCookieScores(a, b) {
-      const left = BigInt(String(a.score || "0"));
-      const right = BigInt(String(b.score || "0"));
-      return left > right ? -1 : left < right ? 1 : 0;
-    }
-
-    function formatCookieScore(value) {
-      const raw = String(value == null ? "0" : value).trim();
-      if (!/^[0-9]+$/.test(raw)) return raw;
-      const digits = raw.replace(/^0+(?=\d)/, "");
-      if (digits.length <= 3) return BigInt(digits).toLocaleString("en-US");
-
-      const units = [
-        "", "thousand", "million", "billion", "trillion", "quadrillion",
-        "quintillion", "sextillion", "septillion", "octillion", "nonillion",
-        "decillion", "undecillion", "duodecillion", "tredecillion",
-        "quattuordecillion", "quindecillion", "sexdecillion",
-        "septendecillion", "octodecillion", "novemdecillion", "vigintillion",
-        "unvigintillion", "duovigintillion", "tresvigintillion", "quattuorvigintillion",
-        "quinvigintillion", "sesvigintillion", "septemvigintillion", "octovigintillion",
-        "novemvigintillion", "trigintillion", "untrigintillion", "duotrigintillion",
-        "trestrigintillion", "quattuortrigintillion", "quintrigintillion", "sestrigintillion",
-        "septentrigintillion", "octotrigintillion", "novemtrigintillion", "quadragintillion",
-        "unquadragintillion", "duoquadragintillion", "tresquadragintillion",
-        "quattuorquadragintillion", "quinquadragintillion", "sesquadragintillion",
-        "septenquadragintillion", "octoquadragintillion", "novemquadragintillion",
-        "quinquagintillion", "unquinquagintillion", "duoquinquagintillion",
-        "tresquinquagintillion", "quattuorquinquagintillion", "quinquinquagintillion",
-        "sesquinquagintillion", "septenquinquagintillion", "octoquinquagintillion",
-        "novemquinquagintillion", "sexagintillion", "unsexagintillion",
-        "duosexagintillion", "tresexagintillion", "quattuorsexagintillion",
-        "quinsexagintillion", "sesexagintillion"
-      ];
-      const group = Math.floor((digits.length - 1) / 3);
-      // For named units beyond this list, show the exact full number with
-      // commas instead of falling back to scientific/power notation.
-      if (group >= units.length) return BigInt(digits).toLocaleString("en-US");
-      const unit = units[group];
-      const leadingLength = digits.length - group * 3;
-      const leading = digits.slice(0, leadingLength);
-      // Take exactly three digits after the decimal and discard the rest.
-      // This truncates rather than rounds, and keeps a consistent three-place display.
-      const fraction = (digits.slice(leadingLength, leadingLength + 3) + "000").slice(0, 3);
-      return leading + "." + fraction + " " + unit;
-    }
-
-    function createPodiumSection(gameTitle, players, timedGames) {
-      const section = document.createElement("section");
-      section.className = "podium-section";
-      const heading = document.createElement("h2");
-      heading.className = "podium-game-title";
-      heading.textContent = gameTitle;
-      const description = gameTitle === "Daily Pick Streak" ? document.createElement("p") : null;
-      if (description) { description.className = "daily-streak-note"; description.textContent = "Player-submitted daily launches. Streaks are not independently verified."; }
-      const podium = document.createElement("div");
-      podium.className = "podium";
-      const order = [
-        { rank: 2, cls: "second", medal: "🥈" },
-        { rank: 1, cls: "first", medal: "👑" },
-        { rank: 3, cls: "third", medal: "🥉" }
-      ];
-      order.forEach(place => {
-        const item = players[place.rank - 1];
-        const card = document.createElement("div");
-        card.className = "podium-place " + place.cls;
-        if (item) {
-          const crown = document.createElement("div");
-          crown.className = "podium-crown";
-          crown.textContent = place.medal;
-          const avatar = document.createElement("img");
-          avatar.className = "podium-avatar";
-          avatar.src = getGameLogo(item.game_title);
-          avatar.alt = "";
-          const name = document.createElement("div");
-          name.className = "podium-name";
-          name.textContent = item.player_name || "Player";
-          const gameKey = String(item.game_title || "").trim().toLowerCase();
-          const seconds = Math.max(0, Number(item.score) || 0);
-          const timed = timedGames.has(gameKey);
-          const reaction = gameKey === "reaction test";
-          const driftBoss = gameKey === "drift boss";
-          const displayScore = gameKey === "daily pick streak" ? seconds.toLocaleString() + (seconds === 1 ? " day" : " days")
-            : gameKey === "cookie clicker" ? formatCookieScore(item.score)
-            : timed
-            ? Math.floor(seconds / 86400) + "d " + Math.floor((seconds % 86400) / 3600) + "h " + Math.floor((seconds % 3600) / 60) + "m " + (seconds % 60) + "s"
-            : reaction ? Math.max(0, 10000 - seconds).toLocaleString() + " ms"
-            : driftBoss ? seconds.toLocaleString() + " m" : seconds.toLocaleString();
-          const score = document.createElement("div");
-          score.className = "podium-score";
-          score.textContent = displayScore;
-          if (gameKey === "cookie clicker") score.title = BigInt(String(item.score || "0")).toLocaleString("en-US") + " cookies";
-          const block = document.createElement("div");
-          block.className = "podium-block";
-          block.textContent = String(place.rank);
-          card.append(crown, avatar, name, score, block);
-        } else {
-          const empty = document.createElement("div");
-          empty.className = "podium-empty";
-          empty.textContent = "—";
-          const block = document.createElement("div");
-          block.className = "podium-block";
-          block.textContent = String(place.rank);
-          card.append(empty, block);
-        }
-        podium.appendChild(card);
-      });
-      section.append(heading);
-      if (description) section.appendChild(description);
-      section.appendChild(podium);
-      scoreList.appendChild(section);
-    }
-
-    async function renderLeaderboard() {
-      await loadCatalogLogos();
-      const loadedScores = window.ArcadeScores ? await window.ArcadeScores.getScores() : [];
-      // Hide legacy/invalid Slope entries above the 1,500-point limit.
-      const onlineScores = loadedScores.filter(item =>
-        String(item.game_title || "").trim().toLowerCase() !== "slope" || Number(item.score) <= 1500
-      );
-      if (!window.ArcadeScores || !window.ArcadeScores.configured || window.ArcadeScores.lastLoadError) {
-        const empty = document.createElement("p");
-        empty.className = "leaderboard-empty";
-        empty.style.cssText = "text-align:center;padding:2rem;color:#c0c0d0;overflow-wrap:anywhere;";
-        empty.textContent = "The leaderboard couldn't connect to the score database. " +
-          (window.ArcadeScores && window.ArcadeScores.lastLoadError ? "Error: " + window.ArcadeScores.lastLoadError : "Check the score database configuration and try again.");
-        scoreList.appendChild(empty);
-        return;
-      }
-
-      // Keep every submitted score as its own leaderboard record.
-      // A player may appear multiple times when they submit multiple runs.
-      const timedGames = new Set(["minecraft", "retro bowl time", "blocky combat swat time"]);
-      // These are the games that currently submit scores or playtime to the leaderboard.
-      // Pre-create their sections so compatible games remain visible before the first submission.
-      const supportedGames = [
-        ["2048", "2048"],
-        ["blocky combat swat time", "Blocky Combat SWAT · Total Playtime"],
-        ["breakout", "Breakout"],
-        ["cookie clicker", "Cookie Clicker"],
-        ["daily pick streak", "Daily Pick Streak"],
-        ["drift boss", "Drift Boss"],
-        ["minecraft", "Minecraft"],
-        ["reaction test", "Reaction Test"],
-        ["retro bowl time", "Retro Bowl · Total Playtime"],
-        ["slope", "Slope"],
-        ["stacktris", "Stacktris"]
-      ];
-      const byGame = new Map(supportedGames.map(([key]) => [key, []]));
-      onlineScores.forEach(item => {
-        const key = String(item.game_title || "Game").trim().toLowerCase();
-        if (!byGame.has(key)) byGame.set(key, []);
-        byGame.get(key).push(item);
-      });
-
-      [...byGame.entries()].sort((a,b) => a[0].localeCompare(b[0])).forEach(([key, players]) => {
-        // Reaction Test stores an inverted score (10000 - milliseconds),
-        // so a higher stored value means a faster reaction and ranks first.
-        if (timedGames.has(key)) {
-          // Session records are accumulated so the podium ranks each player
-          // by their total visible playtime, not their longest single session.
-          const totalByPlayer = new Map();
-          players.forEach(item => {
-            const playerKey = String(item.player_name || "").trim().toLocaleLowerCase();
-            if (!playerKey) return;
-            const seconds = Math.max(0, Number(item.score) || 0);
-            const previous = totalByPlayer.get(playerKey);
-            if (!previous) {
-              totalByPlayer.set(playerKey, { ...item, score: seconds });
-            } else {
-              previous.score += seconds;
-              if (item.created_at && (!previous.created_at || new Date(item.created_at) > new Date(previous.created_at))) {
-                previous.created_at = item.created_at;
-              }
-            }
-          });
-          players = [...totalByPlayer.values()].sort((a,b) => Number(b.score) - Number(a.score));
-        } else {
-          // Higher scores rank first. Use BigInt for Cookie Clicker to avoid
-          // precision loss when scores reach quadrillions and beyond.
-          players.sort(key === "cookie clicker"
-            ? compareCookieScores
-            : (a,b) => Number(b.score) - Number(a.score));
-        }
-        // Cookie Clicker and Daily Pick Streak rank each player by their personal best.
-        // This prevents repeat submissions from occupying multiple podium places.
-        if (key === "cookie clicker" || key === "daily pick streak") {
-          const bestByPlayer = new Map();
-          players.forEach(item => {
-            const playerKey = String(item.player_name || "").trim().toLocaleLowerCase();
-            if (!playerKey) return;
-            const previous = bestByPlayer.get(playerKey);
-            const isBetter = key === "cookie clicker"
-              ? (!previous || BigInt(String(item.score || "0")) > BigInt(String(previous.score || "0")))
-              : (!previous || Number(item.score) > Number(previous.score));
-            if (isBetter) {
-              bestByPlayer.set(playerKey, item);
-            }
-          });
-          players = [...bestByPlayer.values()].sort(key === "cookie clicker" ? compareCookieScores : (a,b) => Number(b.score) - Number(a.score));
-        }
-        const knownTitle = supportedGames.find(([gameKey]) => gameKey === key);
-        const title = key === "retro bowl time" ? "Retro Bowl · Total Playtime"
-          : key === "blocky combat swat time" ? "Blocky Combat SWAT · Total Playtime"
-          : (players[0] && players[0].game_title) || (knownTitle && knownTitle[1]) || key;
-        createPodiumSection(title, players.slice(0,3), timedGames);
-      });
-    }
-    renderLeaderboard();
-    // Report the rendered document height so the main page owns scrolling.
-
-
-  </script>
+  <script src="../duckmath-site/assets/js/leaderboard.js?v=original-theme-3" defer></script>
 
 </body>
 </html>
