@@ -47,7 +47,8 @@
         "multiplayer",
         "local multiplayer",
         "platform fighter"
-      ]
+      ],
+      "players": "2–4"
     },
     {
       "title": "Gun Mayhem 2",
@@ -58,7 +59,8 @@
         "multiplayer",
         "local multiplayer",
         "platform fighter"
-      ]
+      ],
+      "players": "2–4"
     },
     {
       "title": "Wall Smash",
@@ -101,7 +103,8 @@
         "multiplayer",
         "local multiplayer",
         "party"
-      ]
+      ],
+      "players": "2–4"
     },
     {
       "title": "Hole.io",
