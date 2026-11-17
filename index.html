@@ -2412,13 +2412,17 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
     function submitDailyStreakRecord(streak) {
         if (!window.ArcadeScores || !window.ArcadeScores.configured || !Number.isSafeInteger(streak) || streak < 1) return;
         let previousBest = 0;
-        try { previousBest = Number(localStorage.getItem('arcadeAtlasDailyStreakSubmittedBest')) || 0; } catch (error) {}
-        if (streak <= previousBest) return;
-        const playerName = window.ArcadeScores.getPlayerName('Choose a nickname for the public Daily Pick Streak leaderboard (24 characters max). Cancel to play without submitting.');
-        if (!playerName) return;
+        let playerName = '';
+        try {
+            previousBest = Number(localStorage.getItem('arcadeAtlasDailyStreakSubmittedBest')) || 0;
+            playerName = (localStorage.getItem('arcadeLeaderboardPlayerName') || '').trim().slice(0, 24);
+        } catch (error) {}
+        // Daily Pick must launch immediately without an unexpected nickname prompt.
+        // Submit a streak only when the player has already opted in with a saved name.
+        if (!playerName || streak <= previousBest) return;
         window.ArcadeScores.submit('Daily Pick Streak', streak, playerName).then(ok => {
             if (ok) { try { localStorage.setItem('arcadeAtlasDailyStreakSubmittedBest', String(streak)); } catch (error) {} }
-        });
+        }).catch(error => console.warn('Arcade Atlas: daily streak was not submitted.', error));
     }
 
     function launchDailyPick() {
