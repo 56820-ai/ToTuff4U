@@ -53,12 +53,12 @@ jobs:
               if "adsbygoogle.js" in text.lower():
                   skipped_existing.append(str(path))
                   continue
-              match = re.search(r"<head\\b[^>]*>", text, flags=re.IGNORECASE)
+              match = re.search(r"<head\b[^>]*>", text, flags=re.IGNORECASE)
               if not match:
                   skipped_no_head.append(str(path))
                   continue
-              newline = "\\r\\n" if "\\r\\n" in text else "\\n"
-              insertion = newline + tag.replace("\\n", newline)
+              newline = "\r\n" if "\r\n" in text else "\n"
+              insertion = newline + tag.replace("\n", newline)
               updated = text[:match.end()] + insertion + text[match.end():]
               path.write_bytes(updated.encode("utf-8"))
               changed.append(str(path))
@@ -66,15 +66,6 @@ jobs:
           print(f"Updated {len(changed)} pages.")
           print(f"Already had an AdSense script (left unchanged): {len(skipped_existing)}.")
           print(f"No head element (left unchanged): {len(skipped_no_head)}.")
-          with open("/tmp/adsense-pages.txt", "w") as report:
-              report.write("\\n".join(changed))
-
-          if changed:
-              with open("/tmp/adsense-summary.txt", "w") as report:
-                  report.write(
-                      f"Added Arcade Atlas AdSense code to {len(changed)} site/game entry pages. "
-                      f"Left {len(skipped_existing)} pages with existing AdSense scripts unchanged."
-                  )
           PY
 
       - name: Commit the page updates
@@ -82,7 +73,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- '*.html' 'g/*/index.html' 'g/index.html'
+          git add -- '*.html' '*/index.html' 'g/*/index.html' 'g/index.html'
           if git diff --cached --quiet; then
             echo "No HTML pages needed AdSense updates."
             exit 0
