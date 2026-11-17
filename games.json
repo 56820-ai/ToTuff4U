@@ -225,7 +225,7 @@
     {
       "title": "Bloons TD5",
       "path": "g/btd5",
-      "image": "images/btd5.png",
+      "image": "images/bloonstd5-card.webp",
       "category": "STRATEGY",
       "description": "Place dart-throwing monkeys and other defenses to stop waves of balloons."
     },
@@ -271,7 +271,7 @@
     {
       "title": "Mine Sweeper",
       "path": "g/minesweeper",
-      "image": "images/minesweeper.png",
+      "image": "images/minesweeper-card.webp",
       "category": "PUZZLE"
     },
     {
@@ -395,7 +395,7 @@
     {
       "title": "Breakout",
       "path": "g/breakout",
-      "image": "https://raw.githubusercontent.com/jakesgordon/javascript-breakout/master/packaged/assets/icon_128.png",
+      "image": "images/breakout-card.webp",
       "category": "ARCADE"
     },
     {
@@ -413,7 +413,7 @@
     {
       "title": "They Are Coming",
       "path": "g/they-are-coming",
-      "image": "https://pizzaedition.io/assets/game-covers/they-are-coming.jpg",
+      "image": "images/they-are-coming-cover.jpg",
       "category": "ACTION"
     },
     {
@@ -426,7 +426,7 @@
     {
       "title": "A Dark Room",
       "path": "g/a-dark-room",
-      "image": "g/a-dark-room/img/Logo1.jpg",
+      "image": "images/a-dark-room-card.webp",
       "category": "ADVENTURE",
       "source": "https://github.com/doublespeakgames/adarkroom"
     },
@@ -484,7 +484,7 @@
     {
       "title": "Crossy Road",
       "path": "g/crossyroad",
-      "image": "g/crossyroad/sprites/crossy-road-logo.png",
+      "image": "images/crossy-road-card.webp",
       "category": "ARCADE"
     },
     {
@@ -660,7 +660,7 @@
     {
       "title": "2048 Cupcakes",
       "path": "g/cupcake2048",
-      "image": "g/cupcake2048/meta/apple-touch-icon.png",
+      "image": "images/2048-cupcakes-card.webp",
       "category": "PUZZLE"
     },
     {
