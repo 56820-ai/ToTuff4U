@@ -40,6 +40,20 @@
   }
 
 
+  function getPlayerCookieId() {
+    const key = "arcade_player_id";
+    const match = document.cookie.match(new RegExp("(?:^|; )" + key + "=([a-f0-9]{64})(?:;|$)"));
+    if (match) return match[1];
+    if (!window.crypto || !window.crypto.getRandomValues) throw new Error("This browser cannot create a secure player cookie.");
+    const bytes = new Uint8Array(32);
+    window.crypto.getRandomValues(bytes);
+    const id = Array.from(bytes, value => value.toString(16).padStart(2, "0")).join("");
+    document.cookie = key + "=" + id + "; Max-Age=31536000; Path=/; SameSite=Lax; Secure";
+    const saved = document.cookie.match(new RegExp("(?:^|; )" + key + "=([a-f0-9]{64})(?:;|$)"));
+    if (!saved) throw new Error("Your browser is blocking Arcade Atlas cookies. Enable cookies to save personal scores.");
+    return saved[1];
+  }
+
   async function submitThroughServer(gameTitle, score, playerName, kind, keepalive) {
     if (!configured) throw new Error("The shared score database has not been configured yet.");
     const endpoint = config.apiUrl.replace(/\/$/, "") + "/submit-score";
@@ -53,7 +67,8 @@
         player_name: playerName,
         game_title: String(gameTitle).slice(0, 60),
         score: typeof score === "bigint" ? score.toString() : String(score),
-        kind: kind
+        kind: kind,
+        player_cookie_id: getPlayerCookieId()
       })
     });
     const responseText = await response.text();
@@ -133,6 +148,11 @@
     }
   }
 
+  async function getMyScores() {
+    const cookieId = getPlayerCookieId();
+    return request("/my-scores", { method: "GET", headers: { "X-Arcade-Player": cookieId } });
+  }
+
   function getPlayerName(promptText) {
     const key = "arcadeLeaderboardPlayerName";
     let saved = "";
@@ -151,5 +171,5 @@
     return submit(gameTitle, score, playerName);
   }
 
-  window.ArcadeScores = { configured, submit, submitSession, getScores, getPlayerName, promptAndSubmit, lastLoadError: "", lastSubmitError: "" };
+  window.ArcadeScores = { configured, submit, submitSession, getScores, getMyScores, getPlayerCookieId, getPlayerName, promptAndSubmit, lastLoadError: "", lastSubmitError: "" };
 })();
