@@ -10,7 +10,7 @@
     {
       "title": "Gunspin",
       "path": "g/gunspin",
-      "image": "images/gunspin.png",
+      "image": "./images/gunspin-card.webp",
       "category": "ACTION"
     },
     {
@@ -41,7 +41,7 @@
     {
       "title": "Gun Mayhem",
       "path": "g/gunmayhem",
-      "image": "images/gunmayhem.png",
+      "image": "./images/gunmayhem-card.webp",
       "category": "ACTION",
       "tags": [
         "multiplayer",
@@ -63,7 +63,7 @@
     {
       "title": "Wall Smash",
       "path": "g/wallsmash",
-      "image": "images/wallsmash.png",
+      "image": "./images/wallsmash-card.webp",
       "category": "ARCADE"
     },
     {
@@ -82,7 +82,7 @@
     {
       "title": "Infinite Craft",
       "path": "g/infinitecraft",
-      "image": "images/infinitecraft.png",
+      "image": "./images/infinitecraft-card.webp",
       "category": "PUZZLE",
       "description": "Combine simple elements to discover surprising new items and ideas."
     },
@@ -113,7 +113,7 @@
     {
       "title": "Volley Random",
       "path": "g/volleyrandom",
-      "image": "images/volleyrandom.png",
+      "image": "./images/volleyrandom-card.webp",
       "category": "SPORTS",
       "tags": [
         "multiplayer",
@@ -136,13 +136,13 @@
     {
       "title": "Just Fall",
       "path": "g/justfall",
-      "image": "images/justfall.png",
+      "image": "./images/justfall-card.webp",
       "category": "ARCADE"
     },
     {
       "title": "Snow Rider 3D",
       "path": "g/snowrider3d",
-      "image": "./duckmath-site/assets/img/icons/snowrider3d.webp",
+      "image": "./images/snowrider3d-card.webp",
       "category": "RACING",
       "description": "Steer a sled downhill, dodge obstacles, and collect gifts along the way."
     },
@@ -202,7 +202,7 @@
     {
       "title": "Boxing Random",
       "path": "g/boxingrandom",
-      "image": "images/boxingrandom.png",
+      "image": "./images/boxingrandom-card.webp",
       "category": "SPORTS",
       "tags": [
         "multiplayer",
@@ -213,7 +213,7 @@
     {
       "title": "Adventure Capitalist",
       "path": "g/adventurecapitalist",
-      "image": "images/adventurecapitalist.png",
+      "image": "./images/adventurecapitalist-card.webp",
       "category": "IDLE"
     },
     {
@@ -232,13 +232,13 @@
     {
       "title": "Mr Mine",
       "path": "g/mrmine",
-      "image": "images/mrmine.png",
+      "image": "./images/mrmine-card.webp",
       "category": "IDLE"
     },
     {
       "title": "Run 2",
       "path": "g/run2",
-      "image": "images/run2.png",
+      "image": "./images/run2-card.webp",
       "category": "ARCADE"
     },
     {
@@ -251,7 +251,7 @@
     {
       "title": "Spend Elon's Money",
       "path": "g/elonmusk",
-      "image": "images/elonmusk.png",
+      "image": "./images/elonmusk-card.webp",
       "category": "SIMULATION"
     },
     {
@@ -277,13 +277,13 @@
     {
       "title": "N Gon",
       "path": "g/ngon",
-      "image": "images/ngon.jpg",
+      "image": "./images/ngon-card.webp",
       "category": "ACTION"
     },
     {
       "title": "Black Jack",
       "path": "g/blackjack",
-      "image": "images/blackjack.png",
+      "image": "./images/blackjack-card.webp",
       "category": "CARD"
     },
     {
@@ -295,14 +295,14 @@
     {
       "title": "Drive Mad",
       "path": "g/drivemad",
-      "image": "images/drivemad.png",
+      "image": "./images/drivemad-card.webp",
       "category": "RACING",
       "description": "Balance your vehicle across tricky physics courses without flipping over."
     },
     {
       "title": "Papa's Games",
       "path": "g/papas-game",
-      "image": "images/papasgame.jpg",
+      "image": "./images/papas-game-card.webp",
       "category": "SIMULATION"
     },
     {
@@ -327,7 +327,7 @@
     {
       "title": "Basketball Random",
       "path": "g/basketball-random",
-      "image": "images/basketball-random.png",
+      "image": "./images/basketball-random-card.webp",
       "category": "SPORTS",
       "tags": [
         "multiplayer",
@@ -363,7 +363,7 @@
     {
       "title": "Pandemic 2",
       "path": "g/pandemic2",
-      "image": "images/pandemic2.png",
+      "image": "./images/pandemic2-card.webp",
       "category": "STRATEGY"
     },
     {
@@ -389,7 +389,7 @@
     {
       "title": "Snake",
       "path": "g/snake",
-      "image": "images/snake-game.svg",
+      "image": "./images/snake-card.webp",
       "category": "ARCADE"
     },
     {
@@ -401,25 +401,25 @@
     {
       "title": "Memory Match",
       "path": "g/memory-match",
-      "image": "images/memory-match.svg",
+      "image": "./images/memory-match-card.webp",
       "category": "PUZZLE"
     },
     {
       "title": "Reaction Test",
       "path": "g/reaction-test",
-      "image": "images/reaction-test.svg",
+      "image": "./images/reaction-test-card.webp",
       "category": "ARCADE"
     },
     {
       "title": "They Are Coming",
       "path": "g/they-are-coming",
-      "image": "images/they-are-coming-cover.jpg",
+      "image": "./images/they-are-coming-card.webp",
       "category": "ACTION"
     },
     {
       "title": "Hextris",
       "path": "g/hextris",
-      "image": "g/hextris/images/icons/apple-touch-512.png",
+      "image": "./images/hextris-card.webp",
       "category": "PUZZLE",
       "source": "https://github.com/Hextris/hextris"
     },
@@ -440,14 +440,14 @@
     {
       "title": "Arcade 3D",
       "path": "g/arcade-3d",
-      "image": "images/arcade-3d-card.svg",
+      "image": "./images/arcade-3d-card.webp",
       "category": "ACTION",
       "source": "https://github.com/webgl-games/arcade-3d"
     },
     {
       "title": "Duck Life 5",
       "path": "g/ducklife5",
-      "image": "images/ducklife5.png",
+      "image": "./images/ducklife5-card.webp",
       "category": "SIMULATION"
     },
     {
@@ -465,7 +465,7 @@
     {
       "title": "Neon Dodge",
       "path": "g/neon-dodge",
-      "image": "images/neon-dodge.svg",
+      "image": "./images/neon-dodge-card.webp",
       "category": "ARCADE"
     },
     {
@@ -490,7 +490,7 @@
     {
       "title": "Cut The Rope",
       "path": "g/cut-the-rope",
-      "image": "images/cuttherope.png",
+      "image": "./images/cut-the-rope-card.webp",
       "category": "PUZZLE"
     },
     {
@@ -547,13 +547,13 @@
     {
       "title": "Blocky Combat SWAT",
       "path": "g/duckdb2-blocky-combat-swat-main",
-      "image": "images/blocky-combat-swat.svg",
+      "image": "./images/duckdb2-blocky-combat-swat-main-card.webp",
       "category": "ACTION"
     },
     {
       "title": "Block Blast",
       "path": "g/blockblast",
-      "image": "images/blockblast.png",
+      "image": "./images/blockblast-card.webp",
       "category": "PUZZLE",
       "description": "Place block shapes on the board and clear full rows or columns to score."
     },
@@ -573,13 +573,13 @@
     {
       "title": "DuckCraft",
       "path": "g/duckcraft-quacklab",
-      "image": "g/duckcraft-quacklab/index.icon.png",
+      "image": "./images/duckcraft-quacklab-card.webp",
       "category": "SANDBOX"
     },
     {
       "title": "GeoGuessr",
       "path": "g/geoguesser",
-      "image": "images/geoguesser.png",
+      "image": "./images/geoguesser-card.webp",
       "category": "PUZZLE"
     },
     {
@@ -612,49 +612,49 @@
     {
       "title": "Color Clash",
       "path": "g/color-clash",
-      "image": "images/color-clash.svg",
+      "image": "./images/color-clash-card.webp",
       "category": "PUZZLE"
     },
     {
       "title": "Whack-a-Mole",
       "path": "g/whack-a-mole",
-      "image": "images/whack-a-mole.svg",
+      "image": "./images/whack-a-mole-card.webp",
       "category": "ARCADE"
     },
     {
       "title": "Neon Racer",
       "path": "g/neon-racer",
-      "image": "images/neon-racer.svg",
+      "image": "./images/neon-racer-card.webp",
       "category": "RACING"
     },
     {
       "title": "Paddle Clash",
       "path": "g/paddle-clash",
-      "image": "images/paddle-clash.svg",
+      "image": "./images/paddle-clash-card.webp",
       "category": "SPORTS"
     },
     {
       "title": "Sky Hop",
       "path": "g/sky-hop",
-      "image": "images/sky-hop.svg",
+      "image": "./images/sky-hop-card.webp",
       "category": "ARCADE"
     },
     {
       "title": "Gem Maze",
       "path": "g/gem-maze",
-      "image": "images/gem-maze.svg",
+      "image": "./images/gem-maze-card.webp",
       "category": "PUZZLE"
     },
     {
       "title": "Asteroid Rush",
       "path": "g/asteroid-rush",
-      "image": "images/asteroid-rush.svg",
+      "image": "./images/asteroid-rush-card.webp",
       "category": "ARCADE"
     },
     {
       "title": "Google Baseball",
       "path": "g/googlebaseball",
-      "image": "images/google-baseball.svg",
+      "image": "./images/googlebaseball-card.webp",
       "category": "SPORTS"
     },
     {
@@ -666,7 +666,7 @@
     {
       "title": "Connect Four",
       "path": "g/connect-four",
-      "image": "images/connect-four.svg",
+      "image": "./images/connect-four-card.webp",
       "category": "PUZZLE",
       "source": "https://github.com/bryanbraun/connect-four",
       "tags": [
@@ -678,7 +678,7 @@
     {
       "title": "Chess",
       "path": "g/chess",
-      "image": "images/chess.svg",
+      "image": "./images/chess-card.webp",
       "category": "STRATEGY",
       "description": "Play classic chess against a computer opponent. Tap a piece to see legal moves, then choose your destination.",
       "source": "https://github.com/sausi-7/games/tree/main/games/board/chess",
@@ -692,7 +692,7 @@
     {
       "title": "Sudoku",
       "path": "g/sudoku",
-      "image": "images/sudoku.svg",
+      "image": "./images/sudoku-card.webp",
       "category": "PUZZLE",
       "description": "Fill the 9×9 grid so every row, column, and 3×3 box contains the numbers 1–9. Includes a timer and keyboard or touch input.",
       "source": "https://github.com/sausi-7/games/tree/main/games/puzzle/sudoku",
@@ -706,7 +706,7 @@
     {
       "title": "Pong",
       "path": "g/pong",
-      "image": "images/pong.svg",
+      "image": "./images/pong-card.webp",
       "category": "ARCADE",
       "description": "Control your paddle and outscore the computer in this fast classic rally.",
       "source": "https://github.com/JeffreyHamilton6399/arcadia/tree/main/games/pong",
@@ -720,7 +720,7 @@
     {
       "title": "Tic-Tac-Toe",
       "path": "g/tic-tac-toe",
-      "image": "images/tic-tac-toe.svg",
+      "image": "./images/tic-tac-toe-card.webp",
       "category": "STRATEGY",
       "description": "Try to get three in a row against a computer opponent that plans its moves.",
       "source": "https://github.com/JeffreyHamilton6399/arcadia/tree/main/games/tictactoe",
@@ -734,7 +734,7 @@
     {
       "title": "Simon",
       "path": "g/simon",
-      "image": "images/simon.svg",
+      "image": "./images/simon-card.webp",
       "category": "PUZZLE",
       "description": "Repeat the growing sequence of lights and sounds, and beat your best round.",
       "source": "https://github.com/JeffreyHamilton6399/arcadia/tree/main/games/simon",
@@ -748,7 +748,7 @@
     {
       "title": "Aim Trainer",
       "path": "g/aim-trainer",
-      "image": "images/aim-trainer.svg",
+      "image": "./images/aim-trainer-card.webp",
       "category": "ACTION",
       "description": "Hit targets before time runs out. Track your hits, accuracy, and average reaction time.",
       "source": "https://github.com/JeffreyHamilton6399/arcadia/tree/main/games/aimtrainer",
@@ -762,7 +762,7 @@
     {
       "title": "Stack",
       "path": "g/stack",
-      "image": "images/stack.svg",
+      "image": "./images/stack-card.webp",
       "category": "ARCADE",
       "description": "Drop moving blocks, line them up, and build the tallest tower you can.",
       "source": "https://github.com/JeffreyHamilton6399/arcadia/tree/main/games/stack",
@@ -776,7 +776,7 @@
     {
       "title": "Helix Jump",
       "path": "g/helix-jump",
-      "image": "images/helix-jump.svg",
+      "image": "./images/helix-jump-card.webp",
       "category": "ARCADE",
       "description": "Rotate the spiral tower and guide the bouncing ball through safe gaps.",
       "source": "https://github.com/JeffreyHamilton6399/arcadia/tree/main/games/helix",
@@ -790,7 +790,7 @@
     {
       "title": "Slither",
       "path": "g/slither",
-      "image": "images/slither.svg",
+      "image": "./images/slither-card.webp",
       "category": "IO",
       "description": "Grow your snake by collecting glowing orbs while dodging six computer-controlled rivals.",
       "source": "https://github.com/JeffreyHamilton6399/arcadia/tree/main/games/slither",
@@ -805,7 +805,7 @@
     {
       "title": "Polygon Racer",
       "path": "g/polygon-racer",
-      "image": "images/polygon-racer.svg",
+      "image": "./images/polygon-racer-card.webp",
       "category": "RACING",
       "description": "Race around a glowing polygon track in a three-lap time trial with keyboard or touch controls.",
       "source": "https://github.com/JeffreyHamilton6399/arcadia/tree/main/games/polytrack",
@@ -819,7 +819,7 @@
     {
       "title": "Word Hunt",
       "path": "g/word-hunt",
-      "image": "images/word-hunt.svg",
+      "image": "./images/word-hunt-card.webp",
       "category": "PUZZLE",
       "description": "Crack the hidden five-letter word in six guesses using letter clues and color hints.",
       "source": "https://github.com/JeffreyHamilton6399/arcadia/tree/main/games/wordle",
@@ -835,7 +835,7 @@
     {
       "title": "15 Puzzle",
       "path": "g/15-puzzle",
-      "image": "images/15-puzzle.svg",
+      "image": "./images/15-puzzle-card.webp",
       "category": "PUZZLE",
       "description": "Slide numbered tiles into order, plan each move, and beat your best time.",
       "source": "https://github.com/JeffreyHamilton6399/arcadia/tree/main/games/sliding-puzzle",
