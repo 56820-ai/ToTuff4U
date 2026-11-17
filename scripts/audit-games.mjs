@@ -355,8 +355,6 @@ try {
   await syncPage.close();
   const runtimeErrors = await page.evaluate(() => window.__arcadeAuditRuntimeErrors || []);
   errors.push(...runtimeErrors.map(error => "window-error: " + error));
-  const runtimeErrors = await page.evaluate(() => window.__arcadeAuditRuntimeErrors || []);
-  errors.push(...runtimeErrors.map(error => "window-error: " + error));
   const ok = response?.status() === 200 &&
     favoriteButton.tag === "button" &&
     favoriteButton.pressed === "false" &&
@@ -498,6 +496,9 @@ try {
     if (overlay) { overlay.classList.remove("visible"); overlay.setAttribute("aria-hidden", "true"); }
   });
   const secondTabCollections = await syncPage.locator("#collections-grid .collection-card").count();
+  const runtimeErrors = await page.evaluate(() => window.__arcadeAuditRuntimeErrors || []);
+  const syncRuntimeErrors = await syncPage.evaluate(() => window.__arcadeAuditRuntimeErrors || []);
+  errors.push(...runtimeErrors.map(error => "window-error: " + error), ...syncRuntimeErrors.map(error => "sync-window-error: " + error));
   await syncPage.locator("#collections-grid .collection-card").filter({ hasText: "Arcade Night" }).locator(".collection-browse-button").last().click();
   collectionsStage = "waitForFunction #1"; await syncPage.waitForFunction(() => document.getElementById("catalogResultsCount")?.textContent === "2 games in Arcade Night", undefined, { timeout: 4000 });
 
@@ -581,6 +582,8 @@ try {
   await page.waitForSelector("#daily-pick-title", { timeout: 10000 });
   const titleAfterReload = await page.locator("#daily-pick-title").textContent();
   const streakLabel = await page.locator("#daily-pick-streak").textContent();
+  const runtimeErrors = await page.evaluate(() => window.__arcadeAuditRuntimeErrors || []);
+  errors.push(...runtimeErrors.map(error => "window-error: " + error));
   const ok = response?.status() === 200 &&
     !!titleBefore && titleBefore === titleAfterReload &&
     firstState.state.lastDate === today &&
