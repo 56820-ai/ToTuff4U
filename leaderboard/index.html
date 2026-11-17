@@ -85,30 +85,59 @@
       background: linear-gradient(90deg, transparent, rgba(255,107,157,.7));
     }
     .game-board-title::after { transform: scaleX(-1); }
-    .score-card {
-      display: flex; align-items: center; gap: clamp(9px, 2vw, 16px); min-width: 0;
-      margin: 9px 0; padding: clamp(10px, 2vw, 14px);
-      border: 1px solid rgba(132,151,255,.13); border-radius: 15px;
-      background: linear-gradient(105deg, rgba(43,45,76,.86), rgba(27,31,57,.88));
-      box-shadow: 0 5px 16px rgba(0,0,0,.16);
-      transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+    .podium-stage {
+      display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: end;
+      gap: clamp(9px, 2vw, 20px); padding: 44px clamp(4px, 2vw, 18px) 8px;
+      max-width: 850px; margin: 0 auto; min-height: 390px;
     }
-    .score-card:hover { transform: translateY(-2px); border-color: rgba(255,107,157,.42); box-shadow: 0 10px 24px rgba(0,0,0,.24), 0 0 20px rgba(164,119,255,.08); }
-    .rank-medal { flex: 0 0 clamp(30px, 5vw, 42px); text-align: center; font-size: clamp(1.35rem, 3.3vw, 1.85rem); line-height: 1; filter: drop-shadow(0 2px 5px rgba(0,0,0,.2)); }
-    .game-icon-container {
-      flex: 0 0 clamp(44px, 7vw, 62px); width: clamp(44px, 7vw, 62px); height: clamp(44px, 7vw, 62px);
-      overflow: hidden; border: 2px solid rgba(130,160,255,.48); border-radius: 13px;
-      background: #151a32; box-shadow: 0 4px 14px rgba(0,0,0,.24);
+    .podium-card {
+      position: relative; display: flex; flex-direction: column; justify-content: flex-end;
+      min-width: 0; text-align: center; border-radius: 18px 18px 12px 12px;
+      padding: 0 clamp(7px, 1.5vw, 14px) 16px; isolation: isolate;
+      box-shadow: 0 18px 34px rgba(0,0,0,.32), inset 0 1px rgba(255,255,255,.42);
+      border: 1px solid rgba(255,255,255,.22); transition: transform .2s ease, filter .2s ease;
     }
-    .game-icon { display: block; width: 100%; height: 100%; object-fit: cover; }
-    .card-text-align { flex: 1 1 auto; min-width: 0; }
-    .player-name { margin: 0; color: #fff; font: 700 clamp(1rem, 2.4vw, 1.2rem)/1.25 "Pixelify Sans", sans-serif; overflow-wrap: anywhere; }
-    .game-name, .score-date { margin: 3px 0 0; color: var(--muted); font: 400 clamp(.88rem, 2vw, 1rem)/1.2 "VT323", monospace; overflow-wrap: anywhere; }
-    .leaderboard-score {
-      flex: 0 1 auto; max-width: 36%; min-width: 0; padding: 8px 11px;
-      border: 1px solid rgba(107,255,217,.22); border-radius: 10px;
-      background: rgba(107,255,217,.055); color: var(--cyan); text-align: right;
-      font: 700 clamp(.78rem, 1.8vw, 1.02rem)/1.25 "Orbitron", sans-serif; overflow-wrap: anywhere;
+    .podium-card:hover { transform: translateY(-5px); filter: brightness(1.08); }
+    .podium-rank-1 { grid-column: 2; grid-row: 1; min-height: 285px; z-index: 2;
+      background: linear-gradient(155deg,#fff2a6 0%,#f5c94d 24%,#d99a19 62%,#88500b 100%);
+      box-shadow: 0 0 34px rgba(255,207,75,.19), 0 18px 34px rgba(0,0,0,.34), inset 0 2px rgba(255,255,255,.7); }
+    .podium-rank-2 { grid-column: 1; grid-row: 1; min-height: 235px;
+      background: linear-gradient(155deg,#f4f7ff 0%,#b9c5d5 28%,#78879b 68%,#3d4a5d 100%);
+      box-shadow: 0 0 28px rgba(184,205,232,.14), 0 18px 34px rgba(0,0,0,.34), inset 0 2px rgba(255,255,255,.72); }
+    .podium-rank-3 { grid-column: 3; grid-row: 1; min-height: 195px;
+      background: linear-gradient(155deg,#ffd0a8 0%,#d88b56 30%,#a85d32 68%,#61301e 100%);
+      box-shadow: 0 0 28px rgba(220,137,87,.14), 0 18px 34px rgba(0,0,0,.34), inset 0 2px rgba(255,255,255,.55); }
+    .podium-medal { position: absolute; top: -39px; left: 50%; transform: translateX(-50%);
+      font-size: clamp(2rem, 5vw, 3rem); line-height: 1; filter: drop-shadow(0 5px 7px rgba(0,0,0,.35)); }
+    .podium-place { margin: 0 0 8px; color: rgba(25,20,30,.82); font: 800 clamp(.68rem,1.5vw,.9rem) "Orbitron",sans-serif; letter-spacing: 1.5px; text-transform: uppercase; }
+    .podium-player { margin: 0 auto 8px; max-width: 100%; color: #17131d;
+      font: 700 clamp(.9rem,2vw,1.22rem)/1.2 "Pixelify Sans",sans-serif; overflow-wrap: anywhere; text-shadow: 0 1px rgba(255,255,255,.28); }
+    .podium-game-image { width: clamp(38px,6vw,58px); height: clamp(38px,6vw,58px); margin: 0 auto 8px;
+      object-fit: cover; border-radius: 12px; border: 2px solid rgba(255,255,255,.55);
+      box-shadow: 0 5px 14px rgba(0,0,0,.25); }
+    .podium-score { display: block; width: 100%; margin-top: auto; padding: 10px 5px;
+      color: #fff; border-radius: 10px; background: rgba(27,20,17,.22);
+      border: 1px solid rgba(255,255,255,.25); font: 800 clamp(.75rem,1.8vw,1.05rem)/1.3 "Orbitron",sans-serif;
+      overflow-wrap: anywhere; text-shadow: 0 2px 5px rgba(0,0,0,.38); }
+    .podium-date { margin: 7px 0 0; color: rgba(30,24,28,.78); font: 400 .85rem "VT323",monospace; }
+    .game-board-title { gap: 12px; }
+    .game-title-image { width: 42px; height: 42px; object-fit: cover; border-radius: 10px;
+      border: 1px solid rgba(160,175,255,.45); box-shadow: 0 4px 14px rgba(0,0,0,.3); }
+    @media (max-width: 520px) {
+      .podium-stage { gap: 7px; min-height: 290px; padding: 38px 0 4px; }
+      .podium-card { border-radius: 13px 13px 9px 9px; padding: 0 5px 10px; }
+      .podium-rank-1 { min-height: 220px; }
+      .podium-rank-2 { min-height: 185px; }
+      .podium-rank-3 { min-height: 155px; }
+      .podium-medal { top: -31px; }
+      .podium-place { font-size: .58rem; letter-spacing: .5px; }
+      .podium-player { font-size: .78rem; }
+      .podium-score { font-size: .66rem; padding: 7px 3px; }
+      .podium-date { font-size: .72rem; }
+    }
+    @media (max-width: 350px) {
+      .podium-stage { gap: 4px; }
+      .podium-player { font-size: .68rem; }
     }
     .leaderboard-status { padding: 28px 12px; color: var(--muted); text-align: center; font-size: 1rem; }
     @media (max-width: 520px) {
@@ -138,6 +167,6 @@
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8390067368864065" crossorigin="anonymous"></script>
   <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-8390067368864065" data-ad-slot="9531168719" data-ad-format="auto" data-full-width-responsive="true"></ins>
   <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-  <script src="../duckmath-site/assets/js/leaderboard.js?v=classic-neon-4" defer></script>
+  <script src="../duckmath-site/assets/js/leaderboard.js?v=podium-neon-1" defer></script>
 </body>
 </html>
