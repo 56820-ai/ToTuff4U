@@ -353,6 +353,10 @@ try {
     await syncedCard.locator('.game-rating button[aria-pressed="true"]').getAttribute("aria-label").then(label => String(label || "").includes("5 out of 5"));
   await syncPage.evaluate(() => { localStorage.removeItem("favoriteGames"); localStorage.removeItem("arcadeAtlasGameRatings"); });
   await syncPage.close();
+  const runtimeErrors = await page.evaluate(() => window.__arcadeAuditRuntimeErrors || []);
+  errors.push(...runtimeErrors.map(error => "window-error: " + error));
+  const runtimeErrors = await page.evaluate(() => window.__arcadeAuditRuntimeErrors || []);
+  errors.push(...runtimeErrors.map(error => "window-error: " + error));
   const ok = response?.status() === 200 &&
     favoriteButton.tag === "button" &&
     favoriteButton.pressed === "false" &&
@@ -531,7 +535,10 @@ try {
     mimeType: "application/json",
     buffer: Buffer.from(JSON.stringify({ format: "arcade-atlas-playlists", version: 1, collections: tooManyCollections }))
   });
-  await page.waitForFunction(() => JSON.parse(localStorage.getItem("arcadeAtlasCollectionsV1") || "[]").length === 12, undefined, { timeout: 4000 });
+  await page.waitForFunction(() => JSON.parse(localStorage.getItem("arcadeAtlasCollectionsV1") || "[]").length === 12, undefined, { timeout: 4000   const runtimeErrors = await page.evaluate(() => window.__arcadeAuditRuntimeErrors || []);
+  const syncRuntimeErrors = await syncPage.evaluate(() => window.__arcadeAuditRuntimeErrors || []);
+  errors.push(...runtimeErrors.map(error => "window-error: " + error), ...syncRuntimeErrors.map(error => "sync-window-error: " + error));
+});
   const importLimitRespected = await page.evaluate(() => JSON.parse(localStorage.getItem("arcadeAtlasCollectionsV1") || "[]").length === MAX_GAME_COLLECTIONS);
   const ok = response?.status() === 200 && created && storedPaths.length === 1 && backupValid && importMergedAndSanitized && allowedLaunches.includes(randomLaunch) &&
     filterPersistedAfterReload && filteredTitle === "Slope" && filteredCards === 2 && crossTabSynced && customDeleteDialog && deleted && importLimitRespected && errors.length === 0;
