@@ -259,6 +259,7 @@ try {
   const errors = [];
   page.on("pageerror", e => errors.push(String(e.stack || e.message || e).slice(0, 900)));
   const response = await page.goto(BASE + "/", { waitUntil: "domcontentloaded", timeout: 16000 });
+  await page.waitForFunction(() => window.__arcadeAtlasReady === true && Array.isArray(cachedGames) && cachedGames.length > 0, undefined, { timeout: 20000 });
   await page.waitForSelector("#favoritesOnlyToggle", { timeout: 12000 });
   await page.waitForSelector("#all-games-grid .game-card .favorite-star", { timeout: 12000 });
   await page.evaluate(() => {
@@ -439,6 +440,7 @@ try {
   const errors = [];
   page.on("pageerror", e => errors.push(String(e.stack || e.message || e).slice(0, 900)));
   const response = await page.goto(BASE + "/", { waitUntil: "domcontentloaded", timeout: 16000 });
+  await page.waitForFunction(() => window.__arcadeAtlasReady === true && Array.isArray(cachedGames) && cachedGames.length > 0, undefined, { timeout: 20000 });
   await page.waitForSelector("#createCollectionButton", { timeout: 12000 });
   await page.evaluate(() => {
     const overlay = document.getElementById("patchNotesOverlay");
@@ -584,6 +586,7 @@ try {
   const errors = [];
   page.on("pageerror", e => errors.push(String(e.stack || e.message || e).slice(0, 900)));
   const response = await page.goto(BASE + "/", { waitUntil: "domcontentloaded", timeout: 16000 });
+  await page.waitForFunction(() => window.__arcadeAtlasReady === true && Array.isArray(cachedGames) && cachedGames.length > 0, undefined, { timeout: 20000 });
   await page.waitForSelector("#daily-pick-play", { timeout: 12000 });
   await page.waitForSelector("#daily-pick-title", { timeout: 12000 });
   await page.evaluate(() => {
