@@ -261,9 +261,8 @@
                     return grayBest;
                 }
 
-                // Whole-canvas OCR is retained for diagnostics, but never submitted
-                // when both focused score-area passes were blank. This prevents a
-                // stray HUD digit (like the "6" seen in the diagnostic) becoming a score.
+                // Whole-canvas fallback is allowed when it produces a valid score.
+                // The player confirmed that the score "6" was visible only in this pass.
                 var alternate = await recognizeCanvas(canvas, 0, 1, true, 0, 1, 6);
                 var sparse = await recognizeCanvas(canvas, 0, 1, true, 0, 1, 11, "gray");
                 var alternateBest = extractScore(alternate);
@@ -279,7 +278,8 @@
                   " (" + Math.round(chosen && chosen.confidence || 0) + "%)";
                 window.__slopeOcrDebug = lastEndOcrDebug;
                 console.info("Slope end-screen OCR diagnostics:", lastEndOcrDebug);
-                return { value: 0, confidence: 0 };
+                return chosen && chosen.value > 0 && chosen.value <= 1500 && chosen.confidence >= 20
+                    ? chosen : { value: 0, confidence: 0 };
             }
             async function readGameState(canvas) {
                 return await recognizeCanvas(canvas, 0, 1, false);
@@ -366,7 +366,7 @@
                         // Requiring identical OCR on two consecutive scans was too
                         // brittle: small OCR variations could prevent the name prompt forever.
                         if (endScoreReading.value > 0 && endScoreReading.value <= 1500 &&
-                            Number(endScoreReading.confidence) >= 45) {
+                            Number(endScoreReading.confidence) >= 20) {
                             maxScore = Math.max(maxScore, endScoreReading.value);
                             latestScore = Math.max(latestScore, endScoreReading.value);
                             if (endScoreCandidate === endScoreReading.value) {
@@ -393,13 +393,17 @@
                     if ((textEnded || endScreenHits >= 2) && maxScore > 0 && !handled) {
                         handled = true;
                         var score = maxScore;
-                        if (score > 0 && leaderboardReady && window.ArcadeScores) {
+                        if (score > 0) {
                             setStatus("RUN ENDED · submitting " + score + " to leaderboard…");
                             // Ask for a name for every verified run, even if a previous
                             // player name was saved in this browser.
                             var playerName = window.prompt("Verified Slope score: " + score + "\\nEnter your name for the leaderboard (24 characters max):", "");
                             playerName = playerName === null ? "" : playerName.trim().slice(0, 24);
                             if (playerName) {
+                                if (!leaderboardReady || !window.ArcadeScores) {
+                                    setStatus("NOT SUBMITTED · leaderboard connection is not ready");
+                                    status.style.borderColor = "#ff7777";
+                                } else {
                                 var submitted = await window.ArcadeScores.submit("Slope", score, playerName);
                                 if (submitted) {
                                     setStatus("✓ SUBMITTED TO LEADERBOARD · " + score);
@@ -410,6 +414,7 @@
                                     setStatus("NOT SUBMITTED · " + reason);
                                     status.style.borderColor = "#ff7777";
                                     console.warn("Slope leaderboard submission was not confirmed:", reason);
+                                }
                                 }
                             } else {
                                 setStatus("NOT SUBMITTED · name entry was cancelled or left blank");
