@@ -2168,9 +2168,27 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
     }
 
     function makeGameIconFallback(game) {
-        const title = String(game.title || 'Game');
         const category = String(game.category || 'ARCADE').toUpperCase();
-        const initials = title.split(/\s+/).filter(Boolean).slice(0, 2).map(word => word[0]).join('').toUpperCase() || 'G';
+        const glyphs = {
+            ACTION: '<path d="M57 24h14v42l-7 11-7-11z" fill="#fff"/><rect x="40" y="64" width="48" height="9" rx="4.5" fill="#fff"/><rect x="57" y="73" width="14" height="18" rx="5" fill="#fff"/><circle cx="64" cy="93" r="5" fill="#fff"/>',
+            ARCADE: '<rect x="38" y="72" width="52" height="20" rx="10" fill="#fff"/><rect x="60" y="44" width="8" height="30" rx="4" fill="#fff"/><circle cx="64" cy="36" r="13" fill="#fff"/>',
+            ADVENTURE: '<path d="M46 28v70" stroke="#fff" stroke-width="9" stroke-linecap="round"/><path d="M51 30h36l-9 16 9 16H51z" fill="#fff"/>',
+            CARD: '<rect x="34" y="42" width="34" height="48" rx="6" fill="#fff" opacity=".65" transform="rotate(-10 51 66)"/><rect x="58" y="38" width="34" height="48" rx="6" fill="#fff" transform="rotate(8 75 62)"/>',
+            CASUAL: '<path d="M64 94C40 78 34 64 42 54c7-9 18-6 22 2 4-8 15-11 22-2 8 10 2 24-22 40z" fill="#fff"/>',
+            ENDLESS: '<path d="M44 64c0-9 7-15 15-15 12 0 18 30 30 30 8 0 15-6 15-15s-7-15-15-15c-12 0-18 30-30 30-8 0-15-6-15-15z" fill="none" stroke="#fff" stroke-width="9"/>',
+            FIGHTING: '<rect x="40" y="48" width="48" height="36" rx="13" fill="#fff"/><rect x="44" y="40" width="11" height="18" rx="5.5" fill="#fff"/><rect x="59" y="37" width="11" height="21" rx="5.5" fill="#fff"/><rect x="74" y="40" width="11" height="18" rx="5.5" fill="#fff"/>',
+            HORROR: '<circle cx="64" cy="54" r="25" fill="#fff"/><rect x="52" y="70" width="24" height="17" rx="5" fill="#fff"/><circle cx="54" cy="52" r="6" fill="#000" opacity=".35"/><circle cx="74" cy="52" r="6" fill="#000" opacity=".35"/>',
+            IDLE: '<ellipse cx="64" cy="42" rx="24" ry="10" fill="#fff"/><path d="M40 42v22c0 6 11 10 24 10s24-4 24-10V42" fill="none" stroke="#fff" stroke-width="9"/><path d="M40 64v18c0 6 11 10 24 10s24-4 24-10V64" fill="none" stroke="#fff" stroke-width="9"/>',
+            IO: '<circle cx="64" cy="62" r="26" fill="none" stroke="#fff" stroke-width="11"/><circle cx="64" cy="62" r="6" fill="#fff"/>',
+            PLATFORMER: '<rect x="32" y="80" width="64" height="12" rx="6" fill="#fff"/><path d="M44 80v-34" stroke="#fff" stroke-width="9" stroke-linecap="round"/><path d="M64 46h30l-8 14 8 14H64z" fill="#fff"/>',
+            PUZZLE: '<path d="M44 44h16a8 8 0 0 1 16 0h8v16a8 8 0 0 1 0 16v8H68a8 8 0 0 0-16 0H44V68a8 8 0 0 0 0-16z" fill="#fff"/>',
+            RACING: '<circle cx="64" cy="60" r="26" fill="none" stroke="#fff" stroke-width="10"/><circle cx="64" cy="60" r="7" fill="#fff"/>',
+            SIMULATION: '<circle cx="64" cy="60" r="24" fill="none" stroke="#fff" stroke-width="10" stroke-dasharray="10 9"/><circle cx="64" cy="60" r="8" fill="#fff"/>',
+            SPORTS: '<circle cx="64" cy="60" r="26" fill="#fff"/><path d="M38 60h52M64 34v52" stroke="#000" stroke-opacity=".18" stroke-width="4"/>',
+            STRATEGY: '<path d="M64 30l28 10v20c0 20-13 30-28 36-15-6-28-16-28-36V40z" fill="#fff"/>',
+            TOOLS: '<path d="M50 82l26-26" stroke="#fff" stroke-width="11" stroke-linecap="round"/><path d="M72 44a16 16 0 0 1 16 22l-8 4-6-10-10-4z" fill="#fff"/>'
+        };
+        const glyph = glyphs[category] || glyphs.ARCADE;
         const palette = {
             ACTION: ['#ef4444', '#7f1d1d'],
             ARCADE: ['#22c55e', '#14532d'],
@@ -2191,8 +2209,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
             TOOLS: ['#64748b', '#1e293b']
         };
         const colors = palette[category] || ['#60a5fa', '#1e3a8a'];
-        const safeInitials = initials.replace(/[^A-Z0-9]/g, '') || 'G';
-        const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="' + colors[0] + '"/><stop offset="1" stop-color="' + colors[1] + '"/></linearGradient></defs><rect width="128" height="128" rx="22" fill="url(#g)"/><path d="M12 92 92 12h24L36 116H12z" fill="#fff" opacity=".08"/><circle cx="64" cy="55" r="34" fill="#fff" opacity=".12"/><text x="64" y="68" text-anchor="middle" font-family="Arial,sans-serif" font-size="' + (safeInitials.length > 1 ? '34' : '48') + '" font-weight="800" fill="#fff">' + safeInitials + '</text><text x="64" y="108" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" font-weight="700" letter-spacing="1.2" fill="#fff" opacity=".9">' + category.slice(0, 12) + '</text></svg>';
+        const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="' + colors[0] + '"/><stop offset="1" stop-color="' + colors[1] + '"/></linearGradient></defs><rect width="128" height="128" rx="22" fill="url(#g)"/><path d="M12 92 92 12h24L36 116H12z" fill="#fff" opacity=".08"/><circle cx="64" cy="60" r="38" fill="#fff" opacity=".12"/><g opacity=".95">' + glyph + '</g><text x="64" y="116" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" font-weight="700" letter-spacing="1.2" fill="#fff" opacity=".9">' + category.slice(0, 12) + '</text></svg>';
         return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
     }
 
@@ -3052,6 +3069,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         <li>Added 26 open-source games downloaded from GitHub projects, each kept with its MIT licence and source link: arcade shooters, platformers, a beat-'em-up, an RPG, puzzle and casual picks.</li>
         <li>Fixed broken script and icon paths across the game pages, and pointed six cards that opened a series menu at an actual game.</li>
         <li>Rebuilt the web-game thumbnails from real gameplay so those cards show boards and pieces instead of dark instruction screens.</li>
+        <li>Replaced the text-only thumbnails on 18 recent games with drawn symbol art: a spaceship for Clash of Space, a padlock for Cipher Crack, a spade for Earth Digger, and so on. The image fallback now uses a category symbol instead of initials.</li>
         <li>Every catalog thumbnail was rebuilt as a matching square art tile, so the grid looks consistent whether a game ships key art or a screenshot.</li>
         <li>Game cards show a NEW badge on the eight most recently added titles.</li>
         <li>Added Trivia Quiz, a ten-question timed quiz with speed bonuses and streaks.</li>

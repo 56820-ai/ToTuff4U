@@ -1255,7 +1255,7 @@
     {
       "title": "Clash of Space",
       "path": "g/clash-of-space",
-      "image": "./images/clash-of-space-card.webp",
+      "image": "./images/clash-of-space-card.webp?v=2",
       "category": "ACTION",
       "source": "https://github.com/PB2204/Clash-Of-Space",
       "description": "Pilot a fighter through an asteroid field, blast incoming ships and chase a bigger score each run."
@@ -1271,7 +1271,7 @@
     {
       "title": "Tiny Platformer",
       "path": "g/tiny-platformer",
-      "image": "./images/tiny-platformer-card.webp",
+      "image": "./images/tiny-platformer-card.webp?v=2",
       "category": "PLATFORMER",
       "source": "https://github.com/jakesgordon/javascript-tiny-platformer",
       "description": "A compact run-and-jump level: collect the gold and land on monsters instead of walking into them."
@@ -1279,7 +1279,7 @@
     {
       "title": "Star Battle",
       "path": "g/star-battle",
-      "image": "./images/star-battle-card.webp",
+      "image": "./images/star-battle-card.webp?v=2",
       "category": "ACTION",
       "source": "https://github.com/gd4Ark/star-battle",
       "description": "Fly, shoot and dodge while your fuel drains — grab fuel pods and score before the tank hits zero."
@@ -1287,7 +1287,7 @@
     {
       "title": "Tower Builder",
       "path": "g/tower-builder",
-      "image": "./images/tower-builder-card.webp",
+      "image": "./images/tower-builder-card.webp?v=2",
       "category": "ARCADE",
       "source": "https://github.com/iamkun/tower_game",
       "description": "Time each drop to stack blocks into the tallest tower you can build without toppling it."
@@ -1295,7 +1295,7 @@
     {
       "title": "Evade and Destroy",
       "path": "g/evade-and-destroy",
-      "image": "./images/evade-and-destroy-card.webp",
+      "image": "./images/evade-and-destroy-card.webp?v=2",
       "category": "ACTION",
       "source": "https://github.com/mikkun/evade-and-destroy",
       "description": "Weave between bullets in a tight vertical shooter and return fire when the lane opens up."
@@ -1303,7 +1303,7 @@
     {
       "title": "Diablo JS",
       "path": "g/diablo-js",
-      "image": "./images/diablo-js-card.webp",
+      "image": "./images/diablo-js-card.webp?v=2",
       "category": "ADVENTURE",
       "source": "https://github.com/mitallast/diablo-js",
       "description": "An isometric dungeon crawler rendered entirely in canvas: walk the map, meet monsters and fight through the shadows."
@@ -1319,7 +1319,7 @@
     {
       "title": "Jumper",
       "path": "g/jumper",
-      "image": "./images/jumper-card.webp",
+      "image": "./images/jumper-card.webp?v=2",
       "category": "PLATFORMER",
       "source": "https://github.com/egeexyz/jumper",
       "description": "Hop between platforms in a stripped-back Phaser platformer and keep climbing without falling."
@@ -1343,7 +1343,7 @@
     {
       "title": "Sort It Out",
       "path": "g/sort-it-out",
-      "image": "./images/sort-it-out-card.webp",
+      "image": "./images/sort-it-out-card.webp?v=2",
       "category": "PUZZLE",
       "source": "https://github.com/bytenimble/free-html5-games",
       "description": "Drag every animal into the group it belongs to and clear all of the categories."
@@ -1359,7 +1359,7 @@
     {
       "title": "Streets of Fight",
       "path": "g/streets-of-fight",
-      "image": "./images/streets-of-fight-card.webp",
+      "image": "./images/streets-of-fight-card.webp?v=2",
       "category": "FIGHTING",
       "source": "https://github.com/humancto/legacy-games",
       "description": "A side-scrolling brawler: punch, kick and dive-kick through the street before the timer runs out."
@@ -1367,7 +1367,7 @@
     {
       "title": "Tiny RPG Forest",
       "path": "g/tiny-rpg-forest",
-      "image": "./images/tiny-rpg-forest-card.webp",
+      "image": "./images/tiny-rpg-forest-card.webp?v=2",
       "category": "ADVENTURE",
       "source": "https://github.com/humancto/legacy-games",
       "description": "Explore three forest areas as a small hero, using melee attacks, arrows and a shotgun against the wildlife."
@@ -1375,7 +1375,7 @@
     {
       "title": "Underwater Diving",
       "path": "g/underwater-diving",
-      "image": "./images/underwater-diving-card.webp",
+      "image": "./images/underwater-diving-card.webp?v=2",
       "category": "ADVENTURE",
       "source": "https://github.com/humancto/legacy-games",
       "description": "Swim deeper into a dark reef, manage your air and see how far down you can get."
@@ -1383,7 +1383,7 @@
     {
       "title": "Grotto Escape",
       "path": "g/grotto-escape",
-      "image": "./images/grotto-escape-card.webp",
+      "image": "./images/grotto-escape-card.webp?v=2",
       "category": "PLATFORMER",
       "source": "https://github.com/humancto/legacy-games",
       "description": "Climb and jump out of a collapsing cave, dodging hazards on the way back to the surface."
@@ -1391,7 +1391,7 @@
     {
       "title": "Warped City",
       "path": "g/warped-city",
-      "image": "./images/warped-city-card.webp",
+      "image": "./images/warped-city-card.webp?v=2",
       "category": "ACTION",
       "source": "https://github.com/humancto/legacy-games",
       "description": "A neon cyberpunk shooter: run, shoot and crouch your way past the enemies holding the street."
@@ -1399,7 +1399,7 @@
     {
       "title": "Bullet Hell",
       "path": "g/bullet-hell",
-      "image": "./images/bullet-hell-card.webp",
+      "image": "./images/bullet-hell-card.webp?v=2",
       "category": "ACTION",
       "source": "https://github.com/prateek121/90s-games",
       "description": "Thread your ship between dense curtains of bullets, survive each wave and climb the score."
@@ -1407,7 +1407,7 @@
     {
       "title": "Earth Digger",
       "path": "g/earth-digger",
-      "image": "./images/earth-digger-card.webp",
+      "image": "./images/earth-digger-card.webp?v=2",
       "category": "ARCADE",
       "source": "https://github.com/prateek121/90s-games",
       "description": "Dig deeper for gems while dodging the hazards underground, and bank as much gold as you can carry."
@@ -1415,7 +1415,7 @@
     {
       "title": "8-Bit Quest",
       "path": "g/8bit-quest",
-      "image": "./images/8bit-quest-card.webp",
+      "image": "./images/8bit-quest-card.webp?v=2",
       "category": "PLATFORMER",
       "source": "https://github.com/prateek121/90s-games",
       "description": "A pixel platformer with gold to collect, enemies to hit and levels to clear one jump at a time."
@@ -1423,7 +1423,7 @@
     {
       "title": "Cipher Crack",
       "path": "g/cipher-crack",
-      "image": "./images/cipher-crack-card.webp",
+      "image": "./images/cipher-crack-card.webp?v=2",
       "category": "PUZZLE",
       "source": "https://github.com/prateek121/90s-games",
       "description": "Work out the substitution cipher: map each scrambled letter to its real one and read the message."
@@ -1439,7 +1439,7 @@
     {
       "title": "Chrono Jump",
       "path": "g/chrono-jump",
-      "image": "./images/chrono-jump-card.webp",
+      "image": "./images/chrono-jump-card.webp?v=2",
       "category": "PLATFORMER",
       "source": "https://github.com/prateek121/90s-games",
       "description": "Jump between platforms as time shifts around you, timing each hop to stay on solid ground."
