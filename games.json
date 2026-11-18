@@ -15,6 +15,21 @@
       "players": "2–4"
     },
     {
+      "title": "Egg Rush",
+      "path": "g/egg-rush",
+      "image": "./images/egg-rush-card.svg",
+      "category": "ARCADE",
+      "description": "Collect eggs, dodge speedy foxes, and clear increasingly tricky farm rounds before time runs out.",
+      "tags": [
+        "arcade",
+        "collecting",
+        "quick play",
+        "single player",
+        "avoidance"
+      ],
+      "players": "1"
+    },
+    {
       "title": "Slope",
       "path": "g/slope",
       "image": "./images/slope-card.webp",
