@@ -371,23 +371,34 @@
                     else setStatus("DEATH / RUN END DETECTED · confirming (" + endScreenHits + "/2)");
                     endScreenHits = ended ? endScreenHits + 1 : 0;
 
-                    // Wait for the same end-screen score to be read confidently twice.
-                    // Previously textEnded bypassed confirmation and submitted maxScore
-                    // while it was still zero on the first OCR pass.
-                    if ((textEnded || endScreenHits >= 2) && endScoreCandidateHits >= 2 && maxScore > 0 && !handled) {
+                    // Once the end screen is confirmed, one clear, high-confidence
+                    // final-score reading is sufficient. Requiring the OCR to return
+                    // exactly the same number twice caused valid runs to get stuck
+                    // forever when Tesseract varied slightly between frames.
+                    if ((textEnded || endScreenHits >= 2) && maxScore > 0 && !handled) {
                         handled = true;
                         var score = maxScore;
                         if (score > 0 && leaderboardReady && window.ArcadeScores) {
-                            setStatus("game ended · submitting detected score " + score);
+                            setStatus("RUN ENDED · submitting " + score + " to leaderboard…");
                             // Ask for a name for every verified run, even if a previous
                             // player name was saved in this browser.
                             var playerName = window.prompt("Verified Slope score: " + score + "\\nEnter your name for the leaderboard (24 characters max):", "");
                             playerName = playerName === null ? "" : playerName.trim().slice(0, 24);
                             if (playerName) {
                                 var submitted = await window.ArcadeScores.submit("Slope", score, playerName);
-                                setStatus(submitted ? "score submitted: " + score : "score submission failed");
+                                if (submitted) {
+                                    setStatus("✓ SUBMITTED TO LEADERBOARD · " + score);
+                                    status.style.borderColor = "#6bffd9";
+                                    console.info("Slope leaderboard: submission confirmed by server for score " + score);
+                                } else {
+                                    var reason = window.ArcadeScores.lastSubmitError || "The score server did not confirm the submission.";
+                                    setStatus("NOT SUBMITTED · " + reason);
+                                    status.style.borderColor = "#ff7777";
+                                    console.warn("Slope leaderboard submission was not confirmed:", reason);
+                                }
                             } else {
-                                setStatus("name entry cancelled · score not submitted");
+                                setStatus("NOT SUBMITTED · name entry was cancelled or left blank");
+                                status.style.borderColor = "#ffb86b";
                             }
                         } else if (!leaderboardReady) {
                             promptOcrIssue("Leaderboard connection is not configured.");
