@@ -96,7 +96,7 @@ function formatScore(value, gameTitle) {
     const elapsedMs = Math.max(0, 10000 - Number(value));
     return (elapsedMs / 1000).toFixed(3) + " seconds";
   }
-  if (/\btime$/.test(title) || title.includes("minecraft")) {
+  if (title.includes("time") || title.includes("minecraft")) {
     return formatDurationSeconds(value);
   }
   if (title === "cookie clicker") {
