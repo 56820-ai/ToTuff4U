@@ -69,8 +69,37 @@ function formatCookieClickerScore(value) {
   return amount + " × 10^" + exponent;
 }
 
+function formatDurationSeconds(value) {
+  const total = Math.max(0, Math.floor(Number(value) || 0));
+  const units = [
+    ["day", 86400],
+    ["hour", 3600],
+    ["minute", 60],
+    ["second", 1]
+  ];
+  let remaining = total;
+  const parts = [];
+  for (const [unit, size] of units) {
+    const amount = Math.floor(remaining / size);
+    remaining %= size;
+    if (amount || (unit === "second" && parts.length === 0)) {
+      parts.push(amount + " " + unit + (amount === 1 ? "" : "s"));
+    }
+  }
+  return parts.join(", ");
+}
+
 function formatScore(value, gameTitle) {
-  if (String(gameTitle || "").trim().toLowerCase() === "cookie clicker") {
+  const title = String(gameTitle || "").trim().toLowerCase();
+  if (title === "reaction test") {
+    // The game stores 10,000 - elapsed milliseconds so faster reactions rank higher.
+    const elapsedMs = Math.max(0, 10000 - Number(value));
+    return (elapsedMs / 1000).toFixed(3) + " seconds";
+  }
+  if (/\\btime$/.test(title)) {
+    return formatDurationSeconds(value);
+  }
+  if (title === "cookie clicker") {
     return formatCookieClickerScore(value);
   }
   const raw = String(value ?? "—");
