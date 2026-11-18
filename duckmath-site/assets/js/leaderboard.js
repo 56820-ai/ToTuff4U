@@ -133,7 +133,28 @@ async function loadArcadeAtlasLeaderboard() {
       list.append(status);
       return;
     }
-    [...grouped.entries()].sort((a,b) => a[0].localeCompare(b[0])).forEach(([, gameRows]) => {
+    [...grouped.entries()].sort((a,b) => a[0].localeCompare(b[0])).forEach(([gameKey, sourceRows]) => {
+      let gameRows = sourceRows;
+      // Daily Pick Streak is a personal-best board: show each nickname once,
+      // even if an older client or stale API cache returns duplicate submissions.
+      if (gameKey === "daily pick streak") {
+        const bestByPlayer = new Map();
+        gameRows.forEach(row => {
+          const playerKey = String(row.player_name || "Unknown player").trim().toLowerCase();
+          const prior = bestByPlayer.get(playerKey);
+          let isBetter = !prior;
+          if (prior) {
+            try {
+              const score = BigInt(String(row.score));
+              const priorScore = BigInt(String(prior.score));
+              isBetter = score > priorScore || (score === priorScore && new Date(row.created_at || 0) > new Date(prior.created_at || 0));
+            } catch { isBetter = Number(row.score) > Number(prior.score); }
+          }
+          if (isBetter) bestByPlayer.set(playerKey, row);
+        });
+        gameRows = [...bestByPlayer.values()];
+      }
+      if (!gameRows.length) return;
       const title = gameRows[0].game_title || "Game";
       gameRows.sort((a,b) => {
         if (title.toLowerCase() === "cookie clicker") {
