@@ -55,7 +55,7 @@ function loadAllAssets(callback) {
     img.src = src;
   });
   soundList.forEach(([name, src]) => {
-    Audio.load(name, src)
+    Audio.loadSound(name, src)
       .then(() => {
         loadedCount++;
         if (loadedCount >= totalAssets) callback();
