@@ -30,6 +30,21 @@
       "players": "1"
     },
     {
+      "title": "Eggy Car",
+      "path": "g/eggy-car",
+      "image": "./images/eggy-car-card.svg",
+      "category": "ARCADE",
+      "description": "Drive over rolling hills, collect coins, and keep your egg balanced on the car without cracking it.",
+      "tags": [
+        "arcade",
+        "driving",
+        "physics",
+        "skill",
+        "single player"
+      ],
+      "players": "1"
+    },
+    {
       "title": "Slope",
       "path": "g/slope",
       "image": "./images/slope-card.webp",
