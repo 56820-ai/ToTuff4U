@@ -96,7 +96,7 @@ function formatScore(value, gameTitle) {
     const elapsedMs = Math.max(0, 10000 - Number(value));
     return (elapsedMs / 1000).toFixed(3) + " seconds";
   }
-  if (/\btime$/.test(title) || title === "minecraft" || title.startsWith("minecraft ")) {
+  if (/\btime$/.test(title) || title.includes("minecraft")) {
     return formatDurationSeconds(value);
   }
   if (title === "cookie clicker") {
@@ -127,7 +127,7 @@ function makePodiumCard(row, rank) {
   player.textContent = row.player_name || "Unknown player";
   const score = document.createElement("strong");
   score.className = "podium-score";
-  score.textContent = formatScore(row.score, String(row.game_title || ""));
+  score.textContent = formatScore(row.score, [row.game_title, row.game_key].filter(Boolean).join(" "));
   const date = document.createElement("p");
   date.className = "podium-date";
   date.textContent = row.created_at ? new Date(row.created_at).toLocaleDateString() : "";
