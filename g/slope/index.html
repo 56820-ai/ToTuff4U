@@ -168,7 +168,7 @@
                     return { value:Number(raw), digits:raw, confidence:Number(word.confidence)||0,
                       x0:Number(box.x0)||0,y0:Number(box.y0)||0,x1:Number(box.x1)||0,y1:Number(box.y1)||0 };
                 }).filter(function(x) {
-                    return x && x.value >= 1 && x.value <= 1500 && x.confidence >= 35 &&
+                    return x && x.value >= 1 && x.value <= 1500 && x.confidence >= 20 &&
                       (x.x1-x.x0) > 1 && (x.y1-x.y0) > 2;
                 });
                 // Some Tesseract builds return recognized text but no word boxes.
@@ -240,7 +240,7 @@
                 // on the canvas cannot win the OCR selection.
                 var result = await recognizeCanvas(canvas, 0.15, 0.70, true, 0.15, 0.70, 7);
                 var best = extractScore(result);
-                if (best && best.value > 0 && best.value <= 1500 && best.confidence >= 45) {
+                if (best && best.value > 0 && best.value <= 1500 && best.confidence >= 20) {
                     lastEndOcrDebug = "Center crop " + canvas.width + "x" + canvas.height +
                       " | " + String(result.data && result.data.text || "").replace(/\s+/g, " ").trim().slice(0, 80) +
                       " | pick=" + best.value + " (" + Math.round(best.confidence) + "%)";
@@ -253,9 +253,20 @@
                 var alternate = await recognizeCanvas(canvas, 0, 1, true, 0, 1, 6);
                 var alternateBest = extractScore(alternate);
                 var chosen = alternateBest;
-                if (!chosen || chosen.value <= 0 || chosen.value > 1500 || chosen.confidence < 45) {
+                if (!chosen || chosen.value <= 0 || chosen.value > 1500 || chosen.confidence < 20) {
                     var grayscale = await recognizeCanvas(canvas, 0.15, 0.70, true, 0.15, 0.70, 7, "gray");
                     chosen = extractScore(grayscale);
+                }
+                // Slope's end-screen score can be rendered as a separate text block.
+                // Sparse-text segmentation is better at finding isolated digits than
+                // treating the whole crash screen as one line or paragraph.
+                if (!chosen || chosen.value <= 0 || chosen.value > 1500 || chosen.confidence < 20) {
+                    var sparse = await recognizeCanvas(canvas, 0, 1, true, 0, 1, 11, "gray");
+                    var sparseBest = extractScore(sparse);
+                    if (sparseBest && sparseBest.value > 0 && sparseBest.value <= 1500 &&
+                        (!chosen || sparseBest.confidence >= chosen.confidence)) {
+                        chosen = sparseBest;
+                    }
                 }
                 lastEndOcrDebug = "Canvas " + canvas.width + "x" + canvas.height +
                   " | Center=" + String(result.data && result.data.text || "").replace(/\s+/g, " ").trim().slice(0, 45) +
@@ -264,7 +275,7 @@
                   " (" + Math.round(chosen && chosen.confidence || 0) + "%)";
                 window.__slopeOcrDebug = lastEndOcrDebug;
                 console.info("Slope end-screen OCR diagnostics:", lastEndOcrDebug);
-                return chosen && chosen.value > 0 && chosen.value <= 1500 && chosen.confidence >= 45
+                return chosen && chosen.value > 0 && chosen.value <= 1500 && chosen.confidence >= 20
                     ? chosen : { value: 0, confidence: 0 };
             }
             async function readGameState(canvas) {
@@ -368,7 +379,8 @@
                     }
                     if (!gameStarted) setStatus("waiting for gameplay motion (" + motionHits + "/3)");
                     else if (!ended) setStatus("PLAYING · waiting for death screen to read score" + (stoppedHits ? " · stillness " + stoppedHits + "/6" : " · motion detected"));
-                    else setStatus("DEATH / RUN END DETECTED · confirming (" + endScreenHits + "/2)");
+                    else setStatus("DEATH / RUN END DETECTED · reading score (" + endScreenHits + "/2)" +
+                        (lastEndOcrDebug && lastEndOcrDebug !== "not run" ? " · " + lastEndOcrDebug.slice(0, 150) : ""));
                     endScreenHits = ended ? endScreenHits + 1 : 0;
 
                     // Once the end screen is confirmed, one clear, high-confidence
