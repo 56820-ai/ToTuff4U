@@ -248,35 +248,38 @@
                     return best;
                 }
 
-                // Fallback only when the focused pass cannot find a confident score.
-                // A second segmentation mode handles cases where the digits are split.
+                // Retry the score area in grayscale BEFORE scanning the whole canvas.
+                // Full-screen OCR can mistake small HUD counters for the final score.
+                var grayscale = await recognizeCanvas(canvas, 0.12, 0.76, true, 0.12, 0.76, 11, "gray");
+                var grayBest = extractScore(grayscale);
+                if (grayBest && grayBest.value > 0 && grayBest.value <= 1500 && grayBest.confidence >= 20) {
+                    lastEndOcrDebug = "Canvas " + canvas.width + "x" + canvas.height +
+                      " | Center=" + String(result.data && result.data.text || "").replace(/\\s+/g, " ").trim().slice(0, 35) +
+                      " | Gray center=" + String(grayscale.data && grayscale.data.text || "").replace(/\\s+/g, " ").trim().slice(0, 35) +
+                      " | pick=" + grayBest.value + " (" + Math.round(grayBest.confidence) + "%)";
+                    window.__slopeOcrDebug = lastEndOcrDebug;
+                    return grayBest;
+                }
+
+                // Whole-canvas OCR is retained for diagnostics, but never submitted
+                // when both focused score-area passes were blank. This prevents a
+                // stray HUD digit (like the "6" seen in the diagnostic) becoming a score.
                 var alternate = await recognizeCanvas(canvas, 0, 1, true, 0, 1, 6);
+                var sparse = await recognizeCanvas(canvas, 0, 1, true, 0, 1, 11, "gray");
                 var alternateBest = extractScore(alternate);
+                var sparseBest = extractScore(sparse);
                 var chosen = alternateBest;
-                if (!chosen || chosen.value <= 0 || chosen.value > 1500 || chosen.confidence < 20) {
-                    var grayscale = await recognizeCanvas(canvas, 0.15, 0.70, true, 0.15, 0.70, 7, "gray");
-                    chosen = extractScore(grayscale);
-                }
-                // Slope's end-screen score can be rendered as a separate text block.
-                // Sparse-text segmentation is better at finding isolated digits than
-                // treating the whole crash screen as one line or paragraph.
-                if (!chosen || chosen.value <= 0 || chosen.value > 1500 || chosen.confidence < 20) {
-                    var sparse = await recognizeCanvas(canvas, 0, 1, true, 0, 1, 11, "gray");
-                    var sparseBest = extractScore(sparse);
-                    if (sparseBest && sparseBest.value > 0 && sparseBest.value <= 1500 &&
-                        (!chosen || sparseBest.confidence >= chosen.confidence)) {
-                        chosen = sparseBest;
-                    }
-                }
+                if (sparseBest && sparseBest.value > 0 && sparseBest.value <= 1500 &&
+                    (!chosen || sparseBest.confidence > chosen.confidence)) chosen = sparseBest;
                 lastEndOcrDebug = "Canvas " + canvas.width + "x" + canvas.height +
-                  " | Center=" + String(result.data && result.data.text || "").replace(/\s+/g, " ").trim().slice(0, 45) +
-                  " | Full=" + String(alternate.data && alternate.data.text || "").replace(/\s+/g, " ").trim().slice(0, 45) +
+                  " | Center=" + String(result.data && result.data.text || "").replace(/\\s+/g, " ").trim().slice(0, 25) +
+                  " | Gray center=" + String(grayscale.data && grayscale.data.text || "").replace(/\\s+/g, " ").trim().slice(0, 25) +
+                  " | Full=" + String(alternate.data && alternate.data.text || "").replace(/\\s+/g, " ").trim().slice(0, 35) +
                   " | pick=" + (chosen && chosen.value || 0) +
                   " (" + Math.round(chosen && chosen.confidence || 0) + "%)";
                 window.__slopeOcrDebug = lastEndOcrDebug;
                 console.info("Slope end-screen OCR diagnostics:", lastEndOcrDebug);
-                return chosen && chosen.value > 0 && chosen.value <= 1500 && chosen.confidence >= 20
-                    ? chosen : { value: 0, confidence: 0 };
+                return { value: 0, confidence: 0 };
             }
             async function readGameState(canvas) {
                 return await recognizeCanvas(canvas, 0, 1, false);
