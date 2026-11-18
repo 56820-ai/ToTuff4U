@@ -1,5 +1,6 @@
 <!DOCTYPE html><html><head>
-<meta name="google-site-verification" content="uBDEapMmF1jmMtAC2MZve959FPIf4xm0gGhv3RCUUpA"><meta charset="utf-8"><title>Mini DOOM</title><style>body{margin:0;overflow:hidden;background:#000;cursor:crosshair}canvas{width:100vw;height:100vh}</style></head><body><canvas id=c></canvas><script>
+<meta name="google-site-verification" content="uBDEapMmF1jmMtAC2MZve959FPIf4xm0gGhv3RCUUpA">
+<meta charset="utf-8"><title>Mini DOOM</title><style>body{margin:0;overflow:hidden;background:#000;cursor:crosshair}canvas{width:100vw;height:100vh}</style></head><body><canvas id=c></canvas><script>
     c=document.getElementById("c");c.width=320,c.height=240,h=c.getContext("2d");x=4,y=4,a=0,hp=100;
     // f: noise-based map; safe 6x6 area around (4,4) gives open space; walls occur when noise<0.1.
     f=(i,j)=>(Math.abs(i-4)<3&&Math.abs(j-4)<3)?"0":(n=Math.sin(i*12.9898+j*78.233)*43758.5453+1e4,n-=n|0,n<.1?"1":"0");
