@@ -100,7 +100,7 @@ function normalizeIcon(icon) {
   return icon;
 }
 async function checkGame(game, context = browser) {
-  const page = await context.newPage({ viewport: { width: 1365, height: 768 } });
+  const page = await context.newPage({ viewport: { width: 1280, height: 800 } });
   page.setDefaultTimeout(6000);
   page.setDefaultNavigationTimeout(9000);
   const localFailures = [];
@@ -238,7 +238,14 @@ await Promise.all(Array.from({ length: workers }, async () => {
   while (cursor < localPageCatalog.length) {
     const i = cursor++;
     const game = localPageCatalog[i];
-    const context = await browser.newContext({ viewport: { width: 1365, height: 768 } });
+    const context = await browser.newContext({
+      viewport: { width: 1280, height: 800 },
+      screen: { width: 1280, height: 800 },
+      deviceScaleFactor: 1,
+      isMobile: false,
+      hasTouch: true,
+      userAgent: "Mozilla/5.0 (X11; CrOS x86_64 16093.68.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36"
+    });
     let timeoutId;
     try {
       const timedCheck = new Promise((_, reject) => {
@@ -249,7 +256,7 @@ await Promise.all(Array.from({ length: workers }, async () => {
       });
       results[i] = await Promise.race([checkGame(game, context), timedCheck]);
     } catch (error) {
-      results[i] = { title: game?.title || `Catalog entry ${i + 1}`, url: gameUrl(game || {}), status: null, pageTitle: "", mainFrameUrl: "", hardFailure: true, navigationError: String(error?.stack || error).slice(0, 500), localFailures: [], missingCoreAssets: [], criticalPageErrors: [], failedGameFrames: [], externalFailures: [], pageErrors: [], iframeSources: [], canvasCount: 0, missingCanvas: false };
+      results[i] = { title: game?.title || `Catalog entry ${i + 1}`, url: gameUrl(game || {}), status: null, pageTitle: "", mainFrameUrl: "", hardFailure: true, navigationError: String(error?.stack || error).slice(0, 500), localFailures: [], missingCoreAssets: [], criticalPageErrors: [], failedGameFrames: [], externalFailures: [], pageErrors: [], iframeSources: [], canvasCount: 0, missingCanvas: false, externalHosts: [], chromebookTouchPoints: 0 };
     } finally {
       clearTimeout(timeoutId);
       await context.close().catch(() => {});
@@ -261,6 +268,7 @@ await Promise.all(Array.from({ length: workers }, async () => {
 const checkpointReport = {
   generatedAt: new Date().toISOString(),
   catalogCount: catalog.length,
+  testEnvironment: { browser: "Chromium with ChromeOS user agent", viewport: "1280x800", touchEmulation: true, deviceScaleFactor: 1, note: "School-specific web filters and device policies cannot be emulated without the school Chromebook/network." },
   locallyHostedGameChecks: results.filter(Boolean).length,
   catalogPassed: results.filter(r => r && !r.hardFailure).length,
   catalogFailed: results.filter(r => r?.hardFailure),
@@ -937,11 +945,13 @@ if (process.env.GITHUB_STEP_SUMMARY) {
     "# Arcade Atlas browser audit",
     "",
     `- Arcade Atlas entries in merged catalog: ${report.catalogCount}`,
+    `- Test environment: ChromeOS user agent, 1280x800 Chromebook viewport, touchscreen emulation enabled`,
     `- Locally hosted game pages opened in Chromium: ${report.locallyHostedGameChecks}`,
     `- GN Math links, cover formats, and duplicate checks valid: ${sourceValidation.validGameUrls && sourceValidation.validCoverUrls && sourceValidation.uniqueTitles && sourceValidation.noExistingTitleDuplicates}`,
     `- Distinct GN Math games in supplemental feed: ${sourceValidation.importedCount}`,
     `- Locally hosted game pages passing hard checks: ${report.catalogPassed}`,
     `- Arcade Atlas hard failures: ${report.catalogFailed.length}`,
+    `- External game asset hosts observed: ${new Set(results.flatMap(r => r.externalHosts || [])).size}`,
     `- Broken games removed by this audit: 0 (read-only catalog audit)`,
     `- Catalog logos checked: ${logoAudit.length}`,
     `- Broken catalog logos: ${report.brokenLogos.length}`,
