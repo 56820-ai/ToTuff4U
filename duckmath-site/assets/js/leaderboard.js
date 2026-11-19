@@ -73,17 +73,20 @@ function formatCookieClickerScore(value) {
 }
 
 function formatDurationSeconds(value) {
-  const total = Math.max(0, Math.floor(Number(value) || 0));
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return String(value ?? "—");
+  const total = Math.max(0, Math.floor(numeric));
   const days = Math.floor(total / 86400);
   const hours = Math.floor((total % 86400) / 3600);
   const minutes = Math.floor((total % 3600) / 60);
   const seconds = total % 60;
-  const parts = [];
-  if (days) parts.push(days + "d");
-  if (hours || days) parts.push(hours + "h");
-  if (minutes || hours || days) parts.push(minutes + "m");
-  if (seconds || !parts.length) parts.push(seconds + "s");
-  return parts.join(" ");
+  const pad = part => String(part).padStart(2, "0");
+  const clock = days
+    ? days + "d " + pad(hours) + ":" + pad(minutes) + ":" + pad(seconds)
+    : hours
+      ? hours + ":" + pad(minutes) + ":" + pad(seconds)
+      : minutes + ":" + pad(seconds);
+  return clock;
 }
 
 function formatReactionTime(value) {
@@ -96,7 +99,7 @@ function formatReactionTime(value) {
 function formatScore(value, gameTitle) {
   const title = String(gameTitle || "").trim().toLowerCase();
   if (title.includes("reaction test")) return formatReactionTime(value);
-  if (title.endsWith(" time") || title === "minecraft") return formatDurationSeconds(value);
+  if (/\btime\b/i.test(title) || title === "minecraft") return formatDurationSeconds(value);
   if (title.includes("cookie clicker")) return formatCookieClickerScore(value);
   const raw = String(value ?? "—");
   if (/^\d+(\.\d+)?$/.test(raw)) return Number(raw).toLocaleString("en-US", { maximumFractionDigits: 3 });
