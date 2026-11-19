@@ -79,18 +79,18 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#080b12;col
     var total=parts.reduce(function(sum,part){return sum+part.byteLength;},0);
     var merged=new Uint8Array(total),offset=0;
     parts.forEach(function(part){merged.set(new Uint8Array(part),offset);offset+=part.byteLength;});
-    message.textContent="Preparing compressed game engine…";
-    // Blob URLs cannot send Content-Encoding: br. Decompress the merged Brotli
-    // stream before handing it to Unity as a real WebAssembly binary.
-    var brotliModule=await import("https://unpkg.com/brotli-wasm@3.0.0/index.web.js?module");
-    var brotli=await (brotliModule.default||brotliModule);
-    var wasm=brotli.decompress(merged);
-    if(!(wasm instanceof Uint8Array))wasm=new Uint8Array(wasm);
-    if(wasm[0]!==0||wasm[1]!==97||wasm[2]!==115||wasm[3]!==109){
-      throw new Error("The downloaded engine did not decompress into a valid WebAssembly file.");
+    message.textContent="Checking game engine…";
+    // These four repository parts are already the raw WebAssembly bytes.
+    // Their combined size matches Unity's wasmFileSize (38,111,960 bytes);
+    // Brotli-decompressing them causes Unexpected EOF.
+    if(merged.byteLength!==38111960){
+      throw new Error("The game engine is incomplete ("+merged.byteLength+" of 38111960 bytes).");
     }
-    window.arcadeAtlasWasmSize=wasm.byteLength;
-    return URL.createObjectURL(new Blob([wasm],{type:"application/wasm"}));
+    if(merged[0]!==0||merged[1]!==97||merged[2]!==115||merged[3]!==109){
+      throw new Error("The downloaded engine is not a valid WebAssembly binary.");
+    }
+    window.arcadeAtlasWasmSize=merged.byteLength;
+    return URL.createObjectURL(new Blob([merged],{type:"application/wasm"}));
   }
   async function boot(){
     message.textContent="Starting game engine…";
