@@ -95,16 +95,32 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#080b12;col
   }
   async function prepareDataFile(){
     message.textContent="Downloading game data…";
-    var response=await fetch(buildUrl+"/zombieshooterdone.data.br",{cache:"force-cache"});
+    var response=await fetch(buildUrl+"/zombieshooterdone.data.br",{cache:"no-store"});
     if(!response.ok)throw new Error("Could not download game data ("+response.status+").");
-    var compressed=new Uint8Array(await response.arrayBuffer());
-    message.textContent="Unpacking game data…";
-    var brotli=await getBrotli();
-    var data=brotli.decompress(compressed);
-    if(!(data instanceof Uint8Array))data=new Uint8Array(data);
-    var header="UnityWebData1.0\\0";
-    var actual=new TextDecoder().decode(data.subarray(0,header.length));
-    if(actual!==header)throw new Error("The game data did not unpack correctly (invalid Unity data header).");
+    var bytes=new Uint8Array(await response.arrayBuffer());
+    message.textContent="Preparing game data…";
+    var header=[85,110,105,116,121,87,101,98,68,97,116,97,49,46,48,0];
+    function hasUnityHeader(value){
+      if(value.length<header.length)return false;
+      for(var i=0;i<header.length;i++)if(value[i]!==header[i])return false;
+      return true;
+    }
+    // Fetch transparently removes HTTP Content-Encoding. If the CDN already
+    // decompressed this .br response, the Unity data header is present now.
+    var data=bytes;
+    if(!hasUnityHeader(data)){
+      message.textContent="Unpacking game data…";
+      var brotli=await getBrotli();
+      try{
+        data=brotli.decompress(bytes);
+      }catch(error){
+        throw new Error("Game data Brotli decode failed. Downloaded "+bytes.byteLength+" bytes; response type "+(response.headers.get("content-type")||"unknown")+". "+(error&&error.message?error.message:String(error)));
+      }
+      if(!(data instanceof Uint8Array))data=new Uint8Array(data);
+    }
+    if(!hasUnityHeader(data)){
+      throw new Error("Game data is invalid: expected UnityWebData1.0 header; received "+data.byteLength+" bytes (downloaded "+bytes.byteLength+").");
+    }
     return URL.createObjectURL(new Blob([data],{type:"application/octet-stream"}));
   }
   async function boot(){
