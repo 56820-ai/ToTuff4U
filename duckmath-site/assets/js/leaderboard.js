@@ -2,6 +2,7 @@
 const ARCADE_ATLAS_API = "https://br-flat-grass-bdhxbnam-arcadeapi.compute.c-8.us-east-2.aws.neon.tech";
 const MEDALS = ["🥇", "🥈", "🥉"];
 const catalogLogos = new Map();
+let catalogGames = [];
 window.catalogLogos = catalogLogos;
 function normalizeGameKey(value) {
   return String(value || "").trim().toLowerCase().replace(/\s+time$/, "").replace(/[^a-z0-9]+/g, " ").trim();
@@ -16,6 +17,7 @@ async function loadCatalogLogos() {
     const response = await fetch("../games.json", { cache: "no-cache" });
     if (!response.ok) return;
     const data = await response.json();
+    catalogGames = Array.isArray(data.games) ? data.games : [];
     catalogLogos.set("daily pick streak", "../images/daily-pick-streak.svg");
     (data.games || []).forEach(game => {
       const key = String(game.title || "").trim().toLowerCase();
@@ -153,15 +155,24 @@ async function loadArcadeAtlasLeaderboard() {
     if (!Array.isArray(rows)) throw new Error("Invalid leaderboard response.");
     list.innerHTML = "";
     const grouped = new Map();
+    const catalogByKey = new Map();
+    catalogGames.forEach(game => {
+      const title = String(game.title || "").trim();
+      if (!title) return;
+      const key = normalizeGameKey(title);
+      if (!grouped.has(key)) grouped.set(key, []);
+      catalogByKey.set(key, title);
+      const pathKey = normalizeGameKey(String(game.path || "").split("/").filter(Boolean).pop() || "");
+      if (pathKey) catalogByKey.set(pathKey, title);
+    });
     rows.filter(row => Number(row.score) > 0).forEach(row => {
-      const key = String(row.game_key || row.game_title || "other").trim().toLowerCase();
+      const titleKey = normalizeGameKey(row.game_title);
+      const gameKey = normalizeGameKey(row.game_key);
+      const catalogTitle = catalogByKey.get(titleKey) || catalogByKey.get(gameKey);
+      const key = normalizeGameKey(catalogTitle || row.game_key || row.game_title || "other");
       if (!grouped.has(key)) grouped.set(key, []);
       grouped.get(key).push(row);
     });
-    if (!grouped.size) {
-      list.innerHTML = '<p class="leaderboard-status">No scores have been submitted yet.</p>';
-      return;
-    }
 
     const toolbar = document.createElement("div");
     toolbar.className = "leaderboard-tools";
@@ -187,8 +198,8 @@ async function loadArcadeAtlasLeaderboard() {
         });
         gameRows = [...bestByPlayer.values()];
       }
-      if (!gameRows.length) return;
-      const title = gameRows[0].game_title || "Game";
+      const catalogTitle = catalogByKey.get(gameKey);
+      const title = (gameRows[0] && gameRows[0].game_title) || catalogTitle || "Game";
       gameRows.sort((a,b) => {
         if (String(title).toLowerCase() === "cookie clicker") {
           try { const x=BigInt(String(a.score)); const y=BigInt(String(b.score)); return x===y?0:x>y?-1:1; } catch {}
@@ -202,7 +213,7 @@ async function loadArcadeAtlasLeaderboard() {
       heading.className = "game-board-title";
       const headingImage = document.createElement("img");
       headingImage.className = "game-title-image";
-      headingImage.src = getGameImage(gameRows[0]);
+      headingImage.src = gameRows[0] ? getGameImage(gameRows[0]) : (catalogLogos.get(gameKey) || "../assets/arcade-atlas-logo.png");
       headingImage.alt = "";
       headingImage.onerror = () => { headingImage.onerror = null; headingImage.src = "../assets/arcade-atlas-logo.png"; };
       const headingText = document.createElement("span");
@@ -214,7 +225,14 @@ async function loadArcadeAtlasLeaderboard() {
       board.append(heading);
       const entries = document.createElement("div");
       entries.className = "score-rows";
-      gameRows.slice(0,3).forEach((row,index) => entries.append(makeScoreRow(row,index+1)));
+      if (gameRows.length) {
+        gameRows.slice(0,3).forEach((row,index) => entries.append(makeScoreRow(row,index+1)));
+      } else {
+        const empty = document.createElement("p");
+        empty.className = "leaderboard-status";
+        empty.textContent = "No scores submitted yet.";
+        entries.append(empty);
+      }
       board.append(entries);
       list.append(board);
       boards.push({board,title});
