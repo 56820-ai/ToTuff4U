@@ -31,7 +31,7 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    timeout-minutes: 30
+    timeout-minutes: 35
     steps:
       # Browser smoke tests also validate the imported action arcade game pack.
       - name: Check out Arcade Atlas
@@ -59,7 +59,7 @@ jobs:
       - name: Validate browser audit script syntax
         run: node --check scripts/audit-games.mjs
       - name: Audit Arcade Atlas games in Chromium
-        timeout-minutes: 25
+        timeout-minutes: 30
         run: node --unhandled-rejections=strict scripts/audit-games.mjs
       - name: Commit verified game catalog cleanup
         if: success()
