@@ -4,7 +4,7 @@ const MEDALS = ["🥇", "🥈", "🥉"];
 const catalogLogos = new Map();
 window.catalogLogos = catalogLogos;
 function normalizeGameKey(value) {
-  return String(value || "").trim().toLowerCase().replace(/\\s+time$/, "").replace(/[^a-z0-9]+/g, " ").trim();
+  return String(value || "").trim().toLowerCase().replace(/\s+time$/, "").replace(/[^a-z0-9]+/g, " ").trim();
 }
 window.getGameLogo = function (value) {
   const key = normalizeGameKey(value);
@@ -185,7 +185,7 @@ async function loadArcadeAtlasLeaderboard() {
       });
       const board = document.createElement("section");
       board.className = "game-board";
-      board.id = "game-" + normalizeGameKey(gameKey).replace(/\\s+/g, "-");
+      board.id = "game-" + normalizeGameKey(gameKey).replace(/\s+/g, "-");
       const heading = document.createElement("h2");
       heading.className = "game-board-title";
       const headingImage = document.createElement("img");
