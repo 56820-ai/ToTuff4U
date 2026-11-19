@@ -285,7 +285,13 @@ try {
     hasScoreList: !!document.getElementById("score-list"),
     hasLogoFunction: typeof getGameLogo === "function",
     logoCount: typeof catalogLogos !== "undefined" ? catalogLogos.size : 0,
-    blockyLogo: typeof getGameLogo === "function" ? getGameLogo("Blocky Combat SWAT Time") : ""
+    blockyLogo: typeof getGameLogo === "function" ? getGameLogo("Blocky Combat SWAT Time") : "",
+    scoreFormatting: typeof window.arcadeAtlasFormatScore === "function" ? {
+      numeric: window.arcadeAtlasFormatScore("1234567", "Pong"),
+      duration: window.arcadeAtlasFormatScore("90061", "Minecraft"),
+      reaction: window.arcadeAtlasFormatScore("8766", "Reaction Test"),
+      cookieClicker: window.arcadeAtlasFormatScore("5340000000000000000", "Cookie Clicker")
+    } : null
   })).catch(() => ({ hasScoreList: false, hasLogoFunction: false, logoCount: 0, blockyLogo: "" }));
   const dailyStreakIconResponse = await page.request.get(BASE + "/images/daily-pick-streak.svg").catch(() => null);
   const dailyStreakLogo = await page.evaluate(() => typeof getGameLogo === "function" ? getGameLogo("Daily Pick Streak") : "");
@@ -984,7 +990,7 @@ console.log(JSON.stringify({
   connectFourOk: !!uiAudit.connectFour.ok
 }, null, 2));
 const failedUiChecks = [
-  ["leaderboard", uiAudit.leaderboard.status === 200 && uiAudit.leaderboard.dailyStreakLogo === "../images/daily-pick-streak.svg" && uiAudit.leaderboard.dailyStreakIconStatus === 200],
+  ["leaderboard", uiAudit.leaderboard.status === 200 && uiAudit.leaderboard.dailyStreakLogo === "../images/daily-pick-streak.svg" && uiAudit.leaderboard.dailyStreakIconStatus === 200 && uiAudit.leaderboard.scoreFormatting?.numeric === "1,234,567" && uiAudit.leaderboard.scoreFormatting?.duration === "1d 1h 1m 1s" && uiAudit.leaderboard.scoreFormatting?.reaction === "0:01.234" && uiAudit.leaderboard.scoreFormatting?.cookieClicker === "5.34 quintillion"],
   ["catalog and cross-tab preferences", !!uiAudit.catalog.ok],
   ["playlists", !!uiAudit.collections.ok],
   ["Daily Pick", !!uiAudit.dailyPick.ok],
