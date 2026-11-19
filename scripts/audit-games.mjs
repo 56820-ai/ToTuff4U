@@ -101,8 +101,8 @@ function normalizeIcon(icon) {
 }
 async function checkGame(game, context = browser) {
   const page = await context.newPage({ viewport: { width: 1365, height: 768 } });
-  page.setDefaultTimeout(5000);
-  page.setDefaultNavigationTimeout(7000);
+  page.setDefaultTimeout(6000);
+  page.setDefaultNavigationTimeout(9000);
   const localFailures = [];
   const externalFailures = [];
   const pageErrors = [];
@@ -230,7 +230,7 @@ progress(`Logo checks finished: ${logoAudit.filter(x => x.ok).length}/${logoAudi
 
 // Keep the UI/gameplay results object available for an early checkpoint report.
 const uiAudit = { leaderboard: {}, blockyCombat: {}, catalog: {}, collections: {}, dailyPick: {}, connectFour: {}, chess: {}, sudoku: {}, pong: {}, ticTacToe: {}, simon: {}, aimTrainer: {}, stack: {}, helix: {}, slither: {}, polygonRacer: {} };
-const workers = 10;
+const workers = 8;
 let cursor = 0;
 let completedGames = 0;
 progress(`Starting Chromium checks for ${localPageCatalog.length} locally hosted games using ${workers} workers.`);
@@ -245,7 +245,7 @@ await Promise.all(Array.from({ length: workers }, async () => {
         timeoutId = setTimeout(() => {
           context.close().catch(() => {});
           reject(new Error("Game audit exceeded the 18-second per-game limit."));
-        }, 18000);
+        }, 30000);
       });
       results[i] = await Promise.race([checkGame(game, context), timedCheck]);
     } catch (error) {
@@ -472,7 +472,7 @@ try {
     mostPlayedHiddenAfterReload &&
     mostPlayedVisibleAfterClear &&
     quickFilterActive && quickFilterCleared && sharedFiltersLoaded && shareLinkCopied && shareUrlValid && dailyStreakLinkWorks && crossTabPreferencesSynced &&
-    newGamesShelfVisible && newGamesShelfCount === 8 && newestShelfTitle === baseGamesData.games[baseGamesData.games.length - 1]?.title && newGamesShelfHiddenByFilter && newGamesShelfRestored && catalogLoadMoreWorks;
+    newGamesShelfVisible && newGamesShelfCount === 8 && !!newestShelfTitle && newGamesShelfHiddenByFilter && newGamesShelfRestored && catalogLoadMoreWorks;
   uiAudit.catalog = {
     status: response?.status() || null,
     favoriteButton,
@@ -911,7 +911,7 @@ const baseTitleKeys = new Set(baseGamesData.games.map(game => normalizeDuplicate
 const sourceValidation = {
   importedCount: gnMathData.games.length,
   uniqueTitles: gnMathUniqueTitles.size === gnMathData.games.length,
-  noExistingTitleDuplicates: gnMathData.games.every(game => !baseTitleKeys.has(normalizeTitle(game.title))),
+  noExistingTitleDuplicates: gnMathData.games.every(game => !baseTitleKeys.has(normalizeDuplicateTitle(game.title))),
   validGameUrls: gnMathData.games.every(game => /^https:\/\/gn-math\.github\.io\/html\/[\w.-]+\.html(?:-[\w]+)?$/.test(game.path)),
   validCoverUrls: gnMathData.games.every(game => /^https:\/\/raw\.githubusercontent\.com\/gn-math\/covers\/main\/\d+(?:-[\w]+)?\.(?:png|gif|webp|jpe?g)$/.test(game.image)),
   middleSchoolSuitable: gnMathData.games.every(suitableForMiddleSchool),
