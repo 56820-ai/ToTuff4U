@@ -76,17 +76,18 @@ function formatDurationSeconds(value) {
   const numeric = Number(value);
   if (!Number.isFinite(numeric)) return String(value ?? "—");
   const total = Math.max(0, Math.floor(numeric));
-  const days = Math.floor(total / 86400);
-  const hours = Math.floor((total % 86400) / 3600);
-  const minutes = Math.floor((total % 3600) / 60);
-  const seconds = total % 60;
-  const pad = part => String(part).padStart(2, "0");
-  const clock = days
-    ? days + "d " + pad(hours) + ":" + pad(minutes) + ":" + pad(seconds)
-    : hours
-      ? hours + ":" + pad(minutes) + ":" + pad(seconds)
-      : minutes + ":" + pad(seconds);
-  return clock;
+  const units = [
+    [Math.floor(total / 86400), "day"],
+    [Math.floor((total % 86400) / 3600), "hour"],
+    [Math.floor((total % 3600) / 60), "minute"],
+    [total % 60, "second"]
+  ];
+  const parts = units
+    .filter(([amount]) => amount > 0)
+    .map(([amount, name]) => amount + " " + name + (amount === 1 ? "" : "s"));
+  if (!parts.length) return "0 seconds";
+  if (parts.length === 1) return parts[0];
+  return parts.slice(0, -1).join(", ") + ", and " + parts[parts.length - 1];
 }
 
 function formatReactionTime(value) {
