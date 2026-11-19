@@ -291,7 +291,9 @@ try {
       duration: window.arcadeAtlasFormatScore("90061", "Minecraft"),
       storyMode: window.arcadeAtlasFormatScore("12345", "Minecraft: Story Mode"),
       reaction: window.arcadeAtlasFormatScore("8766", "Reaction Test"),
-      cookieClicker: window.arcadeAtlasFormatScore("5340000000000000000", "Cookie Clicker")
+      cookieClicker: window.arcadeAtlasFormatScore("5340000000000000000", "Cookie Clicker"),
+      cookieTenBillion: window.arcadeAtlasFormatScore("10000000000", "Cookie Clicker"),
+      cookieTwoHundredZeroes: window.arcadeAtlasFormatScore("1" + "0".repeat(200), "Cookie Clicker")
     } : null
   })).catch(() => ({ hasScoreList: false, hasLogoFunction: false, logoCount: 0, blockyLogo: "" }));
   const dailyStreakIconResponse = await page.request.get(BASE + "/images/daily-pick-streak.svg").catch(() => null);
@@ -991,7 +993,7 @@ console.log(JSON.stringify({
   connectFourOk: !!uiAudit.connectFour.ok
 }, null, 2));
 const failedUiChecks = [
-  ["leaderboard", uiAudit.leaderboard.status === 200 && uiAudit.leaderboard.dailyStreakLogo === "../images/daily-pick-streak.svg" && uiAudit.leaderboard.dailyStreakIconStatus === 200 && uiAudit.leaderboard.scoreFormatting?.numeric === "1,234,567" && uiAudit.leaderboard.scoreFormatting?.duration === "1d 1h 1m 1s" && uiAudit.leaderboard.scoreFormatting?.storyMode === "12,345" && uiAudit.leaderboard.scoreFormatting?.reaction === "0:01.234" && uiAudit.leaderboard.scoreFormatting?.cookieClicker === "5.34 quintillion"],
+  ["leaderboard", uiAudit.leaderboard.status === 200 && uiAudit.leaderboard.dailyStreakLogo === "../images/daily-pick-streak.svg" && uiAudit.leaderboard.dailyStreakIconStatus === 200 && uiAudit.leaderboard.scoreFormatting?.numeric === "1,234,567" && uiAudit.leaderboard.scoreFormatting?.duration === "1d 1h 1m 1s" && uiAudit.leaderboard.scoreFormatting?.storyMode === "12,345" && uiAudit.leaderboard.scoreFormatting?.reaction === "0:01.234" && uiAudit.leaderboard.scoreFormatting?.cookieClicker === "5.34 quintillion" && uiAudit.leaderboard.scoreFormatting?.cookieTenBillion === "10.00 billion" && uiAudit.leaderboard.scoreFormatting?.cookieTwoHundredZeroes === "100.00 sexsexagintillion"],
   ["catalog and cross-tab preferences", !!uiAudit.catalog.ok],
   ["playlists", !!uiAudit.collections.ok],
   ["Daily Pick", !!uiAudit.dailyPick.ok],
