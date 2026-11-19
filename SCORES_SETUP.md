@@ -23,7 +23,7 @@ The Neon Function source imports `pg`. Neon requires the function to be bundled 
 
 The workflow installs `pg`, uses the official Neon CLI bundler, deploys to branch `br-flat-grass-bdhxbnam`, waits for completion, and checks both `/health` and `/scores`. It also runs automatically when files in `neon/functions/arcadeapi/` change on `main`.
 
-Do not put the Neon API key in a repository file, browser JavaScript, or a commit. Until the secret is configured and the workflow succeeds, the currently deployed API may still return a runtime error.
+Do not put the Neon API key in a repository file, browser JavaScript, or a commit. The production API currently responds to `/health`; changes to the Neon Function require the `NEON_API_KEY` repository secret and a successful deployment workflow. Check `/health` and `/scores` after deployment.
 
 ## Database tables
 

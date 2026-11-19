@@ -1158,11 +1158,21 @@ body {font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-se
 .featured-game-info {padding:clamp(24px,4vw,48px)}
 .featured-game-title {font-family:inherit;font-size:clamp(1.7rem,3vw,2.5rem);letter-spacing:-1px;background:none;color:#f5f8ff;-webkit-text-fill-color:initial}
 .featured-game-description {font-family:inherit;font-size:15px;line-height:1.65;color:#b7c4d9}
+.quick-picks-section {margin:0 0 30px;padding:20px 22px 2px;border:1px solid rgba(101,230,194,.18);border-radius:20px;background:linear-gradient(120deg,rgba(20,43,58,.72),rgba(17,28,48,.72))}
+.quick-picks-heading {display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:14px}
+.quick-picks-heading .section-title {margin:0 0 5px}
+.quick-picks-heading p {margin:0;color:#9fb0c7;font:500 13px/1.5 system-ui,sans-serif}
+.quick-picks-section .games-grid {margin-bottom:10px}
+@media(max-width:600px){.quick-picks-section{padding:15px 13px 1px}.quick-picks-heading{align-items:flex-start;flex-direction:column;gap:5px}}
 .play-button {background:var(--accent-pink);color:#092018;border-radius:11px;font-family:inherit;font-size:14px;font-weight:750;box-shadow:none}
 .play-button:hover {background:#8af0d5;box-shadow:0 10px 24px rgba(101,230,194,.2)}
 .section-title,#favorites-heading {font-family:inherit;font-size:13px;letter-spacing:1.8px;text-shadow:none;color:#dce8fa;background:none;-webkit-text-fill-color:initial;text-align:left;margin:34px 0 16px}
 #favorites-heading {color:#f2d58b}
 .games-grid {grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:16px}
+.catalog-load-more{display:block;margin:22px auto 10px;padding:12px 22px;border:1px solid rgba(86,220,180,.4);border-radius:999px;background:linear-gradient(135deg,#183b3a,#172c45);color:#dffbf3;font:800 13px/1 system-ui,sans-serif;cursor:pointer;transition:transform .16s ease,border-color .16s ease,background .16s ease}
+.catalog-load-more:hover{transform:translateY(-2px);border-color:rgba(86,220,180,.8);background:linear-gradient(135deg,#205049,#1c3956)}
+.catalog-load-more:focus-visible{outline:3px solid #74f0ce;outline-offset:3px}
+.catalog-load-more[hidden]{display:none}
 .game-card {background:linear-gradient(155deg,#192741,#121d31);border:1px solid rgba(160,185,220,.13);border-radius:16px;min-height:170px;padding:16px;box-shadow:0 8px 22px rgba(0,0,0,.14)}
 .game-card:hover {background:#1c2d49;border-color:rgba(101,230,194,.5);transform:translateY(-4px);box-shadow:0 16px 30px rgba(0,0,0,.24)}
 .game-card-image {width:78px;height:78px;border-radius:18px;border:1px solid rgba(255,255,255,.12);box-shadow:none}
@@ -1361,6 +1371,11 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
                     <div class="featured-game-image" style="background-image: url('images/rblarge.png')"></div>
                 </div>
 
+                <section id="quick-picks-section" class="quick-picks-section" aria-label="Quick start game picks">
+                    <div class="quick-picks-heading"><div><h2 class="section-title">QUICK START HITS</h2><p>Jump into a familiar favorite or try a new challenge.</p></div></div>
+                    <div id="quick-picks-grid" class="games-grid"></div>
+                </section>
+
                 <h2 id="favorites-heading">FAVORITE GAMES</h2>
                 <div id="favorites-section">
                     <div id="favorites-container">
@@ -1481,6 +1496,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
                 </div>
                 <div class="games-grid" id="all-games-grid">
                 </div>
+                <button type="button" id="catalog-load-more" class="catalog-load-more" aria-controls="all-games-grid" hidden>Show more games</button>
             </div>
         </div>
 
@@ -1504,7 +1520,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
     <div class="container privacy-container">
         <article class="privacy-panel">
             <h1>Privacy Policy</h1>
-            <p class="privacy-date">Effective date: November 11, 2026</p>
+            <p class="privacy-date">Effective date: November 18, 2026</p>
             <p>This Privacy Policy explains how Arcade Atlas ("we," "our," or "the site") handles information when you visit and use the website. Arcade Atlas is a browser-based game site.</p>
             <h2>Information you provide</h2>
             <p>Some games offer leaderboards. If you choose to submit a score or playtime, the player name, game name, score, and/or playtime value you submit may be sent to our leaderboard database and displayed publicly on the site. Do not use your real name or include personal information in a player name.</p>
@@ -1512,7 +1528,8 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
             <h2>Information stored in your browser</h2>
             <p>The site may use browser local storage to remember preferences such as favorite games, custom game playlist names and membership, recently played games, game launch counts, personal game ratings, your player name, locally tracked playtime, local best scores in some individual games (including Simon, Aim Trainer, Stack, Helix Jump, Slither, and Polygon Racer), your Daily Pick launch streak, and Arcade Quests progress (XP and unlocked badges). Playlists store game paths from this catalog so you can filter the catalog to your saved games. The currently selected playlist filter may be remembered in this tab's session so it stays selected if you refresh. You can export your playlists to a JSON backup file or import a backup; imports only keep games that are already in this catalog. Arcade Atlas does not upload playlist data. The Play More Like This shelf uses your favorites, ratings, and repeat launches to suggest games on this device. Arcade Quests records which games you launch on this device so it can track daily goals and lifetime badge milestones, including distinct multiplayer titles; it does not verify that a game was completed. These preferences, playlists, recommendations, and quest records stay on this device and are not sent to Arcade Atlas. They may remain in your browser until you clear the site's data or your browser removes them. Clearing site data may reset these preferences and locally stored totals. The Daily Pick streak records that you opened the featured game; it does not track game completion. If you submit a new personal-best streak, your chosen nickname and streak length appear publicly on the Daily Pick Streak leaderboard.</p>
             <h2>Leaderboards and database</h2>
-            <p>Leaderboard submissions are processed by Supabase, our database service provider. Submitted leaderboard information is used to operate and display game rankings. Because leaderboard entries are public, information you submit there should be treated as public. Database and service-provider handling is also subject to <a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer">Supabase's Privacy Policy</a>.</p>
+            <p>Leaderboard submissions are processed by the Arcade Atlas score API and stored in a Neon PostgreSQL database. Submitted nicknames, game names, scores, and playtime values are displayed publicly, so treat anything you submit as public. Read <a href="https://www.databricks.com/legal/privacynotice" target="_blank" rel="noopener noreferrer">Neon's current provider privacy notice</a> for information about provider handling.</p>
+            <p>A secure, random browser cookie helps associate your submissions with the My Scores page on this browser. It lasts for up to one year and does not contain your name. If you clear cookies or change browsers, Arcade Atlas cannot automatically match your older entries to the new browser identifier. When IP-based abuse prevention is enabled, the score service processes the request IP address and stores a secret-keyed hash in a private database table. Arcade Atlas does not store the readable IP address in its score tables.</p>
             <h2>Analytics and advertising</h2>
             <p>Arcade Atlas uses Google technologies, including Google Tag Manager and Google AdSense. These services may collect information such as browser/device details, approximate location derived from network information, pages visited, and interactions. Google AdSense and its partners may use cookies or similar technologies to show and measure advertisements, subject to your settings, applicable law, and Google's policies.</p>
             <p>Learn more about how Google uses information from sites and apps that use its services at <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener noreferrer">Google's partner-sites policy</a>. You can review Google's <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a> and <a href="https://adssettings.google.com/" target="_blank" rel="noopener noreferrer">ad settings</a>.</p>
@@ -1542,7 +1559,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
                     <a href="https://discord.com/invite/proll" target="_blank" title="Discord">
                         <i class="fab fa-discord"></i>
                     </a>
-                    <a href="https://github.com/prollhouse2" target="_blank" title="GitHub">
+                    <a href="https://github.com/56820-ai/ToTuff4U" target="_blank" rel="noopener noreferrer" title="Arcade Atlas on GitHub">
                         <i class="fab fa-github"></i>
                     </a>
                 </div>
@@ -1628,6 +1645,8 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
     let catalogSearchSequence = 0;
     let activeGameCollectionId = '';
     let catalogShareStatusTimer = 0;
+    let catalogVisibleCount = 48;
+    let currentSortedCatalogGames = [];
     let collectionDialogGame = null;
     let collectionDialogRenameId = '';
     let collectionDialogDeleteId = '';
@@ -2143,10 +2162,26 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
     async function loadGames() {
         if (cachedGames.length) return cachedGames;
         try {
-            const response = await fetch('games.json?v=2026-11-17-player-tags');
+            const response = await fetch('games.json?v=2026-11-18-gnmath-import-2');
             if (!response.ok) throw new Error('Could not load games.json: ' + response.status);
             const data = await response.json();
             cachedGames = Array.isArray(data.games) ? data.games : [];
+            try {
+                const extraResponse = await fetch('gn-math-games.json?v=2026-11-18-gnmath-import-2');
+                if (extraResponse.ok) {
+                    const extraData = await extraResponse.json();
+                    const knownPaths = new Set(cachedGames.map(game => normalizeGamePath(game.path)));
+                    for (const game of Array.isArray(extraData.games) ? extraData.games : []) {
+                        const key = normalizeGamePath(game.path);
+                        if (key && !knownPaths.has(key)) {
+                            cachedGames.push(game);
+                            knownPaths.add(key);
+                        }
+                    }
+                }
+            } catch (extraError) {
+                console.warn('GN Math games could not be loaded; showing the main catalog.', extraError);
+            }
             return cachedGames;
         } catch (error) {
             console.error('Error loading games:', error);
@@ -2532,6 +2567,20 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         if (ranked.length) renderGames(ranked, container);
     }
 
+    function updateQuickPicksSection() {
+        const section = document.getElementById('quick-picks-section');
+        const container = document.getElementById('quick-picks-grid');
+        if (!section || !container) return;
+        const query = document.getElementById('searchInput')?.value?.trim() || '';
+        const category = document.getElementById('categoryFilter')?.value || '';
+        const filteredView = query !== '' || !!category || getFavoritesOnly() || !!activeCatalogMode || !!activeGameCollectionId;
+        const quickPickPaths = new Set(['g/slope', 'g/mc/1.12.2', 'g/subway-surfers', 'g/geodash', 'g/1v1lol', 'g/retro-bowl', 'g/drivemad', 'g/basketballio']);
+        const picks = cachedGames.filter(game => quickPickPaths.has(normalizeGamePath(game.path)));
+        container.innerHTML = '';
+        section.style.display = !filteredView && picks.length ? '' : 'none';
+        if (!filteredView && picks.length) renderGames(picks, container);
+    }
+
     function updateNewGamesSection() {
         const section = document.getElementById('new-games-section');
         const container = document.getElementById('new-games-grid');
@@ -2539,10 +2588,16 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         const query = document.getElementById('searchInput')?.value?.trim() || '';
         const category = document.getElementById('categoryFilter')?.value || '';
         const filteredView = query !== '' || !!category || getFavoritesOnly() || !!activeCatalogMode || !!activeGameCollectionId;
-        const newest = cachedGames.slice(-8).reverse();
+        const newest = getRecentlyAddedGames().reverse();
         container.innerHTML = '';
         section.style.display = newest.length && !filteredView ? '' : 'none';
         if (newest.length && !filteredView) renderGames(newest, container);
+    }
+
+    function getRecentlyAddedGames() {
+        return cachedGames
+            .filter(game => !(Array.isArray(game.tags) && game.tags.includes('GN Math')))
+            .slice(-8);
     }
 
     function updateRecommendationsSection() {
@@ -2611,18 +2666,23 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 
     async function searchGames() {
         const searchSequence = ++catalogSearchSequence;
+        catalogVisibleCount = 48;
         const query = document.getElementById('searchInput').value.toLowerCase().trim();
         const category = (document.getElementById('categoryFilter') || {}).value || '';
         syncCatalogUrl();
         updateCategoryQuickFilters(category, activeCatalogMode);
         const favoritesOnly = getFavoritesOnly();
         const allGamesGrid = document.getElementById('all-games-grid');
+        const loadMoreButton = document.getElementById('catalog-load-more');
+        if (loadMoreButton) loadMoreButton.hidden = true;
+        currentSortedCatalogGames = [];
         const favoritesSection = document.getElementById('favorites-section');
         const favoritesHeading = document.getElementById('favorites-heading');
         const recentSection = document.getElementById('recent-games-section');
         const filteredView = query !== '' || !!category || favoritesOnly || !!activeCatalogMode || !!activeGameCollectionId;
         const dailyPickSection = document.getElementById('daily-pick-section');
         if (dailyPickSection) dailyPickSection.style.display = filteredView ? 'none' : '';
+        updateQuickPicksSection();
         updateNewGamesSection();
 
         if (!filteredView) {
@@ -2653,12 +2713,14 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
             return matchesQuery && matchesCategory && matchesFavorite && matchesMode && matchesCollection;
         });
         const sortedGames = sortGameList(filteredGames);
+        currentSortedCatalogGames = sortedGames;
         const count = document.getElementById('catalogResultsCount');
-        if (count) count.textContent = sortedGames.length + (sortedGames.length === 1 ? ' game' : ' games') + (favoritesOnly ? ' in favorites' : '') + (activeCollection ? ' in ' + activeCollection.name : '');
+        if (count) count.textContent = catalogCountLabel(sortedGames.length, Math.min(catalogVisibleCount, sortedGames.length), favoritesOnly, activeCollection);
         updateCollectionFilterControl(getGameCollections());
 
         if (sortedGames.length) {
-            renderGames(sortedGames, allGamesGrid);
+            catalogVisibleCount = Math.min(catalogVisibleCount, sortedGames.length);
+            renderGames(sortedGames.slice(0, catalogVisibleCount), allGamesGrid);
         } else {
             const message = document.createElement('p');
             message.className = 'empty-games-message';
@@ -2670,7 +2732,33 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
                 : 'No games found. Try a different title or category.';
             allGamesGrid.appendChild(message);
         }
+        updateCatalogLoadMore(allGamesGrid);
         updateMostPlayedSection();
+    }
+
+    function catalogCountLabel(total, visible, favoritesOnly, activeCollection) {
+        const suffix = (favoritesOnly ? ' in favorites' : '') + (activeCollection ? ' in ' + activeCollection.name : '');
+        if (visible < total) return 'Showing ' + visible + ' of ' + total + ' games' + suffix;
+        return total + (total === 1 ? ' game' : ' games') + suffix;
+    }
+
+    function updateCatalogLoadMore(grid) {
+        const button = document.getElementById('catalog-load-more');
+        if (!button) return;
+        const remaining = currentSortedCatalogGames.length - catalogVisibleCount;
+        button.hidden = remaining <= 0;
+        if (button.hidden) return;
+        button.textContent = 'Show 48 more games · ' + remaining + ' remaining';
+        button.onclick = () => {
+            const previousCount = catalogVisibleCount;
+            catalogVisibleCount = Math.min(catalogVisibleCount + 48, currentSortedCatalogGames.length);
+            renderGames(currentSortedCatalogGames.slice(previousCount, catalogVisibleCount), grid);
+            const favoritesOnly = getFavoritesOnly();
+            const activeCollection = getGameCollections().find(collection => collection.id === activeGameCollectionId);
+            const count = document.getElementById('catalogResultsCount');
+            if (count) count.textContent = catalogCountLabel(currentSortedCatalogGames.length, catalogVisibleCount, favoritesOnly, activeCollection);
+            updateCatalogLoadMore(grid);
+        };
     }
 
     function updateCategoryQuickFilters(activeCategory, activeMode) {
@@ -2761,7 +2849,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         const favorites = getFavorites();
         const ratings = getGameRatings();
         const collections = getGameCollections();
-        const newestPaths = new Set(cachedGames.slice(-8).map(game => normalizeGamePath(game.path)));
+        const newestPaths = new Set(getRecentlyAddedGames().map(game => normalizeGamePath(game.path)));
         games.forEach(game => {
             const isFavorite = favorites.some(fav => normalizeGamePath(fav.path) === normalizeGamePath(game.path));
             const gameCard = document.createElement('div');
@@ -2958,7 +3046,6 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         } catch (error) {}
         populateCategoryFilter(allGames);
         
-        const allGamesGrid = document.getElementById("all-games-grid");
         const sortFilter = document.getElementById("sortFilter");
         try {
             const savedSort = localStorage.getItem("arcadeAtlasSortMode");
@@ -2981,13 +3068,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         updateFavoritesFilterButton();
         const favoritesToggle = document.getElementById('favoritesOnlyToggle');
         if (favoritesToggle) favoritesToggle.addEventListener('click', toggleFavoritesOnly);
-        if (getFavoritesOnly() || activeGameCollectionId || new URLSearchParams(window.location.search).has('q') || new URLSearchParams(window.location.search).has('category') || new URLSearchParams(window.location.search).has('mode')) {
-            await searchGames();
-        } else {
-            renderGames(sortGameList(allGames), allGamesGrid);
-            const count = document.getElementById('catalogResultsCount');
-            if (count) count.textContent = allGames.length + ' games';
-        }
+        await searchGames();
 
         updateFavoritesSection();
         updateRecentSection();
@@ -2996,6 +3077,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
         updateArcadeQuests();
         updateCollectionsSection();
         updateDailyPickSection();
+        updateQuickPicksSection();
         updateNewGamesSection();
         const createCollection = document.getElementById('createCollectionButton');
         if (createCollection) createCollection.addEventListener('click', () => openCollectionDialog());

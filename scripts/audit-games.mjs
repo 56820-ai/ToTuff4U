@@ -2,10 +2,18 @@ import { chromium } from "playwright";
 import { readFile, writeFile, appendFile } from "node:fs/promises";
 
 const BASE = "http://127.0.0.1:4173/ToTuff4U";
-const gamesData = JSON.parse(await readFile("games.json", "utf8"));
-const catalog = Array.isArray(gamesData.games) ? gamesData.games : [];
+const baseGamesData = JSON.parse(await readFile("games.json", "utf8"));
+const gnMathData = JSON.parse(await readFile("gn-math-games.json", "utf8"));
+const gamesData = { ...baseGamesData, games: [
+  ...(Array.isArray(baseGamesData.games) ? baseGamesData.games : []),
+  ...(Array.isArray(gnMathData.games) ? gnMathData.games : [])
+] };
+const catalog = gamesData.games;
+const localPageCatalog = catalog.filter(game => !/^https?:\/\//i.test(String(game.path || "")));
+const imageCatalog = catalog.filter(game => String(game.image || "").trim());
 const browser = await chromium.launch({
   headless: true,
+  executablePath: process.env.ARCADE_CHROMIUM_PATH || undefined,
   args: ["--no-sandbox", "--disable-dev-shm-usage", "--enable-webgl", "--ignore-gpu-blocklist", "--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader"]
 });
 // The Chromium audit uses software WebGL so GPU-backed arcade games can be checked in CI.
@@ -40,6 +48,20 @@ function categoryFor(value) {
 function normalizeTitle(value) {
   return String(value || "").toLowerCase().replace(/[^a-z0-9]/g, "");
 }
+function normalizeDuplicateTitle(value) {
+  let normalized = String(value || "").toLowerCase()
+    .replace(/^\s*the\b/, "")
+    .replace(/\b(?:versus|vs|v)\b/g, "vs")
+    .replace(/[^a-z0-9]/g, "")
+    .replace(/capatalist/g, "capitalist");
+  const aliases = {
+    justfalllol: "justfall",
+    slitherio: "slither",
+    timeshooter1: "timeshooter",
+    rooftopsnipers: "rooftopsniper"
+  };
+  return aliases[normalized] || normalized;
+}
 function slugFromGame(game) {
   const query = String(game?.path || "").split("?")[1] || "";
   const match = query.match(/(?:^|&)title=([^&]*)/);
@@ -68,7 +90,7 @@ function formatGameTitle(value) {
 }
 function suitableForMiddleSchool(app) {
   const text = [app?.title, app?.categories, app?.description].flat().join(" ").toLowerCase();
-  return !/(horror|gore|blood|adult|nsfw|sexual|nudity|casino|gambling|mortal.?kombat|doom|omori|fnaf|five.?nights|granny|poppy.?playtime|ultrakill|doki.?doki|pokemon|super.?mario|street.?fighter|portal|animal.?crossing|grand.?theft|gta|roblox|fortnite|among.?us|super.?smash|hollow.?knight|pizza.?tower|twerk|poop.?clicker|happy.?wheels|binding.?of.?isaac|backrooms|backdooms)/i.test(text);
+  return !/(horror|gore|blood|adult|nsfw|sexual|nudity|casino|gambling|mortal.?kombat|doom|omori|fnaf|five.?nights|granny|poppy.?playtime|ultrakill|doki.?doki|pokemon|super.?mario|street.?fighter|portal|animal.?crossing|grand.?theft|gta|roblox|fortnite|among.?us|super.?smash|hollow.?knight|pizza.?tower|twerk|poop.?clicker|happy.?wheels|binding.?of.?isaac|backrooms|backdooms|creepypasta|sonic.?exe|scary.?shawarma|garten.?of.?banban|joy.?of.?creation|roam0120)/i.test(text);
 }
 function normalizeIcon(icon) {
   if (typeof icon !== "string" || !icon.trim()) return "";
@@ -103,6 +125,17 @@ async function checkGame(game) {
     }
   } catch (e) {
     navigationError = String(e.message || e).slice(0, 260);
+    // A few pages finish their initial document load just after Playwright's
+    // navigation deadline. Retry at the response-commit boundary, then wait
+    // briefly for DOM readiness before classifying the page as failed.
+    try {
+      response = await page.goto(url, { waitUntil: "commit", timeout: 12000 });
+      await page.waitForLoadState("domcontentloaded", { timeout: 8000 });
+      navigationError = "";
+      await page.waitForTimeout(900);
+    } catch (retryError) {
+      navigationError += " | retry: " + String(retryError.message || retryError).slice(0, 180);
+    }
   }
   const status = response ? response.status() : null;
   const title = await page.title().catch(() => "");
@@ -155,9 +188,9 @@ async function checkGame(game) {
 }
 
 // Verify every catalog logo actually loads in Chromium.
-progress(`Starting logo checks for ${catalog.length} catalog entries.`);
+progress(`Starting logo checks for ${imageCatalog.length} local and remote catalog images.`);
 const logoPage = await browser.newPage();
-const logoUrls = catalog.map(game => {
+const logoUrls = imageCatalog.map(game => {
   const image = String(game.image || "");
   const remote = image.startsWith("https://") || image.startsWith("http://") ||
     image.startsWith("data:") || image.startsWith("blob:");
@@ -198,17 +231,17 @@ progress(`Logo checks finished: ${logoAudit.filter(x => x.ok).length}/${logoAudi
 const workers = 6;
 let cursor = 0;
 let completedGames = 0;
-progress(`Starting Chromium checks for ${catalog.length} games using ${workers} workers.`);
+progress(`Starting Chromium checks for ${localPageCatalog.length} locally hosted games using ${workers} workers.`);
 await Promise.all(Array.from({ length: workers }, async () => {
-  while (cursor < catalog.length) {
+  while (cursor < localPageCatalog.length) {
     const i = cursor++;
     try {
-      results[i] = await checkGame(catalog[i]);
+      results[i] = await checkGame(localPageCatalog[i]);
     } catch (error) {
-      results[i] = { title: catalog[i]?.title || `Catalog entry ${i + 1}`, url: gameUrl(catalog[i] || {}), status: null, pageTitle: "", mainFrameUrl: "", hardFailure: true, navigationError: String(error?.stack || error).slice(0, 500), localFailures: [], missingCoreAssets: [], criticalPageErrors: [], failedGameFrames: [], externalFailures: [], pageErrors: [], iframeSources: [], canvasCount: 0, missingCanvas: false };
+      results[i] = { title: localPageCatalog[i]?.title || `Catalog entry ${i + 1}`, url: gameUrl(localPageCatalog[i] || {}), status: null, pageTitle: "", mainFrameUrl: "", hardFailure: true, navigationError: String(error?.stack || error).slice(0, 500), localFailures: [], missingCoreAssets: [], criticalPageErrors: [], failedGameFrames: [], externalFailures: [], pageErrors: [], iframeSources: [], canvasCount: 0, missingCanvas: false };
     }
     completedGames++;
-    progress(`Game checks: ${completedGames}/${catalog.length} complete${results[i].hardFailure ? ` (failed: ${results[i].title})` : ""}.`);
+    progress(`Game checks: ${completedGames}/${localPageCatalog.length} complete${results[i].hardFailure ? ` (failed: ${results[i].title})` : ""}.`);
   }
 }));
 progress("All catalog game checks finished; starting interface and gameplay tests.");
@@ -271,6 +304,12 @@ try {
   });
   await page.locator('.nav-item[data-page="home"]').click();
   await page.waitForFunction(() => document.getElementById("home-content")?.classList.contains("active"), undefined, { timeout: 5000 });
+  const catalogInitialCardCount = await page.locator("#all-games-grid .game-card").count();
+  const catalogLoadMoreVisible = await page.locator("#catalog-load-more").isVisible();
+  if (catalogLoadMoreVisible) await page.locator("#catalog-load-more").click();
+  await page.waitForFunction(() => document.querySelectorAll("#all-games-grid .game-card").length === 96, undefined, { timeout: 5000 });
+  const catalogLoadMoreWorks = catalogInitialCardCount === 48 && catalogLoadMoreVisible &&
+    await page.locator("#catalogResultsCount").textContent().then(text => String(text || "").startsWith("Showing 96 of "));
   await page.waitForFunction(() => { const section = document.getElementById("daily-pick-section"); return section && getComputedStyle(section).display !== "none"; }, undefined, { timeout: 10000 });
   const dailyStreakLink = page.locator("#daily-pick-leaderboard-link");
   const dailyStreakLinkVisible = await dailyStreakLink.isVisible();
@@ -398,7 +437,7 @@ try {
     mostPlayedHiddenAfterReload &&
     mostPlayedVisibleAfterClear &&
     quickFilterActive && quickFilterCleared && sharedFiltersLoaded && shareLinkCopied && shareUrlValid && dailyStreakLinkWorks && crossTabPreferencesSynced &&
-    newGamesShelfVisible && newGamesShelfCount === 8 && newestShelfTitle === gamesData.games[gamesData.games.length - 1]?.title && newGamesShelfHiddenByFilter && newGamesShelfRestored;
+    newGamesShelfVisible && newGamesShelfCount === 8 && newestShelfTitle === baseGamesData.games[baseGamesData.games.length - 1]?.title && newGamesShelfHiddenByFilter && newGamesShelfRestored && catalogLoadMoreWorks;
   uiAudit.catalog = {
     status: response?.status() || null,
     favoriteButton,
@@ -421,6 +460,9 @@ try {
     newGamesShelfVisible,
     newGamesShelfCount,
     newestShelfTitle,
+    catalogInitialCardCount,
+    catalogLoadMoreVisible,
+    catalogLoadMoreWorks,
     newGamesShelfHiddenByFilter,
     newGamesShelfRestored,
     errors,
@@ -558,7 +600,7 @@ try {
   await page.locator('#collection-form').evaluate(form => form.requestSubmit());
   await page.waitForFunction(() => !JSON.parse(localStorage.getItem("arcadeAtlasCollectionsV1") || "[]").some(item => item.name === "Arcade Favorites"), undefined, { timeout: 4000 });
   collectionsStage = "waitForFunction #4"; await syncPage.waitForFunction(() => document.getElementById("clearCollectionFilter")?.style.display === "none", undefined, { timeout: 4000 });
-  collectionsStage = "waitForFunction #5"; await syncPage.waitForFunction(() => document.getElementById("catalogResultsCount")?.textContent === "100 games", undefined, { timeout: 4000 });
+  collectionsStage = "waitForFunction #5"; await syncPage.waitForFunction(() => document.getElementById("catalogResultsCount")?.textContent === "Showing 48 of " + cachedGames.length + " games", undefined, { timeout: 4000 });
   const deleted = await page.locator('#collections-grid .collection-card').count() === 1 &&
     (await page.locator('#collections-grid h3').textContent()) === "Co-op Night";
   const crossTabSynced = secondTabCollections === 2;
@@ -829,86 +871,45 @@ await runArcadeSmokeTest("polygonRacer", "/g/polygon-racer/", "#c", async page =
 });
 
 progress("Gameplay checks finished; preparing audit report.");
-// DuckMath is backed by its own live catalog service. Verify its app list and
-// test each returned game's page wrapper before adding it to Arcade Atlas.
-const duckmath = { homeStatus: null, dynamicCards: 0, cachedApps: 0, checked: 0, verified: [], broken: [], excludedForAge: [], error: "" };
-let additions = [];
-// DuckMath catalog importing is intentionally disabled: Arcade Atlas removed all DuckMath games.
-
-
-const failedTitles = new Set(results.filter(r => r.hardFailure).map(r => normalizeTitle(r.title)));
-const removedBrokenGames = gamesData.games.filter(g => failedTitles.has(normalizeTitle(g.title)));
-gamesData.games = gamesData.games.filter(g => !failedTitles.has(normalizeTitle(g.title)));
-
-const importedEntries = gamesData.games.filter(g => String(g.path || "").startsWith("duckmath-site/g4m3s/"));
-const nativeEntries = gamesData.games.filter(g => !String(g.path || "").startsWith("duckmath-site/g4m3s/"));
-const nativeKeys = new Set(nativeEntries.map(g => normalizeTitle(g.title)));
-const excludedKeys = new Set(duckmath.excludedForAge.map(normalizeTitle));
-const seenTitles = new Set(nativeKeys);
-const keptImported = [];
-const removedUnsuitableDuckMath = [];
-const removedDuplicateDuckMath = [];
-for (const game of importedEntries) {
-  const slug = slugFromGame(game);
-  const key = normalizeTitle(slug);
-  if (excludedKeys.has(key) || !suitableForMiddleSchool({ title: slug })) {
-    removedUnsuitableDuckMath.push(game.title);
-    continue;
-  }
-  if (seenTitles.has(key)) {
-    removedDuplicateDuckMath.push(game.title);
-    continue;
-  }
-  game.title = formatGameTitle(slug);
-  seenTitles.add(key);
-  keptImported.push(game);
-}
-gamesData.games = [...nativeEntries, ...keptImported];
-const existing = new Set(gamesData.games.map(g => normalizeTitle(g.title)));
-const uniqueAdditions = additions.filter((game, index, array) => {
-  const key = normalizeTitle(slugFromGame(game));
-  if (existing.has(key)) return false;
-  existing.add(key);
-  return array.findIndex(item => normalizeTitle(slugFromGame(item)) === key) === index;
-});
-if (uniqueAdditions.length) gamesData.games.push(...uniqueAdditions);
-if (removedBrokenGames.length || removedUnsuitableDuckMath.length || removedDuplicateDuckMath.length || uniqueAdditions.length) {
-  await writeFile("games.json", JSON.stringify(gamesData, null, 2) + "\n");
-}
+const gnMathUniqueTitles = new Set(gnMathData.games.map(game => normalizeDuplicateTitle(game.title)));
+const baseTitleKeys = new Set(baseGamesData.games.map(game => normalizeDuplicateTitle(game.title)));
+const sourceValidation = {
+  importedCount: gnMathData.games.length,
+  uniqueTitles: gnMathUniqueTitles.size === gnMathData.games.length,
+  noExistingTitleDuplicates: gnMathData.games.every(game => !baseTitleKeys.has(normalizeTitle(game.title))),
+  validGameUrls: gnMathData.games.every(game => /^https:\/\/gn-math\.github\.io\/html\/[\w.-]+\.html(?:-[\w]+)?$/.test(game.path)),
+  validCoverUrls: gnMathData.games.every(game => /^https:\/\/raw\.githubusercontent\.com\/gn-math\/covers\/main\/\d+(?:-[\w]+)?\.(?:png|gif|webp|jpe?g)$/.test(game.image)),
+  middleSchoolSuitable: gnMathData.games.every(suitableForMiddleSchool),
+  sourceRepository: "https://github.com/gn-math/html"
+};
 const report = {
   generatedAt: new Date().toISOString(),
   catalogCount: catalog.length,
+  locallyHostedGameChecks: results.length,
+  gnMathSourceValidation: sourceValidation,
   catalogPassed: results.filter(r => !r.hardFailure).length,
   catalogFailed: results.filter(r => r.hardFailure),
   catalogWarnings: results.filter(r => r.pageErrors.length || r.externalFailures.length || r.localFailures.length),
-  removedBrokenGames: removedBrokenGames.map(g => g.title),
-  removedUnsuitableDuckMath,
-  removedDuplicateDuckMath,
+  removedBrokenGames: [],
   logoAudit,
   brokenLogos: logoAudit.filter(x => !x.ok),
-  duckmath,
   uiAudit,
-  duckmathAddedToArcadeAtlas: uniqueAdditions.map(g => g.title)
+  gnMathAddedToArcadeAtlas: gnMathData.games.length
 };
 await writeFile("arcade-atlas-game-audit.json", JSON.stringify(report, null, 2) + "\n");
 if (process.env.GITHUB_STEP_SUMMARY) {
   const summary = [
     "# Arcade Atlas browser audit",
     "",
-    `- Arcade Atlas entries tested: ${report.catalogCount}`,
-    `- Arcade Atlas pages passing hard checks: ${report.catalogPassed}`,
+    `- Arcade Atlas entries in merged catalog: ${report.catalogCount}`,
+    `- Locally hosted game pages opened in Chromium: ${report.locallyHostedGameChecks}`,
+    `- GN Math links, cover formats, and duplicate checks valid: ${sourceValidation.validGameUrls && sourceValidation.validCoverUrls && sourceValidation.uniqueTitles && sourceValidation.noExistingTitleDuplicates}`,
+    `- Distinct GN Math games in supplemental feed: ${sourceValidation.importedCount}`,
+    `- Locally hosted game pages passing hard checks: ${report.catalogPassed}`,
     `- Arcade Atlas hard failures: ${report.catalogFailed.length}`,
-    `- Broken Arcade Atlas games removed: ${removedBrokenGames.length}`,
-    `- Unsuitable DuckMath catalog entries removed: ${removedUnsuitableDuckMath.length}`,
-    `- Duplicate DuckMath catalog entries removed: ${removedDuplicateDuckMath.length}`,
+    `- Broken games removed by this audit: 0 (read-only catalog audit)`,
     `- Catalog logos checked: ${logoAudit.length}`,
     `- Broken catalog logos: ${report.brokenLogos.length}`,
-    `- DuckMath dynamic games found: ${duckmath.cachedApps}`,
-    `- DuckMath game pages tested: ${duckmath.checked}`,
-    `- DuckMath game pages verified: ${duckmath.verified.length}`,
-    `- DuckMath game pages not verified: ${duckmath.broken.length}`,
-    `- DuckMath titles excluded for middle-school suitability: ${duckmath.excludedForAge.length}`,
-    `- New DuckMath games added to Arcade Atlas: ${uniqueAdditions.length}`,
     `- Leaderboard logo map loaded: ${uiAudit.leaderboard.logoCount || 0}`,
     `- Daily Pick streak icon loaded: ${uiAudit.leaderboard.dailyStreakLogo === "../images/daily-pick-streak.svg" && uiAudit.leaderboard.dailyStreakIconStatus === 200}`,
     `- Blocky Combat timer detected: ${!!uiAudit.blockyCombat.timer}`,
@@ -925,6 +926,7 @@ if (process.env.GITHUB_STEP_SUMMARY) {
     `- Catalog filters, favorites, share links, Daily Pick leaderboard navigation, and cross-tab preference tests passed: ${!!uiAudit.catalog.ok}`,
     `- Quick category filter UI smoke test passed: ${!!uiAudit.catalog.quickFiltersOk}`,
     `- New Games shelf displays the newest eight games and respects filters: ${!!uiAudit.catalog.newGamesShelfRestored && !!uiAudit.catalog.newGamesShelfHiddenByFilter}`,
+    `- Catalog load-more renders the next 48 cards: ${!!uiAudit.catalog.catalogLoadMoreWorks}`,
     `- Custom playlist create, backup, restore, filter persistence, random play, cross-tab sync, rename, delete, and import-limit tests passed: ${!!uiAudit.collections.ok}`,
     `- Daily Pick rotation and streak test passed: ${!!uiAudit.dailyPick.ok}`,
     `- Connect Four two-player board smoke test passed: ${!!uiAudit.connectFour.ok}`,
@@ -938,8 +940,6 @@ if (process.env.GITHUB_STEP_SUMMARY) {
     "## Arcade Atlas hard failures",
     ...report.catalogFailed.map(x => `- ${x.title}: HTTP ${x.status || "no response"}; ${x.navigationError || x.localFailures.map(y => y.url).join(", ")}`),
     "",
-    "## DuckMath games not verified",
-    ...duckmath.broken.slice(0, 80).map(x => `- ${x.title}: ${x.error}`),
     ""
   ].join("\n");
   await appendFile(process.env.GITHUB_STEP_SUMMARY, summary);
@@ -950,11 +950,8 @@ console.log(JSON.stringify({
   catalogPassed: report.catalogPassed,
   catalogFailed: report.catalogFailed.length,
   removedBrokenGames: report.removedBrokenGames.length,
-  duckmathFound: duckmath.cachedApps,
-  duckmathVerified: duckmath.verified.length,
-  duckmathBroken: duckmath.broken.length,
-  added: uniqueAdditions.length,
-  duckmathError: duckmath.error,
+  gnMathImported: sourceValidation.importedCount,
+  gnMathUrlsValid: sourceValidation.validGameUrls && sourceValidation.validCoverUrls && sourceValidation.uniqueTitles && sourceValidation.noExistingTitleDuplicates,
   catalogUiOk: !!uiAudit.catalog.ok,
   collectionsUiOk: !!uiAudit.collections.ok,
   dailyPickOk: !!uiAudit.dailyPick.ok,

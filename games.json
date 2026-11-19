@@ -2,17 +2,21 @@
   "games": [
     {
       "title": "Tag",
-      "path": "g/tag",
-      "image": "./images/tag-card.webp",
+      "path": "https://gn-math.github.io/html/627-fix3.html",
+      "image": "https://raw.githubusercontent.com/gn-math/covers/main/627.png",
       "category": "ARCADE",
-      "description": "Chase and dodge in this local multiplayer game for 2–4 players.",
+      "description": "Chase and dodge with 2–4 players across colorful arenas with trampolines and teleporters. Original game by WeLoPlay.",
       "tags": [
-        "multiplayer",
+        "GN Math",
+        "local multiplayer",
         "local multiplayer",
         "party",
         "tag"
       ],
-      "players": "2–4"
+      "players": "2–4",
+      "developer": "WeLoPlay",
+      "developerUrl": "https://www.weloplay.com/",
+      "sourceRepository": "https://github.com/gn-math/html"
     },
     {
       "title": "Egg Rush",
@@ -55,7 +59,8 @@
       "title": "Gunspin",
       "path": "g/gunspin",
       "image": "./images/gunspin-card.webp",
-      "category": "ACTION"
+      "category": "ACTION",
+      "description": "Fire at the right angle and use each shot’s recoil to launch your weapon as far as possible."
     },
     {
       "title": "1v1.lol",
@@ -68,19 +73,22 @@
       "title": "Idle Breakout",
       "path": "g/idle-breakout",
       "image": "./images/idle-breakout-card.webp",
-      "category": "IDLE"
+      "category": "IDLE",
+      "description": "Upgrade a growing set of balls to break through numbered blocks automatically."
     },
     {
       "title": "Learn To Fly",
       "path": "g/learntofly/1",
       "image": "./images/learntofly-card.webp",
-      "category": "ARCADE"
+      "category": "ARCADE",
+      "description": "Build and upgrade a penguin’s glider, then launch from a ramp and try to fly farther."
     },
     {
       "title": "Baldi's Basics",
       "path": "g/baldisbasics",
       "image": "./images/baldisbasics-card.webp",
-      "category": "HORROR"
+      "category": "HORROR",
+      "description": "Explore a strange school, collect notebooks, and solve classroom puzzles while avoiding the teacher."
     },
     {
       "title": "Gun Mayhem",
@@ -92,7 +100,8 @@
         "local multiplayer",
         "platform fighter"
       ],
-      "players": "2–4"
+      "players": "2–4",
+      "description": "Battle computer opponents in a fast platform arena and knock them off the stage."
     },
     {
       "title": "Gun Mayhem 2",
@@ -104,13 +113,15 @@
         "local multiplayer",
         "platform fighter"
       ],
-      "players": "2–4"
+      "players": "2–4",
+      "description": "Choose a character and arena, then outmaneuver opponents in chaotic platform battles."
     },
     {
       "title": "Wall Smash",
       "path": "g/wallsmash",
       "image": "./images/wallsmash-card.webp",
-      "category": "ARCADE"
+      "category": "ARCADE",
+      "description": "Aim and launch through breakable walls while steering around obstacles."
     },
     {
       "title": "Drift Boss",
@@ -123,7 +134,8 @@
       "title": "Jack Smith",
       "path": "g/jacksmith",
       "image": "./images/jacksmith-card.webp",
-      "category": "ADVENTURE"
+      "category": "ADVENTURE",
+      "description": "Forge custom weapons to fill orders, then help a team of heroes on their adventure."
     },
     {
       "title": "Infinite Craft",
@@ -136,7 +148,8 @@
       "title": "Lazy Jump 3D",
       "path": "g/lazyjump3d",
       "image": "./images/lazyjump3d-card.webp",
-      "category": "ARCADE"
+      "category": "ARCADE",
+      "description": "Time each tap to make a floppy character jump, tumble, and land near the goal."
     },
     {
       "title": "House Of Hazards",
@@ -148,7 +161,8 @@
         "local multiplayer",
         "party"
       ],
-      "players": "2–4"
+      "players": "2–4",
+      "description": "Race through a home obstacle course while avoiding traps and competing to finish tasks."
     },
     {
       "title": "Hole.io",
@@ -166,25 +180,29 @@
         "multiplayer",
         "local multiplayer",
         "sports"
-      ]
+      ],
+      "description": "Play quick, unpredictable volleyball rounds with changing ball physics and court conditions."
     },
     {
       "title": "Draw The Hill",
       "path": "g/draw-the-hill",
       "image": "./images/draw-the-hill-card.webp",
-      "category": "PUZZLE"
+      "category": "PUZZLE",
+      "description": "Sketch a path for your vehicle and guide it over hills without crashing."
     },
     {
       "title": "Basketball Bros",
       "path": "g/basketballio",
       "image": "./images/basketballio-card.webp",
-      "category": "SPORTS"
+      "category": "SPORTS",
+      "description": "Take the court in quick basketball matches with arcade-style movement and shots."
     },
     {
       "title": "Just Fall",
       "path": "g/justfall",
       "image": "./images/justfall-card.webp",
-      "category": "ARCADE"
+      "category": "ARCADE",
+      "description": "Steer a jelly character across a series of platforms and avoid falling out of the arena."
     },
     {
       "title": "Snow Rider 3D",
@@ -204,25 +222,29 @@
       "title": "Checkout Frenzy",
       "path": "g/checkoutfrenzy",
       "image": "./images/checkoutfrenzy-card.webp",
-      "category": "SIMULATION"
+      "category": "SIMULATION",
+      "description": "Scan items and keep the checkout line moving in a fast-paced shop challenge."
     },
     {
       "title": "Tiny Fishing",
       "path": "g/tinyfishing",
       "image": "./images/tinyfishing-card.webp",
-      "category": "CASUAL"
+      "category": "CASUAL",
+      "description": "Cast your line, catch fish, and earn upgrades that help you reach deeper waters."
     },
     {
       "title": "Time Shooter",
       "path": "g/timeshooter/1",
       "image": "./images/timeshooter-card.webp",
-      "category": "ACTION"
+      "category": "ACTION",
+      "description": "Move through a tactical arena where time advances when you move, then dodge and outsmart opponents."
     },
     {
       "title": "Getaway Shootout",
       "path": "g/getaway-shootout",
       "image": "./images/getaway-shootout-card.webp",
-      "category": "ACTION"
+      "category": "ACTION",
+      "description": "Race other players through a side-scrolling obstacle course using short hops and quick decisions."
     },
     {
       "title": "Soccer Random",
@@ -233,7 +255,8 @@
         "multiplayer",
         "local multiplayer",
         "sports"
-      ]
+      ],
+      "description": "Score goals in short, physics-driven soccer matches where each round changes the rules."
     },
     {
       "title": "Rooftop Sniper",
@@ -244,7 +267,8 @@
         "multiplayer",
         "local multiplayer",
         "platform fighter"
-      ]
+      ],
+      "description": "Compete in one-on-one rooftop duels and try to push your opponent off the building."
     },
     {
       "title": "Boxing Random",
@@ -255,19 +279,22 @@
         "multiplayer",
         "local multiplayer",
         "sports"
-      ]
+      ],
+      "description": "Trade goofy punches in short boxing rounds with changing arenas and physics."
     },
     {
       "title": "Adventure Capitalist",
       "path": "g/adventurecapitalist",
       "image": "./images/adventurecapitalist-card.webp",
-      "category": "IDLE"
+      "category": "IDLE",
+      "description": "Invest in businesses, hire managers, and grow a playful money-making empire."
     },
     {
       "title": "MonkeyMart",
       "path": "g/monkey-mart",
       "image": "./images/monkey-mart-card.webp",
-      "category": "SIMULATION"
+      "category": "SIMULATION",
+      "description": "Grow crops, stock store shelves, and expand a busy supermarket as a helpful monkey."
     },
     {
       "title": "Bloons TD5",
@@ -280,13 +307,15 @@
       "title": "Mr Mine",
       "path": "g/mrmine",
       "image": "./images/mrmine-card.webp",
-      "category": "IDLE"
+      "category": "IDLE",
+      "description": "Dig deeper, collect resources, and upgrade equipment in an incremental mining adventure."
     },
     {
       "title": "Run 2",
       "path": "g/run2",
       "image": "./images/run2-card.webp",
-      "category": "ARCADE"
+      "category": "ARCADE",
+      "description": "Guide a runner through a 3D space course, switch gravity, and reach the exit without falling."
     },
     {
       "title": "Run 3",
@@ -299,14 +328,23 @@
       "title": "Spend Elon's Money",
       "path": "g/elonmusk",
       "image": "./images/elonmusk-card.webp",
-      "category": "SIMULATION"
+      "category": "SIMULATION",
+      "description": "Explore a playful shopping challenge by spending a huge fictional fortune on different items."
     },
     {
-      "title": "Plants V Zombies",
-      "path": "g/pvz",
-      "image": "./images/pvz-card.webp",
+      "title": "Plants vs Zombies",
+      "path": "https://gn-math.github.io/html/232-fix2.html",
+      "image": "https://raw.githubusercontent.com/gn-math/covers/main/232.png",
       "category": "STRATEGY",
-      "description": "Place plants with different abilities to defend your garden from silly zombies."
+      "description": "Play Plants vs Zombies in your browser — by PopCap Games. Hosted by GN Math.",
+      "tags": [
+        "GN Math",
+        "strategy",
+        "PopCap Games"
+      ],
+      "developer": "PopCap Games",
+      "developerUrl": "https://www.ea.com/ea-studios/popcap/plants-vs-zombies",
+      "sourceRepository": "https://github.com/gn-math/html"
     },
     {
       "title": "Duck Life",
@@ -319,25 +357,29 @@
       "title": "Mine Sweeper",
       "path": "g/minesweeper",
       "image": "images/minesweeper-card.webp",
-      "category": "PUZZLE"
+      "category": "PUZZLE",
+      "description": "Reveal safe squares and use number clues to locate every hidden mine."
     },
     {
       "title": "N Gon",
       "path": "g/ngon",
       "image": "./images/ngon-card.webp",
-      "category": "ACTION"
+      "category": "ACTION",
+      "description": "Swing and tumble through a minimalist obstacle course while avoiding spikes and gaps."
     },
     {
       "title": "Black Jack",
       "path": "g/blackjack",
       "image": "./images/blackjack-card.webp",
-      "category": "CARD"
+      "category": "CARD",
+      "description": "Play a simple card game and try to get closer to 21 than the dealer without going over."
     },
     {
       "title": "DBZ Devolution",
       "path": "g/dbz",
       "image": "./images/dbz-card.webp",
-      "category": "FIGHTING"
+      "category": "FIGHTING",
+      "description": "Explore a fan-made fighting adventure with side-view combat and familiar anime-inspired characters."
     },
     {
       "title": "Drive Mad",
@@ -357,13 +399,15 @@
       "title": "Stickman Golf",
       "path": "g/stickman-golf",
       "image": "./images/stickman-golf-card.webp",
-      "category": "SPORTS"
+      "category": "SPORTS",
+      "description": "Aim each shot carefully and guide a stick-figure golfer through compact courses."
     },
     {
       "title": "Bitlife",
       "path": "g/bitlife",
       "image": "./images/bitlife-card.webp",
-      "category": "SIMULATION"
+      "category": "SIMULATION",
+      "description": "Make choices across a fictional character’s life and see how each decision changes the story."
     },
     {
       "title": "Subway Surfers",
@@ -381,7 +425,8 @@
         "multiplayer",
         "local multiplayer",
         "sports"
-      ]
+      ],
+      "description": "Play short arcade basketball rounds with unpredictable physics and changing court setups."
     },
     {
       "title": "MotoX3M",
@@ -394,25 +439,29 @@
       "title": "Cookie Clicker",
       "path": "g/cookieclicker",
       "image": "./images/cookieclicker-card.webp",
-      "category": "IDLE"
+      "category": "IDLE",
+      "description": "Bake cookies with each click, then buy upgrades that grow your cookie production."
     },
     {
       "title": "Temple Run 2",
       "path": "g/temple-run-2",
       "image": "./images/temple-run-2-card.webp",
-      "category": "ENDLESS RUNNER"
+      "category": "ENDLESS RUNNER",
+      "description": "Sprint through an ancient temple, turn at the right moments, and dodge hazards while collecting coins."
     },
     {
       "title": "CSGO Case Opener",
       "path": "g/case-clicker",
       "image": "./images/case-clicker-card.webp",
-      "category": "SIMULATION"
+      "category": "SIMULATION",
+      "description": "Open virtual item cases and browse randomized cosmetic drops in a simulated case-opening game."
     },
     {
       "title": "Pandemic 2",
       "path": "g/pandemic2",
       "image": "./images/pandemic2-card.webp",
-      "category": "STRATEGY"
+      "category": "STRATEGY",
+      "description": "Manage a fictional disease simulation by choosing traits and watching how it spreads around the world."
     },
     {
       "title": "Jetpack Joyride",
@@ -432,95 +481,110 @@
       "title": "Duck Life 1",
       "path": "g/ducklife1",
       "image": "./images/ducklife1-card.webp",
-      "category": "SIMULATION"
+      "category": "SIMULATION",
+      "description": "Train a duck’s running, flying, swimming, and climbing skills to compete in races."
     },
     {
       "title": "Snake",
       "path": "g/snake",
       "image": "./images/snake-card.webp",
-      "category": "ARCADE"
+      "category": "ARCADE",
+      "description": "Guide a growing snake around the board, collect food, and avoid hitting walls or its own tail."
     },
     {
       "title": "Breakout",
       "path": "g/breakout",
       "image": "images/breakout-card.webp",
-      "category": "ARCADE"
+      "category": "ARCADE",
+      "description": "Bounce a ball off your paddle to clear rows of bricks without letting it fall."
     },
     {
       "title": "Memory Match",
       "path": "g/memory-match",
       "image": "./images/memory-match-card.webp",
-      "category": "PUZZLE"
+      "category": "PUZZLE",
+      "description": "Flip cards and remember their locations to find every matching pair."
     },
     {
       "title": "Reaction Test",
       "path": "g/reaction-test",
       "image": "./images/reaction-test-card.webp",
-      "category": "ARCADE"
+      "category": "ARCADE",
+      "description": "Wait for the signal, then click as quickly as you can to measure your reaction time."
     },
     {
       "title": "They Are Coming",
       "path": "g/they-are-coming",
       "image": "./images/they-are-coming-card.webp",
-      "category": "ACTION"
+      "category": "ACTION",
+      "description": "Defend against waves of opponents by choosing gear and holding your ground."
     },
     {
       "title": "Hextris",
       "path": "g/hextris",
       "image": "./images/hextris-card.webp",
       "category": "PUZZLE",
-      "source": "https://github.com/Hextris/hextris"
+      "source": "https://github.com/Hextris/hextris",
+      "description": "Rotate the central hexagon to match incoming colored blocks and clear growing stacks."
     },
     {
       "title": "A Dark Room",
       "path": "g/a-dark-room",
       "image": "images/a-dark-room-card.webp",
       "category": "ADVENTURE",
-      "source": "https://github.com/doublespeakgames/adarkroom"
+      "source": "https://github.com/doublespeakgames/adarkroom",
+      "description": "Build a settlement one decision at a time in a quiet, text-led exploration game."
     },
     {
       "title": "HexGL",
       "path": "g/hexgl",
       "image": "./images/hexgl-card.webp",
       "category": "RACING",
-      "source": "https://github.com/BKcore/HexGL"
+      "source": "https://github.com/BKcore/HexGL",
+      "description": "Steer a high-speed futuristic craft around a 3D track and try to set a faster lap."
     },
     {
       "title": "Arcade 3D",
       "path": "g/arcade-3d",
       "image": "./images/arcade-3d-card.webp",
       "category": "ACTION",
-      "source": "https://github.com/webgl-games/arcade-3d"
+      "source": "https://github.com/webgl-games/arcade-3d",
+      "description": "Choose a compact arcade challenge and use quick reflexes to beat each round."
     },
     {
       "title": "Duck Life 5",
       "path": "g/ducklife5",
       "image": "./images/ducklife5-card.webp",
-      "category": "SIMULATION"
+      "category": "SIMULATION",
+      "description": "Train a duck, explore a colorful world, and take on races and mini-games."
     },
     {
       "title": "Flappy Bird",
       "path": "g/flappy-bird",
       "image": "./images/flappy-bird-card.webp",
-      "category": "ARCADE"
+      "category": "ARCADE",
+      "description": "Tap to guide a small bird through narrow gaps between pipes."
     },
     {
       "title": "Flappy 2048",
       "path": "g/flappy-2048",
       "image": "images/flappy-2048-card.webp",
-      "category": "ARCADE"
+      "category": "ARCADE",
+      "description": "Guide a numbered tile through obstacles and combine matching values as you play."
     },
     {
       "title": "Neon Dodge",
       "path": "g/neon-dodge",
       "image": "./images/neon-dodge-card.webp",
-      "category": "ARCADE"
+      "category": "ARCADE",
+      "description": "Move through a glowing arena and dodge incoming obstacles for as long as possible."
     },
     {
       "title": "World's Hardest Game",
       "path": "g/worlds-hardest-game",
       "image": "./images/worlds-hardest-game-card.webp",
-      "category": "PUZZLE"
+      "category": "PUZZLE",
+      "description": "Move a red square through obstacle-filled levels, collect coins, and reach the goal."
     },
     {
       "title": "Agar.io",
@@ -533,13 +597,15 @@
       "title": "Crossy Road",
       "path": "g/crossyroad",
       "image": "images/crossy-road-card.webp",
-      "category": "ARCADE"
+      "category": "ARCADE",
+      "description": "Hop across roads, rivers, and tracks while avoiding traffic and other hazards."
     },
     {
       "title": "Cut The Rope",
       "path": "g/cut-the-rope",
       "image": "./images/cut-the-rope-card.webp",
-      "category": "PUZZLE"
+      "category": "PUZZLE",
+      "description": "Cut ropes in the right order to guide candy to a hungry little monster."
     },
     {
       "title": "Fireboy & Watergirl",
@@ -550,13 +616,15 @@
         "co-op",
         "two-player",
         "puzzle"
-      ]
+      ],
+      "description": "Solve cooperative temple puzzles by guiding two characters to their matching exits."
     },
     {
       "title": "Rooftop Snipers 2",
       "path": "g/rooftop-snipers-2-main",
       "image": "images/rooftop-snipers-2-card.webp",
-      "category": "ACTION"
+      "category": "ACTION",
+      "description": "Challenge a friend or computer opponent in quick rooftop duels with bouncy controls."
     },
     {
       "title": "OvO",
@@ -578,25 +646,29 @@
       "path": "g/doodle-jump",
       "image": "./images/doodle-jump-card.webp",
       "category": "PLATFORMER",
-      "source": "https://github.com/freemany/gamedoh"
+      "source": "https://github.com/freemany/gamedoh",
+      "description": "Bounce upward from platform to platform and avoid hazards as you climb."
     },
     {
       "title": "Duck Life 2",
       "path": "g/ducklife2",
       "image": "./images/ducklife2-card.webp",
-      "category": "ARCADE"
+      "category": "ARCADE",
+      "description": "Train a duck in several skills, then compete in races and explore new areas."
     },
     {
       "title": "Duck Life 3",
       "path": "g/ducklife3",
       "image": "./images/ducklife3-card.webp",
-      "category": "ARCADE"
+      "category": "ARCADE",
+      "description": "Raise and train ducks with different abilities to win a series of competitions."
     },
     {
       "title": "Blocky Combat SWAT",
       "path": "g/duckdb2-blocky-combat-swat-main",
       "image": "./images/duckdb2-blocky-combat-swat-main-card.webp",
-      "category": "ACTION"
+      "category": "ACTION",
+      "description": "Explore block-style multiplayer arenas and practice aiming, movement, and teamwork."
     },
     {
       "title": "Block Blast",
@@ -616,19 +688,22 @@
       "title": "Ace Gangster",
       "path": "g/acegangster",
       "image": "./images/acegangster-card.webp",
-      "category": "ACTION"
+      "category": "ACTION",
+      "description": "Explore a top-down city, take on missions, and drive around a retro-style open world."
     },
     {
       "title": "DuckCraft",
       "path": "g/duckcraft-quacklab",
       "image": "./images/duckcraft-quacklab-card.webp",
-      "category": "SANDBOX"
+      "category": "SANDBOX",
+      "description": "Explore and build in a browser-based voxel sandbox with blocky terrain."
     },
     {
       "title": "GeoGuessr",
       "path": "g/geoguesser",
       "image": "./images/geoguesser-card.webp",
-      "category": "PUZZLE"
+      "category": "PUZZLE",
+      "description": "Study a street-level location and use visual clues to guess where in the world you are."
     },
     {
       "title": "Minecraft 1.12.2",
@@ -655,61 +730,71 @@
       "title": "Waterworks",
       "path": "g/waterworks",
       "image": "./images/waterworks-card.webp",
-      "category": "PUZZLE"
+      "category": "PUZZLE",
+      "description": "Connect and manage pipes to route water through a series of logic puzzles."
     },
     {
       "title": "Color Clash",
       "path": "g/color-clash",
       "image": "./images/color-clash-card.webp",
-      "category": "PUZZLE"
+      "category": "PUZZLE",
+      "description": "Match colors and react quickly as the board changes in this compact arcade challenge."
     },
     {
       "title": "Whack-a-Mole",
       "path": "g/whack-a-mole",
       "image": "./images/whack-a-mole-card.webp",
-      "category": "ARCADE"
+      "category": "ARCADE",
+      "description": "Watch the board and tap moles as they pop up before the timer runs out."
     },
     {
       "title": "Neon Racer",
       "path": "g/neon-racer",
       "image": "./images/neon-racer-card.webp",
-      "category": "RACING"
+      "category": "RACING",
+      "description": "Steer a glowing vehicle around a futuristic track and avoid walls at speed."
     },
     {
       "title": "Paddle Clash",
       "path": "g/paddle-clash",
       "image": "./images/paddle-clash-card.webp",
-      "category": "SPORTS"
+      "category": "SPORTS",
+      "description": "Move your paddle, return the ball, and outscore your opponent in an arcade rally."
     },
     {
       "title": "Sky Hop",
       "path": "g/sky-hop",
       "image": "./images/sky-hop-card.webp",
-      "category": "ARCADE"
+      "category": "ARCADE",
+      "description": "Jump between floating platforms, keep your balance, and see how far you can climb."
     },
     {
       "title": "Gem Maze",
       "path": "g/gem-maze",
       "image": "./images/gem-maze-card.webp",
-      "category": "PUZZLE"
+      "category": "PUZZLE",
+      "description": "Navigate a maze, collect gems, and find the exit while planning a clear route."
     },
     {
       "title": "Asteroid Rush",
       "path": "g/asteroid-rush",
       "image": "./images/asteroid-rush-card.webp",
-      "category": "ARCADE"
+      "category": "ARCADE",
+      "description": "Pilot through an asteroid field, avoid collisions, and survive as long as you can."
     },
     {
       "title": "Google Baseball",
       "path": "g/googlebaseball",
       "image": "./images/googlebaseball-card.webp",
-      "category": "SPORTS"
+      "category": "SPORTS",
+      "description": "Swing at incoming pitches in a simple timing-based baseball mini-game."
     },
     {
       "title": "2048 Cupcakes",
       "path": "g/cupcake2048",
       "image": "images/2048-cupcakes-card.webp",
-      "category": "PUZZLE"
+      "category": "PUZZLE",
+      "description": "Slide matching cupcake tiles together and combine them to create higher-value treats."
     },
     {
       "title": "Connect Four",
@@ -721,7 +806,8 @@
         "multiplayer",
         "local multiplayer",
         "strategy"
-      ]
+      ],
+      "description": "Drop colored discs into the grid and be the first to connect four in a row."
     },
     {
       "title": "Chess",
