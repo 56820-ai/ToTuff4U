@@ -1,23 +1,7 @@
 <!DOCTYPE html>
 <html><head><script>const cancelFrame=window.cancelAnimationFrame.bind(window);window.cancelAnimationFrame=function(value){return typeof value==="function"?window.requestAnimationFrame(value):cancelFrame(value);};</script>
 <base href="https://cdn.jsdelivr.net/gh/bubbls/UGS-Assets@main/blumgi-rocket/">
-<script>
-/* Resolve Construct worker assets against the game's CDN base, not this local wrapper URL. */
-(() => {
-  const NativeWorker = window.Worker;
-  if (!NativeWorker || !document.querySelector("base[href]")) return;
-  const base = document.baseURI;
-  window.Worker = class ArcadeAtlasBaseWorker extends NativeWorker {
-    constructor(url, options) {
-      let target = url;
-      if (typeof url === "string" && /^\/?scripts\/(?:c3runtime|jobworker|dispatchworker|workermain)\.js(?:[?#].*)?$/i.test(url)) {
-        target = new URL(url.replace(/^\//, ""), base).href;
-      }
-      super(target, options);
-    }
-  };
-})();
-</script>
+
 <style>
 canvas{-webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;outline:0;-webkit-tap-highlight-color:rgba(255,255,255,0)}
 body{-webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;outline:0}
