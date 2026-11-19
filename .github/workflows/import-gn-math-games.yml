@@ -2,6 +2,10 @@ name: Import GN Math games into Arcade Atlas
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/import-gn-math-games.yml"
 
 permissions:
   contents: write
