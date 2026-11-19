@@ -64,6 +64,52 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#080b12;col
   var errorBox=document.getElementById("load-error");
   var cover=document.getElementById("loading-cover");
   var unityInstance=null;
+  // The original game's Unity/Yandex bridge expects these values in the
+  // page's global scope. Keep them global even though this loader is isolated.
+  var ua=navigator.userAgent||"";
+  window.environmentData={
+    language:"en",
+    domain:"default_domain",
+    deviceType:/Mobi|Android|iPhone|iPad/i.test(ua)?"mobile":"desktop",
+    isMobile:/Mobi|Android|iPhone|iPad/i.test(ua),
+    isDesktop:!/Mobi|Android|iPhone|iPad/i.test(ua),
+    isTablet:/iPad|Tablet/i.test(ua),
+    isTV:false,
+    appID:"default_app_id",
+    browserLang:navigator.language||"en",
+    payload:null,
+    promptCanShow:false,
+    reviewCanShow:false,
+    platform:navigator.platform||"unknown",
+    browser:/YaBrowser/.test(ua)?"Yandex":/OPR|Opera/.test(ua)?"Opera":/Firefox/.test(ua)?"Firefox":/Edg/.test(ua)?"Edge":/Chrome/.test(ua)?"Chrome":/Safari/.test(ua)?"Safari":"Other"
+  };
+  window.cloudSaves="noData";
+  window.paymentsData="none";
+  window.playerData="noData";
+  window.player=null;
+  window.payments=null;
+  window.initGame=false;
+  window.nowFullAdOpen=false;
+  window.ysdk=null;
+  window.GetPayments=window.GetPayments||function(){return Promise.resolve("none");};
+  window.SaveCloud=window.SaveCloud||function(){};
+  window.LoadCloud=window.LoadCloud||function(){return Promise.resolve("noData");};
+  window.InitPlayer=window.InitPlayer||function(){return Promise.resolve("noData");};
+  window.StickyAdActivity=window.StickyAdActivity||function(){};
+  window.Review=window.Review||function(){};
+  window.PromptShow=window.PromptShow||function(){};
+  window.InitLeaderboards=window.InitLeaderboards||function(){};
+  window.GetLeaderboardScores=window.GetLeaderboardScores||function(){};
+  window.SetLeaderboardScores=window.SetLeaderboardScores||function(){};
+  window.ConsumePurchase=window.ConsumePurchase||function(){};
+  window.ConsumePurchases=window.ConsumePurchases||function(){};
+  window.FullAdShow=window.FullAdShow||function(){
+    if(window.nowFullAdOpen)return;
+    window.nowFullAdOpen=true;
+    setTimeout(function(){window.nowFullAdOpen=false;},500);
+  };
+  window.RewardedShow=window.RewardedShow||function(){};
+  window.InitGame=window.InitGame||function(){window.initGame=true;};
   function fail(error){
     console.error("They Are Coming failed to load:",error);
     errorBox.style.display="block";
@@ -146,6 +192,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#080b12;col
         message.textContent="Loading game… "+Math.round(value*100)+"%";
       }).then(function(instance){
         unityInstance=instance;
+        window.myGameInstance=instance;
         cover.style.display="none";
       }).catch(fail);
     };
