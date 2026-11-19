@@ -17,7 +17,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: arcade-atlas-game-audit
+  group: arcade-atlas-game-audit-fast-v2
   cancel-in-progress: true
 
 permissions:
