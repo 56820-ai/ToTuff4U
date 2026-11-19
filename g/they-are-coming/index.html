@@ -70,6 +70,13 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#080b12;col
     errorBox.textContent="The game could not load. Try reloading the page. "+(error&&error.message?error.message:String(error||""));
     message.textContent="Game loading failed";
   }
+  async function getBrotli(){
+    if(!window.arcadeAtlasBrotli){
+      var module=await import("https://unpkg.com/brotli-wasm@3.0.0/index.web.js?module");
+      window.arcadeAtlasBrotli=await (module.default||module);
+    }
+    return window.arcadeAtlasBrotli;
+  }
   async function mergeWasmParts(){
     var urls=[0,1,2,3].map(function(i){return buildUrl+"/zombieshooterdone.wasm.br.part"+i;});
     message.textContent="Downloading game engine parts…";
@@ -80,23 +87,32 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#080b12;col
     var merged=new Uint8Array(total),offset=0;
     parts.forEach(function(part){merged.set(new Uint8Array(part),offset);offset+=part.byteLength;});
     message.textContent="Checking game engine…";
-    // These four repository parts are already the raw WebAssembly bytes.
-    // Their combined size matches Unity's wasmFileSize (38,111,960 bytes);
-    // Brotli-decompressing them causes Unexpected EOF.
-    if(merged.byteLength!==38111960){
-      throw new Error("The game engine is incomplete ("+merged.byteLength+" of 38111960 bytes).");
-    }
-    if(merged[0]!==0||merged[1]!==97||merged[2]!==115||merged[3]!==109){
-      throw new Error("The downloaded engine is not a valid WebAssembly binary.");
-    }
+    // The split WASM files are raw bytes despite their .br.part names.
+    if(merged.byteLength!==38111960)throw new Error("The game engine is incomplete ("+merged.byteLength+" of 38111960 bytes).");
+    if(merged[0]!==0||merged[1]!==97||merged[2]!==115||merged[3]!==109)throw new Error("The downloaded engine is not a valid WebAssembly binary.");
     window.arcadeAtlasWasmSize=merged.byteLength;
     return URL.createObjectURL(new Blob([merged],{type:"application/wasm"}));
+  }
+  async function prepareDataFile(){
+    message.textContent="Downloading game data…";
+    var response=await fetch(buildUrl+"/zombieshooterdone.data.br",{cache:"force-cache"});
+    if(!response.ok)throw new Error("Could not download game data ("+response.status+").");
+    var compressed=new Uint8Array(await response.arrayBuffer());
+    message.textContent="Unpacking game data…";
+    var brotli=await getBrotli();
+    var data=brotli.decompress(compressed);
+    if(!(data instanceof Uint8Array))data=new Uint8Array(data);
+    var header="UnityWebData1.0\\0";
+    var actual=new TextDecoder().decode(data.subarray(0,header.length));
+    if(actual!==header)throw new Error("The game data did not unpack correctly (invalid Unity data header).");
+    return URL.createObjectURL(new Blob([data],{type:"application/octet-stream"}));
   }
   async function boot(){
     message.textContent="Starting game engine…";
     var codeUrl=await mergeWasmParts();
+    var dataUrl=await prepareDataFile();
     var config={
-      dataUrl:buildUrl+"/zombieshooterdone.data.br",
+      dataUrl:dataUrl,
       frameworkUrl:buildUrl+"/zombieshooterdone.framework.js",
       codeUrl:codeUrl,
       wasmFileSize:window.arcadeAtlasWasmSize,
