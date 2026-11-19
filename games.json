@@ -2,7 +2,7 @@
   "games": [
     {
       "title": "Tag",
-      "path": "https://gn-math.github.io/html/627-fix3.html",
+      "path": "g/tag/",
       "image": "https://raw.githubusercontent.com/gn-math/covers/main/627.png",
       "category": "ARCADE",
       "description": "Chase and dodge with 2–4 players across colorful arenas with trampolines and teleporters. Original game by WeLoPlay.",

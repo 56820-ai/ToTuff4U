@@ -1,115 +1,133 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta name="google-site-verification" content="uBDEapMmF1jmMtAC2MZve959FPIf4xm0gGhv3RCUUpA">
-<meta name="google-adsense-account" content="ca-pub-8390067368864065">
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8390067368864065" crossorigin="anonymous"></script>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#080d19">
-<title>Tag · Arcade Atlas</title>
-<link rel="icon" href="../../images/favicon.png">
-<style>
-:root{color-scheme:dark;--bg:#080d19;--panel:#111b2d;--line:#263651;--muted:#9aabc5;--cyan:#6be7ff}
-*{box-sizing:border-box}
-html,body{width:100%;height:100%;margin:0;overflow:hidden;background:var(--bg);color:#f4f7ff;font-family:Inter,system-ui,Segoe UI,Arial,sans-serif}
-button,select{font:inherit}
-#game{position:fixed;inset:0;width:100%;height:100%;display:block}
-.hud{position:fixed;inset:0;pointer-events:none}
-.topbar{position:absolute;top:14px;left:50%;transform:translateX(-50%);display:flex;gap:12px;align-items:center;padding:9px 16px;border:1px solid #ffffff20;border-radius:15px;background:#08111dcc;box-shadow:0 8px 30px #0006;backdrop-filter:blur(12px)}
-#timer{font-size:clamp(22px,4vw,34px);font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:2px}
-#it-label{font-size:12px;color:#ffcc70;font-weight:800;letter-spacing:1px;white-space:nowrap}
-.scoreboard{position:absolute;left:14px;top:14px;width:min(210px,38vw);padding:12px;border:1px solid #ffffff20;border-radius:14px;background:#08111dcc;backdrop-filter:blur(12px)}
-.scoreboard h3{margin:0 0 8px;font-size:11px;color:#9aabc5;letter-spacing:1.5px;text-transform:uppercase}
-.player-row{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:13px;font-weight:700}
-.dot{width:11px;height:11px;border-radius:50%;box-shadow:0 0 12px currentColor}
-.player-row small{margin-left:auto;color:#9aabc5;font-size:10px}
-.hint{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);padding:8px 12px;border-radius:10px;background:#08111dcc;color:#bdcbe0;font-size:11px;text-align:center;white-space:nowrap}
-.overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:18px;background:radial-gradient(ellipse at 50% 20%,#162945cc,#070b14f2 72%);z-index:5}
-.panel{width:min(440px,96vw);max-height:94vh;overflow:auto;padding:25px;border:1px solid #31435f;border-radius:22px;background:linear-gradient(155deg,#17243a,#0d1525 72%);box-shadow:0 24px 80px #0009}
-.eyebrow{color:var(--cyan);font-size:11px;font-weight:900;letter-spacing:2.5px;text-transform:uppercase}
-h1{margin:7px 0 5px;font-size:clamp(34px,8vw,48px);line-height:1;font-weight:1000;letter-spacing:-2px}
-h1 span{color:var(--cyan)}
-.subtitle{margin:10px 0 20px;color:#aab9cf;font-size:13px;line-height:1.55}
-.field{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
-label{display:block;margin:0 0 6px;color:#aab9cf;font-size:11px;font-weight:800;letter-spacing:.7px;text-transform:uppercase}
-select{width:100%;padding:11px;border:1px solid #344762;border-radius:10px;background:#0a1322;color:#fff;outline:none}
-.primary,.secondary{width:100%;border:0;border-radius:11px;padding:13px 16px;font-weight:900;cursor:pointer}
-.primary{margin-top:12px;background:linear-gradient(90deg,#67e7ff,#77baff);color:#07111e;box-shadow:0 7px 22px #39c8f544}
-.secondary{margin-top:9px;background:#24344c;color:#dce8fa}
-.controls{margin-top:17px;padding:12px;border:1px solid #263954;border-radius:12px;background:#0a1424;color:#aab9cf;font-size:11px;line-height:1.7}
-.controls b{color:#fff}
-#result-title{font-size:26px;font-weight:1000;margin:5px 0}
-#result-copy{color:#adbed5;font-size:13px;line-height:1.5}
-.hidden{display:none!important}
-@media(max-width:600px){.scoreboard{top:auto;bottom:45px;left:8px;width:145px;padding:8px}.scoreboard h3{font-size:9px}.player-row{font-size:11px;padding:3px 0}.hint{bottom:8px;font-size:9px}.topbar{top:8px}.panel{padding:20px}}
-</style>
-</head>
-<body>
-<canvas id="game" aria-label="Local multiplayer Tag game"></canvas>
-<div class="hud" id="hud" hidden>
-  <div class="scoreboard"><h3>Players</h3><div id="players"></div></div>
-  <div class="topbar"><div id="timer">01:00</div><div id="it-label">● RED IS IT</div></div>
-  <div class="hint">P1 <b>WASD</b> · P2 <b>ARROWS</b> · P3 <b>IJL</b> · P4 <b>TFH</b> · <b>ESC</b> pause</div>
-</div>
-<div class="overlay" id="menu">
- <section class="panel">
-  <div class="eyebrow">Arcade Atlas · Local multiplayer</div>
-  <h1>TAG<span>!</span></h1>
-  <p class="subtitle">Run, dodge, and tag your friends. Pass the “it” role before the timer hits zero—or you lose!</p>
-  <div class="field">
-   <div><label for="count">Players</label><select id="count"><option value="2">2 players</option><option value="3">3 players</option><option value="4">4 players</option></select></div>
-   <div><label for="map">Map</label><select id="map"><option value="garden">Garden</option><option value="ice">Ice world</option><option value="lava">Lava zone</option></select></div>
-   <div><label for="duration">Round length</label><select id="duration"><option value="60">60 seconds</option><option value="120">120 seconds</option><option value="180">180 seconds</option></select></div>
-   <div><label for="buffs">Power-ups</label><select id="buffs"><option value="on">On</option><option value="off">Off</option></select></div>
-  </div>
-  <button class="primary" id="start">START GAME</button>
-  <div class="controls"><b>Controls</b><br>Player 1 (red): W A S D &nbsp; · &nbsp; Player 2 (blue): arrow keys<br>Player 3 (yellow): I J K L &nbsp; · &nbsp; Player 4 (green): T F G H<br>Move in all directions. Touch another player to pass “it”.</div>
- </section>
-</div>
-<div class="overlay hidden" id="pause"><section class="panel"><div class="eyebrow">Match paused</div><h1>PAUSED</h1><p class="subtitle">Take a breather. Your round is waiting.</p><button class="primary" id="resume">RESUME</button><button class="secondary" id="restart">RESTART MATCH</button><button class="secondary" id="quit">MAIN MENU</button></section></div>
-<div class="overlay hidden" id="result"><section class="panel"><div class="eyebrow">Time's up</div><div id="result-title">ROUND OVER</div><p id="result-copy"></p><button class="primary" id="again">PLAY AGAIN</button><button class="secondary" id="back">MAIN MENU</button></section></div>
-<script>
-(function(){
-"use strict";
-const canvas=document.getElementById("game"),ctx=canvas.getContext("2d");
-const $=id=>document.getElementById(id);
-const colors=["#ff596b","#55b9ff","#ffd45c","#70e59b"];
-const names=["RED","BLUE","YELLOW","GREEN"];
-const keys=[["w","a","s","d"],["arrowup","arrowleft","arrowdown","arrowright"],["i","j","k","l"],["t","f","g","h"]];
-let W=0,H=0,dpr=1,players=[],count=2,it=0,timeLeft=60,duration=60,playing=false,paused=false,last=0,raf=0,tagLock=0,buffs=true,mapName="garden",pads=[],portals=[],particles=[],roundNo=0;
-const held=new Set();
-const maps={
- garden:{bg:"#102b2b",floor:"#183b37",grid:"#2b5a50",obstacle:"#316c58",accent:"#83e5ad"},
- ice:{bg:"#122b42",floor:"#1b405b",grid:"#32647d",obstacle:"#36718a",accent:"#9beaff"},
- lava:{bg:"#321b25",floor:"#48242b",grid:"#71343a",obstacle:"#8c4140",accent:"#ffad69"}
-};
-function resize(){dpr=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);canvas.style.width=W+"px";canvas.style.height=H+"px";ctx.setTransform(dpr,0,0,dpr,0,0)}
-addEventListener("resize",resize);resize();
-function arena(){const scale=Math.min(W/900,H/620);return {x:(W-820*scale)/2,y:(H-520*scale)/2,w:820*scale,h:520*scale,s:scale}}
-function setupMap(){const a=arena();pads=[{x:a.x+a.w*.25,y:a.y+a.h*.28,r:17*a.s},{x:a.x+a.w*.73,y:a.y+a.h*.72,r:17*a.s}];portals=[{x:a.x+a.w*.12,y:a.y+a.h*.78,r:15*a.s},{x:a.x+a.w*.88,y:a.y+a.h*.22,r:15*a.s}];}
-function reset(){count=+$("count").value;duration=+$("duration").value;timeLeft=duration;mapName=$("map").value;buffs=$("buffs").value==="on";it=Math.floor(Math.random()*count);tagLock=1.2;roundNo++;players=Array.from({length:count},(_,i)=>({id:i,x:0,y:0,vx:0,vy:0,r:13,color:colors[i],name:names[i],score:0,boost:0,teleport:0}));const a=arena();players.forEach((p,i)=>{const ang=i/count*Math.PI*2;p.x=W/2+Math.cos(ang)*Math.min(a.w*.25,160);p.y=H/2+Math.sin(ang)*Math.min(a.h*.25,110)});particles=[];setupMap();$("hud").hidden=false;$("menu").classList.add("hidden");$("pause").classList.add("hidden");$("result").classList.add("hidden");playing=true;paused=false;last=performance.now();cancelAnimationFrame(raf);raf=requestAnimationFrame(loop);updateHud()}
-function updateHud(){const p=players[it];$("it-label").textContent="● "+p.name+" IS IT";$("it-label").style.color=p.color;$("players").innerHTML=players.map((x,i)=>'<div class="player-row"><span class="dot" style="background:'+x.color+';color:'+x.color+'"></span>'+x.name+(i===it?' <b style="color:#ffcf73">IT!</b>':'')+'<small>'+Math.floor(x.score)+'s safe</small></div>').join("");$("timer").textContent=String(Math.ceil(timeLeft/60)).padStart(2,"0")+":"+String(Math.ceil(timeLeft%60)).padStart(2,"0")}
-function start(){reset()}
-function end(){playing=false;cancelAnimationFrame(raf);const loser=players[it];$("result-title").textContent=loser.name+" WAS IT!";$("result-title").style.color=loser.color;$("result-copy").textContent=loser.name+" was still tagged when time ran out. "+players.filter((p,i)=>i!==it).map(p=>p.name).join(", ")+" escaped!";$("result").classList.remove("hidden")}
-function pause(){if(!playing)return;paused=true;playing=false;cancelAnimationFrame(raf);$("pause").classList.remove("hidden")}
-function resume(){if(paused){paused=false;playing=true;last=performance.now();$("pause").classList.add("hidden");raf=requestAnimationFrame(loop)}}
-function mainMenu(){playing=false;paused=false;cancelAnimationFrame(raf);$("hud").hidden=true;$("pause").classList.add("hidden");$("result").classList.add("hidden");$("menu").classList.remove("hidden")}
-function loop(now){if(!playing)return;const dt=Math.min((now-last)/1000,.035);last=now;update(dt);draw();raf=requestAnimationFrame(loop)}
-function update(dt){timeLeft-=dt;if(timeLeft<=0){timeLeft=0;updateHud();end();return}tagLock=Math.max(0,tagLock-dt);players.forEach((p,i)=>{if(i!==it)p.score+=dt;const k=keys[i],up=held.has(k[0]),left=held.has(k[1]),down=held.has(k[2]),right=held.has(k[3]);let dx=(right?1:0)-(left?1:0),dy=(down?1:0)-(up?1:0),len=Math.hypot(dx,dy)||1;dx/=len;dy/=len;const base=210*arena().s*(i===it?1.04:1);const accel=base*7;p.vx+=(dx*base-p.vx)*Math.min(1,dt*7);p.vy+=(dy*base-p.vy)*Math.min(1,dt*7);if(!dx&&!dy){p.vx*=Math.pow(.12,dt);p.vy*=Math.pow(.12,dt)}p.x+=p.vx*dt;p.y+=p.vy*dt;const a=arena(),r=p.r*a.s;p.x=Math.max(a.x+r,Math.min(a.x+a.w-r,p.x));p.y=Math.max(a.y+r,Math.min(a.y+a.h-r,p.y));if(buffs){pads.forEach(pad=>{if(Math.hypot(p.x-pad.x,p.y-pad.y)<pad.r&&p.boost<=0){p.vx*=1.9;p.vy*=1.9;p.boost=1.1;burst(p.x,p.y,p.color,10)}});portals.forEach((portal,j)=>{if(Math.hypot(p.x-portal.x,p.y-portal.y)<portal.r&&p.teleport<=0){const dest=portals[1-j];p.x=dest.x;p.y=dest.y;p.teleport=2;burst(p.x,p.y,p.color,15)}})}p.boost=Math.max(0,p.boost-dt);p.teleport=Math.max(0,p.teleport-dt);});
-const a=arena();if(tagLock<=0){const tagger=players[it];for(let i=0;i<count;i++){if(i===it)continue;const p=players[i];if(Math.hypot(p.x-tagger.x,p.y-tagger.y)<(p.r+tagger.r)*a.s*1.1){const old=it;it=i;tagLock=1.25;burst(p.x,p.y,"#fff",22);updateHud();break}}}
+
+
+                                 
+                                                                                                                              
+
+
+
+</style><script src="offtag.js"></script><style type="text/css">#button {
+  display:none;
 }
-function burst(x,y,color,n){for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,s=40+Math.random()*170;particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:.45+Math.random()*.4,color})}}
-function draw(){const m=maps[mapName],a=arena();ctx.clearRect(0,0,W,H);ctx.fillStyle=m.bg;ctx.fillRect(0,0,W,H);ctx.save();ctx.shadowColor="#0008";ctx.shadowBlur=40;ctx.fillStyle=m.floor;roundRect(ctx,a.x,a.y,a.w,a.h,24*a.s);ctx.fill();ctx.restore();ctx.save();ctx.beginPath();roundRect(ctx,a.x,a.y,a.w,a.h,24*a.s);ctx.clip();ctx.strokeStyle=m.grid;ctx.lineWidth=1;for(let x=a.x;x<a.x+a.w;x+=35*a.s){ctx.beginPath();ctx.moveTo(x,a.y);ctx.lineTo(x,a.y+a.h);ctx.stroke()}for(let y=a.y;y<a.y+a.h;y+=35*a.s){ctx.beginPath();ctx.moveTo(a.x,y);ctx.lineTo(a.x+a.w,y);ctx.stroke()}
-const blocks=[{x:.36,y:.2,w:.1,h:.16},{x:.61,y:.64,w:.13,h:.12},{x:.18,y:.48,w:.12,h:.08},{x:.76,y:.35,w:.08,h:.13}];blocks.forEach(b=>{ctx.fillStyle=m.obstacle;roundRect(ctx,a.x+b.x*a.w,a.y+b.y*a.h,b.w*a.w,b.h*a.h,10*a.s);ctx.fill()});
-if(buffs){pads.forEach(p=>{ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle="#a4ffcf33";ctx.fill();ctx.strokeStyle="#9effcb";ctx.lineWidth=2;ctx.stroke();ctx.fillStyle="#c9ffe2";ctx.font="bold "+(p.r*1.1)+"px sans-serif";ctx.textAlign="center";ctx.fillText("↑",p.x,p.y+p.r*.38)});portals.forEach((p,i)=>{ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=i?"#bd9aff33":"#7deaff33";ctx.fill();ctx.strokeStyle=i?"#bd9aff":"#7deaff";ctx.lineWidth=3;ctx.stroke();ctx.beginPath();ctx.arc(p.x,p.y,p.r*.55,0,Math.PI*2);ctx.stroke()})}
-players.forEach((p,i)=>{ctx.save();ctx.shadowColor=p.color;ctx.shadowBlur=i===it?25:13;ctx.beginPath();ctx.arc(p.x,p.y,p.r*a.s,0,Math.PI*2);ctx.fillStyle=p.color;ctx.fill();ctx.shadowBlur=0;ctx.lineWidth=3;ctx.strokeStyle="#ffffffcc";ctx.stroke();if(i===it){ctx.fillStyle="#fff";ctx.font="900 "+(16*a.s)+"px system-ui";ctx.textAlign="center";ctx.fillText("IT",p.x,p.y-p.r*a.s-13*a.s);ctx.beginPath();ctx.moveTo(p.x,p.y-p.r*a.s-8*a.s);ctx.lineTo(p.x-6*a.s,p.y-p.r*a.s-18*a.s);ctx.lineTo(p.x+6*a.s,p.y-p.r*a.s-18*a.s);ctx.closePath();ctx.fill()}ctx.restore()});ctx.restore();particles=particles.filter(p=>p.life>0);particles.forEach(p=>{p.life-=.016;p.x+=p.vx*.016;p.y+=p.vy*.016;ctx.globalAlpha=Math.max(0,p.life);ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x,p.y,3,0,Math.PI*2);ctx.fill()});ctx.globalAlpha=1;ctx.fillStyle="#ffffff20";ctx.font="800 11px system-ui";ctx.textAlign="center";ctx.fillText(mapName==="garden"?"GARDEN ARENA":mapName==="ice"?"ICE WORLD":"LAVA ZONE",W/2,a.y-12);updateHud()}
-function roundRect(c,x,y,w,h,r){c.beginPath();c.roundRect(x,y,w,h,r)}
-addEventListener("keydown",e=>{const k=e.key.toLowerCase();if(["arrowup","arrowdown","arrowleft","arrowright"," "].includes(k))e.preventDefault();if(k==="escape"){if(playing)pause();else if(paused)resume();return}held.add(k)});
-addEventListener("keyup",e=>held.delete(e.key.toLowerCase()));addEventListener("blur",()=>{held.clear();if(playing)pause()});
-$("start").addEventListener("click",start);$("resume").addEventListener("click",resume);$("restart").addEventListener("click",start);$("quit").addEventListener("click",mainMenu);$("again").addEventListener("click",start);$("back").addEventListener("click",mainMenu);
-draw();
-})();
-</script>
-</body>
-</html>
+.imgb_vis {
+  animation: imgb-animation 7s linear;
+}
+@keyframes imgb-animation {
+  10% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(100px);
+  }
+  90% {
+    transform: translateX(100px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}</style></head><body dir="ltr">
+	<div id="fb-root"></div>
+	
+	<script>
+	                                                                    
+	(function(){
+		                                              
+		if (window.location.protocol.substr(0, 4) ==="file")
+		{
+			alert("Exported games won't work until you upload them. (When running on the file:/// protocol, browsers block many features from working for security reasons.)");
+		}
+	})();
+	</script>
+	
+	                                                           
+	<div id="c2canvasdiv" style="width: 1262px; height: 710px; margin-left: 0px; margin-top: 109px;">
+	
+		                                                                                             
+                                                                                        
+		<canvas height="710" id="c2canvas" width="1262" style="width: 1262px; height: 710px;">
+			                                                                            
+                                                                                 
+                                                                                 
+			<h1>Your browser does not appear to support HTML5.  Try upgrading your browser to the latest version.  <a href="http://www.whatbrowser.org">What is a browser?</a>
+			<br><br><a href="http://www.microsoft.com/windows/internet-explorer/default.aspx">Microsoft Internet Explorer</a><br>
+			<a href="http://www.mozilla.com/firefox/">Mozilla Firefox</a><br>
+			<a href="https://www.google.com/chrome/">Google Chrome</a><br>
+			<a href="http://www.apple.com/safari/download/">Apple Safari</a></h1>
+		</canvas>
+		
+	</div>
+
+	<script src="jtag.js"></script>
+	<script src="c2tag.js"></script>
+   <script>
+		                                                        
+		jQuery(document).ready(function ()
+		{			
+			                                        
+			cr_createRuntime("c2canvas");
+		});
+		
+		                                                      
+		function onVisibilityChanged() {
+			if (document.hidden || document.mozHidden || document.webkitHidden || document.msHidden)
+				cr_setSuspended(true);
+			else
+				cr_setSuspended(false);
+		};
+		
+		document.addEventListener("visibilitychange", onVisibilityChanged, false);
+		document.addEventListener("mozvisibilitychange", onVisibilityChanged, false);
+		document.addEventListener("webkitvisibilitychange", onVisibilityChanged, false);
+		document.addEventListener("msvisibilitychange", onVisibilityChanged, false);
+		
+		function OnRegisterSWError(e)
+		{
+			console.warn("Failed to register service worker: ", e);
+		};
+		
+		                                                                                     
+		                                                                                
+		window.C2_RegisterSW = function C2_RegisterSW()
+		{
+			if (!navigator.serviceWorker)
+				return;		                             
+			
+			try {
+				navigator.serviceWorker.register("sw.js", { scope: "./" })
+				.then(function (reg)
+				{
+					console.log("Registered service worker on " + reg.scope);
+				})
+				.catch(OnRegisterSWError);
+			}
+			catch (e)
+			{
+				OnRegisterSWError(e);
+			}
+		};
+    </script>
+	<script src=""></script>
+ 
+
+<script>gadgets.util.runOnLoadHandlers();</script><script>window.google.csi.tickDl();
+</script></body></html>
+</script><style type="text/css">
+		* {
+			padding: 0;
+			margin: 0;
+		}
+		html, body {
+			background: #000;
+			color: #fff;
+			overflow: hidden;
+			touch-action: none;
+			-ms-touch-action: none;
+		}
+		canvas {
+			touch-action-delay: none;
+			touch-action: none;
+			-ms-touch-action: none;
+		}
+    </style>
+
+
+<script>
