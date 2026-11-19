@@ -99,8 +99,8 @@ function normalizeIcon(icon) {
   if (icon.startsWith("/ToTuff4U/duckmath-site/")) return icon.slice("/ToTuff4U/".length);
   return icon;
 }
-async function checkGame(game) {
-  const page = await browser.newPage({ viewport: { width: 1365, height: 768 } });
+async function checkGame(game, context = browser) {
+  const page = await context.newPage({ viewport: { width: 1365, height: 768 } });
   page.setDefaultTimeout(8000);
   page.setDefaultNavigationTimeout(12000);
   const localFailures = [];
@@ -119,7 +119,7 @@ async function checkGame(game) {
   const url = gameUrl(game);
   try {
     response = await page.goto(url, { waitUntil: "domcontentloaded", timeout: 12000 });
-    await page.waitForTimeout(900);
+    await page.waitForTimeout(450);
     if (String(game.path || "").startsWith("g/one-button-collection/?")) {
       await page.waitForFunction(() => document.querySelector("canvas"), undefined, { timeout: 10000 }).catch(() => {});
     }
@@ -132,7 +132,7 @@ async function checkGame(game) {
       response = await page.goto(url, { waitUntil: "commit", timeout: 12000 });
       await page.waitForLoadState("domcontentloaded", { timeout: 8000 });
       navigationError = "";
-      await page.waitForTimeout(900);
+      await page.waitForTimeout(450);
     } catch (retryError) {
       navigationError += " | retry: " + String(retryError.message || retryError).slice(0, 180);
     }
@@ -228,6 +228,8 @@ const logoAudit = await logoPage.evaluate(async items => {
 await logoPage.close();
 progress(`Logo checks finished: ${logoAudit.filter(x => x.ok).length}/${logoAudit.length} loaded.`);
 
+// Keep the UI/gameplay results object available for an early checkpoint report.
+const uiAudit = { leaderboard: {}, blockyCombat: {}, catalog: {}, collections: {}, dailyPick: {}, connectFour: {}, chess: {}, sudoku: {}, pong: {}, ticTacToe: {}, simon: {}, aimTrainer: {}, stack: {}, helix: {}, slither: {}, polygonRacer: {} };
 const workers = 6;
 let cursor = 0;
 let completedGames = 0;
@@ -235,20 +237,44 @@ progress(`Starting Chromium checks for ${localPageCatalog.length} locally hosted
 await Promise.all(Array.from({ length: workers }, async () => {
   while (cursor < localPageCatalog.length) {
     const i = cursor++;
+    const game = localPageCatalog[i];
+    const context = await browser.newContext({ viewport: { width: 1365, height: 768 } });
+    let timeoutId;
     try {
-      results[i] = await checkGame(localPageCatalog[i]);
+      const timedCheck = new Promise((_, reject) => {
+        timeoutId = setTimeout(() => {
+          context.close().catch(() => {});
+          reject(new Error("Game audit exceeded the 35-second per-game limit."));
+        }, 35000);
+      });
+      results[i] = await Promise.race([checkGame(game, context), timedCheck]);
     } catch (error) {
-      results[i] = { title: localPageCatalog[i]?.title || `Catalog entry ${i + 1}`, url: gameUrl(localPageCatalog[i] || {}), status: null, pageTitle: "", mainFrameUrl: "", hardFailure: true, navigationError: String(error?.stack || error).slice(0, 500), localFailures: [], missingCoreAssets: [], criticalPageErrors: [], failedGameFrames: [], externalFailures: [], pageErrors: [], iframeSources: [], canvasCount: 0, missingCanvas: false };
+      results[i] = { title: game?.title || `Catalog entry ${i + 1}`, url: gameUrl(game || {}), status: null, pageTitle: "", mainFrameUrl: "", hardFailure: true, navigationError: String(error?.stack || error).slice(0, 500), localFailures: [], missingCoreAssets: [], criticalPageErrors: [], failedGameFrames: [], externalFailures: [], pageErrors: [], iframeSources: [], canvasCount: 0, missingCanvas: false };
+    } finally {
+      clearTimeout(timeoutId);
+      await context.close().catch(() => {});
     }
     completedGames++;
     progress(`Game checks: ${completedGames}/${localPageCatalog.length} complete${results[i].hardFailure ? ` (failed: ${results[i].title})` : ""}.`);
   }
 }));
+const checkpointReport = {
+  generatedAt: new Date().toISOString(),
+  catalogCount: catalog.length,
+  locallyHostedGameChecks: results.filter(Boolean).length,
+  catalogPassed: results.filter(r => r && !r.hardFailure).length,
+  catalogFailed: results.filter(r => r?.hardFailure),
+  catalogWarnings: results.filter(r => r && (r.pageErrors.length || r.externalFailures.length || r.localFailures.length)),
+  logoAudit,
+  brokenLogos: logoAudit.filter(x => !x.ok),
+  uiAudit,
+  gnMathAddedToArcadeAtlas: gnMathData.games.length
+};
+await writeFile("arcade-atlas-game-audit.json", JSON.stringify(checkpointReport, null, 2) + "\n");
 progress("All catalog game checks finished; starting interface and gameplay tests.");
 
 // Check the custom interfaces and gameplay flows touched by this maintenance pass.
 progress("Checking leaderboard and Blocky Combat.");
-const uiAudit = { leaderboard: {}, blockyCombat: {}, catalog: {}, collections: {}, dailyPick: {}, connectFour: {}, chess: {}, sudoku: {}, pong: {}, ticTacToe: {}, simon: {}, aimTrainer: {}, stack: {}, helix: {}, slither: {}, polygonRacer: {} };
 try {
   const page = await browser.newPage({ viewport: { width: 1365, height: 768 } });
   const errors = [];
