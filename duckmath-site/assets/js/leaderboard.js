@@ -99,6 +99,7 @@ function formatReactionTime(value) {
 
 function formatScore(value, gameTitle) {
   const title = String(gameTitle || "").trim().toLowerCase();
+  if (title.includes("they are coming")) return Math.floor(Number(value)) + " days survived";
   if (title.includes("reaction test")) return formatReactionTime(value);
   if (/\btime\b/i.test(title) || /\bminecraft\b/i.test(title)) return formatDurationSeconds(value);
   if (title.includes("cookie clicker")) return formatCookieClickerScore(value);
