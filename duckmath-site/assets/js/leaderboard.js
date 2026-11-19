@@ -54,8 +54,11 @@ function formatCookieClickerScore(value) {
   if (group === 0) return n.toLocaleString("en-US");
   const exponent = raw.length - 1;
   const significant = raw.slice(0, 3);
-  const mantissa = Number(significant) / (10 ** (significant.length - 1));
-  const amount = mantissa.toFixed(2);
+  // BigInt keeps the original value exact; Number is used only for a 3-digit
+  // leading coefficient, never for the full score.
+  const scientificMantissa = Number(significant) / (10 ** (significant.length - 1));
+  const groupMantissa = scientificMantissa * (10 ** (exponent % 3));
+  const amount = groupMantissa.toFixed(2);
   if (group < names.length) return amount + " " + names[group];
   if (group <= 66) {
     const ones = ["", "un", "duo", "tre", "quattuor", "quin", "sex", "septen", "octo", "novem"];
@@ -65,8 +68,8 @@ function formatCookieClickerScore(value) {
     const name = (one ? ones[one] : "") + tens[ten] + "illion";
     return amount + " " + name;
   }
-  // Beyond 200 zeroes, keep the magnitude readable without Number precision loss.
-  return amount + " × 10^" + exponent;
+  // Beyond the named-unit range, use scientific notation without losing precision.
+  return scientificMantissa.toFixed(2) + " × 10^" + exponent;
 }
 
 function formatDurationSeconds(value) {
