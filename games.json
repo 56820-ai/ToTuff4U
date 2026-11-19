@@ -13368,10 +13368,10 @@
     },
     {
       "title": "Slope Plus",
-      "path": "https://coweggs.itch.io/slope-plus",
+      "path": "g/slope-plus/",
       "image": "./images/slope-plus-card.svg",
       "category": "RACING",
-      "description": "Play the official Slope Plus browser game by coweggs. Set seeds, replay runs, and load custom maps.",
+      "description": "Play Slope Plus inside Arcade Atlas with seeded runs and custom maps.",
       "tags": [
         "slope",
         "seeded runs",
