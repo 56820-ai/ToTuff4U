@@ -20,7 +20,7 @@
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#080b12;color:#fff;font-family:Arial,sans-serif}
 #unity-container{position:fixed;inset:0;width:100%;height:100%;background:#080b12}
 #unity-canvas{display:block;width:100%;height:100%;outline:none;background:#080b12;touch-action:none}
-#loading-cover{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#080b12 url("https://cdn.jsdelivr.net/gh/awaiblecomponent/575@main/background.png") center/cover no-repeat;z-index:3}
+#loading-cover{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#080b12 url("https://raw.githubusercontent.com/awaiblecomponent/575/main/background.png") center/cover no-repeat;z-index:3}
 #loading-panel{width:min(420px,86vw);padding:24px;border:1px solid #39465b;border-radius:14px;background:rgba(8,12,20,.9);text-align:center}
 #loading-panel img{width:90px;height:auto;object-fit:contain}
 #loading-title{font-size:20px;font-weight:700;margin:12px 0}
@@ -39,7 +39,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#080b12;col
   <canvas id="unity-canvas" tabindex="-1"></canvas>
   <div id="loading-cover">
     <div id="loading-panel">
-      <img src="https://cdn.jsdelivr.net/gh/awaiblecomponent/575@main/logo.png" alt="">
+      <img src="https://raw.githubusercontent.com/awaiblecomponent/575/main/logo.png" alt="">
       <div id="loading-title">They Are Coming</div>
       <div id="loading-track"><div id="loading-progress"></div></div>
       <div id="loading-message">Loading game files from GitHub…</div>
@@ -57,7 +57,16 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#080b12;col
 <script>
 (function(){
   "use strict";
-  var buildUrl="https://cdn.jsdelivr.net/gh/awaiblecomponent/575@main/Build";
+  var buildUrl="https://raw.githubusercontent.com/awaiblecomponent/575/main/Build";
+  var cdnBuildUrl="https://cdn.jsdelivr.net/gh/awaiblecomponent/575@main/Build";
+  async function fetchGameAsset(path,options){
+    var urls=[buildUrl+"/"+path,cdnBuildUrl+"/"+path],lastError;
+    for(var i=0;i<urls.length;i++){
+      try{var response=await fetch(urls[i],options||{});if(response.ok)return response;lastError=new Error("HTTP "+response.status+" from "+urls[i]);}
+      catch(error){lastError=error;}
+    }
+    throw lastError||new Error("Game asset unavailable: "+path);
+  }
   var canvas=document.getElementById("unity-canvas");
   var progress=document.getElementById("loading-progress");
   var message=document.getElementById("loading-message");
@@ -118,15 +127,23 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#080b12;col
   }
   async function getBrotli(){
     if(!window.arcadeAtlasBrotli){
-      var module=await import("https://unpkg.com/brotli-wasm@3.0.0/index.web.js?module");
-      window.arcadeAtlasBrotli=await (module.default||module);
+      var candidates=[
+        "https://unpkg.com/brotli-wasm@3.0.0/index.web.js?module",
+        "https://cdn.jsdelivr.net/npm/brotli-wasm@3.0.0/index.web.js?module",
+        "https://esm.sh/brotli-wasm@3.0.0"
+      ],lastError;
+      for(var i=0;i<candidates.length;i++){
+        try{var module=await import(candidates[i]);window.arcadeAtlasBrotli=await (module.default||module);break;}
+        catch(error){lastError=error;}
+      }
+      if(!window.arcadeAtlasBrotli)throw new Error("Could not load the Brotli decoder. The school network may be blocking the decoder CDNs. "+(lastError&&lastError.message||""));
     }
     return window.arcadeAtlasBrotli;
   }
   async function mergeWasmParts(){
     var urls=[0,1,2,3].map(function(i){return buildUrl+"/zombieshooterdone.wasm.br.part"+i;});
     message.textContent="Downloading game engine parts…";
-    var responses=await Promise.all(urls.map(function(url){return fetch(url,{cache:"force-cache"});}));
+    var responses=await Promise.all(urls.map(function(url){return fetchGameAsset(url.substring(url.lastIndexOf("/")+1),{cache:"force-cache"});}));
     responses.forEach(function(response){if(!response.ok)throw new Error("Could not download a game file ("+response.status+").");});
     var parts=await Promise.all(responses.map(function(response){return response.arrayBuffer();}));
     var total=parts.reduce(function(sum,part){return sum+part.byteLength;},0);
@@ -141,7 +158,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#080b12;col
   }
   async function prepareDataFile(){
     message.textContent="Downloading game data…";
-    var response=await fetch(buildUrl+"/zombieshooterdone.data.br",{cache:"no-store"});
+    var response=await fetchGameAsset("zombieshooterdone.data.br",{cache:"no-store"});
     if(!response.ok)throw new Error("Could not download game data ("+response.status+").");
     var bytes=new Uint8Array(await response.arrayBuffer());
     message.textContent="Preparing game data…";
@@ -185,6 +202,11 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#080b12;col
     };
     var loader=document.createElement("script");
     loader.src=buildUrl+"/zombieshooterdone.loader.js";
+    loader.onerror=function(){
+      if(loader.dataset.cdnFallback==="1"){fail("Could not download the Unity loader from GitHub or the fallback CDN.");return;}
+      loader.dataset.cdnFallback="1";
+      loader.src=cdnBuildUrl+"/zombieshooterdone.loader.js";
+    };
     loader.onload=function(){
       if(typeof createUnityInstance!=="function"){fail("Unity loader did not initialize.");return;}
       createUnityInstance(canvas,config,function(value){
