@@ -93,7 +93,7 @@ function formatReactionTime(value) {
 function formatScore(value, gameTitle) {
   const title = String(gameTitle || "").trim().toLowerCase();
   if (title.includes("reaction test")) return formatReactionTime(value);
-  if (title.includes("time") || title.includes("minecraft")) return formatDurationSeconds(value);
+  if (title.endsWith(" time") || title === "minecraft") return formatDurationSeconds(value);
   if (title.includes("cookie clicker")) return formatCookieClickerScore(value);
   const raw = String(value ?? "—");
   if (/^\d+(\.\d+)?$/.test(raw)) return Number(raw).toLocaleString("en-US", { maximumFractionDigits: 3 });
