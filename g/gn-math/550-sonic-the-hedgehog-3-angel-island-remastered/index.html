@@ -8,6 +8,35 @@
 </script><!doctype html>
 <html lang="en-us">
 <head>
+<script>
+/* A page on this site cannot register a service worker hosted on a different
+   origin (for example jsDelivr). Skip only those impossible registrations;
+   keep same-origin registrations untouched so the game can still run online. */
+(() => {
+  if (!("serviceWorker" in navigator)) return;
+  const serviceWorkers = navigator.serviceWorker;
+  const nativeRegister = serviceWorkers.register.bind(serviceWorkers);
+  serviceWorkers.register = function(scriptURL, options) {
+    let target;
+    try { target = new URL(scriptURL, document.baseURI); }
+    catch { return nativeRegister(scriptURL, options); }
+    if (target.origin !== location.origin) {
+      const scope = new URL("./", location.href).href;
+      return Promise.resolve({
+        scope,
+        active: null,
+        installing: null,
+        waiting: null,
+        update: () => Promise.resolve(),
+        unregister: () => Promise.resolve(true),
+        addEventListener: () => {},
+        removeEventListener: () => {}
+      });
+    }
+    return nativeRegister(scriptURL, options);
+  };
+})();
+</script>
 <base href="https://cdn.jsdelivr.net/gh/waycrosspublicmedia/assets/sonic3/">
 <link rel="apple-touch-icon" sizes="256x256" href="icon.png">
 <link rel="manifest" href="manifest.json">
