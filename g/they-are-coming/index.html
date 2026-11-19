@@ -190,9 +190,11 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#080b12;col
     message.textContent="Starting game engine…";
     var codeUrl=await mergeWasmParts();
     var dataUrl=await prepareDataFile();
+    var frameworkResponse=await fetchGameAsset("zombieshooterdone.framework.js",{cache:"force-cache"});
+    var frameworkUrl=URL.createObjectURL(await frameworkResponse.blob());
     var config={
       dataUrl:dataUrl,
-      frameworkUrl:buildUrl+"/zombieshooterdone.framework.js",
+      frameworkUrl:frameworkUrl,
       codeUrl:codeUrl,
       wasmFileSize:window.arcadeAtlasWasmSize,
       streamingAssetsUrl:"StreamingAssets",
@@ -201,12 +203,8 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#080b12;col
       productVersion:"1.19"
     };
     var loader=document.createElement("script");
-    loader.src=buildUrl+"/zombieshooterdone.loader.js";
-    loader.onerror=function(){
-      if(loader.dataset.cdnFallback==="1"){fail("Could not download the Unity loader from GitHub or the fallback CDN.");return;}
-      loader.dataset.cdnFallback="1";
-      loader.src=cdnBuildUrl+"/zombieshooterdone.loader.js";
-    };
+    var loaderResponse=await fetchGameAsset("zombieshooterdone.loader.js",{cache:"force-cache"});
+    loader.src=URL.createObjectURL(await loaderResponse.blob());
     loader.onload=function(){
       if(typeof createUnityInstance!=="function"){fail("Unity loader did not initialize.");return;}
       createUnityInstance(canvas,config,function(value){
