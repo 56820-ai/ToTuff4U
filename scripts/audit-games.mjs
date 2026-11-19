@@ -1006,7 +1006,7 @@ console.log(JSON.stringify({
   connectFourOk: !!uiAudit.connectFour.ok
 }, null, 2));
 const failedUiChecks = [
-  ["leaderboard", uiAudit.leaderboard.status === 200 && uiAudit.leaderboard.dailyStreakLogo === "../images/daily-pick-streak.svg" && uiAudit.leaderboard.dailyStreakIconStatus === 200 && uiAudit.leaderboard.scoreFormatting?.numeric === "1,234,567" && uiAudit.leaderboard.scoreFormatting?.duration === "1d 1h 1m 1s" && uiAudit.leaderboard.scoreFormatting?.storyMode === "12,345" && uiAudit.leaderboard.scoreFormatting?.reaction === "0:01.234" && uiAudit.leaderboard.scoreFormatting?.cookieClicker === "5.34 quintillion" && uiAudit.leaderboard.scoreFormatting?.cookieTenBillion === "10.00 billion" && uiAudit.leaderboard.scoreFormatting?.cookieTwoHundredZeroes === "100.00 sexsexagintillion"],
+  ["leaderboard", uiAudit.leaderboard.status === 200 && uiAudit.leaderboard.dailyStreakLogo === "../images/daily-pick-streak.svg" && uiAudit.leaderboard.dailyStreakIconStatus === 200 && uiAudit.leaderboard.scoreFormatting?.numeric === "1,234,567" && uiAudit.leaderboard.scoreFormatting?.duration === "1 day, 1 hour, 1 minute, and 1 second" && uiAudit.leaderboard.scoreFormatting?.storyMode === "3 hours, 25 minutes, and 45 seconds" && uiAudit.leaderboard.scoreFormatting?.reaction === "0:01.234" && uiAudit.leaderboard.scoreFormatting?.cookieClicker === "5.34 quintillion" && uiAudit.leaderboard.scoreFormatting?.cookieTenBillion === "10.00 billion" && uiAudit.leaderboard.scoreFormatting?.cookieTwoHundredZeroes === "100.00 sexsexagintillion"],
   ["catalog and cross-tab preferences", !!uiAudit.catalog.ok],
   ["playlists", !!uiAudit.collections.ok],
   ["Daily Pick", !!uiAudit.dailyPick.ok],
