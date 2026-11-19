@@ -297,6 +297,9 @@ try {
     scoreFormatting: typeof window.arcadeAtlasFormatScore === "function" ? {
       numeric: window.arcadeAtlasFormatScore("1234567", "Pong"),
       duration: window.arcadeAtlasFormatScore("90061", "Minecraft"),
+      shortDuration: window.arcadeAtlasFormatScore("125", "Blocky Combat SWAT Time"),
+      longDuration: window.arcadeAtlasFormatScore("2175844", "Minecraft"),
+      zeroDuration: window.arcadeAtlasFormatScore("0", "Minecraft"),
       storyMode: window.arcadeAtlasFormatScore("12345", "Minecraft: Story Mode"),
       reaction: window.arcadeAtlasFormatScore("8766", "Reaction Test"),
       cookieClicker: window.arcadeAtlasFormatScore("5340000000000000000", "Cookie Clicker"),
