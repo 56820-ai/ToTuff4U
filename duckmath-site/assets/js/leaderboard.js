@@ -96,9 +96,13 @@ function formatScore(value, gameTitle) {
   if (title.includes("time") || title.includes("minecraft")) return formatDurationSeconds(value);
   if (title.includes("cookie clicker")) return formatCookieClickerScore(value);
   const raw = String(value ?? "—");
-  if (/^\\d+(\\.\\d+)?$/.test(raw)) return Number(raw).toLocaleString("en-US", { maximumFractionDigits: 3 });
+  if (/^\d+(\.\d+)?$/.test(raw)) return Number(raw).toLocaleString("en-US", { maximumFractionDigits: 3 });
   return raw;
 }
+
+// Expose pure formatters for the browser audit and keep score formatting consistent.
+window.arcadeAtlasFormatScore = formatScore;
+window.arcadeAtlasFormatCookieClickerScore = formatCookieClickerScore;
 
 function makeScoreRow(row, rank) {
   const card = document.createElement("article");
