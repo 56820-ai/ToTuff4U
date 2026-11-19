@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="google-site-verification" content="uBDEapMmF1jmMtAC2MZve959FPIf4xm0gGhv3RCUUpA">
+  <title>Slope Plus · Arcade Atlas</title>
+  <meta name="description" content="Play the official Slope Plus browser game with seeded runs and custom maps inside Arcade Atlas.">
+  <style>
+    *{box-sizing:border-box}
+    html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#080d18;color:#fff;font-family:system-ui,-apple-system,Segoe UI,sans-serif}
+    .shell{height:100%;display:flex;flex-direction:column}
+    header{height:52px;flex:0 0 52px;display:flex;align-items:center;gap:14px;padding:0 16px;background:#101a2c;border-bottom:1px solid #263754}
+    header a{color:#9be9ff;text-decoration:none;font-weight:700}
+    header strong{font-size:15px;letter-spacing:.02em}
+    header span{margin-left:auto;color:#a9b7cc;font-size:12px}
+    main{flex:1;min-height:0;position:relative}
+    iframe{display:block;width:100%;height:100%;border:0;background:#000}
+    .notice{position:absolute;left:12px;right:12px;bottom:10px;pointer-events:none;text-align:center;color:#aebbd0;font-size:11px;text-shadow:0 1px 3px #000}
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <a href="../../index.html">← Arcade Atlas</a>
+      <strong>SLOPE PLUS</strong>
+      <span>Official version · Seeded Runs · Custom Games</span>
+    </header>
+    <main>
+      <iframe
+        src="https://coweggs.itch.io/slope-plus"
+        title="Official Slope Plus game by coweggs"
+        allow="autoplay; fullscreen; gamepad"
+        allowfullscreen
+        referrerpolicy="strict-origin-when-cross-origin">
+      </iframe>
+      <div class="notice">Official Slope Plus player embedded from its publisher</div>
+    </main>
+  </div>
+</body>
+</html>
