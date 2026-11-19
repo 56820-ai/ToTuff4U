@@ -13365,6 +13365,22 @@
       "developerUrl": "https://store.steampowered.com/app/376870/Minecraft_Story_Mode_A_Telltale_Games_Series/",
       "sourceRepository": "https://github.com/gn-math/html",
       "source": "https://github.com/gn-math/html"
+    },
+    {
+      "title": "Slope Plus",
+      "path": "https://coweggs.itch.io/slope-plus",
+      "image": "./images/slope-plus-card.svg",
+      "category": "RACING",
+      "description": "Play the official Slope Plus browser game by coweggs. Set seeds, replay runs, and load custom maps.",
+      "tags": [
+        "slope",
+        "seeded runs",
+        "custom maps",
+        "racing"
+      ],
+      "developer": "coweggs",
+      "developerUrl": "https://coweggs.itch.io",
+      "source": "https://coweggs.itch.io/slope-plus"
     }
   ]
 }
