@@ -72,21 +72,34 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#080b12;col
   }
   async function mergeWasmParts(){
     var urls=[0,1,2,3].map(function(i){return buildUrl+"/zombieshooterdone.wasm.br.part"+i;});
-    var responses=await Promise.all(urls.map(function(url){return fetch(url);}));
+    message.textContent="Downloading game engine parts…";
+    var responses=await Promise.all(urls.map(function(url){return fetch(url,{cache:"force-cache"});}));
     responses.forEach(function(response){if(!response.ok)throw new Error("Could not download a game file ("+response.status+").");});
     var parts=await Promise.all(responses.map(function(response){return response.arrayBuffer();}));
     var total=parts.reduce(function(sum,part){return sum+part.byteLength;},0);
     var merged=new Uint8Array(total),offset=0;
     parts.forEach(function(part){merged.set(new Uint8Array(part),offset);offset+=part.byteLength;});
-    return URL.createObjectURL(new Blob([merged],{type:"application/wasm+br"}));
+    message.textContent="Preparing compressed game engine…";
+    // Blob URLs cannot send Content-Encoding: br. Decompress the merged Brotli
+    // stream before handing it to Unity as a real WebAssembly binary.
+    var brotliModule=await import("https://unpkg.com/brotli-wasm@3.0.0/index.web.js?module");
+    var brotli=await (brotliModule.default||brotliModule);
+    var wasm=brotli.decompress(merged);
+    if(!(wasm instanceof Uint8Array))wasm=new Uint8Array(wasm);
+    if(wasm[0]!==0||wasm[1]!==97||wasm[2]!==115||wasm[3]!==109){
+      throw new Error("The downloaded engine did not decompress into a valid WebAssembly file.");
+    }
+    window.arcadeAtlasWasmSize=wasm.byteLength;
+    return URL.createObjectURL(new Blob([wasm],{type:"application/wasm"}));
   }
   async function boot(){
-    message.textContent="Downloading game engine…";
+    message.textContent="Starting game engine…";
     var codeUrl=await mergeWasmParts();
     var config={
       dataUrl:buildUrl+"/zombieshooterdone.data.br",
       frameworkUrl:buildUrl+"/zombieshooterdone.framework.js",
       codeUrl:codeUrl,
+      wasmFileSize:window.arcadeAtlasWasmSize,
       streamingAssetsUrl:"StreamingAssets",
       companyName:"OnHitDev",
       productName:"They Are Coming",
