@@ -71,77 +71,66 @@ function formatCookieClickerScore(value) {
 
 function formatDurationSeconds(value) {
   const total = Math.max(0, Math.floor(Number(value) || 0));
-  const units = [
-    ["day", 86400],
-    ["hour", 3600],
-    ["minute", 60],
-    ["second", 1]
-  ];
-  let remaining = total;
+  const days = Math.floor(total / 86400);
+  const hours = Math.floor((total % 86400) / 3600);
+  const minutes = Math.floor((total % 3600) / 60);
+  const seconds = total % 60;
   const parts = [];
-  for (const [unit, size] of units) {
-    const amount = Math.floor(remaining / size);
-    remaining %= size;
-    if (amount || (unit === "second" && parts.length === 0)) {
-      parts.push(amount + " " + unit + (amount === 1 ? "" : "s"));
-    }
-  }
-  return parts.join(", ");
+  if (days) parts.push(days + "d");
+  if (hours || days) parts.push(hours + "h");
+  if (minutes || hours || days) parts.push(minutes + "m");
+  if (seconds || !parts.length) parts.push(seconds + "s");
+  return parts.join(" ");
+}
+
+function formatReactionTime(value) {
+  const elapsedMs = Math.max(0, 10000 - Number(value));
+  const minutes = Math.floor(elapsedMs / 60000);
+  const seconds = ((elapsedMs % 60000) / 1000).toFixed(3).padStart(6, "0");
+  return minutes + ":" + seconds;
 }
 
 function formatScore(value, gameTitle) {
   const title = String(gameTitle || "").trim().toLowerCase();
-  if (title === "reaction test") {
-    // The game stores 10,000 - elapsed milliseconds so faster reactions rank higher.
-    const elapsedMs = Math.max(0, 10000 - Number(value));
-    return (elapsedMs / 1000).toFixed(3) + " seconds";
-  }
-  if (title.includes("time") || title.includes("minecraft")) {
-    return formatDurationSeconds(value);
-  }
-  if (title === "cookie clicker") {
-    return formatCookieClickerScore(value);
-  }
+  if (title.includes("reaction test")) return formatReactionTime(value);
+  if (title.includes("time") || title.includes("minecraft")) return formatDurationSeconds(value);
+  if (title.includes("cookie clicker")) return formatCookieClickerScore(value);
   const raw = String(value ?? "—");
-  if (/^\d+(\.\d+)?$/.test(raw)) return Number(raw).toLocaleString("en-US", { maximumFractionDigits: 3 });
+  if (/^\\d+(\\.\\d+)?$/.test(raw)) return Number(raw).toLocaleString("en-US", { maximumFractionDigits: 3 });
   return raw;
 }
 
-function makePodiumCard(row, rank) {
+function makeScoreRow(row, rank) {
   const card = document.createElement("article");
-  card.className = "podium-card podium-rank-" + rank;
-  card.setAttribute("aria-label", "Rank " + rank + ": " + (row.player_name || "Unknown player"));
-  const medal = document.createElement("div");
-  medal.className = "podium-medal";
-  medal.textContent = MEDALS[rank - 1];
-  const place = document.createElement("p");
-  place.className = "podium-place";
-  place.textContent = rank === 1 ? "1st Place" : rank === 2 ? "2nd Place" : "3rd Place";
+  card.className = "score-row rank-" + rank;
+  const rankLabel = document.createElement("span");
+  rankLabel.className = "score-rank";
+  rankLabel.textContent = rank === 1 ? "🥇 1" : rank === 2 ? "🥈 2" : "🥉 3";
   const image = document.createElement("img");
-  image.className = "podium-game-image";
+  image.className = "score-game-image";
   image.src = getGameImage(row);
   image.alt = (row.game_title || "Game") + " logo";
   image.onerror = () => { image.onerror = null; image.src = "../assets/arcade-atlas-logo.png"; };
-  const player = document.createElement("h3");
-  player.className = "podium-player";
+  const playerInfo = document.createElement("div");
+  playerInfo.className = "score-player-info";
+  const player = document.createElement("strong");
+  player.className = "score-player";
   player.textContent = row.player_name || "Unknown player";
-  const score = document.createElement("strong");
-  score.className = "podium-score";
-  score.textContent = formatScore(row.score, [row.game_title, row.game_key].filter(Boolean).join(" "));
-  const date = document.createElement("p");
-  date.className = "podium-date";
+  const date = document.createElement("span");
+  date.className = "score-date";
   date.textContent = row.created_at ? new Date(row.created_at).toLocaleDateString() : "";
-  card.append(medal, place, image, player, score, date);
+  playerInfo.append(player, date);
+  const score = document.createElement("strong");
+  score.className = "score-value";
+  score.textContent = formatScore(row.score, [row.game_title, row.game_key].filter(Boolean).join(" "));
+  card.append(rankLabel, image, playerInfo, score);
   return card;
 }
 
 async function loadArcadeAtlasLeaderboard() {
   const list = document.getElementById("score-list");
   if (!list) return;
-  const status = document.createElement("p");
-  status.className = "leaderboard-status";
-  status.textContent = "Loading live scores…";
-  list.append(status);
+  list.innerHTML = '<p class="leaderboard-status">Loading scores…</p>';
   try {
     await loadCatalogLogos();
     const response = await fetch(ARCADE_ATLAS_API + "/scores", {
@@ -150,7 +139,7 @@ async function loadArcadeAtlasLeaderboard() {
     if (!response.ok) throw new Error("Leaderboard request failed (" + response.status + ").");
     const rows = await response.json();
     if (!Array.isArray(rows)) throw new Error("Invalid leaderboard response.");
-    status.remove();
+    list.innerHTML = "";
     const grouped = new Map();
     rows.filter(row => Number(row.score) > 0).forEach(row => {
       const key = String(row.game_key || row.game_title || "other").trim().toLowerCase();
@@ -158,14 +147,17 @@ async function loadArcadeAtlasLeaderboard() {
       grouped.get(key).push(row);
     });
     if (!grouped.size) {
-      status.textContent = "No scores have been submitted yet.";
-      list.append(status);
+      list.innerHTML = '<p class="leaderboard-status">No scores have been submitted yet.</p>';
       return;
     }
+
+    const toolbar = document.createElement("div");
+    toolbar.className = "leaderboard-tools";
+    toolbar.innerHTML = '<label class="search-wrap"><span>Find a game</span><input id="game-search" type="search" placeholder="Search games…" autocomplete="off"></label><label class="sort-wrap"><span>Jump to game</span><select id="game-jump"><option value="">All games</option></select></label><span class="game-count" id="game-count"></span>';
+    list.append(toolbar);
+    const boards = [];
     [...grouped.entries()].sort((a,b) => a[0].localeCompare(b[0])).forEach(([gameKey, sourceRows]) => {
       let gameRows = sourceRows;
-      // Daily Pick Streak is a personal-best board: show each nickname once,
-      // even if an older client or stale API cache returns duplicate submissions.
       if (gameKey === "daily pick streak") {
         const bestByPlayer = new Map();
         gameRows.forEach(row => {
@@ -186,13 +178,14 @@ async function loadArcadeAtlasLeaderboard() {
       if (!gameRows.length) return;
       const title = gameRows[0].game_title || "Game";
       gameRows.sort((a,b) => {
-        if (title.toLowerCase() === "cookie clicker") {
+        if (String(title).toLowerCase() === "cookie clicker") {
           try { const x=BigInt(String(a.score)); const y=BigInt(String(b.score)); return x===y?0:x>y?-1:1; } catch {}
         }
         return Number(b.score) - Number(a.score);
       });
       const board = document.createElement("section");
       board.className = "game-board";
+      board.id = "game-" + normalizeGameKey(gameKey).replace(/\\s+/g, "-");
       const heading = document.createElement("h2");
       heading.className = "game-board-title";
       const headingImage = document.createElement("img");
@@ -202,17 +195,53 @@ async function loadArcadeAtlasLeaderboard() {
       headingImage.onerror = () => { headingImage.onerror = null; headingImage.src = "../assets/arcade-atlas-logo.png"; };
       const headingText = document.createElement("span");
       headingText.textContent = title;
-      heading.append(headingImage, headingText);
+      const total = document.createElement("span");
+      total.className = "game-board-total";
+      total.textContent = gameRows.length + (gameRows.length === 1 ? " score" : " scores");
+      heading.append(headingImage, headingText, total);
       board.append(heading);
-      const stage = document.createElement("div");
-      stage.className = "podium-stage";
-      gameRows.slice(0,3).forEach((row,index) => stage.append(makePodiumCard(row,index+1)));
-      board.append(stage);
+      const entries = document.createElement("div");
+      entries.className = "score-rows";
+      gameRows.slice(0,3).forEach((row,index) => entries.append(makeScoreRow(row,index+1)));
+      board.append(entries);
       list.append(board);
+      boards.push({board,title});
+      const option=document.createElement("option");
+      option.value=board.id;
+      option.textContent=title;
+      document.getElementById("game-jump").append(option);
     });
+
+    const search=document.getElementById("game-search");
+    const jump=document.getElementById("game-jump");
+    const count=document.getElementById("game-count");
+    const filterBoards=()=>{
+      const query=search.value.trim().toLowerCase();
+      let visible=0;
+      boards.forEach(({board,title})=>{
+        const show=title.toLowerCase().includes(query);
+        board.hidden=!show;
+        if(show) visible++;
+      });
+      count.textContent=visible+" of "+boards.length+" games";
+      if(jump.value && !document.getElementById(jump.value)?.hidden) {
+        document.getElementById(jump.value)?.scrollIntoView({behavior:"smooth",block:"start"});
+      }
+    };
+    search.addEventListener("input",()=>{
+      jump.value="";
+      filterBoards();
+    });
+    jump.addEventListener("change",()=>{
+      search.value="";
+      filterBoards();
+      if(jump.value) document.getElementById(jump.value)?.scrollIntoView({behavior:"smooth",block:"start"});
+    });
+    filterBoards();
   } catch (error) {
     console.error("Arcade Atlas leaderboard:", error);
-    status.textContent = "The live leaderboard is temporarily unavailable. Please refresh to try again.";
+    list.innerHTML = '<p class="leaderboard-status">The live leaderboard is temporarily unavailable. Please refresh to try again.</p>';
   }
 }
+
 document.addEventListener("DOMContentLoaded", loadArcadeAtlasLeaderboard);
