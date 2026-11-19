@@ -11,6 +11,23 @@
 
 <head>
 	    <base href="https://cdn.jsdelivr.net/gh/waycrosspublicmedia/whatver/catgunner/">
+<script>
+/* Resolve Construct worker assets against the game's CDN base, not this local wrapper URL. */
+(() => {
+  const NativeWorker = window.Worker;
+  if (!NativeWorker || !document.querySelector("base[href]")) return;
+  const base = document.baseURI;
+  window.Worker = class ArcadeAtlasBaseWorker extends NativeWorker {
+    constructor(url, options) {
+      let target = url;
+      if (typeof url === "string" && /^\/?scripts\/(?:c3runtime|jobworker|dispatchworker|workermain)\.js(?:[?#].*)?$/i.test(url)) {
+        target = new URL(url.replace(/^\//, ""), base).href;
+      }
+      super(target, options);
+    }
+  };
+})();
+</script>
 	<link rel="manifest" href="appmanifest.json">
 	<link rel="apple-touch-icon" sizes="128x128" href="icons/icon-128.png">
 	<link rel="apple-touch-icon" sizes="256x256" href="icons/icon-256.png">
