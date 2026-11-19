@@ -1,0 +1,119 @@
+name: Import GN Math games into Arcade Atlas
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: import-gn-math
+  cancel-in-progress: false
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Arcade Atlas
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download GN Math HTML game builds
+        run: |
+          git clone --depth 1 https://github.com/gn-math/html.git "$RUNNER_TEMP/gn-math-html"
+
+      - name: Install games as local Arcade Atlas pages
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json, os, re, shutil
+          from pathlib import Path
+          from urllib.parse import urlparse
+
+          root = Path.cwd()
+          source_root = Path(os.environ["RUNNER_TEMP"]) / "gn-math-html"
+          source_catalog = json.loads((root / "gn-math-games.json").read_text(encoding="utf-8"))
+          catalog_path = root / "games.json"
+          catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
+          games = catalog.setdefault("games", [])
+
+          existing_titles = {str(g.get("title", "")).strip().casefold() for g in games}
+          existing_paths = {str(g.get("path", "")).strip().rstrip("/") for g in games}
+          imported = []
+          skipped = []
+
+          for item in source_catalog.get("games", []):
+              source_name = Path(urlparse(item.get("path", "")).path).name
+              if not source_name:
+                  skipped.append((item.get("title", "Unknown"), "missing source filename"))
+                  continue
+              source_file = source_root / source_name
+              if not source_file.is_file():
+                  skipped.append((item.get("title", source_name), "HTML build missing"))
+                  continue
+
+              image_name = Path(urlparse(item.get("image", "")).path).stem
+              id_match = re.search(r"\d+", image_name or source_name)
+              game_id = id_match.group(0) if id_match else re.sub(r"[^a-z0-9]+", "-", source_name.casefold()).strip("-")
+              slug = re.sub(r"[^a-z0-9]+", "-", str(item.get("title", "game")).casefold()).strip("-")[:58].strip("-")
+              folder_name = f"{game_id}-{slug or 'game'}"
+              local_path = f"g/gn-math/{folder_name}"
+              html = source_file.read_text(encoding="utf-8", errors="replace")
+
+              # The GN Math HTML files are the launch documents. Their existing
+              # base URLs are intentionally preserved so game-specific bundles
+              # continue to load from the upstream locations they were built for.
+              target_dir = root / local_path
+              target_dir.mkdir(parents=True, exist_ok=True)
+              (target_dir / "index.html").write_text(html, encoding="utf-8")
+
+              record = dict(item)
+              record["path"] = local_path
+              record["source"] = "https://github.com/gn-math/html"
+              tags = list(record.get("tags") or [])
+              if not any(str(tag).casefold() == "gn math" for tag in tags):
+                  tags.insert(0, "GN Math")
+              record["tags"] = tags
+
+              title_key = str(record.get("title", "")).strip().casefold()
+              if title_key in existing_titles or local_path in existing_paths:
+                  skipped.append((record.get("title", source_name), "already listed in Arcade Atlas"))
+                  continue
+              games.append(record)
+              existing_titles.add(title_key)
+              existing_paths.add(local_path)
+              imported.append(record["title"])
+
+          catalog_path.write_text(json.dumps(catalog, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+          attribution = root / "g" / "gn-math" / "ATTRIBUTION.md"
+          attribution.parent.mkdir(parents=True, exist_ok=True)
+          attribution.write_text(
+              "# GN Math game imports\n\n"
+              "Game launch HTML files are imported from https://github.com/gn-math/html. "
+              "Game-specific payloads continue to load from the upstream locations referenced "
+              "by each original launch file; those payloads are not mirrored into this repository.\n\n"
+              "Game names, developers, descriptions, and cover references are sourced from "
+              "the repository's gn-math-games.json catalog. Individual games may have separate "
+              "third-party authors and terms.\n",
+              encoding="utf-8"
+          )
+
+          print(f"Imported {len(imported)} GN Math games.")
+          print(f"Skipped {len(skipped)} entries.")
+          print("First imports:", ", ".join(imported[:20]))
+          if skipped:
+              print("Skipped examples:", skipped[:20])
+          if not imported:
+              raise SystemExit("No GN Math games were imported; refusing to create an empty commit.")
+          PY
+
+      - name: Commit and push imported games
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add games.json g/gn-math
+          git commit -m "Import GN Math games into Arcade Atlas"
+          git pull --rebase origin main
+          git push
