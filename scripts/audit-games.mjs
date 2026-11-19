@@ -289,6 +289,7 @@ try {
     scoreFormatting: typeof window.arcadeAtlasFormatScore === "function" ? {
       numeric: window.arcadeAtlasFormatScore("1234567", "Pong"),
       duration: window.arcadeAtlasFormatScore("90061", "Minecraft"),
+      storyMode: window.arcadeAtlasFormatScore("12345", "Minecraft: Story Mode"),
       reaction: window.arcadeAtlasFormatScore("8766", "Reaction Test"),
       cookieClicker: window.arcadeAtlasFormatScore("5340000000000000000", "Cookie Clicker")
     } : null
@@ -990,7 +991,7 @@ console.log(JSON.stringify({
   connectFourOk: !!uiAudit.connectFour.ok
 }, null, 2));
 const failedUiChecks = [
-  ["leaderboard", uiAudit.leaderboard.status === 200 && uiAudit.leaderboard.dailyStreakLogo === "../images/daily-pick-streak.svg" && uiAudit.leaderboard.dailyStreakIconStatus === 200 && uiAudit.leaderboard.scoreFormatting?.numeric === "1,234,567" && uiAudit.leaderboard.scoreFormatting?.duration === "1d 1h 1m 1s" && uiAudit.leaderboard.scoreFormatting?.reaction === "0:01.234" && uiAudit.leaderboard.scoreFormatting?.cookieClicker === "5.34 quintillion"],
+  ["leaderboard", uiAudit.leaderboard.status === 200 && uiAudit.leaderboard.dailyStreakLogo === "../images/daily-pick-streak.svg" && uiAudit.leaderboard.dailyStreakIconStatus === 200 && uiAudit.leaderboard.scoreFormatting?.numeric === "1,234,567" && uiAudit.leaderboard.scoreFormatting?.duration === "1d 1h 1m 1s" && uiAudit.leaderboard.scoreFormatting?.storyMode === "12,345" && uiAudit.leaderboard.scoreFormatting?.reaction === "0:01.234" && uiAudit.leaderboard.scoreFormatting?.cookieClicker === "5.34 quintillion"],
   ["catalog and cross-tab preferences", !!uiAudit.catalog.ok],
   ["playlists", !!uiAudit.collections.ok],
   ["Daily Pick", !!uiAudit.dailyPick.ok],
