@@ -100,7 +100,7 @@ function formatReactionTime(value) {
 function formatScore(value, gameTitle) {
   const title = String(gameTitle || "").trim().toLowerCase();
   if (title.includes("reaction test")) return formatReactionTime(value);
-  if (/\btime\b/i.test(title) || title === "minecraft") return formatDurationSeconds(value);
+  if (/\btime\b/i.test(title) || /\bminecraft\b/i.test(title)) return formatDurationSeconds(value);
   if (title.includes("cookie clicker")) return formatCookieClickerScore(value);
   const raw = String(value ?? "—");
   if (/^\d+(\.\d+)?$/.test(raw)) return Number(raw).toLocaleString("en-US", { maximumFractionDigits: 3 });
