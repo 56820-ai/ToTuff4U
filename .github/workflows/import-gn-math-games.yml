@@ -77,13 +77,17 @@ jobs:
               # Load the shared CDN fallback before the game's own scripts. Keep
               # each game's original base URL and game-specific loader intact.
               fallback_tag = '<script src="../../../js/gn-math-network-fallback.js"></script>'
-              if fallback_tag not in html:
-                  if re.search(r"<base\b[^>]*>", html, flags=re.IGNORECASE):
-                      html = re.sub(r"(<base\b[^>]*>)", r"\1\n" + fallback_tag, html, count=1, flags=re.IGNORECASE)
-                  elif re.search(r"<head\b[^>]*>", html, flags=re.IGNORECASE):
-                      html = re.sub(r"(<head\b[^>]*>)", r"\1\n" + fallback_tag, html, count=1, flags=re.IGNORECASE)
-                  else:
-                      html = fallback_tag + "\n" + html
+              original_html = html
+              # Normalize any earlier placement (including before the doctype)
+              # so the loader always runs inside <head>, after the game's <base>.
+              html = html.replace(fallback_tag, "")
+              if re.search(r"<base\b[^>]*>", html, flags=re.IGNORECASE):
+                  html = re.sub(r"(<base\b[^>]*>)", r"\1\n" + fallback_tag, html, count=1, flags=re.IGNORECASE)
+              elif re.search(r"<head\b[^>]*>", html, flags=re.IGNORECASE):
+                  html = re.sub(r"(<head\b[^>]*>)", r"\1\n" + fallback_tag, html, count=1, flags=re.IGNORECASE)
+              else:
+                  html = fallback_tag + "\n" + html
+              if html != original_html:
                   target_file.write_text(html, encoding="utf-8")
                   patched += 1
 
