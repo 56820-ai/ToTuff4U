@@ -77,10 +77,11 @@ jobs:
 
               # Load the shared CDN fallback before the game's own scripts. Keep
               # each game's original base URL and game-specific loader intact.
-              fallback_tag = '<script src="../../../js/gn-math-network-fallback.js"></script>'
+              fallback_tag = '<script src="https://56820-ai.github.io/ToTuff4U/js/gn-math-network-fallback.js"></script>'
               original_html = html
-              # Normalize any earlier placement (including before the doctype)
-              # so the loader always runs inside <head>, after the game's <base>.
+              # Remove old relative tags and place the absolute GitHub Pages URL
+              # inside <head> after <base>, so the game's base cannot hijack it.
+              html = html.replace('<script src="../../../js/gn-math-network-fallback.js"></script>', "")
               html = html.replace(fallback_tag, "")
               if re.search(r"<base\b[^>]*>", html, flags=re.IGNORECASE):
                   html = re.sub(r"(<base\b[^>]*>)", r"\1\n" + fallback_tag, html, count=1, flags=re.IGNORECASE)
