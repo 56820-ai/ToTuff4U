@@ -86,16 +86,16 @@ jobs:
               # Remove any previous copy, then insert one copy with normalized
               # whitespace. This makes the importer safe to run repeatedly.
               html = html.replace(old_fallback_tag, "").replace(fallback_tag, "")
-              anchors = (r"<base\\b[^>]*>", r"<head\\b[^>]*>", r"<!doctype\\b[^>]*>")
+              anchors = (r"<base\b[^>]*>", r"<head\b[^>]*>", r"<!doctype\b[^>]*>")
               for anchor in anchors:
                   match = re.search(anchor, html, flags=re.IGNORECASE)
                   if not match:
                       continue
                   start = match.end()
                   end = start
-                  while end < len(html) and html[end] in " \\t\\r\\n":
+                  while end < len(html) and html[end] in " \t\r\n":
                       end += 1
-                  html = html[:start] + "\\n" + fallback_tag + "\\n" + html[end:]
+                  html = html[:start] + "\n" + fallback_tag + "\n" + html[end:]
                   break
               else:
                   html = fallback_tag + "\\n" + html
