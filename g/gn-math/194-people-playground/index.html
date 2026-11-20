@@ -78,17 +78,27 @@
   </script>
   <script src="https://cdn.jsdelivr.net/gh/bubbls/UGS-Assets@main/merge.js"></script>
     <script>
-      window.addEventListener("load", function () {
-        if ("serviceWorker" in navigator) {
-          navigator.serviceWorker.register("ServiceWorker.js");
-        }
-      });
-
-      var canvas = document.querySelector("#unity-canvas");
+var canvas = document.querySelector("#unity-canvas");
       var xpBox = document.querySelector("#xp-loader");
       var xpFill = document.querySelector("#xp-loader-fill");
       var xpText = document.querySelector("#xp-loader-text");
       var warningBanner = document.querySelector("#unity-warning");
+      function showGameError(message) {
+        xpBox.style.display = "flex";
+        xpBox.style.zIndex = "10001";
+        xpBox.style.width = "min(420px, calc(100vw - 48px))";
+        xpBox.style.color = "#7f1d1d";
+        xpBox.style.background = "#fff1f2";
+        xpBox.style.borderColor = "#be123c";
+        xpBox.innerHTML = '<div id="xp-loader-title">People Playground could not start</div><div style="font-size:13px;line-height:1.5;overflow-wrap:anywhere"></div><button id="ppg-retry" style="padding:9px 14px;cursor:pointer">Reload game</button>';
+        xpBox.querySelector("div:nth-child(2)").textContent = String(message || "Unknown Unity loading error");
+        xpBox.querySelector("#ppg-retry").addEventListener("click", function () { location.reload(); });
+        console.error("[People Playground] Startup failed:", message);
+      }
+      canvas.addEventListener("webglcontextlost", function (event) {
+        event.preventDefault();
+        showGameError("The browser lost the WebGL graphics context. Reload the game or try enabling hardware acceleration.");
+      });
 
       function unityShowBanner(msg, type) {
         function updateBannerVisibility() {
@@ -138,8 +148,11 @@
         }).then((unityInstance) => {
           xpBox.style.display = "none";
         }).catch((message) => {
-          alert(message);
+          showGameError(message);
         });
+      };
+      script.onerror = function () {
+        showGameError("The Unity loader script could not be downloaded. Check whether the game CDN is accessible, then reload.");
       };
       document.body.appendChild(script);
     </script>
