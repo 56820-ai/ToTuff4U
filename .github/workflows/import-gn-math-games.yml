@@ -28,6 +28,9 @@ jobs:
         run: |
           git clone --depth 1 https://github.com/gn-math/html.git "$RUNNER_TEMP/gn-math-html"
 
+      - name: Sync with the latest main branch before editing
+        run: git pull --rebase origin main
+
       - name: Install games as local Arcade Atlas pages
         shell: bash
         run: |
@@ -141,5 +144,4 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add games.json g/gn-math
           git commit -m "Import GN Math games into Arcade Atlas"
-          git pull --rebase origin main
           git push
