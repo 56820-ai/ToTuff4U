@@ -78,12 +78,12 @@ jobs:
               # each game's original base URL and game-specific loader intact.
               fallback_tag = '<script src="../../../js/gn-math-network-fallback.js"></script>'
               if fallback_tag not in html:
-                  if re.search(r"<base\\b[^>]*>", html, flags=re.IGNORECASE):
-                      html = re.sub(r"(<base\\b[^>]*>)", r"\\1\\n" + fallback_tag, html, count=1, flags=re.IGNORECASE)
-                  elif re.search(r"<head\\b[^>]*>", html, flags=re.IGNORECASE):
-                      html = re.sub(r"(<head\\b[^>]*>)", r"\\1\\n" + fallback_tag, html, count=1, flags=re.IGNORECASE)
+                  if re.search(r"<base\b[^>]*>", html, flags=re.IGNORECASE):
+                      html = re.sub(r"(<base\b[^>]*>)", r"\1\n" + fallback_tag, html, count=1, flags=re.IGNORECASE)
+                  elif re.search(r"<head\b[^>]*>", html, flags=re.IGNORECASE):
+                      html = re.sub(r"(<head\b[^>]*>)", r"\1\n" + fallback_tag, html, count=1, flags=re.IGNORECASE)
                   else:
-                      html = fallback_tag + "\\n" + html
+                      html = fallback_tag + "\n" + html
                   target_file.write_text(html, encoding="utf-8")
                   patched += 1
 
