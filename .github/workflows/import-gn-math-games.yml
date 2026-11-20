@@ -81,19 +81,24 @@ jobs:
               # Load the shared CDN fallback before the game's own scripts. Keep
               # each game's original base URL and game-specific loader intact.
               fallback_tag = '<script src="https://56820-ai.github.io/ToTuff4U/js/gn-math-network-fallback.js"></script>'
+              old_fallback_tag = '<script src="../../../js/gn-math-network-fallback.js"></script>'
               original_html = html
-              # Remove old relative tags and place the absolute GitHub Pages URL
-              # inside <head> after <base>, so the game's base cannot hijack it.
-              html = html.replace('<script src="../../../js/gn-math-network-fallback.js"></script>', "")
-              html = html.replace(fallback_tag, "")
-              if re.search(r"<base\b[^>]*>", html, flags=re.IGNORECASE):
-                  html = re.sub(r"(<base\b[^>]*>)", r"\1\n" + fallback_tag, html, count=1, flags=re.IGNORECASE)
-              elif re.search(r"<head\b[^>]*>", html, flags=re.IGNORECASE):
-                  html = re.sub(r"(<head\b[^>]*>)", r"\1\n" + fallback_tag, html, count=1, flags=re.IGNORECASE)
-              elif re.search(r"<!doctype\b[^>]*>", html, flags=re.IGNORECASE):
-                  html = re.sub(r"(<!doctype\b[^>]*>)", r"\1\n" + fallback_tag, html, count=1, flags=re.IGNORECASE)
+              # Remove any previous copy, then insert one copy with normalized
+              # whitespace. This makes the importer safe to run repeatedly.
+              html = html.replace(old_fallback_tag, "").replace(fallback_tag, "")
+              anchors = (r"<base\\b[^>]*>", r"<head\\b[^>]*>", r"<!doctype\\b[^>]*>")
+              for anchor in anchors:
+                  match = re.search(anchor, html, flags=re.IGNORECASE)
+                  if not match:
+                      continue
+                  start = match.end()
+                  end = start
+                  while end < len(html) and html[end] in " \\t\\r\\n":
+                      end += 1
+                  html = html[:start] + "\\n" + fallback_tag + "\\n" + html[end:]
+                  break
               else:
-                  html = fallback_tag + "\n" + html
+                  html = fallback_tag + "\\n" + html
               if html != original_html:
                   target_file.write_text(html, encoding="utf-8")
                   patched += 1
