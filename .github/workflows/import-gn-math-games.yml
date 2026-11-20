@@ -90,6 +90,8 @@ jobs:
                   html = re.sub(r"(<base\b[^>]*>)", r"\1\n" + fallback_tag, html, count=1, flags=re.IGNORECASE)
               elif re.search(r"<head\b[^>]*>", html, flags=re.IGNORECASE):
                   html = re.sub(r"(<head\b[^>]*>)", r"\1\n" + fallback_tag, html, count=1, flags=re.IGNORECASE)
+              elif re.search(r"<!doctype\b[^>]*>", html, flags=re.IGNORECASE):
+                  html = re.sub(r"(<!doctype\b[^>]*>)", r"\1\n" + fallback_tag, html, count=1, flags=re.IGNORECASE)
               else:
                   html = fallback_tag + "\n" + html
               if html != original_html:
