@@ -36,7 +36,7 @@
     } catch (_) { return null; }
   }
 
-  // Retry failed HTML resources such as scripts, stylesheets, images, and audio.
+  // Retry failed HTML resources such as scripts, stylesheets, images, and media.
   document.addEventListener("error", function (event) {
     var el = event.target;
     if (!el || !el.getAttribute) return;
@@ -68,69 +68,5 @@
         return nativeFetch(retryInput, init);
       });
     };
-  }
-
-  // Retry dedicated workers if the first CDN host cannot serve the worker file.
-  if (window.Worker) {
-    var NativeWorker = window.Worker;
-    window.Worker = function (url, options) {
-      var original = new URL(url, document.baseURI).href;
-      var fallback = alternate(original);
-      var active = new NativeWorker(original, options);
-      if (!fallback) return active;
-      var listeners = {};
-      var handlers = { message: null, error: null, messageerror: null };
-      var retried = false;
-      function attach(worker) {
-        Object.keys(listeners).forEach(function (type) {
-          listeners[type].forEach(function (entry) {
-            worker.addEventListener(type, entry.listener, entry.options);
-          });
-        });
-        Object.keys(handlers).forEach(function (type) {
-          worker["on" + type] = handlers[type];
-        });
-      }
-      active.addEventListener("error", function (event) {
-        if (retried) return;
-        retried = true;
-        try { event.preventDefault(); } catch (_) {}
-        active.terminate();
-        try {
-          active = new NativeWorker(fallback, options);
-          attach(active);
-        } catch (error) {
-          if (handlers.error) handlers.error.call(proxy, error);
-        }
-      });
-      var proxy = new Proxy(active, {
-        get: function (_, property) {
-          if (property === "postMessage") return function () { return active.postMessage.apply(active, arguments); };
-          if (property === "terminate") return function () { return active.terminate(); };
-          if (property === "addEventListener") return function (type, listener, opts) {
-            (listeners[type] = listeners[type] || []).push({ listener: listener, options: opts });
-            active.addEventListener(type, listener, opts);
-          };
-          if (property === "removeEventListener") return function (type, listener, opts) {
-            if (listeners[type]) listeners[type] = listeners[type].filter(function (entry) { return entry.listener !== listener; });
-            active.removeEventListener(type, listener, opts);
-          };
-          if (property === "onmessage" || property === "onerror" || property === "onmessageerror") return handlers[property.slice(2)];
-          var value = active[property];
-          return typeof value === "function" ? value.bind(active) : value;
-        },
-        set: function (_, property, value) {
-          if (property === "onmessage" || property === "onerror" || property === "onmessageerror") {
-            handlers[property.slice(2)] = value;
-            active[property] = value;
-            return true;
-          }
-          active[property] = value;
-          return true;
-        }
-      });
-      return proxy;
-    };
-    window.Worker.prototype = NativeWorker.prototype;
   }
 })();
