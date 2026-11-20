@@ -46,6 +46,7 @@ jobs:
           existing_paths = {str(g.get("path", "")).strip().rstrip("/") for g in games}
           imported = []
           skipped = []
+          patched = 0
 
           for item in source_catalog.get("games", []):
               source_name = Path(urlparse(item.get("path", "")).path).name
@@ -63,14 +64,28 @@ jobs:
               slug = re.sub(r"[^a-z0-9]+", "-", str(item.get("title", "game")).casefold()).strip("-")[:58].strip("-")
               folder_name = f"{game_id}-{slug or 'game'}"
               local_path = f"g/gn-math/{folder_name}"
-              html = source_file.read_text(encoding="utf-8", errors="replace")
-
-              # The GN Math HTML files are the launch documents. Their existing
-              # base URLs are intentionally preserved so game-specific bundles
-              # continue to load from the upstream locations they were built for.
+              # Preserve locally maintained wrappers. Only use the upstream HTML
+              # when this game's local launch page does not exist or is empty.
               target_dir = root / local_path
               target_dir.mkdir(parents=True, exist_ok=True)
-              (target_dir / "index.html").write_text(html, encoding="utf-8")
+              target_file = target_dir / "index.html"
+              if target_file.is_file() and target_file.stat().st_size:
+                  html = target_file.read_text(encoding="utf-8", errors="replace")
+              else:
+                  html = source_file.read_text(encoding="utf-8", errors="replace")
+
+              # Load the shared CDN fallback before the game's own scripts. Keep
+              # each game's original base URL and game-specific loader intact.
+              fallback_tag = '<script src="../../../js/gn-math-network-fallback.js"></script>'
+              if fallback_tag not in html:
+                  if re.search(r"<base\\b[^>]*>", html, flags=re.IGNORECASE):
+                      html = re.sub(r"(<base\\b[^>]*>)", r"\\1\\n" + fallback_tag, html, count=1, flags=re.IGNORECASE)
+                  elif re.search(r"<head\\b[^>]*>", html, flags=re.IGNORECASE):
+                      html = re.sub(r"(<head\\b[^>]*>)", r"\\1\\n" + fallback_tag, html, count=1, flags=re.IGNORECASE)
+                  else:
+                      html = fallback_tag + "\\n" + html
+                  target_file.write_text(html, encoding="utf-8")
+                  patched += 1
 
               record = dict(item)
               record["path"] = local_path
@@ -105,12 +120,13 @@ jobs:
           )
 
           print(f"Imported {len(imported)} GN Math games.")
+          print(f"Added CDN fallback to {patched} existing or new game pages.")
           print(f"Skipped {len(skipped)} entries.")
           print("First imports:", ", ".join(imported[:20]))
           if skipped:
               print("Skipped examples:", skipped[:20])
-          if not imported:
-              raise SystemExit("No GN Math games were imported; refusing to create an empty commit.")
+          if not imported and not patched:
+              raise SystemExit("No new games or fallback changes were needed; refusing to create an empty commit.")
           PY
 
       - name: Commit and push imported games
