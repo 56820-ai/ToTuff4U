@@ -1,4 +1,5 @@
 name: Import GN Math games into Arcade Atlas
+# Re-run the importer to normalize the fallback script in every existing GN Math page.
 
 on:
   workflow_dispatch:
