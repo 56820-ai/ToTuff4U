@@ -76,6 +76,29 @@
         debug: true
       };  
   </script>
+  <script>
+    // Try jsDelivr for split binary chunks when raw.githubusercontent.com is blocked.
+    (function () {
+      var nativeFetch = window.fetch.bind(window);
+      var rawPrefix = "https://raw.githubusercontent.com/bubbls/ugss/main/people-playground/Build/";
+      var cdnPrefix = "https://cdn.jsdelivr.net/gh/bubbls/ugss@main/people-playground/Build/";
+      window.fetch = function (input, init) {
+        var url = typeof input === "string" ? input : (input && input.url) || String(input);
+        var request = input;
+        return nativeFetch(request, init).then(function (response) {
+          if (url.indexOf(rawPrefix) === 0 && !response.ok) {
+            return nativeFetch(cdnPrefix + url.slice(rawPrefix.length), init);
+          }
+          return response;
+        }).catch(function (error) {
+          if (url.indexOf(rawPrefix) === 0) {
+            return nativeFetch(cdnPrefix + url.slice(rawPrefix.length), init);
+          }
+          throw error;
+        });
+      };
+    })();
+  </script>
   <script src="https://cdn.jsdelivr.net/gh/bubbls/UGS-Assets@main/merge.js"></script>
     <script>
 var canvas = document.querySelector("#unity-canvas");
