@@ -1266,6 +1266,15 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
 .home-section-nav-label{margin-right:5px;color:#8da2c0;font-size:10px;font-weight:900;letter-spacing:1.4px}
 .home-section-nav button{border:1px solid #2a3a56;border-radius:999px;padding:8px 13px;background:#111d32;color:#dce8fa;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;transition:background .16s,border-color .16s,transform .16s}
 .home-section-nav button:hover,.home-section-nav button:focus-visible{background:#183047;border-color:#65e6c2;transform:translateY(-1px);outline:none}
+.atlas-editorial{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(220px,1fr);gap:22px;align-items:center;margin:24px 0 30px;padding:clamp(20px,3vw,30px);border:1px solid rgba(107,157,255,.25);border-radius:16px;background:linear-gradient(135deg,rgba(26,26,46,.96),rgba(37,37,58,.92));box-shadow:0 10px 28px rgba(0,0,0,.2)}
+.atlas-editorial-kicker{margin:0 0 8px;color:#ff8eb5;font:700 11px system-ui,sans-serif;letter-spacing:2px}
+.atlas-editorial h2{margin:0 0 10px;color:#fff;font:700 clamp(19px,2.5vw,26px) system-ui,sans-serif;line-height:1.25}
+.atlas-editorial p:not(.atlas-editorial-kicker){margin:0;color:#c9c9d8;font:15px/1.65 system-ui,sans-serif}
+.atlas-editorial-links{display:grid;gap:9px}
+.atlas-editorial-links a{display:flex;justify-content:space-between;gap:10px;padding:11px 13px;border:1px solid rgba(138,177,255,.2);border-radius:9px;background:rgba(0,0,0,.16);color:#b9d0ff;text-decoration:none;font:600 13px system-ui,sans-serif}
+.atlas-editorial-links a:hover{border-color:#ff8eb5;color:#fff}
+@media(max-width:700px){.atlas-editorial{grid-template-columns:1fr}.atlas-editorial-links{grid-template-columns:1fr}}
+
 #quick-picks-section,#favorites-heading,#collections-section,#recent-games-section,#daily-pick-section,#new-games-section,#arcade-quests,#all-games-heading{scroll-margin-top:78px}
 @media(max-width:600px){.home-section-nav{position:relative;padding:10px 14px;gap:6px}.home-section-nav-label{width:100%}.home-section-nav button{padding:7px 10px;font-size:11px}}
 </style>
@@ -1294,6 +1303,14 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
     <div class="nav-icon"><i class="fas fa-hat-wizard"></i></div>
     <div class="nav-text">Game Cheats</div>
 </a>
+        <a href="./about.html" class="nav-item">
+            <div class="nav-icon"><i class="fas fa-circle-info"></i></div>
+            <div class="nav-text">About</div>
+        </a>
+        <a href="./guides/" class="nav-item">
+            <div class="nav-icon"><i class="fas fa-book-open"></i></div>
+            <div class="nav-text">Game Guides</div>
+        </a>
         <div class="sidebar-divider"></div>
         <a href="#privacy" class="nav-item" data-page="privacy">
             <div class="nav-icon"><i class="fas fa-shield-alt"></i></div>
@@ -1376,6 +1393,10 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
                 <button type="button" onclick="document.getElementById('all-games-heading').scrollIntoView({behavior:'smooth'})">All games</button>
             </nav>
             <div class="container">
+                <section class="atlas-editorial" aria-labelledby="atlas-editorial-title">
+                    <div><p class="atlas-editorial-kicker">PLAY WITH A PLAN</p><h2 id="atlas-editorial-title">Find the right game for your kind of break</h2><p>Arcade Atlas is more than a list of launch buttons. Compare game styles, learn practical strategies, understand multiplayer modes, and get help when a browser game will not load.</p></div>
+                    <div class="atlas-editorial-links"><a href="./guides/">Read browser game guides <span aria-hidden="true">→</span></a><a href="./about.html">How Arcade Atlas works <span aria-hidden="true">→</span></a><a href="./changelog/">See catalog and site updates <span aria-hidden="true">→</span></a></div>
+                </section>
                 <div class="featured-game">
                     <div class="featured-game-info">
                         <h2 class="featured-game-title">RETRO BOWL</h2>
@@ -1579,7 +1600,7 @@ footer {border-top:1px solid rgba(160,185,220,.12);margin-top:48px}
                         <i class="fab fa-github"></i>
                     </a>
                 </div>
-                <p><a href="./privacy.html" style="color:inherit;text-decoration:underline;">Privacy Policy</a></p>
+                <p class="footer-links"><a href="./about.html">About</a> · <a href="./guides/">Game Guides</a> · <a href="./changelog/">Changelog</a> · <a href="./privacy.html" style="color:inherit;text-decoration:underline;">Privacy Policy</a></p>
                 <p>© <span id="current-year"></span> Arcade Atlas. All rights reserved.</p>
             </div>
         </footer>
